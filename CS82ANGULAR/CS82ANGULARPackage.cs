@@ -1,4 +1,6 @@
 ﻿using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.TextTemplating.VSHost;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -25,6 +27,7 @@ namespace CS82ANGULAR
     /// </remarks>
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(CS82ANGULARPackage.PackageGuidString)]
+    [ProvideMenuResource("Menus1.ctmenu", 1)]
     public sealed class CS82ANGULARPackage : AsyncPackage
     {
         /// <summary>
@@ -46,6 +49,22 @@ namespace CS82ANGULAR
             // When initialized asynchronously, the current thread may be a background thread at this point.
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+
+            ITextTemplating textTemplating = null;
+            EnvDTE80.DTE2 dte2 = null;
+            IVsThreadedWaitDialogFactory dialogFactory = null;
+
+            dte2 = await GetServiceAsync(typeof(SDTE)) as EnvDTE80.DTE2;
+            textTemplating = await GetServiceAsync(typeof(STextTemplating)) as ITextTemplating;
+            dialogFactory = await GetServiceAsync(typeof(SVsThreadedWaitDialogFactory)) as IVsThreadedWaitDialogFactory;
+
+
+            await CS82ANGULAR.Commands.CrtDbContextCommand.InitializeAsync(this);
+            await CS82ANGULAR.Commands.CrtFeatureScriptsCommand.InitializeAsync(this);
+            await CS82ANGULAR.Commands.CrtJavaScriptsCommand.InitializeAsync(this);
+            await CS82ANGULAR.Commands.CrtViewModelCommand.InitializeAsync(this);
+            await CS82ANGULAR.Commands.CrtWebApiServiceCommand.InitializeAsync(this);
         }
 
         #endregion
