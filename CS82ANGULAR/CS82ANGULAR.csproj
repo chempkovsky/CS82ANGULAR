@@ -126,6 +126,88 @@
     <Compile Include="TemplateProcessingHelpers\TPCallback.cs" />
     <Compile Include="TemplateProcessingHelpers\TPError.cs" />
     <Compile Include="TemplateProcessingHelpers\TPResult.cs" />
+    <Compile Include="ViewModel\BaseGenerateViewModel.cs" />
+    <Compile Include="ViewModel\BaseSelectSourceViewModel.cs" />
+    <Compile Include="ViewModel\BatchProcessingViewModel.cs" />
+    <Compile Include="ViewModel\CreateForeignKeyViewModel.cs" />
+    <Compile Include="ViewModel\CreatePrimaryKeyViewModel.cs" />
+    <Compile Include="ViewModel\CreateViewViewModel.cs" />
+    <Compile Include="ViewModel\CreateWebApiViewModel.cs" />
+    <Compile Include="ViewModel\FeatureViewModel.cs" />
+    <Compile Include="ViewModel\GenerateCommonStaffViewModel.cs" />
+    <Compile Include="ViewModel\GenerateDbContextViewModel.cs" />
+    <Compile Include="ViewModel\GenerateViewModel.cs" />
+    <Compile Include="ViewModel\GenerateViewPageModel.cs" />
+    <Compile Include="ViewModel\InvitationViewModel.cs" />
+    <Compile Include="ViewModel\MainWindowBase.cs" />
+    <Compile Include="ViewModel\MainWindowDbContext.cs" />
+    <Compile Include="ViewModel\MainWindowEf2Vm.cs" />
+    <Compile Include="ViewModel\MainWindowFeatureScripts.cs" />
+    <Compile Include="ViewModel\MainWindowJavaScripts.cs" />
+    <Compile Include="ViewModel\MainWindowVm2WebApi.cs" />
+    <Compile Include="ViewModel\ModifyFeatureViewModel.cs" />
+    <Compile Include="ViewModel\SelectDbContextViewModel.cs" />
+    <Compile Include="ViewModel\SelectEntityForGivenDbContextViewModel.cs" />
+    <Compile Include="ViewModel\SelectExistingViewModel.cs" />
+    <Compile Include="ViewModel\SelectFeatureFolderViewModel.cs" />
+    <Compile Include="ViewModel\SelectFolderViewModel.cs" />
+    <Compile Include="ViewModel\SelectForeignKeyViewModel.cs" />
+    <Compile Include="ViewModel\Selectt4TemplateViewModel.cs" />
+    <Compile Include="ViewModel\T4EditorViewModel.cs" />
+    <Compile Include="View\UserControlCreateForeignKey.xaml.cs">
+      <DependentUpon>UserControlCreateForeignKey.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlCreatePrimKey.xaml.cs">
+      <DependentUpon>UserControlCreatePrimKey.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlCreateView.xaml.cs">
+      <DependentUpon>UserControlCreateView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlCreateWebApi.xaml.cs">
+      <DependentUpon>UserControlCreateWebApi.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlFeature.xaml.cs">
+      <DependentUpon>UserControlFeature.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlGenerate.xaml.cs">
+      <DependentUpon>UserControlGenerate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlInvitation.xaml.cs">
+      <DependentUpon>UserControlInvitation.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlOneCommand.xaml.cs">
+      <DependentUpon>UserControlOneCommand.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlSelectExisting.xaml.cs">
+      <DependentUpon>UserControlSelectExisting.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlSelectFeatureFolder.xaml.cs">
+      <DependentUpon>UserControlSelectFeatureFolder.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlSelectFolder.xaml.cs">
+      <DependentUpon>UserControlSelectFolder.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlSelectForeignKey.xaml.cs">
+      <DependentUpon>UserControlSelectForeignKey.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlSelectSource.xaml.cs">
+      <DependentUpon>UserControlSelectSource.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlT4Editor.xaml.cs">
+      <DependentUpon>UserControlT4Editor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlT4SelectTemplate.xaml.cs">
+      <DependentUpon>UserControlT4SelectTemplate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\WindowBatch.xaml.cs">
+      <DependentUpon>WindowBatch.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\WindowCS2ANGLAR.xaml.cs">
+      <DependentUpon>WindowCS2ANGLAR.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\WindowModifyFeature.xaml.cs">
+      <DependentUpon>WindowModifyFeature.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">
@@ -149,15 +231,93 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp">
       <Version>4.0.1</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.31902.203" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.32112.339" ExcludeAssets="runtime">
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.5234" />
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.1</Version>
+    </PackageReference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <VSCTCompile Include="Commands\CS82ANGULARPackage.vsct">
       <ResourceName>Menus1.ctmenu</ResourceName>
     </VSCTCompile>
     <Content Include="Commands\Resources\CrtCommand.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="View\UserControlCreateForeignKey.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControlCreatePrimKey.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControlCreateView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControlCreateWebApi.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControlFeature.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControlGenerate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControlInvitation.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControlOneCommand.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControlSelectExisting.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControlSelectFeatureFolder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControlSelectFolder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControlSelectForeignKey.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControlSelectSource.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControlT4Editor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControlT4SelectTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\WindowBatch.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\WindowCS2ANGLAR.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\WindowModifyFeature.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
