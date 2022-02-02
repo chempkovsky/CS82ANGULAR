@@ -472,39 +472,50 @@ namespace CS82ANGULAR.ViewModel
                 string jsonString = JsonConvert.SerializeObject(CurrentDbContext);
                 File.WriteAllText(locFileName, jsonString);
             }
-            try
             {
-
+                string FlNm = "";
                 SolutionDirectory = System.IO.Path.GetDirectoryName(Dte.Solution.FullName);
-                if (CurrentUiStepId == 6)
+                try
                 {
-                    string FlNm = Path.Combine(
-                    SolutionDirectory,
-                    Path.GetDirectoryName((CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewProject),
-                    (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewFolder,
-                    (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewName
-                    + (GenerateUC.DataContext as GenerateViewModel).FileExtension);
-                    File.WriteAllText(FlNm, (GenerateUC.DataContext as GenerateViewModel).GenerateText);
-                    DestinationProject.ProjectItems.AddFromFile(FlNm);
+                    if (CurrentUiStepId == 6)
+                    {
+                        FlNm = Path.Combine(
+                        SolutionDirectory,
+                        Path.GetDirectoryName((CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewProject),
+                        (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewFolder,
+                        (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewName
+                        + (GenerateUC.DataContext as GenerateViewModel).FileExtension);
+                        File.WriteAllText(FlNm, (GenerateUC.DataContext as GenerateViewModel).GenerateText);
+                        DestinationProject.ProjectItems.AddFromFile(FlNm);
+                    }
+                    else if (CurrentUiStepId == 8)
+                    {
+                        FlNm = Path.Combine(
+                        SolutionDirectory,
+                        Path.GetDirectoryName((CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewProject),
+                        (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewFolder,
+                        (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.PageViewName
+                        //+ "." 
+                        + (GeneratePageUC.DataContext as GenerateViewPageModel).FileExtension);
+                        File.WriteAllText(FlNm, (GeneratePageUC.DataContext as GenerateViewPageModel).GenerateText);
+                        DestinationProject.ProjectItems.AddFromFile(FlNm);
+                    }
                 }
-                else if (CurrentUiStepId == 8)
+                catch (Exception e)
                 {
-                    string FlNm = Path.Combine(
-                    SolutionDirectory,
-                    Path.GetDirectoryName((CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewProject),
-                    (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewFolder,
-                    (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.PageViewName
-                    //+ "." 
-                    + (GeneratePageUC.DataContext as GenerateViewPageModel).FileExtension);
-                    File.WriteAllText(FlNm, (GeneratePageUC.DataContext as GenerateViewPageModel).GenerateText);
-                    DestinationProject.ProjectItems.AddFromFile(FlNm);
+                    MessageBox.Show("Error: Could not save generated file.  This type of exception can be thrown when EXISTING project added to the solution and developer tries to update VS project repository. Original Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
                 }
-
-                MessageBox.Show(SuccessNotification, "Done", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                try
+                {
+                    DestinationProject.ProjectItems.AddFromFile(FlNm);
+                    MessageBox.Show(SuccessNotification, "Done", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Error: Could not update VS Solution repository file. This type of exception can be thrown when existing project added to the solution and developer tries to update VS project repository.  Original Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
             }
         }
 

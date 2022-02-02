@@ -336,6 +336,30 @@ namespace CS82ANGULAR.ViewModel
                             SelectedItem = _SelectedTreeViewItem;
                             FAPIAttributePropertyVisibility = Visibility.Visible;
                         }
+
+                        else if (_SelectedTreeViewItem is ModelViewAttributeSerializable)
+                        {
+                            SelectedItem = _SelectedTreeViewItem;
+                            AttributeVisibility = Visibility.Visible;
+                        }
+                        else if (_SelectedTreeViewItem is ModelViewAttributePropertySerializable)
+                        {
+                            SelectedItem = _SelectedTreeViewItem;
+                            AttributePropertyVisibility = Visibility.Visible;
+                        }
+
+
+                        else if (_SelectedTreeViewItem is ModelViewFAPIAttributeSerializable)
+                        {
+                            SelectedItem = _SelectedTreeViewItem;
+                            AttributeVisibility = Visibility.Visible;
+                        }
+                        else if (_SelectedTreeViewItem is ModelViewFAPIAttributePropertySerializable)
+                        {
+                            SelectedItem = _SelectedTreeViewItem;
+                            AttributePropertyVisibility = Visibility.Visible;
+                        }
+
                         else if (_SelectedTreeViewItem is ModelViewUIFormProperty)
                         {
                             ModelViewUIFormProperty modelViewUIFormProperty = _SelectedTreeViewItem as ModelViewUIFormProperty;
@@ -867,7 +891,7 @@ namespace CS82ANGULAR.ViewModel
 
             return result;
         }
-        public ModelViewSerializable GetSelectedModelCommonShallowCopy(string FileType, string FileName)
+        public ModelViewSerializable GetSelectedModelCommonShallowCopy(string FileType, string FileName, string T4Template)
         {
             if (SelectedModel == null) return null;
             ModelViewSerializable result = SelectedModel.ModelViewSerializableGetShallowCopy();
@@ -886,7 +910,8 @@ namespace CS82ANGULAR.ViewModel
                     FileName = c.FileName,
                     FileProject = c.FileProject,
                     FileDefaultProjectNameSpace = c.FileDefaultProjectNameSpace,
-                    FileFolder = c.FileFolder
+                    FileFolder = c.FileFolder,
+                    T4Template = c.T4Template
                 }));
             }
             CommonStaffSerializable commonStaffItem =
@@ -903,7 +928,7 @@ namespace CS82ANGULAR.ViewModel
             commonStaffItem.FileProject = this.DestinationProject;
             commonStaffItem.FileDefaultProjectNameSpace = this.DefaultProjectNameSpace;
             commonStaffItem.FileFolder = this.DestinationFolder;
-
+            commonStaffItem.T4Template = T4Template;
             result.ScalarProperties = new List<ModelViewPropertyOfVwSerializable>();
             if (ScalarProperties != null)
             {
@@ -966,7 +991,8 @@ namespace CS82ANGULAR.ViewModel
             SelectedTreeViewItem = null;
             ModelViews.Clear();
             if (SerializableDbContext == null) return;
-            if ((SerializableDbContext.ModelViews == null) && IsWebServiceEditable) return;
+            //if ((SerializableDbContext.ModelViews == null) && IsWebServiceEditable) return;
+            if (SerializableDbContext.ModelViews == null) return;
 
             if ((SerializableDbContext.ModelViews.Count < 1) && IsWebServiceEditable) return;
 
@@ -1109,7 +1135,7 @@ namespace CS82ANGULAR.ViewModel
                     if (SelectedModel.AllProperties.Count > 0)
                     {
                         IsViewHasAllRequiredProperties = true;
-                        foreach (ModelViewKeyPropertySerializable prop in SelectedModel.AllProperties)
+                        foreach (ModelViewEntityPropertySerializable prop in SelectedModel.AllProperties)
                         {
                             if (!prop.IsRequired) continue;
                             if (SelectedModel.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == prop.OriginalPropertyName)) continue;

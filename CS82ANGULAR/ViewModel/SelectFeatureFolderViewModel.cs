@@ -335,7 +335,7 @@ namespace CS82ANGULAR.ViewModel
 
         #endregion
 
-        public FeatureSerializable GetSelectedFeatureCommonShallowCopy(string FileType, string FileName)
+        public FeatureSerializable GetSelectedFeatureCommonShallowCopy(string FileType, string FileName, string T4Template)
         {
             FeatureSerializable result = null;
             if (SelectedFeature == null) return result;
@@ -355,6 +355,7 @@ namespace CS82ANGULAR.ViewModel
             commonStaffItem.FileProject = this.DestinationProjectName;
             commonStaffItem.FileDefaultProjectNameSpace = this.DefaultProjectNameSpace;
             commonStaffItem.FileFolder = this.DestinationFolder;
+            commonStaffItem.T4Template = T4Template;
             return result;
         }
 

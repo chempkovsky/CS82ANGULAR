@@ -255,23 +255,33 @@ namespace CS82ANGULAR.ViewModel
                 string jsonString = JsonConvert.SerializeObject(localDbContext);
                 File.WriteAllText(locFileName, jsonString);
             }
-
-            try
             {
-                SolutionDirectory = System.IO.Path.GetDirectoryName(Dte.Solution.FullName);
-                string FlNm = Path.Combine(
-                    SolutionDirectory,
-                    Path.GetDirectoryName(modelViewSerializable.WebApiServiceProject),
-                    modelViewSerializable.WebApiServiceFolder,
-                    modelViewSerializable.WebApiServiceName
-                    + (GenerateUC.DataContext as GenerateCommonStaffViewModel).FileExtension);
-                File.WriteAllText(FlNm, (GenerateUC.DataContext as GenerateCommonStaffViewModel).GenerateText);
-                DestinationProject.ProjectItems.AddFromFile(FlNm);
-                MessageBox.Show(SuccessNotification, "Done", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                string FlNm = "";
+                try
+                {
+                    SolutionDirectory = System.IO.Path.GetDirectoryName(Dte.Solution.FullName);
+                    FlNm = Path.Combine(
+                        SolutionDirectory,
+                        Path.GetDirectoryName(modelViewSerializable.WebApiServiceProject),
+                        modelViewSerializable.WebApiServiceFolder,
+                        modelViewSerializable.WebApiServiceName
+                        + (GenerateUC.DataContext as GenerateCommonStaffViewModel).FileExtension);
+                    File.WriteAllText(FlNm, (GenerateUC.DataContext as GenerateCommonStaffViewModel).GenerateText);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Error: Error: Could not save generated file. This type of exception can be thrown when EXISTING project added to the solution and developer tries to update VS project repository.  Original Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                try
+                {
+                    DestinationProject.ProjectItems.AddFromFile(FlNm);
+                    MessageBox.Show(SuccessNotification, "Done", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Error: Could not update VS Solution repository file. This type of exception can be thrown when EXISTING project added to the solution and developer tries to update VS project repository.  Original Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
         #endregion

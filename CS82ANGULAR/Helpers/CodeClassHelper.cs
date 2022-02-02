@@ -11,7 +11,7 @@ using VSLangProj;
 
 namespace CS82ANGULAR.Helpers
 {
-#pragma warning disable VSTHRD010
+    #pragma warning disable VSTHRD010
     public static class CodeClassHelper
     {
         // System.DateTime ss; //not null (struct)
@@ -2357,7 +2357,7 @@ namespace CS82ANGULAR.Helpers
 
             if (SelectedModel.AllProperties == null)
             {
-                SelectedModel.AllProperties = new ObservableCollection<ModelViewKeyProperty>();
+                SelectedModel.AllProperties = new ObservableCollection<ModelViewEntityProperty>();
             }
             else
             {
@@ -2365,7 +2365,7 @@ namespace CS82ANGULAR.Helpers
             }
             foreach (ModelViewProperty scalarProperty in SelectedModel.ScalarProperties)
             {
-                SelectedModel.AllProperties.Add(new ModelViewKeyProperty()
+                SelectedModel.AllProperties.Add(new ModelViewEntityProperty()
                 {
                     OriginalPropertyName = scalarProperty.OriginalPropertyName,
                     TypeFullName = scalarProperty.TypeFullName,
@@ -2373,7 +2373,9 @@ namespace CS82ANGULAR.Helpers
                     IsRequired = scalarProperty.IsRequired,
                     UnderlyingTypeName = scalarProperty.UnderlyingTypeName,
                     ViewPropertyName = scalarProperty.ViewPropertyName,
-                    JsonPropertyName = scalarProperty.JsonPropertyName
+                    JsonPropertyName = scalarProperty.JsonPropertyName,
+                    Attributes = scalarProperty.Attributes.CloneModelViewAttributeCollection(),
+                    FAPIAttributes = scalarProperty.FAPIAttributes.CloneModelViewFAPIAttributeCollection()
                 });
             }
             return SelectedModel;
@@ -2383,4 +2385,5 @@ namespace CS82ANGULAR.Helpers
             throw new NotImplementedException();
         }
     }
+
 }

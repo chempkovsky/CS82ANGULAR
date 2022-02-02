@@ -207,7 +207,8 @@ namespace CS82ANGULAR.ViewModel
                             (SelectFeatureFolderUC.DataContext as SelectFeatureFolderViewModel).SerializableFeatureContext,
                             (SelectFeatureFolderUC.DataContext as SelectFeatureFolderViewModel).GetSelectedFeatureCommonShallowCopy(
                                 (SelectFeatureFolderUC.DataContext as SelectFeatureFolderViewModel).T4SelectedFolder,
-                                (SelectFeatureFolderUC.DataContext as SelectFeatureFolderViewModel).FileName),
+                                (SelectFeatureFolderUC.DataContext as SelectFeatureFolderViewModel).FileName,
+                                (T4EditorUC.DataContext as T4EditorViewModel).T4SelectedTemplate),
                                 (FeatureUC.DataContext as FeatureViewModel).AllowedFileTypes,
                                 (InvitationUC.DataContext as InvitationViewModel).DefaultProjectNameSpace
                             );

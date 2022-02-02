@@ -16,6 +16,7 @@ using System.Collections.ObjectModel;
 
 namespace CS82ANGULAR.Helpers.BatchProcess
 {
+    #pragma warning disable VSTHRD010
     public static class BatchSettingsHelper
     {
         public static BatchSettings ReadBatchSettingsFromString(string jsonString)
@@ -96,7 +97,7 @@ namespace CS82ANGULAR.Helpers.BatchProcess
                                             ObservableCollection<ModelViewUIFormProperty> UIFormProperties,
                                             ObservableCollection<ModelViewUIListProperty> UIListProperties,
                                             string DestinationProject, string DefaultProjectNameSpace, string DestinationFolder, string DestinationSubFolder,
-                                            string FileType, string FileName)
+                                            string FileType, string FileName, string T4Template)
         {
             ModelViewSerializable result = SelectedModel.ModelViewSerializableGetShallowCopy();
 
@@ -115,6 +116,7 @@ namespace CS82ANGULAR.Helpers.BatchProcess
                     FileProject = c.FileProject,
                     FileDefaultProjectNameSpace = c.FileDefaultProjectNameSpace,
                     FileFolder = c.FileFolder,
+                    T4Template = c.T4Template
                     //FileTypeData = c.FileTypeData
                 }));
             }
@@ -131,6 +133,7 @@ namespace CS82ANGULAR.Helpers.BatchProcess
             commonStaffItem.FileName = FileName;
             commonStaffItem.FileProject = DestinationProject;
             commonStaffItem.FileDefaultProjectNameSpace = DefaultProjectNameSpace;
+            commonStaffItem.T4Template = T4Template;
             if (string.IsNullOrEmpty(DestinationSubFolder))
             {
                 commonStaffItem.FileFolder = DestinationFolder;
@@ -176,7 +179,7 @@ namespace CS82ANGULAR.Helpers.BatchProcess
                                         string DestinationProjectRootFolder,
                                         string DestinationFolder,
                                         string DestinationSubFolder,
-                                        string FileName, string FileExtension,
+                                        string FileName, string FileExtension, string T4Template,
                                         string GenerateText)
         {
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
@@ -193,6 +196,7 @@ namespace CS82ANGULAR.Helpers.BatchProcess
                 if (commonStaffSerializable != null)
                 {
                     commonStaffSerializable.Extension = FileExtension;
+                    commonStaffSerializable.T4Template = T4Template;
                 }
 
             }

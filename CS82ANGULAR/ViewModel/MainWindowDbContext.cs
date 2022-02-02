@@ -419,7 +419,15 @@ namespace CS82ANGULAR.ViewModel
 
             string FlNm = Path.Combine(GetDestinationSelItemFolder(), (SelectDbContextUC.DataContext as SelectDbContextViewModel).UiCommandProppertyName
                 + (GenerateDbContextUC.DataContext as GenerateDbContextViewModel).FileExtension);
-            File.WriteAllText(FlNm, (GenerateDbContextUC.DataContext as GenerateDbContextViewModel).GenerateText);
+            try
+            {
+                File.WriteAllText(FlNm, (GenerateDbContextUC.DataContext as GenerateDbContextViewModel).GenerateText);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error: Error: Could not save generated file. This type of exception can be thrown when EXISTING project added to the solution and developer tries to update VS project repository.  Original Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
             try
             {
                 DestinationProject.ProjectItems.AddFromFile(FlNm);
@@ -427,7 +435,7 @@ namespace CS82ANGULAR.ViewModel
             }
             catch (Exception e)
             {
-                MessageBox.Show("Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Error: Could not update VS Solution repository file. This type of exception can be thrown when EXISTING project added to the solution and developer tries to update VS project repository.  Original Error: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
         }
