@@ -1,10 +1,13 @@
-﻿using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
+﻿using CS82ANGULAR.View;
+using CS82ANGULAR.ViewModel;
+
+using EnvDTE80;
 using System;
 using System.ComponentModel.Design;
-using System.Globalization;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.Internal.VisualStudio.PlatformUI;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.TextTemplating.VSHost;
 using Task = System.Threading.Tasks.Task;
 
 namespace CS82ANGULAR.Commands
@@ -65,11 +68,17 @@ namespace CS82ANGULAR.Commands
             }
         }
 
+        IVsUIShell uiShell;
+        DTE2 dTE2;
+        ITextTemplating TextTemplating;
+        IVsThreadedWaitDialogFactory DialogFactory;
+
+
         /// <summary>
         /// Initializes the singleton instance of the command.
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
-        public static async Task InitializeAsync(AsyncPackage package)
+        public static async Task InitializeAsync(AsyncPackage package, DTE2 dTE2, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory)
         {
             // Switch to the main thread - the call to AddCommand in CrtViewModelCommand's constructor requires
             // the UI thread.
@@ -77,6 +86,11 @@ namespace CS82ANGULAR.Commands
 
             OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
             Instance = new CrtViewModelCommand(package, commandService);
+
+            Instance.uiShell = (IVsUIShell)(await package.GetServiceAsync(typeof(SVsUIShell)));
+            Instance.dTE2 = dTE2;
+            Instance.TextTemplating = textTemplating;
+            Instance.DialogFactory = dialogFactory;
         }
 
         /// <summary>
@@ -89,17 +103,22 @@ namespace CS82ANGULAR.Commands
         private void Execute(object sender, EventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
-            string title = "CrtViewModelCommand";
-
-            // Show a message box to prove we were here
-            VsShellUtilities.ShowMessageBox(
-                this.package,
-                message,
-                title,
-                OLEMSGICON.OLEMSGICON_INFO,
-                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            MainWindowEf2Vm dataContext = new MainWindowEf2Vm(dTE2, TextTemplating, DialogFactory);
+            WindowCS2ANGLAR mainWin = new WindowCS2ANGLAR(dataContext); //uiShell, dTE2, TextTemplating);
+            //get the owner of this dialog
+            IntPtr hwnd;
+            uiShell.GetDialogOwnerHwnd(out hwnd);
+            mainWin.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+            uiShell.EnableModeless(0);
+            try
+            {
+                WindowHelper.ShowModal(mainWin, hwnd);
+            }
+            finally
+            {
+                // This will take place after the window is closed.
+                uiShell.EnableModeless(1);
+            }
         }
     }
 }

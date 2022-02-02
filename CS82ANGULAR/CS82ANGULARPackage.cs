@@ -60,11 +60,11 @@ namespace CS82ANGULAR
             dialogFactory = await GetServiceAsync(typeof(SVsThreadedWaitDialogFactory)) as IVsThreadedWaitDialogFactory;
 
 
-            await CS82ANGULAR.Commands.CrtDbContextCommand.InitializeAsync(this);
-            await CS82ANGULAR.Commands.CrtFeatureScriptsCommand.InitializeAsync(this);
-            await CS82ANGULAR.Commands.CrtJavaScriptsCommand.InitializeAsync(this);
-            await CS82ANGULAR.Commands.CrtViewModelCommand.InitializeAsync(this);
-            await CS82ANGULAR.Commands.CrtWebApiServiceCommand.InitializeAsync(this);
+            await CS82ANGULAR.Commands.CrtDbContextCommand.InitializeAsync(this, dte2, textTemplating, dialogFactory);
+            await CS82ANGULAR.Commands.CrtFeatureScriptsCommand.InitializeAsync(this, dte2, textTemplating, dialogFactory);
+            await CS82ANGULAR.Commands.CrtJavaScriptsCommand.InitializeAsync(this, dte2, textTemplating, dialogFactory);
+            await CS82ANGULAR.Commands.CrtViewModelCommand.InitializeAsync(this, dte2, textTemplating, dialogFactory);
+            await CS82ANGULAR.Commands.CrtWebApiServiceCommand.InitializeAsync(this, dte2, textTemplating, dialogFactory);
         }
 
         #endregion
