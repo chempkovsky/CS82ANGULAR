@@ -170,7 +170,8 @@ namespace CS82ANGULAR.Helpers
             string propertyClassName = propertyClass.Name;
             propertyNameSpace = propertyNameSpace.Replace("." + propertyClassName, "");
 
-            if (destClass.AddNameSpace(propertyNameSpace))
+            
+            if (!destClass.AddNameSpace(propertyNameSpace))
             {
                 propertyClassName = propertyClass.FullName;
             }
@@ -180,11 +181,12 @@ namespace CS82ANGULAR.Helpers
                 destClass.AddProperty(PropertyName, PropertyName, "DbSet<" + propertyClassName + ">", -1, vsCMAccess.vsCMAccessPublic, null);
             EditPoint editPoint = codeProperty.Getter.StartPoint.CreateEditPoint();
             editPoint.Delete(codeProperty.Getter.EndPoint);
-            editPoint.Insert("get ;");
+            editPoint.Insert("get => Set<" + propertyClassName + ">();");
+//            editPoint.Insert("get ;");
 
             editPoint = codeProperty.Setter.StartPoint.CreateEditPoint();
             editPoint.Delete(codeProperty.Setter.EndPoint);
-            editPoint.Insert("set ;");
+//            editPoint.Insert("set ;");
             if (destClass.ProjectItem != null)
             {
                 if (destClass.ProjectItem.IsDirty)
