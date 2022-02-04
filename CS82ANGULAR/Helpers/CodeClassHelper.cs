@@ -20,6 +20,28 @@ namespace CS82ANGULAR.Helpers
         // System.Guid ss; //not null (struct)
         // Blob ->	System.Byte[] <- System.TimeSpan
 
+        public static bool IsCodePropertyNullable(this CodeProperty codeProperty)
+        {
+            if (codeProperty == null) return true;
+            int absoluteParentOffset = codeProperty.StartPoint.AbsoluteCharOffset;
+            int absoluteAttributesOffset = absoluteParentOffset;
+            CodeElements attribs = codeProperty.Attributes;
+            foreach (CodeElement attrib in attribs)
+            {
+                int i = attrib.GetEndPoint().AbsoluteCharOffset;
+                if (i > absoluteAttributesOffset) absoluteAttributesOffset = i;
+            }
+            string textToAnalise = codeProperty.StartPoint.CreateEditPoint().GetText(codeProperty.EndPoint)
+                .Substring(absoluteAttributesOffset - absoluteParentOffset).Replace("\n", " ").Replace("\r", " ").Replace("\t", " ").Replace("{", " ");
+            bool result = textToAnalise.IndexOf("?" + codeProperty.Name + " ") > 0;
+            if (!result)
+            {
+                int i = textToAnalise.IndexOf("?");
+                result = (i > -1) && (i < textToAnalise.IndexOf(" " + codeProperty.Name + " "));
+            }
+            return result;
+        }
+
         public static bool IsScalarTypeOrString(this CodeTypeRef codeTypeRef)
         {
             if (codeTypeRef == null) return true;
@@ -296,7 +318,10 @@ namespace CS82ANGULAR.Helpers
                 if (codeProperty.Access != vsCMAccess.vsCMAccessPublic) continue;
                 if (codeProperty.Type == null) continue;
                 if (codeProperty.Type.CodeType == null) continue;
-                if (!codeProperty.Type.IsNotNullableScalarTypeOrString()) continue;
+                // nullable columns can be part of the primary key
+                // if (!codeProperty.Type.IsNotNullableScalarTypeOrString()) continue;
+                // instead of IsNotNullableScalarTypeOrString-method we should call IsScalarTypeOrString
+                if (!codeProperty.Type.IsScalarTypeOrString()) continue;
 
                 if (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute") != null)
                 {
@@ -379,14 +404,23 @@ namespace CS82ANGULAR.Helpers
                 if (codeProperty.Access != vsCMAccess.vsCMAccessPublic) continue;
                 if (codeProperty.Type == null) continue;
                 if (codeProperty.Type.CodeType == null) continue;
-                if (!codeProperty.Type.IsNotNullableScalarTypeOrString()) continue;
+                if (!codeProperty.Type.IsNotNullableScalarTypeOrString())
+                {
+                    if (codeProperty.Type.TypeKind == vsCMTypeRef.vsCMTypeRefString)
+                    {
+                        if(codeProperty.IsCodePropertyNullable()) continue;
+                    } else
+                    {
+                        continue;
+                    }
+                }
                 if (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute") != null) continue;
 
                 if (codeProperty.Type.TypeKind == vsCMTypeRef.vsCMTypeRefString)
                 {
                     if (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.RequiredAttribute") == null)
                     {
-                        continue;
+                        if(codeProperty.IsCodePropertyNullable()) continue;
                     }
                 }
                 properties.Add(codeProperty.Name);
@@ -416,7 +450,17 @@ namespace CS82ANGULAR.Helpers
                 if (codeProperty.Access != vsCMAccess.vsCMAccessPublic) continue;
                 if (codeProperty.Type == null) continue;
                 if (codeProperty.Type.CodeType == null) continue;
-                if (!codeProperty.Type.IsNotNullableScalarTypeOrString()) continue;
+                if (!codeProperty.Type.IsNotNullableScalarTypeOrString())
+                {
+                    if (codeProperty.Type.TypeKind == vsCMTypeRef.vsCMTypeRefString)
+                    {
+                        if (codeProperty.IsCodePropertyNullable()) continue;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
                 CodeTypeRef codeTypeRef = codeProperty.Type;
                 if (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute") != null) continue;
                 bool IsNullable = false;
@@ -424,7 +468,7 @@ namespace CS82ANGULAR.Helpers
                 {
                     if (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.RequiredAttribute") == null)
                     {
-                        continue;
+                        if (codeProperty.IsCodePropertyNullable()) continue;
                     }
                     IsNullable = true;
                 }
@@ -513,7 +557,8 @@ namespace CS82ANGULAR.Helpers
                 {
                     if (codeTypeRefTypeKind == vsCMTypeRef.vsCMTypeRefString)
                     {
-                        IsNullable = true;
+                        // IsNullable = true;
+                        IsNullable = codeProperty.IsCodePropertyNullable();
                         IsRequired = (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.RequiredAttribute") != null);
                     }
                 }
@@ -1181,7 +1226,7 @@ namespace CS82ANGULAR.Helpers
                     {
                         if (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.RequiredAttribute") == null)
                         {
-                            return false;
+                            if(codeProperty.IsCodePropertyNullable()) return false;
                         }
                     }
                 }
