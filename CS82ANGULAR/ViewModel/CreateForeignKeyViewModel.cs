@@ -367,8 +367,15 @@ namespace CS82ANGULAR.ViewModel
             EntityPropertiesIndex = -1;
             if (SelectedEntity == null) return;
             if (SelectedEntity.CodeElementRef == null) return;
-            (SelectedEntity.CodeElementRef as CodeClass).
-                CollectCodeClassAllMappedScalarProperties(EntityProperties);
+            CodeClass dbContext = null;
+            if (SelectedDbContext != null)
+            {
+                if (SelectedDbContext.CodeElementRef != null)
+                {
+                    dbContext = SelectedDbContext.CodeElementRef as CodeClass;
+                }
+            }
+            (SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassAllMappedScalarPropertiesWithDbContext(EntityProperties, null, dbContext);
         }
         public void CollectEntityNonScalarProperties()
         {
@@ -435,7 +442,7 @@ namespace CS82ANGULAR.ViewModel
             {
                 int order = 0;
                 primKey.KeyProperties.ForEach(i => i.PropOrder = order++);
-                masterCodeClass.CollectCodeClassAllMappedScalarProperties(PrimaryKeyProperties, primKey.KeyProperties);
+                masterCodeClass.CollectCodeClassAllMappedScalarPropertiesWithDbContext(PrimaryKeyProperties, primKey.KeyProperties, dbContext);
             }
             List<CodeProperty> masterNavigations =
                 masterCodeClass.GetPublicMappedNonScalarPropertiesByTypeFullName(currentCodeClass.FullName);

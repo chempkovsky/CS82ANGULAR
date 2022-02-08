@@ -1,5 +1,6 @@
 ﻿using CS82ANGULAR.Model.AnalyzeOnModelCreating;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CS82ANGULAR.Helpers
 {
@@ -68,5 +69,85 @@ namespace CS82ANGULAR.Helpers
             }
             return isSatisfied;
         }
+
+        public static bool HoldsIsRequired(this FluentAPIEntityNode faen, string propName, out bool IsReq)
+        {
+            IsReq = false;
+            if ((faen == null) || string.IsNullOrEmpty(propName)) return false;
+            if (faen.Methods == null) return false;
+            bool checkProp = true;
+            bool result = false;
+            foreach (FluentAPIMethodNode m in faen.Methods)
+            {
+                if (checkProp) {
+                    if (m.MethodName == "Property")
+                    {
+                        if(m.MethodArguments != null)
+                            if(m.MethodArguments.Any(p => p == propName)) 
+                                checkProp = false; 
+                            else 
+                                return false;
+                    }
+                    continue;
+                }
+                if (m.MethodName == "IsRequired")
+                {
+                    result = true;
+                    if (m.MethodArguments != null)
+                    {
+                        IsReq = m.MethodArguments.Any(a => (a == System.Boolean.TrueString) || (a == "\"" + System.Boolean.TrueString + "\""));
+                    } 
+                    else
+                    {
+                        IsReq = false;
+                    }
+                }
+            }
+            return result;
+        }
+        public static bool HoldsIsRequired(this IList<FluentAPIEntityNode> faens, string propName, out bool IsReq)
+        {
+            IsReq = false;
+            bool result = false;
+            if (faens == null) return result;
+            foreach (FluentAPIEntityNode faen in faens)
+            {
+                bool locrslt = false;
+                if (faen.HoldsIsRequired(propName, out locrslt))
+                {
+                    result = true;
+                    IsReq = locrslt;
+                }
+            }
+            return result;
+        }
+        public static bool HoldsIgnore(this FluentAPIEntityNode faen, string propName)
+        {
+            if ((faen == null) || string.IsNullOrEmpty(propName)) return false;
+            if (faen.Methods == null) return false;
+            foreach (FluentAPIMethodNode m in faen.Methods)
+            {
+                if (m.MethodName == "Ignore")
+                {
+                    if (m.MethodArguments != null)
+                        if (m.MethodArguments.Any(a => (a == propName) || (a == "\"" + propName + "\"")))
+                            return true;
+                }
+            }
+            return false;
+        }
+        public static bool HoldsIgnore(this IList<FluentAPIEntityNode> faens, string propName)
+        {
+            if (faens == null) return false;
+            foreach (FluentAPIEntityNode faen in faens)
+            {
+                if (faen.HoldsIgnore(propName))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
     }
 }

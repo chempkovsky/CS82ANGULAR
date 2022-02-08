@@ -22,6 +22,7 @@ namespace CS82ANGULAR.Helpers.UI
                     {
                         foreach (Object itm in FolderItems)
                         {
+                            if (itm == null) continue;
                             PropertyInfo myPropInfo = itm.GetType().GetProperty(CheckPropertyName);
                             if (myPropInfo != null)
                             {

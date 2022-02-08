@@ -14,6 +14,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using System.Linq;
 
 namespace CS82ANGULAR.ViewModel
 {
@@ -207,14 +208,20 @@ namespace CS82ANGULAR.ViewModel
                 }
             }
 
-
+            
             if (EntityProperties.Count < 1)
             {
                 if (SelectedEntity != null)
                 {
                     if (SelectedEntity.CodeElementRef != null)
                     {
-                        (SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassMappedScalarNotNullProperties(EntityProperties);
+                        //(SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassMappedScalarNotNullProperties(EntityProperties);
+                        CodeClass locDbContext = null;
+                        if (SelectedDbContext != null)
+                        {
+                            locDbContext = (SelectedDbContext.CodeElementRef as CodeClass);
+                        }
+                        (SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassAllMappedScalarPropertiesWithDbContext(EntityProperties, null, locDbContext);
                         OnPropertyChanged("EntityProperties");
                     }
                 }
@@ -238,11 +245,12 @@ namespace CS82ANGULAR.ViewModel
                         {
                             FluentAPIKey primKey = new FluentAPIKey();
                             (SelectedEntity.CodeElementRef as CodeClass).CollectPrimaryKeyPropsHelper(primKey, SelectedDbContext.CodeElementRef as CodeClass);
-                            if ((primKey.KeyProperties != null) && (EntityProperties != null))
+                            if (primKey.KeyProperties != null) //&& (EntityProperties != null))
                             {
                                 int order = 0;
                                 primKey.KeyProperties.ForEach(i => i.PropOrder = order++);
-                                (SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassAllMappedScalarProperties(PrimaryKeyProperties, primKey.KeyProperties);
+                                (SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassAllMappedScalarPropertiesWithDbContext(PrimaryKeyProperties, primKey.KeyProperties, SelectedDbContext.CodeElementRef as CodeClass);
+                                // (SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassAllMappedScalarProperties(PrimaryKeyProperties, primKey.KeyProperties);
                                 //foreach (FluentAPIProperty itm in primKey.KeyProperties)
                                 //{
                                 //    FluentAPIExtendedProperty primKeyProp = EntityProperties.FirstOrDefault(e => e.PropName == itm.PropName);

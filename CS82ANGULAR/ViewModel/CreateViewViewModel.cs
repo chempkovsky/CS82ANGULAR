@@ -330,11 +330,14 @@ namespace CS82ANGULAR.ViewModel
         }
         public void OnSelectAllPropertiesChanged()
         {
-            if (SelectedModel.ScalarProperties != null)
+            if (SelectedModel != null)
             {
-                foreach (ModelViewProperty modelViewProperty in SelectedModel.ScalarProperties)
+                if (SelectedModel.ScalarProperties != null)
                 {
-                    modelViewProperty.IsSelected = SelectAllProperties;
+                    foreach (ModelViewProperty modelViewProperty in SelectedModel.ScalarProperties)
+                    {
+                        modelViewProperty.IsSelected = SelectAllProperties;
+                    }
                 }
             }
         }

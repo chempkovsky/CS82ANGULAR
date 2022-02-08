@@ -41,6 +41,55 @@ namespace CS82ANGULAR.Helpers
             }
             return result;
         }
+        public static List<FluentAPIEntityNode> GetFAPIAttributesForScalarProperties(this CodeClass srcClass, CodeClass dbContext)
+        {
+            if ((srcClass == null) || (dbContext == null)) return null;
+            string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
+            CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
+            if (codeFunction == null) return null;
+            List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
+                    {
+                        new FluentAPIEntityNode()
+                        {
+                            Methods = new List<FluentAPIMethodNode>()
+                            {
+                                new FluentAPIMethodNode() {
+                                    MethodName = "Property"
+                                }
+                            }
+                        }
+                    };
+            return codeFunction.DoAnalyzeWithFilter(classNames, filter);
+        }
+        public static List<FluentAPIEntityNode> GetFAPIAttributesAndIgnoreForScalarProperties(this CodeClass srcClass, CodeClass dbContext)
+        {
+            if ((srcClass == null) || (dbContext == null)) return null;
+            string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
+            CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
+            if (codeFunction == null) return null;
+            List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
+                    {
+                        new FluentAPIEntityNode()
+                        {
+                            Methods = new List<FluentAPIMethodNode>()
+                            {
+                                new FluentAPIMethodNode() {
+                                    MethodName = "Property"
+                                }
+                            }
+                        },
+                        new FluentAPIEntityNode()
+                        {
+                            Methods = new List<FluentAPIMethodNode>()
+                            {
+                                new FluentAPIMethodNode() {
+                                    MethodName = "Ignore"
+                                }
+                            }
+                        }
+                    };
+            return codeFunction.DoAnalyzeWithFilter(classNames, filter);
+        }
 
         public static bool IsScalarTypeOrString(this CodeTypeRef codeTypeRef)
         {
@@ -254,7 +303,7 @@ namespace CS82ANGULAR.Helpers
             primKey.SourceCount = 0;
             if (primKey.KeyProperties != null) primKey.KeyProperties.Clear();
             string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
-
+            List<FluentAPIEntityNode> ignoreNodes = null;
             if (dbContext != null)
             {
                 CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
@@ -273,6 +322,8 @@ namespace CS82ANGULAR.Helpers
                         }
                     };
                     List<FluentAPIEntityNode> entityNodes = codeFunction.DoAnalyzeWithFilter(classNames, filter);
+                    filter[0].Methods[0].MethodName = "Ignore";
+                    ignoreNodes = codeFunction.DoAnalyzeWithFilter(classNames, filter);
                     if (entityNodes != null)
                     {
                         primKey.SourceCount = entityNodes.Count;
@@ -289,6 +340,7 @@ namespace CS82ANGULAR.Helpers
                                     int i = 0;
                                     foreach (string ma in m.MethodArguments)
                                     {
+                                        if( ignoreNodes.HoldsIgnore(ma) ) continue;
                                         primKey.KeyProperties.Add(new FluentAPIProperty()
                                         {
                                             PropName = ma,
@@ -318,6 +370,10 @@ namespace CS82ANGULAR.Helpers
                 if (codeProperty.Access != vsCMAccess.vsCMAccessPublic) continue;
                 if (codeProperty.Type == null) continue;
                 if (codeProperty.Type.CodeType == null) continue;
+
+                if (ignoreNodes != null) {
+                    if (ignoreNodes.HoldsIgnore(codeProperty.Name)) continue;
+                }
                 // nullable columns can be part of the primary key
                 // if (!codeProperty.Type.IsNotNullableScalarTypeOrString()) continue;
                 // instead of IsNotNullableScalarTypeOrString-method we should call IsScalarTypeOrString
@@ -366,7 +422,7 @@ namespace CS82ANGULAR.Helpers
                     return primKey;
                 }
             }
-            string[] propNames = new string[] { "Id", srcClass.Name + "Id", };
+            //string[] propNames = new string[] { "Id", srcClass.Name + "Id", };
             if (ConventionProps != null)
             {
                 string propName = ConventionProps[0].Name;
@@ -563,6 +619,77 @@ namespace CS82ANGULAR.Helpers
                     }
                 }
 
+                if (filterItem != null) locOrder = filterItem.PropOrder;
+                FluentAPIExtendedProperty outProp = new FluentAPIExtendedProperty()
+                {
+                    PropOrder = locOrder,
+                    PropName = codePropertyName,
+                    UnderlyingTypeName = ShortTypeName,
+                    TypeFullName = codeTypeRef.AsFullName,
+                    IsNullable = IsNullable,
+                    IsRequired = IsRequired
+                };
+                properties.Add(outProp);
+            }
+            return properties;
+        }
+        // ready
+        public static IList<FluentAPIExtendedProperty> CollectCodeClassAllMappedScalarPropertiesWithDbContext(this CodeClass srcClass, IList<FluentAPIExtendedProperty> properties, List<FluentAPIProperty> filter = null, CodeClass dbContext = null)
+        {
+            if ((srcClass == null) || (properties == null))
+            {
+                return null;
+            }
+            if (dbContext == null)
+                return srcClass.CollectCodeClassAllMappedScalarProperties(properties, filter);
+            List<FluentAPIEntityNode> localFAENs = srcClass.GetFAPIAttributesAndIgnoreForScalarProperties(dbContext);
+            int order = -1;
+            foreach (CodeElement codeElement in srcClass.Members)
+            {
+                order++;
+                if (codeElement.Kind != vsCMElement.vsCMElementProperty) continue;
+                CodeProperty codeProperty = codeElement as CodeProperty;
+                string codePropertyName = codeProperty.Name;
+                FluentAPIProperty filterItem = null;
+                if (filter != null)
+                {
+                    filterItem = filter.FirstOrDefault(f => f.PropName == codePropertyName);
+                    if (filterItem == null) continue;
+                }
+                if (codeProperty.Access != vsCMAccess.vsCMAccessPublic) continue;
+                if (codeProperty.Type == null) continue;
+                if (codeProperty.Type.CodeType == null) continue;
+                CodeTypeRef codeTypeRef = codeProperty.Type;
+                if (!codeTypeRef.IsScalarTypeOrString()) continue;
+                vsCMTypeRef codeTypeRefTypeKind = codeTypeRef.TypeKind;
+                if (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute") != null) continue;
+                if (localFAENs.HoldsIgnore(codePropertyName)) continue;
+                int locOrder = codeProperty.GetColumnOrderByAttributes();
+                if (locOrder < 0) locOrder = order;
+                string ShortTypeName = "";
+                bool IsNullable = false;
+                bool IsRequired = true;
+                ShortTypeName = codeTypeRef.AsFullName;
+                if (codeTypeRefTypeKind == vsCMTypeRef.vsCMTypeRefCodeType)
+                {
+                    if (ShortTypeName.Contains("System.Nullable"))
+                    {
+                        ShortTypeName = ShortTypeName.Replace("System.Nullable", "").Replace("<", "").Replace(">", "").Replace(">", "").Replace("\n", "").Replace("\t", "").Replace("\r", "");
+                        IsNullable = true;
+                        IsRequired = false;
+                    }
+                }
+                else
+                {
+                    if (codeTypeRefTypeKind == vsCMTypeRef.vsCMTypeRefString)
+                    {
+                        // IsNullable = true;
+                        IsNullable = codeProperty.IsCodePropertyNullable();
+                        IsRequired = (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.RequiredAttribute") != null);
+                    }
+                }
+                bool locIsRequired;
+                if (localFAENs.HoldsIsRequired(codePropertyName, out locIsRequired)) IsRequired = locIsRequired;
                 if (filterItem != null) locOrder = filterItem.PropOrder;
                 FluentAPIExtendedProperty outProp = new FluentAPIExtendedProperty()
                 {
@@ -2181,7 +2308,7 @@ namespace CS82ANGULAR.Helpers
             srcClass.CollectPrimaryKeyPropsHelper(primKey, dbContext);
 
             List<FluentAPIExtendedProperty> properties = new List<FluentAPIExtendedProperty>();
-            srcClass.CollectCodeClassAllMappedScalarProperties(properties, null);
+            srcClass.CollectCodeClassAllMappedScalarPropertiesWithDbContext(properties, null, dbContext);
 
             properties.Sort((a, b) => a.PropOrder - b.PropOrder);
             if (SelectedModel.ScalarProperties == null)
@@ -2357,7 +2484,7 @@ namespace CS82ANGULAR.Helpers
                                 if (masterEntity != null)
                                 {
                                     masterKeys = new List<FluentAPIExtendedProperty>();
-                                    masterEntity.CollectCodeClassAllMappedScalarProperties(masterKeys, foreignKey.PrincipalKeyProps);
+                                    masterEntity.CollectCodeClassAllMappedScalarPropertiesWithDbContext(masterKeys, foreignKey.PrincipalKeyProps, dbContext);
                                 }
                                 destForeignKey.PrincipalKeyProps = new List<ModelViewKeyProperty>();
                                 foreignKey.PrincipalKeyProps.ForEach(fkp =>
