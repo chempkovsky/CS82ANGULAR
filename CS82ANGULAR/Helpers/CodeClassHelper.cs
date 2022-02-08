@@ -90,7 +90,6 @@ namespace CS82ANGULAR.Helpers
                     };
             return codeFunction.DoAnalyzeWithFilter(classNames, filter);
         }
-
         public static bool IsScalarTypeOrString(this CodeTypeRef codeTypeRef)
         {
             if (codeTypeRef == null) return true;
@@ -149,7 +148,6 @@ namespace CS82ANGULAR.Helpers
             }
             return true;
         }
-
         public static CodeFunction AddMethodHelper(this CodeClass destClass, string methodName, vsCMFunction Kind, vsCMTypeRef returnType, vsCMAccess Access)
         {
             if (destClass == null) return null;
@@ -446,6 +444,58 @@ namespace CS82ANGULAR.Helpers
             }
             return primKey;
         }
+        public static IList<FluentAPIEntityNode> CollectAllUniqueKeysHelper(this CodeClass srcClass, IList<FluentAPIEntityNode> UniqueKeys, CodeClass dbContext = null)
+        {
+            if ((srcClass == null) || (UniqueKeys == null)) return null;
+            UniqueKeys.Clear();
+            if(dbContext == null) return UniqueKeys;
+            CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
+            if (codeFunction == null) return UniqueKeys;
+            string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
+            List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
+            {
+                new FluentAPIEntityNode()
+                {
+                    Methods = new List<FluentAPIMethodNode>()
+                    {
+                        new FluentAPIMethodNode() {
+                            MethodName = "HasAlternateKey"
+                        }
+                    }
+                }
+            };
+            List<FluentAPIEntityNode> entityNodes = codeFunction.DoAnalyzeWithFilter(classNames, filter);
+            if(entityNodes == null) return UniqueKeys;
+            if (entityNodes.Count < 1) return UniqueKeys;
+            filter[0].Methods[0].MethodName = "Ignore";
+            List<FluentAPIEntityNode> ignoreNodes = codeFunction.DoAnalyzeWithFilter(classNames, filter);
+            List<string> mappedProps = new List<string>();
+            srcClass.CollectCodeClassAllMappedScalarProperties(mappedProps);
+            foreach (FluentAPIEntityNode enttnd in entityNodes)
+            {
+                if (enttnd.Methods == null) continue;
+                if (enttnd.Methods.Count < 1) continue;
+                foreach(FluentAPIMethodNode mthd in enttnd.Methods)
+                {
+                    if (!("HasAlternateKey".Equals(mthd.MethodName, StringComparison.OrdinalIgnoreCase))) continue;
+                    if(mthd.MethodArguments == null) continue;
+                    if (mthd.MethodArguments.Count < 1) continue;
+                    List<String> newLst = new List<String>();
+                    foreach (string mthdarg in mthd.MethodArguments)
+                    {
+                        if (ignoreNodes != null)
+                        {
+                            if (ignoreNodes.HoldsIgnore(mthdarg)) continue;
+                        }
+                        if(!mappedProps.Any(x => x.Equals(mthdarg))) continue;
+                        newLst.Add(mthdarg);
+                    }
+                    mthd.MethodArguments = newLst;
+                }
+                UniqueKeys.Add(enttnd);
+            }
+            return UniqueKeys;
+        }
         // ready
         public static IList<string> CollectCodeClassMappedScalarNotNullProperties(this CodeClass srcClass, IList<string> properties)
         {
@@ -736,6 +786,60 @@ namespace CS82ANGULAR.Helpers
             }
             return properties;
         }
+        public static void RemoveUniqueKeyDeclarations(this CodeClass srcClass, CodeClass dbContext, string UniqueKeyName)
+        {
+            if ((srcClass == null) || (dbContext == null)) return;
+            CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
+            if (codeFunction != null)
+            {
+                string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
+                List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
+                    {
+                        new FluentAPIEntityNode()
+                        {
+                            Methods = new List<FluentAPIMethodNode>()
+                            {
+                                new FluentAPIMethodNode() {
+                                    MethodName = "HasAlternateKey"
+                                },
+                                new FluentAPIMethodNode() {
+                                    MethodName = "HasName",
+                                    MethodArguments = new List<string> { UniqueKeyName }
+                                },
+                            }
+                        }
+                    };
+                codeFunction.DoRemoveInvocationWithFilter(classNames, filter);
+                dbContext.StartPoint.CreateEditPoint().SmartFormat(dbContext.EndPoint);
+                if (dbContext.ProjectItem != null) dbContext.ProjectItem.Save();
+            }
+        }
+        public static void AddUniqueKeyDeclaration(this CodeClass srcClass, CodeClass dbContext, string UniqueKeyStatement, string UniqueKeyName)
+        {
+            if (string.IsNullOrEmpty(UniqueKeyStatement) || string.IsNullOrEmpty(UniqueKeyName) || (srcClass == null) || (dbContext == null)) return;
+            srcClass.RemoveUniqueKeyDeclarations(dbContext, "\"" + UniqueKeyName.Replace("\"", "") + "\"");
+
+            string propertyNameSpace = srcClass.FullName;
+            string propertyClassName = srcClass.Name;
+            propertyNameSpace = propertyNameSpace.Replace("." + propertyClassName, "");
+            if (!dbContext.AddNameSpace(propertyNameSpace))
+            {
+                propertyClassName = srcClass.FullName;
+            }
+
+            CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
+            if (codeFunction != null)
+            {
+                codeFunction.AddStatementsToFunctionBody(UniqueKeyStatement, propertyClassName, false);
+                dbContext.StartPoint.CreateEditPoint().SmartFormat(dbContext.EndPoint);
+                if (dbContext.ProjectItem != null)
+                {
+                    dbContext.ProjectItem.Save();
+                }
+            }
+        }
+
+
         public static void RemovePrimaryKeyDeclarations(this CodeClass srcClass, CodeClass dbContext)
         {
             if ((srcClass == null) || (dbContext == null)) return;

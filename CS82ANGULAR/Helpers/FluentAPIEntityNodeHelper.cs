@@ -148,6 +148,21 @@ namespace CS82ANGULAR.Helpers
             }
             return false;
         }
-
+        public static FluentAPIEntityNode HoldsHasName(this IList<FluentAPIEntityNode> faens, string nameToFilter)
+        {
+            if ((faens == null) || (nameToFilter == null)) return null;
+            int cnt = faens.Count;
+            
+            for(int i = cnt-1; i >= 0; i--)
+            {
+                FluentAPIEntityNode faen = faens[i];
+                if (faen.Methods == null) continue;
+                FluentAPIMethodNode mthdNd = faen.Methods.FirstOrDefault(e => e.MethodName == "HasName");
+                if (mthdNd == null) continue;
+                if (mthdNd.MethodArguments == null) continue;
+                if (mthdNd.MethodArguments.Any(e=> nameToFilter.Equals(e))) return faen;
+            }
+            return null;
+        }
     }
 }

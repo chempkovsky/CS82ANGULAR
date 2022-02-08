@@ -24,6 +24,7 @@ namespace CS82ANGULAR.ViewModel
         UserControlGenerate GenerateDbContextUC = null;
         UserControlSelectSource SelectSourceEntityUC = null;
         UserControlCreatePrimKey CreatePrimKeyUC = null;
+        UserControlCreateUniqueKey CreateUniqueKeyUC = null;
         UserControlSelectForeignKey SelectForeignKeyUC = null;
         UserControlCreateForeignKey CreateForeignKeyUC = null;
         #endregion
@@ -122,10 +123,17 @@ namespace CS82ANGULAR.ViewModel
                     this.CurrentUserControl = T4Editor;
                     this.OnPropertyChanged("CurrentUserControl");
                     break;
+
                 case 201:
                     CurrentUiStepId = 3;
                     PrevBtnCommandAction(param);
                     return;
+
+                case 211:
+                    CurrentUiStepId = 200;
+                    NextBtnCommandAction(param);
+                    return;
+
                 case 301:
                     CurrentUiStepId = 4;
                     PrevBtnCommandAction(param);
@@ -352,10 +360,32 @@ namespace CS82ANGULAR.ViewModel
                     this.OnPropertyChanged("CurrentUserControl");
                     break;
                 case 201:
+                    CurrentUiStepId = 210;
+                    NextBtnCommandAction(param);
+                    break;
+                case 210:
+                    CurrentUiStepId = 211;
+                    PrevBtnEnabled = true;
+                    NextBtnEnabled = true;
+                    if (CreateUniqueKeyUC == null)
+                    {
+                        CreateUniqueKeyViewModel dataContext = new CreateUniqueKeyViewModel(Dte, TextTemplating);
+                        string TemplatesFld = TemplatePathHelper.GetTemplatePath();
+                        dataContext.TemplateFolder = Path.Combine(TemplatesFld, "HasAlternateKeyTmplst");
+                        CreateUniqueKeyUC = new UserControlCreateUniqueKey(dataContext);
+                    }
+                    (CreateUniqueKeyUC.DataContext as CreateUniqueKeyViewModel).SelectedDbContext =
+                        (SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedDbContext;
+                    (CreateUniqueKeyUC.DataContext as CreateUniqueKeyViewModel).SelectedEntity =
+                        (SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedCodeElement;
+                    (CreateUniqueKeyUC.DataContext as CreateUniqueKeyViewModel).DoAnalise();
+                    this.CurrentUserControl = CreateUniqueKeyUC;
+                    this.OnPropertyChanged("CurrentUserControl");
+                    break;
+                case 211:
                     CurrentUiStepId = 1;
                     NextBtnCommandAction(param);
                     break;
-
                 case 300:
                     CurrentUiStepId = 301;
                     PrevBtnEnabled = true;

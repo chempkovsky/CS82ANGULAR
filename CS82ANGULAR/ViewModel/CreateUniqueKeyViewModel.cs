@@ -14,12 +14,12 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
-
+using System.Linq;
 
 namespace CS82ANGULAR.ViewModel
 {
     #pragma warning disable VSTHRD010
-    public class CreatePrimaryKeyViewModel : IsReadyViewModel
+    public class CreateUniqueKeyViewModel : IsReadyViewModel
     {
         #region Fields
         protected DTE2 Dte;
@@ -28,13 +28,14 @@ namespace CS82ANGULAR.ViewModel
         protected SolutionCodeElement _SelectedEntity;
         protected string _InvitationCaption;
         protected string _EntityNameCaption;
+        protected string _UniqueKeyName;
         protected int _EntityPropertiesIndex = -1;
-        protected int _PrimaryKeyPropertiesIndex = -1;
+        protected int _UniqueKeyPropertiesIndex = -1;
         protected string _templateFolder;
         protected string _selectedTemplate;
         protected string _T4TempateText;
+        protected List<FluentAPIEntityNode> InternalUniqueKeys = new List<FluentAPIEntityNode>();
         #endregion
-
         public string T4TempateText
         {
             get { return _T4TempateText; }
@@ -103,6 +104,7 @@ namespace CS82ANGULAR.ViewModel
                 OnPropertyChanged();
             }
         }
+
         public int EntityPropertiesIndex
         {
             get
@@ -114,35 +116,36 @@ namespace CS82ANGULAR.ViewModel
                 if (_EntityPropertiesIndex == value) return;
                 _EntityPropertiesIndex = value;
                 OnPropertyChanged();
-                OnPropertyChanged("IsEnabledToPrimary");
-                OnPropertyChanged("IsEnabledAllFromPrimary");
+                OnPropertyChanged("IsEnabledToUnique");
+                OnPropertyChanged("IsEnabledAllFromUnique");
             }
         }
-        public int PrimaryKeyPropertiesIndex
+        public int UniqueKeyPropertiesIndex
         {
             get
             {
-                return _PrimaryKeyPropertiesIndex;
+                return _UniqueKeyPropertiesIndex;
             }
             set
             {
-                if (_PrimaryKeyPropertiesIndex == value) return;
-                _PrimaryKeyPropertiesIndex = value;
+                if (_UniqueKeyPropertiesIndex == value) return;
+                _UniqueKeyPropertiesIndex = value;
                 OnPropertyChanged();
-                OnPropertyChanged("IsEnabledFromPrimary");
-                OnPropertyChanged("IsEnabledAllFromPrimary");
+                OnPropertyChanged("IsEnabledFromUnique");
+                OnPropertyChanged("IsEnabledAllFromUnique");
             }
         }
         public ObservableCollection<string> Templates { get; set; }
-        public CreatePrimaryKeyViewModel(DTE2 dte, ITextTemplating textTemplating) : base()
+        public CreateUniqueKeyViewModel(DTE2 dte, ITextTemplating textTemplating) : base()
         {
             this.Dte = dte;
             this.textTemplating = textTemplating;
             EntityProperties = new ObservableCollection<FluentAPIExtendedProperty>();
-            PrimaryKeyProperties = new ObservableCollection<FluentAPIExtendedProperty>();
+            UniqueKeyProperties = new ObservableCollection<FluentAPIExtendedProperty>();
             Templates = new ObservableCollection<string>();
+            _UniqueKeyName = "";
             TemplateExtention = "*.t4";
-            InvitationCaption = "Create(Modify) primary key settings";
+            InvitationCaption = "Create(Modify) unique key settings";
         }
         public SolutionCodeElement SelectedDbContext
         {
@@ -177,19 +180,35 @@ namespace CS82ANGULAR.ViewModel
                 OnSelectedEntityChanged();
             }
         }
+        public string UniqueKeyName
+        {
+            get
+            {
+                return _UniqueKeyName;
+            }
+            set
+            {
+                if (_UniqueKeyName == value) return;
+                _UniqueKeyName = value;
+                OnPropertyChanged();
+                CollectUniqueKeyProperties();
+            }
+        }
+
+        public ObservableCollection<string> UniqueKeys { get; set; } = new ObservableCollection<string>();
         public ObservableCollection<FluentAPIExtendedProperty> EntityProperties { get; set; }
-        public ObservableCollection<FluentAPIExtendedProperty> PrimaryKeyProperties { get; set; }
+        public ObservableCollection<FluentAPIExtendedProperty> UniqueKeyProperties { get; set; }
         public void OnSelectedDbContextChanged()
         {
-            PrimaryKeyPropertiesIndex = -1;
-            PrimaryKeyProperties.Clear();
+            UniqueKeyPropertiesIndex = -1;
+            UniqueKeyProperties.Clear();
         }
         public void OnSelectedEntityChanged()
         {
-            PrimaryKeyPropertiesIndex = -1;
+            UniqueKeyPropertiesIndex = -1;
             EntityPropertiesIndex = -1;
             EntityProperties.Clear();
-            PrimaryKeyProperties.Clear();
+            UniqueKeyProperties.Clear();
         }
         public void DoAnalise()
         {
@@ -208,14 +227,13 @@ namespace CS82ANGULAR.ViewModel
                 }
             }
 
-            
+
             if (EntityProperties.Count < 1)
             {
                 if (SelectedEntity != null)
                 {
                     if (SelectedEntity.CodeElementRef != null)
                     {
-                        //(SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassMappedScalarNotNullProperties(EntityProperties);
                         CodeClass locDbContext = null;
                         if (SelectedDbContext != null)
                         {
@@ -225,59 +243,54 @@ namespace CS82ANGULAR.ViewModel
                         OnPropertyChanged("EntityProperties");
                     }
                 }
+                CollectInternalUniqueKeys();
             }
-            if (PrimaryKeyProperties.Count < 1)
+            if (UniqueKeyProperties.Count < 1)
             {
-                CollectPrimaryKeyProperties();
+                CollectUniqueKeyProperties();
             }
         }
-        public void CollectPrimaryKeyProperties()
+        public void CollectInternalUniqueKeys()
         {
-            PrimaryKeyPropertiesIndex = -1;
-            PrimaryKeyProperties.Clear();
+            InternalUniqueKeys.Clear();
             if (SelectedEntity != null)
             {
                 if (SelectedEntity.CodeElementRef != null)
                 {
+                    CodeClass locDbContext = null;
                     if (SelectedDbContext != null)
                     {
-                        if (SelectedDbContext.CodeElementRef != null)
+                        locDbContext = (SelectedDbContext.CodeElementRef as CodeClass);
+                    }
+                    (SelectedEntity.CodeElementRef as CodeClass).CollectAllUniqueKeysHelper(InternalUniqueKeys, locDbContext);
+                }
+            }
+            string locUniqueKeyName = UniqueKeyName;
+            UniqueKeys.Clear();
+            foreach(FluentAPIEntityNode iuk in InternalUniqueKeys)
+            {
+                if(iuk.Methods != null)
+                {
+                    FluentAPIMethodNode mthd = iuk.Methods.FirstOrDefault(m => "HasName".Equals(m.MethodName));
+                    if(mthd != null)
+                    {
+                        if(mthd.MethodArguments != null)
                         {
-                            FluentAPIKey primKey = new FluentAPIKey();
-                            (SelectedEntity.CodeElementRef as CodeClass).CollectPrimaryKeyPropsHelper(primKey, SelectedDbContext.CodeElementRef as CodeClass);
-                            if (primKey.KeyProperties != null) //&& (EntityProperties != null))
+                            string ukNm = mthd.MethodArguments.FirstOrDefault();
+                            if (!string.IsNullOrEmpty(ukNm))
                             {
-                                int order = 0;
-                                primKey.KeyProperties.ForEach(i => i.PropOrder = order++);
-                                (SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassAllMappedScalarPropertiesWithDbContext(PrimaryKeyProperties, primKey.KeyProperties, SelectedDbContext.CodeElementRef as CodeClass);
-                                // (SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassAllMappedScalarProperties(PrimaryKeyProperties, primKey.KeyProperties);
-                                //foreach (FluentAPIProperty itm in primKey.KeyProperties)
-                                //{
-                                //    FluentAPIExtendedProperty primKeyProp = EntityProperties.FirstOrDefault(e => e.PropName == itm.PropName);
-                                //    if (primKeyProp != null)
-                                //    {
-                                //        PrimaryKeyProperties.Add(primKeyProp);
-                                //    } else
-                                //    {
-                                //        PrimaryKeyProperties.Add(
-                                //            new FluentAPIExtendedProperty()
-                                //            {
-                                //                PropName = itm.PropName
-                                //            });
-                                //    }
-                                //}
+                                UniqueKeys.Add(ukNm.Replace("\"", ""));
                             }
                         }
                     }
-
                 }
             }
-            OnPropertyChanged("PrimaryKeyProperties");
+            UniqueKeyName = locUniqueKeyName;
         }
-        public void RemovePrimaryKeyInvocations()
+        public void CollectUniqueKeyProperties()
         {
-            PrimaryKeyPropertiesIndex = -1;
-            PrimaryKeyProperties.Clear();
+            UniqueKeyPropertiesIndex = -1;
+            UniqueKeyProperties.Clear();
             if (SelectedEntity != null)
             {
                 if (SelectedEntity.CodeElementRef != null)
@@ -286,14 +299,57 @@ namespace CS82ANGULAR.ViewModel
                     {
                         if (SelectedDbContext.CodeElementRef != null)
                         {
-                            (SelectedEntity.CodeElementRef as CodeClass).RemovePrimaryKeyDeclarations(SelectedDbContext.CodeElementRef as CodeClass);
-                            CollectPrimaryKeyProperties();
+                            string nameToFilter = "";
+                            if (!string.IsNullOrEmpty(UniqueKeyName)) nameToFilter = UniqueKeyName;
+                            FluentAPIEntityNode enttNd = InternalUniqueKeys.HoldsHasName("\"" +  nameToFilter.Replace("\"", "") + "\"");
+                            if (enttNd != null)
+                            {
+                                if(enttNd.Methods != null)
+                                {
+                                    FluentAPIMethodNode mthdNd = enttNd.Methods.FirstOrDefault(m => m.MethodName == "HasAlternateKey");
+                                    if(mthdNd != null)
+                                    {
+                                        if (mthdNd.MethodArguments != null)
+                                        {
+                                            FluentAPIKey unkKey = new FluentAPIKey();
+                                            unkKey.KeyProperties = new List<FluentAPIProperty>();
+                                            int ord = 0;
+                                            foreach(string arg in mthdNd.MethodArguments)
+                                            {
+                                                ord++;
+                                                unkKey.KeyProperties.Add(new FluentAPIProperty() { PropOrder = ord, PropName =  arg.Replace("\"", "")  });
+                                            }
+                                            (SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassAllMappedScalarPropertiesWithDbContext(UniqueKeyProperties, unkKey.KeyProperties, SelectedDbContext.CodeElementRef as CodeClass);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-
                 }
             }
-            OnPropertyChanged("PrimaryKeyProperties");
+            OnPropertyChanged("UniqueKeyProperties");
+        }
+        public void RemoveUniqueKeyInvocations()
+        {
+            UniqueKeyPropertiesIndex = -1;
+            UniqueKeyProperties.Clear();
+            if (SelectedEntity != null)
+            {
+                if (SelectedEntity.CodeElementRef != null)
+                {
+                    if (SelectedDbContext != null)
+                    {
+                        if (SelectedDbContext.CodeElementRef != null)
+                        {
+                            (SelectedEntity.CodeElementRef as CodeClass).RemoveUniqueKeyDeclarations(SelectedDbContext.CodeElementRef as CodeClass, UniqueKeyName);
+                            CollectInternalUniqueKeys();
+                            CollectUniqueKeyProperties();
+                        }
+                    }
+                }
+            }
+            OnPropertyChanged("UniqueKeyProperties");
         }
         public void OnSelectedTemplateChanged()
         {
@@ -302,18 +358,24 @@ namespace CS82ANGULAR.ViewModel
             string tempatePath = Path.Combine(TemplateFolder, SelectedTemplate);
             T4TempateText = File.ReadAllText(tempatePath);
         }
-        public string GeneratePrimKeyStatement()
+        public string GenerateUniqueKeyStatement()
         {
+            if (string.IsNullOrEmpty(UniqueKeyName))
+            {
+                MessageBox.Show("Unique Key Name is not defined", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return null;
+            }
             ITextTemplatingSessionHost textTemplatingSessionHost = (ITextTemplatingSessionHost)textTemplating;
             textTemplatingSessionHost.Session = textTemplatingSessionHost.CreateSession();
             TPCallback tpCallback = new TPCallback();
-            List<string> primKeyProperties = new List<string>();
-            foreach (FluentAPIExtendedProperty itm in this.PrimaryKeyProperties)
+            List<string> uniqueKeyProperties = new List<string>();
+            foreach (FluentAPIExtendedProperty itm in this.UniqueKeyProperties)
             {
-                primKeyProperties.Add(itm.PropName);
+                uniqueKeyProperties.Add(itm.PropName);
             }
             string tempatePath = Path.Combine(TemplateFolder, SelectedTemplate);
-            textTemplatingSessionHost.Session["PrimKeyProperties"] = primKeyProperties;
+            textTemplatingSessionHost.Session["UniqueKeyProperties"] = uniqueKeyProperties;
+            textTemplatingSessionHost.Session["UniqueKeyName"] = UniqueKeyName;
             string result = textTemplating.ProcessTemplate(tempatePath, T4TempateText, tpCallback);
             if (tpCallback.ProcessingErrors != null)
             {
@@ -331,75 +393,75 @@ namespace CS82ANGULAR.ViewModel
             return result;
         }
 
-        #region UiBtnCommandToPrimary
-        private ICommand _UiBtnCommandToPrimary;
-        public ICommand UiBtnCommandToPrimary
+        #region UiBtnCommandToUnique
+        private ICommand _UiBtnCommandToUnique;
+        public ICommand UiBtnCommandToUnique
         {
             get
             {
-                return _UiBtnCommandToPrimary ?? (_UiBtnCommandToPrimary = new CommandHandler((param) => UiBtnCommandToPrimaryAction(param), (param) => UiBtnCommandToPrimaryCanExecute(param)));
+                return _UiBtnCommandToUnique ?? (_UiBtnCommandToUnique = new CommandHandler((param) => UiBtnCommandToUniqueAction(param), (param) => UiBtnCommandToUniqueCanExecute(param)));
             }
         }
-        public bool UiBtnCommandToPrimaryCanExecute(Object param)
+        public bool UiBtnCommandToUniqueCanExecute(Object param)
         {
             return (EntityPropertiesIndex > -1) && (EntityPropertiesIndex < EntityProperties.Count);
         }
-        public virtual void UiBtnCommandToPrimaryAction(Object param)
+        public virtual void UiBtnCommandToUniqueAction(Object param)
         {
             if ((EntityPropertiesIndex > -1) && (EntityPropertiesIndex < EntityProperties.Count))
             {
                 var itm = EntityProperties[EntityPropertiesIndex];
-                if (!PrimaryKeyProperties.Contains(itm))
+                if (!UniqueKeyProperties.Contains(itm))
                 {
-                    PrimaryKeyProperties.Add(itm);
+                    UniqueKeyProperties.Add(itm);
                 }
             }
         }
         #endregion
 
-        #region UiBtnCommandFromPrimary
-        private ICommand _UiBtnCommandFromPrimary;
-        public ICommand UiBtnCommandFromPrimary
+        #region UiBtnCommandFromUnique
+        private ICommand _UiBtnCommandFromUnique;
+        public ICommand UiBtnCommandFromUnique
         {
             get
             {
-                return _UiBtnCommandFromPrimary ?? (_UiBtnCommandFromPrimary = new CommandHandler((param) => UiBtnCommandFromPrimaryAction(param), (param) => UiBtnCommandFromPrimaryCanExecute(param)));
+                return _UiBtnCommandFromUnique ?? (_UiBtnCommandFromUnique = new CommandHandler((param) => UiBtnCommandFromUniqueAction(param), (param) => UiBtnCommandFromUniqueCanExecute(param)));
             }
         }
-        public bool UiBtnCommandFromPrimaryCanExecute(Object param)
+        public bool UiBtnCommandFromUniqueCanExecute(Object param)
         {
-            return (PrimaryKeyPropertiesIndex > -1) && (PrimaryKeyPropertiesIndex < PrimaryKeyProperties.Count);
+            return (UniqueKeyPropertiesIndex > -1) && (UniqueKeyPropertiesIndex < UniqueKeyProperties.Count);
         }
-        public virtual void UiBtnCommandFromPrimaryAction(Object param)
+        public virtual void UiBtnCommandFromUniqueAction(Object param)
         {
-            if ((PrimaryKeyPropertiesIndex > -1) && (PrimaryKeyPropertiesIndex < PrimaryKeyProperties.Count))
+            if ((UniqueKeyPropertiesIndex > -1) && (UniqueKeyPropertiesIndex < UniqueKeyProperties.Count))
             {
-                PrimaryKeyProperties.RemoveAt(PrimaryKeyPropertiesIndex);
-                if (PrimaryKeyProperties.Count <= PrimaryKeyPropertiesIndex)
+                UniqueKeyProperties.RemoveAt(UniqueKeyPropertiesIndex);
+                if (UniqueKeyProperties.Count <= UniqueKeyPropertiesIndex)
                 {
-                    if (PrimaryKeyPropertiesIndex > -1) PrimaryKeyPropertiesIndex -= 1;
+                    if (UniqueKeyPropertiesIndex > -1) UniqueKeyPropertiesIndex -= 1;
                 }
             }
         }
         #endregion
 
-        #region UiBtnCommandAllFromPrimary
-        private ICommand _UiBtnCommandAllFromPrimary;
-        public ICommand UiBtnCommandAllFromPrimary
+        #region UiBtnCommandAllFromUnique
+        private ICommand _UiBtnCommandAllFromUnique;
+        public ICommand UiBtnCommandAllFromUnique
         {
             get
             {
-                return _UiBtnCommandAllFromPrimary ?? (_UiBtnCommandAllFromPrimary = new CommandHandler((param) => UiBtnCommandAllFromPrimaryAction(param), (param) => UiBtnCommandAllFromPrimaryCanExecute(param)));
+                return _UiBtnCommandAllFromUnique ?? (_UiBtnCommandAllFromUnique = new CommandHandler((param) => UiBtnCommandAllFromUniqueAction(param), (param) => UiBtnCommandAllFromUniqueCanExecute(param)));
             }
         }
-        public bool UiBtnCommandAllFromPrimaryCanExecute(Object param)
+        public bool UiBtnCommandAllFromUniqueCanExecute(Object param)
         {
-            return PrimaryKeyProperties.Count > 0;
+            return UniqueKeyProperties.Count > 0;
         }
-        public virtual void UiBtnCommandAllFromPrimaryAction(Object param)
+        public virtual void UiBtnCommandAllFromUniqueAction(Object param)
         {
-            PrimaryKeyProperties.Clear();
-            PrimaryKeyPropertiesIndex = -1;
+            UniqueKeyProperties.Clear();
+            UniqueKeyPropertiesIndex = -1;
         }
         #endregion
 
@@ -414,14 +476,13 @@ namespace CS82ANGULAR.ViewModel
         }
         public bool UiBtnCommandUpCanExecute(Object param)
         {
-            return (PrimaryKeyPropertiesIndex > 0) && (PrimaryKeyPropertiesIndex < PrimaryKeyProperties.Count);
+            return (UniqueKeyPropertiesIndex > 0) && (UniqueKeyPropertiesIndex < UniqueKeyProperties.Count);
         }
         public virtual void UiBtnCommandUpAction(Object param)
         {
-            if ((PrimaryKeyPropertiesIndex > 0) && (PrimaryKeyPropertiesIndex < PrimaryKeyProperties.Count))
+            if ((UniqueKeyPropertiesIndex > 0) && (UniqueKeyPropertiesIndex < UniqueKeyProperties.Count))
             {
-                PrimaryKeyProperties.Move(PrimaryKeyPropertiesIndex, PrimaryKeyPropertiesIndex - 1);
-                //PrimaryKeyPropertiesIndex = PrimaryKeyPropertiesIndex - 1;
+                UniqueKeyProperties.Move(UniqueKeyPropertiesIndex, UniqueKeyPropertiesIndex - 1);
             }
         }
         #endregion
@@ -437,14 +498,13 @@ namespace CS82ANGULAR.ViewModel
         }
         public bool UiBtnCommandDownCanExecute(Object param)
         {
-            return (PrimaryKeyPropertiesIndex > -1) && (PrimaryKeyPropertiesIndex < PrimaryKeyProperties.Count - 1);
+            return (UniqueKeyPropertiesIndex > -1) && (UniqueKeyPropertiesIndex < UniqueKeyProperties.Count - 1);
         }
         public virtual void UiBtnCommandDownAction(Object param)
         {
-            if ((PrimaryKeyPropertiesIndex > -1) && (PrimaryKeyPropertiesIndex < PrimaryKeyProperties.Count - 1))
+            if ((UniqueKeyPropertiesIndex > -1) && (UniqueKeyPropertiesIndex < UniqueKeyProperties.Count - 1))
             {
-                PrimaryKeyProperties.Move(PrimaryKeyPropertiesIndex, PrimaryKeyPropertiesIndex + 1);
-                //PrimaryKeyPropertiesIndex = PrimaryKeyPropertiesIndex + 1;
+                UniqueKeyProperties.Move(UniqueKeyPropertiesIndex, UniqueKeyPropertiesIndex + 1);
             }
         }
         #endregion
@@ -464,7 +524,8 @@ namespace CS82ANGULAR.ViewModel
         }
         public virtual void UiBtnCommandRefreshAction(Object param)
         {
-            CollectPrimaryKeyProperties();
+            CollectInternalUniqueKeys();
+            CollectUniqueKeyProperties();
         }
         #endregion
 
@@ -479,7 +540,7 @@ namespace CS82ANGULAR.ViewModel
         }
         public bool UiBtnCommandCreateCanExecute(Object param)
         {
-            return (PrimaryKeyProperties.Count > 0) && (!string.IsNullOrEmpty(SelectedTemplate)) && (!string.IsNullOrEmpty(T4TempateText));
+            return (UniqueKeyProperties.Count > 0) && (!string.IsNullOrEmpty(SelectedTemplate)) && (!string.IsNullOrEmpty(T4TempateText));
         }
         public virtual void UiBtnCommandCreateAction(Object param)
         {
@@ -491,23 +552,21 @@ namespace CS82ANGULAR.ViewModel
                     {
                         if (SelectedDbContext.CodeElementRef != null)
                         {
-                            string PrimKeyStatement = GeneratePrimKeyStatement();
-                            if (!string.IsNullOrEmpty(PrimKeyStatement))
+                            string UniqueKeyStatement = GenerateUniqueKeyStatement();
+                            if (!string.IsNullOrEmpty(UniqueKeyStatement))
                             {
                                 (SelectedEntity.CodeElementRef as CodeClass)
-                                    .AddPrimaryKeyDeclaration(SelectedDbContext.CodeElementRef as CodeClass, PrimKeyStatement);
+                                    .AddUniqueKeyDeclaration(SelectedDbContext.CodeElementRef as CodeClass, UniqueKeyStatement, UniqueKeyName);
                                 MessageBox.Show("Operation completed successfully", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-                                CollectPrimaryKeyProperties();
+                                CollectInternalUniqueKeys();
+                                CollectUniqueKeyProperties();
                             }
                         }
                     }
-
                 }
             }
         }
         #endregion
-
-
 
     }
 }

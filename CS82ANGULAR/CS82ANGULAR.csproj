@@ -134,6 +134,7 @@
     <Compile Include="ViewModel\BatchProcessingViewModel.cs" />
     <Compile Include="ViewModel\CreateForeignKeyViewModel.cs" />
     <Compile Include="ViewModel\CreatePrimaryKeyViewModel.cs" />
+    <Compile Include="ViewModel\CreateUniqueKeyViewModel.cs" />
     <Compile Include="ViewModel\CreateViewViewModel.cs" />
     <Compile Include="ViewModel\CreateWebApiViewModel.cs" />
     <Compile Include="ViewModel\FeatureViewModel.cs" />
@@ -162,6 +163,9 @@
     </Compile>
     <Compile Include="View\UserControlCreatePrimKey.xaml.cs">
       <DependentUpon>UserControlCreatePrimKey.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlCreateUniqueKey.xaml.cs">
+      <DependentUpon>UserControlCreateUniqueKey.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\UserControlCreateView.xaml.cs">
       <DependentUpon>UserControlCreateView.xaml</DependentUpon>
@@ -248,6 +252,14 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Templates\HasAlternateKeyTmplst\HasAlternateKey.Net.Core.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\HasAlternateKeyTmplst\HasAlternateKey.Net.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -286,6 +298,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\UserControlCreatePrimKey.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControlCreateUniqueKey.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
