@@ -41,7 +41,7 @@
                     <GridViewColumn  Header="Reference navigation" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Vertical" MinWidth="200">
                                     <TextBlock Text="{Binding NavigationName}" />
                                     <TextBlock Margin="0 3 0 3" Visibility="{Binding Path=HasErrors, Converter={StaticResource BoolToVisConverter} }" Text="Errors:" FontWeight="Bold" Foreground="Red"  />
                                     <TextBox Text="{Binding ErrorsText}" Visibility="{Binding Path=HasErrors, Converter={StaticResource BoolToVisConverter} }" 

@@ -1,5 +1,6 @@
 ﻿using CS82ANGULAR.Model;
 using CS82ANGULAR.Model.AnalyzeOnModelCreating;
+using System.Collections.Generic;
 
 namespace CS82ANGULAR.Helpers
 {
@@ -69,6 +70,52 @@ namespace CS82ANGULAR.Helpers
             }
 
             return foreignKey;
+        }
+        public static bool IsTheListOfNamesIdentical(this FluentAPIKey fapks, ICollection<FluentAPIProperty> keyProperties)
+        {
+            bool result = false;
+            if ((fapks == null) || (keyProperties == null)) return result;
+            if(fapks.KeyProperties == null) return result;
+            if(fapks.KeyProperties.Count != keyProperties.Count) return result;
+            int i = 0;
+            foreach(FluentAPIProperty property in keyProperties)
+            {
+                if (!string.Equals(property.PropName, fapks.KeyProperties[i].PropName)) return result;
+                i++;
+            }
+            return true;
+        }
+        public static bool IsTheListOfNamesIdentical(this FluentAPIKey fapks, ICollection<string> keyProperties)
+        {
+            bool result = false;
+            if ((fapks == null) || (keyProperties == null)) return result;
+            if (fapks.KeyProperties == null) return result;
+            if (fapks.KeyProperties.Count != keyProperties.Count) return result;
+            int i = 0;
+            foreach(string key in keyProperties)
+            {
+                if (!string.Equals(key, fapks.KeyProperties[i].PropName)) return result;
+                i++;
+            }
+            return true;
+        }
+        public static FluentAPIKey GetFluentAPIKeyWithIdenticalListOfNames(this ICollection<FluentAPIKey> fapks, ICollection<FluentAPIProperty> keyProperties)
+        {
+            if ((fapks == null) || (keyProperties == null)) return null;
+            foreach(FluentAPIKey r in fapks)
+            {
+                if(r.IsTheListOfNamesIdentical(keyProperties)) return r;
+            }
+            return null;
+        }
+        public static FluentAPIKey GetFluentAPIKeyWithIdenticalListOfNames(this ICollection<FluentAPIKey> fapks, ICollection<string> keyProperties)
+        {
+            if ((fapks == null) || (keyProperties == null)) return null;
+            foreach (FluentAPIKey r in fapks)
+            {
+                if (r.IsTheListOfNamesIdentical(keyProperties)) return r;
+            }
+            return null;
         }
     }
 }

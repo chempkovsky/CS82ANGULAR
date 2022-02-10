@@ -133,7 +133,7 @@ namespace CS82ANGULAR.ViewModel
             }
 
             List<FluentAPIForeignKey> result =
-                (SelectedEntity.CodeElementRef as CodeClass).CollectForeignKeys(SelectedDbContext.CodeElementRef as CodeClass);
+                (SelectedEntity.CodeElementRef as CodeClass).CollectForeignKeys(SelectedDbContext.CodeElementRef as CodeClass, null, true);
             if (result != null)
             {
                 foreach (FluentAPIForeignKey itm in result)

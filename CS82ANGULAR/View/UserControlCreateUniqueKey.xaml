@@ -35,7 +35,7 @@
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical">
                 <TextBlock Margin="5">All Mapped Properties</TextBlock>
-                <ListBox Width="200" Height="160" ItemsSource="{Binding EntityProperties}" SelectedIndex="{Binding  EntityPropertiesIndex}">
+                <ListBox Width="200" Height="176" ItemsSource="{Binding EntityProperties}" SelectedIndex="{Binding  EntityPropertiesIndex}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Vertical" >
@@ -61,7 +61,7 @@
             </StackPanel>
             <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical">
                 <TextBlock Margin="5">Unique Key</TextBlock>
-                <ListBox Width="200" Height="90" ItemsSource="{Binding UniqueKeyProperties}"  SelectedIndex="{Binding  UniqueKeyPropertiesIndex}">
+                <ListBox Width="200" Height="100" ItemsSource="{Binding UniqueKeyProperties}"  SelectedIndex="{Binding  UniqueKeyPropertiesIndex}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Vertical" >
@@ -111,7 +111,7 @@
                                        ItemsSource ="{Binding Templates}"
                                        SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}" 
                                        Width="440"/>
-            <TextBox Grid.Column="0" Margin="0 5 0 0" Grid.Row="2" Width="440" Height="150" 
+            <TextBox Grid.Column="0" Margin="0 5 0 0" Grid.Row="2" Width="440" Height="138" 
                       AcceptsReturn="True" AcceptsTab="True"
                       ScrollViewer.HorizontalScrollBarVisibility="Auto" 
                       ScrollViewer.VerticalScrollBarVisibility="Auto" 

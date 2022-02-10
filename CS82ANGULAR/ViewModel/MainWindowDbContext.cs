@@ -138,6 +138,10 @@ namespace CS82ANGULAR.ViewModel
                     CurrentUiStepId = 4;
                     PrevBtnCommandAction(param);
                     return;
+                case 311:
+                    CurrentUiStepId = 300;
+                    NextBtnCommandAction(param);
+                    return;
                 default:
                     break;
             }
@@ -406,11 +410,32 @@ namespace CS82ANGULAR.ViewModel
                     this.OnPropertyChanged("CurrentUserControl");
                     break;
                 case 301:
+                    CurrentUiStepId = 310;
+                    NextBtnCommandAction(param);
+                    break;
+                case 310:
+                    CurrentUiStepId = 311;
+                    PrevBtnEnabled = true;
+                    NextBtnEnabled = true;
+                    if (CreateUniqueKeyUC == null)
+                    {
+                        CreateUniqueKeyViewModel dataContext = new CreateUniqueKeyViewModel(Dte, TextTemplating);
+                        string TemplatesFld = TemplatePathHelper.GetTemplatePath();
+                        dataContext.TemplateFolder = Path.Combine(TemplatesFld, "HasAlternateKeyTmplst");
+                        CreateUniqueKeyUC = new UserControlCreateUniqueKey(dataContext);
+                    }
+                    (CreateUniqueKeyUC.DataContext as CreateUniqueKeyViewModel).SelectedDbContext =
+                        (SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).SelectedDbContext;
+                    (CreateUniqueKeyUC.DataContext as CreateUniqueKeyViewModel).SelectedEntity =
+                        (CreatePrimKeyUC.DataContext as CreatePrimaryKeyViewModel).SelectedEntity;
+                    (CreateUniqueKeyUC.DataContext as CreateUniqueKeyViewModel).DoAnalise();
+                    this.CurrentUserControl = CreateUniqueKeyUC;
+                    this.OnPropertyChanged("CurrentUserControl");
+                    break;
+                case 311:
                     CurrentUiStepId = 4;
                     PrevBtnCommandAction(param);
                     break;
-
-
                 default:
                     break;
             }

@@ -6,6 +6,7 @@ namespace CS82ANGULAR.Helpers
 {
     public static class FluentAPIEntityNodeHelper
     {
+        // "faen" matches the filter if "faen" matches one of the list items (== List<FluentAPIEntityNode> filter)
         public static bool IsSatisfiedTheFilter(this FluentAPIEntityNode faen, List<FluentAPIEntityNode> filter)
         {
             if (faen == null) return false;
@@ -69,7 +70,6 @@ namespace CS82ANGULAR.Helpers
             }
             return isSatisfied;
         }
-
         public static bool HoldsIsRequired(this FluentAPIEntityNode faen, string propName, out bool IsReq)
         {
             IsReq = false;

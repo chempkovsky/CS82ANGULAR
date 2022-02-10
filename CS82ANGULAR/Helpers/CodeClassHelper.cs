@@ -90,6 +90,26 @@ namespace CS82ANGULAR.Helpers
                     };
             return codeFunction.DoAnalyzeWithFilter(classNames, filter);
         }
+        public static List<FluentAPIEntityNode> GetIgnoreNodes(this CodeClass srcClass, CodeClass dbContext)
+        {
+            if ((srcClass == null) || (dbContext == null)) return null;
+            string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
+            CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
+            if (codeFunction == null) return null;
+            List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
+            {
+                new FluentAPIEntityNode()
+                {
+                    Methods = new List<FluentAPIMethodNode>()
+                    {
+                        new FluentAPIMethodNode() {
+                            MethodName = "Ignore"
+                        }
+                    }
+                }
+            };
+            return codeFunction.DoAnalyzeWithFilter(classNames, filter);
+        }
         public static bool IsScalarTypeOrString(this CodeTypeRef codeTypeRef)
         {
             if (codeTypeRef == null) return true;
@@ -299,6 +319,7 @@ namespace CS82ANGULAR.Helpers
             if ((srcClass == null) || (primKey == null)) return null;
             primKey.KeySource = InfoSourceEnum.ByAttribute;
             primKey.SourceCount = 0;
+            primKey.IsPrimary = true;
             if (primKey.KeyProperties != null) primKey.KeyProperties.Clear();
             string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
             List<FluentAPIEntityNode> ignoreNodes = null;
@@ -330,25 +351,36 @@ namespace CS82ANGULAR.Helpers
                             FluentAPIEntityNode node = entityNodes.Last();
                             primKey.KeySource = InfoSourceEnum.ByOnModelCreating;
                             if (primKey.KeyProperties == null) primKey.KeyProperties = new List<FluentAPIProperty>();
-                            foreach (FluentAPIMethodNode m in node.Methods)
+                            if (node.Methods != null)
                             {
-                                if (m.MethodName != "HasKey") continue;
-                                if (m.MethodArguments != null)
+                                FluentAPIMethodNode mthd = node.Methods.FirstOrDefault(m => "HasName".Equals(m.MethodName));
+                                if(mthd!=null)
                                 {
-                                    int i = 0;
-                                    foreach (string ma in m.MethodArguments)
+                                    if(mthd.MethodArguments!=null)
                                     {
-                                        if( ignoreNodes.HoldsIgnore(ma) ) continue;
-                                        primKey.KeyProperties.Add(new FluentAPIProperty()
-                                        {
-                                            PropName = ma,
-                                            PropOrder = i
-                                        });
-                                        i++;
+                                        primKey.KeyName = mthd.MethodArguments.FirstOrDefault();
                                     }
-                                    if (primKey.KeyProperties.Count > 0)
+                                }
+                                mthd = node.Methods.FirstOrDefault(m => "HasKey".Equals(m.MethodName));
+                                if(mthd != null)
+                                {
+                                    if (mthd.MethodArguments != null)
                                     {
-                                        return primKey;
+                                        int i = 0;
+                                        foreach (string ma in mthd.MethodArguments)
+                                        {
+                                            if (ignoreNodes.HoldsIgnore(ma)) continue;
+                                            primKey.KeyProperties.Add(new FluentAPIProperty()
+                                            {
+                                                PropName = ma,
+                                                PropOrder = i
+                                            });
+                                            i++;
+                                        }
+                                        if (primKey.KeyProperties.Count > 0)
+                                        {
+                                            return primKey;
+                                        }
                                     }
                                 }
                             }
@@ -493,6 +525,41 @@ namespace CS82ANGULAR.Helpers
                     mthd.MethodArguments = newLst;
                 }
                 UniqueKeys.Add(enttnd);
+            }
+            return UniqueKeys;
+        }
+        public static IList<FluentAPIKey> CollectAllUniqueKeysHelper(this CodeClass srcClass, IList<FluentAPIKey> UniqueKeys, CodeClass dbContext = null)
+        {
+            if ((srcClass == null) || (UniqueKeys == null)) return null;
+            UniqueKeys.Clear();
+            IList<FluentAPIEntityNode> fApinds = srcClass.CollectAllUniqueKeysHelper(new List<FluentAPIEntityNode>(), dbContext);
+            if(fApinds == null) return UniqueKeys;
+            foreach (FluentAPIEntityNode fApind in fApinds)
+            {
+                FluentAPIMethodNode mthd = fApind.Methods.FirstOrDefault(m => "HasAlternateKey".Equals(m.MethodName));
+                if (mthd == null) continue;
+                if(mthd.MethodArguments == null) continue;
+                if (mthd.MethodArguments.Count < 1) continue;
+
+                FluentAPIKey key = new FluentAPIKey() { KeyProperties = new List<FluentAPIProperty>() };
+                int ord = 0;
+                foreach(string mthdarg in mthd.MethodArguments)
+                {
+                    ord++;
+                    key.KeyProperties.Add(new FluentAPIProperty() { PropOrder = ord, PropName = mthdarg });
+                }
+                mthd = fApind.Methods.FirstOrDefault(m => "HasName".Equals(m.MethodName));
+                if(mthd !=null)
+                {
+                    if(mthd.MethodArguments != null)
+                    {
+                        if (mthd.MethodArguments.Count > 0)
+                            key.KeyName = mthd.MethodArguments[0];
+                    }
+                }
+                key.SourceCount = key.KeyProperties.Count;
+                key.KeySource = InfoSourceEnum.ByOnModelCreating;
+                UniqueKeys.Add(key);
             }
             return UniqueKeys;
         }
@@ -761,6 +828,7 @@ namespace CS82ANGULAR.Helpers
             {
                 return null;
             }
+            properties.Clear();
             foreach (CodeElement codeElement in srcClass.Members)
             {
                 if (codeElement.Kind != vsCMElement.vsCMElementProperty) continue;
@@ -783,6 +851,20 @@ namespace CS82ANGULAR.Helpers
                 }
                 if (codeProperty.GetCodePropertyAttributeByFullName("System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute") != null) continue;
                 properties.Add(codeProperty.Name);
+            }
+            return properties;
+        }
+        public static IList<string> CollectCodeClassAllMappedNonScalarPropertiesWithDbContext(this CodeClass srcClass, IList<string> properties, CodeClass dbContext = null)
+        {
+            if ((srcClass == null) || (properties == null))
+            {
+                return null;
+            }
+            srcClass.CollectCodeClassAllMappedNonScalarProperties(properties);
+            List<FluentAPIEntityNode> localFAENs = srcClass.GetFAPIAttributesAndIgnoreForScalarProperties(dbContext);
+            for(int i = properties.Count - 1; i >= 0; i--)
+            {
+                if (localFAENs.HoldsIgnore(properties[i])) properties.RemoveAt(i);
             }
             return properties;
         }
@@ -838,8 +920,6 @@ namespace CS82ANGULAR.Helpers
                 }
             }
         }
-
-
         public static void RemovePrimaryKeyDeclarations(this CodeClass srcClass, CodeClass dbContext)
         {
             if ((srcClass == null) || (dbContext == null)) return;
@@ -897,6 +977,11 @@ namespace CS82ANGULAR.Helpers
                 string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
                 List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
                     {
+                        // 
+                        // EF.Net 6
+                        //
+                        
+                       // or
                         new FluentAPIEntityNode()
                         {
                             Methods = new List<FluentAPIMethodNode>()
@@ -907,6 +992,7 @@ namespace CS82ANGULAR.Helpers
                                 }
                             }
                         },
+                        // or 
                         new FluentAPIEntityNode()
                         {
                             Methods = new List<FluentAPIMethodNode>()
@@ -917,6 +1003,12 @@ namespace CS82ANGULAR.Helpers
                                 }
                             }
                         },
+
+                        //
+                        //  EF.Core 6
+                        //
+
+                        // or
                         new FluentAPIEntityNode()
                         {
                             Methods = new List<FluentAPIMethodNode>()
@@ -927,6 +1019,7 @@ namespace CS82ANGULAR.Helpers
                                 }
                             }
                         },
+                        // or
                         new FluentAPIEntityNode()
                         {
                             Methods = new List<FluentAPIMethodNode>()
@@ -1236,6 +1329,19 @@ namespace CS82ANGULAR.Helpers
             }
             return null;
         }
+        public static CodeProperty GetPublicMappedNonScalarPropertyByNameWithDbContext(this CodeClass masterCodeClass, string propertyName, CodeClass dbContext = null) 
+        {
+            if (masterCodeClass == null)  return null;
+            CodeProperty result = masterCodeClass.GetPublicMappedNonScalarPropertyByName(propertyName);
+            if(result == null) return null;
+            if(dbContext == null) return result;
+            List<FluentAPIEntityNode> localFAENs = masterCodeClass.GetIgnoreNodes(dbContext);
+            if (localFAENs != null)
+            {
+                if(localFAENs.HoldsIgnore(propertyName)) return null;
+            }
+            return result;
+        }
         // ready
         public static List<CodeProperty> GetPublicMappedNonScalarPropertiesByTypeFullName(this CodeClass masterCodeClass, string typeFullName)
         {
@@ -1289,6 +1395,24 @@ namespace CS82ANGULAR.Helpers
             }
             return result;
         }
+
+        public static List<CodeProperty> GetPublicMappedNonScalarPropertiesByTypeFullNameWithDbContext(this CodeClass masterCodeClass, string typeFullName, CodeClass dbContext = null)
+        {
+            if (masterCodeClass == null) return null;
+            List<CodeProperty> result = masterCodeClass.GetPublicMappedNonScalarPropertiesByTypeFullName(typeFullName);
+            if (result == null) return null;
+            if (dbContext == null) return result;
+            List<FluentAPIEntityNode> localFAENs = masterCodeClass.GetIgnoreNodes(dbContext);
+            if (localFAENs != null)
+            {
+                for(int i = result.Count - 1; i >= 0; i--)
+                {
+                   if (localFAENs.HoldsIgnore(result[i].Name)) result.RemoveAt(i);
+                }
+            }
+            return result;
+        }
+
         public static FluentAPIKey CollectForeignKeyByAttributes(this CodeProperty codeProperty)
         {
             FluentAPIKey result = null;
@@ -1559,7 +1683,7 @@ namespace CS82ANGULAR.Helpers
             if (codeTypeRef.AsFullName.StartsWith("System.Collections.Generic.List<")) return true;
             return false;
         }
-        public static FluentAPIForeignKey FluentAPIEntityNodeToForeignKey(this FluentAPIEntityNode entityNode)
+        public static FluentAPIForeignKey FluentAPIEntityNodeToForeignKey(this FluentAPIEntityNode entityNode, bool ignoreTheOpposite = false)
         {
             FluentAPIForeignKey result = null;
             if (entityNode == null) return result;
@@ -1570,6 +1694,9 @@ namespace CS82ANGULAR.Helpers
             if (string.IsNullOrEmpty(firstMethodNode.MethodName)) return result;
             if (firstMethodNode.MethodArguments == null) return result;
             if (firstMethodNode.MethodArguments.Count < 1) return result;
+            //
+            // EF.Net
+            //
             if ("HasRequired".Equals(firstMethodNode.MethodName))
             {
                 string InverseNavigationName = null;
@@ -1766,15 +1893,21 @@ namespace CS82ANGULAR.Helpers
                 }
                 return result;
             }
+            //
+            // EF.Core
+            //
             if ("HasOne".Equals(firstMethodNode.MethodName))
             {
                 string InverseNavigationName = null;
                 List<String> foreignKeyProps = null;
+                List<String> principalKeyProps = null;
                 bool IsOneToMany = false;
                 bool IsWithOne = false;
                 bool IsRequired = false;
                 bool IsCascadeDelete = false;
-                string genericName = null;
+                string GenericForeignKeyClassName = null;
+                string GenericPrincipalKeyClassName = null;
+                string deleteBehavior = "DeleteBehavior.NoAction";
                 for (int i = 1; i < methodsCount; i++)
                 {
                     FluentAPIMethodNode methodNode = entityNode.Methods[i];
@@ -1783,8 +1916,37 @@ namespace CS82ANGULAR.Helpers
                     {
                         if (methodNode.MethodArguments != null)
                         {
-                            IsCascadeDelete = methodNode.MethodArguments.Contains("Cascade");
+                            if (methodNode.MethodArguments.Contains("DeleteBehavior.Cascade"))
+                            {
+                                IsCascadeDelete = true;
+                                deleteBehavior = "DeleteBehavior.Cascade";
+                            }
+                            else if (methodNode.MethodArguments.Contains("DeleteBehavior.ClientSetNull"))
+                            {
+                                deleteBehavior = "DeleteBehavior.ClientSetNull";
+                            }
+                            else if (methodNode.MethodArguments.Contains("DeleteBehavior.Restrict"))
+                            {
+                                deleteBehavior = "DeleteBehavior.Restrict";
+                            }
+                            else if (methodNode.MethodArguments.Contains("DeleteBehavior.SetNull"))
+                            {
+                                deleteBehavior = "DeleteBehavior.SetNull";
+                            }
+                            else if (methodNode.MethodArguments.Contains("DeleteBehavior.ClientCascade"))
+                            {
+                                deleteBehavior = "DeleteBehavior.ClientCascade";
+                            }
+                            else if (methodNode.MethodArguments.Contains("DeleteBehavior.NoAction"))
+                            {
+                                deleteBehavior = "DeleteBehavior.NoAction";
+                            }
+                            else if (methodNode.MethodArguments.Contains("DeleteBehavior.ClientNoAction"))
+                            {
+                                deleteBehavior = "DeleteBehavior.ClientNoAction";
+                            }
                         }
+                        continue;
                     }
                     if ("WithMany".Equals(methodNode.MethodName))
                     {
@@ -1792,6 +1954,7 @@ namespace CS82ANGULAR.Helpers
                         if (methodNode.MethodArguments.Count < 1) return result;
                         InverseNavigationName = methodNode.MethodArguments[0];
                         IsOneToMany = true;
+                        continue;
                     }
                     if ("WithOne".Equals(methodNode.MethodName))
                     {
@@ -1799,13 +1962,21 @@ namespace CS82ANGULAR.Helpers
                         if (methodNode.MethodArguments.Count < 1) return result;
                         InverseNavigationName = methodNode.MethodArguments[0];
                         IsWithOne = true;
+                        continue;
                     }
                     if ("HasForeignKey".Equals(methodNode.MethodName))
                     {
                         if (methodNode.MethodArguments == null) return result;
                         if (methodNode.MethodArguments.Count < 1) return result;
-                        genericName = methodNode.GenericName;
+                        GenericForeignKeyClassName = methodNode.GenericName;
                         foreignKeyProps = methodNode.MethodArguments;
+                        continue;
+                    }
+                    if ("HasPrincipalKey".Equals(methodNode.MethodName))
+                    {
+                        principalKeyProps = methodNode.MethodArguments;
+                        GenericPrincipalKeyClassName = methodNode.GenericName;
+                        continue;
                     }
                     if ("IsRequired".Equals(methodNode.MethodName))
                     {
@@ -1833,39 +2004,96 @@ namespace CS82ANGULAR.Helpers
                 if (IsOneToMany == IsWithOne) return result;
                 if (IsOneToMany)
                 {
-                    if (foreignKeyProps == null) return result;
-                    if (foreignKeyProps.Count < 1) return result;
                     NavigationTypeEnum NavigationType = NavigationTypeEnum.OptionalToMany;
-                    if (IsRequired)
+                    if (foreignKeyProps != null)
                     {
-                        NavigationType = NavigationTypeEnum.OneToMany;
-                    }
-
-                    result = new FluentAPIForeignKey()
-                    {
-                        NavigationName = firstMethodNode.MethodArguments[0],
-                        InverseNavigationName = InverseNavigationName,
-                        ForeignKeySource = InfoSourceEnum.ByOnModelCreating,
-                        PrincipalKeySource = InfoSourceEnum.ByConvention,
-                        InverseNavigationSource = InfoSourceEnum.ByOnModelCreating,
-                        NavigationType = NavigationType,
-                        IsCascadeDelete = IsCascadeDelete
-                    };
-                    result.ForeignKeyProps = new List<FluentAPIProperty>();
-                    int ord = 0;
-                    foreach (string prop in foreignKeyProps)
-                    {
-                        result.ForeignKeyProps.Add(
-                        new FluentAPIProperty()
+                        if (foreignKeyProps.Count > 0)
                         {
-                            PropName = prop,
-                            PropOrder = ord++
-                        });
+                            if (IsRequired)
+                            {
+                                NavigationType = NavigationTypeEnum.OneToMany;
+                            }
+
+                            result = new FluentAPIForeignKey()
+                            {
+                                NavigationName = firstMethodNode.MethodArguments[0],
+                                InverseNavigationName = InverseNavigationName,
+                                ForeignKeySource = InfoSourceEnum.ByOnModelCreating,
+                                PrincipalKeySource = InfoSourceEnum.ByConvention,
+                                InverseNavigationSource = InfoSourceEnum.ByOnModelCreating,
+                                NavigationType = NavigationType,
+                                IsCascadeDelete = IsCascadeDelete,
+                                DeleteBehavior = deleteBehavior,
+                            };
+                            result.ForeignKeyProps = new List<FluentAPIProperty>();
+                            int ord = 0;
+                            foreach (string prop in foreignKeyProps)
+                            {
+                                result.ForeignKeyProps.Add(
+                                new FluentAPIProperty()
+                                {
+                                    PropName = prop,
+                                    PropOrder = ord++
+                                });
+                            }
+                        }
+                    }
+                    if (principalKeyProps != null)
+                    {
+                        if (principalKeyProps.Count > 0)
+                        {
+                            if (result == null)
+                            {
+                                if (IsRequired)
+                                {
+                                    NavigationType = NavigationTypeEnum.OneToMany;
+                                }
+                                result = new FluentAPIForeignKey()
+                                {
+                                    NavigationName = firstMethodNode.MethodArguments[0],
+                                    InverseNavigationName = InverseNavigationName,
+                                    ForeignKeySource = InfoSourceEnum.ByOnModelCreating,
+                                    PrincipalKeySource = InfoSourceEnum.ByConvention,
+                                    InverseNavigationSource = InfoSourceEnum.ByOnModelCreating,
+                                    NavigationType = NavigationType,
+                                    IsCascadeDelete = IsCascadeDelete,
+                                    DeleteBehavior = deleteBehavior,
+                                };
+                            }
+                            result.PrincipalKeyProps = new List<FluentAPIProperty>();
+                            int ord = 0;
+                            foreach (string prop in principalKeyProps)
+                            {
+                                result.PrincipalKeyProps.Add(
+                                new FluentAPIProperty()
+                                {
+                                    PropName = prop,
+                                    PropOrder = ord++
+                                });
+                            }
+                        }
                     }
                     return result;
                 }
                 if (IsWithOne)
                 {
+                    if (ignoreTheOpposite)
+                    {
+                        if (string.IsNullOrEmpty(entityNode.EntityName)) return null;
+                        if (!string.IsNullOrEmpty(GenericPrincipalKeyClassName))
+                        {
+                            if ((GenericPrincipalKeyClassName == entityNode.EntityName) ||
+                                GenericPrincipalKeyClassName.EndsWith("." + entityNode.EntityName) ||
+                                entityNode.EntityName.EndsWith("." + GenericPrincipalKeyClassName)) return null;
+                        }
+                        if (!string.IsNullOrEmpty(GenericForeignKeyClassName))
+                        {
+                            if (!((GenericForeignKeyClassName == entityNode.EntityName) ||
+                                GenericForeignKeyClassName.EndsWith("." + entityNode.EntityName) ||
+                                entityNode.EntityName.EndsWith("." + GenericForeignKeyClassName))) return null;
+                        }
+                    }
+
                     NavigationTypeEnum NavigationType = NavigationTypeEnum.OptionalToOne;
                     if (IsRequired)
                     {
@@ -1877,32 +2105,53 @@ namespace CS82ANGULAR.Helpers
                     {
                         NavigationName = firstMethodNode.MethodArguments[0],
                         InverseNavigationName = InverseNavigationName,
-                        GenericForeignKeyClassName = genericName, //
+                        GenericForeignKeyClassName = GenericForeignKeyClassName, //
                         ForeignKeySource = InfoSourceEnum.ByOnModelCreating,
                         PrincipalKeySource = InfoSourceEnum.ByConvention,
                         InverseNavigationSource = InfoSourceEnum.ByOnModelCreating,
                         NavigationType = NavigationType,
-                        IsCascadeDelete = IsCascadeDelete
+                        IsCascadeDelete = IsCascadeDelete,
+                        DeleteBehavior = deleteBehavior,
                     };
-                    if (foreignKeyProps == null) return result;
-                    if (foreignKeyProps.Count < 1) return result;
-                    result.PrincipalKeyProps = new List<FluentAPIProperty>(); // correct !!!
-                    int ord = 0;
-                    foreach (string prop in foreignKeyProps)
+                    if (principalKeyProps != null)
                     {
-                        result.PrincipalKeyProps.Add(
-                        new FluentAPIProperty()
+                        if (principalKeyProps.Count > 0)
                         {
-                            PropName = prop,
-                            PropOrder = ord++
-                        });
+                            result.PrincipalKeyProps = new List<FluentAPIProperty>(); // correct !!!
+                            int ord = 0;
+                            foreach (string prop in principalKeyProps)
+                            {
+                                result.PrincipalKeyProps.Add(
+                                new FluentAPIProperty()
+                                {
+                                    PropName = prop,
+                                    PropOrder = ord++
+                                });
+                            }
+                        }
+                    }
+                    if (foreignKeyProps != null)
+                    {
+                        if (foreignKeyProps.Count > 0)
+                        {
+                            result.ForeignKeyProps = new List<FluentAPIProperty>();
+                            int ord = 0;
+                            foreach (string prop in foreignKeyProps)
+                            {
+                                result.ForeignKeyProps.Add(
+                                new FluentAPIProperty()
+                                {
+                                    PropName = prop,
+                                    PropOrder = ord++
+                                });
+                            }
+                        }
                     }
                 }
-
             }
             return result;
         }
-        public static List<FluentAPIForeignKey> CollectForeignKeysByDbContext(this CodeClass srcClass, CodeClass dbContext)
+        public static List<FluentAPIForeignKey> CollectForeignKeysByDbContext(this CodeClass srcClass, CodeClass dbContext, bool ignoreTheOpposite = false)
         {
             List<FluentAPIForeignKey> result = null;
             if ((srcClass == null) || (dbContext == null)) return result;
@@ -1911,6 +2160,11 @@ namespace CS82ANGULAR.Helpers
             string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
             List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
                     {
+                        //   
+                        // EF.Net
+                        //
+
+                        // or
                         new FluentAPIEntityNode()
                         {
                             Methods = new List<FluentAPIMethodNode>()
@@ -1920,6 +2174,7 @@ namespace CS82ANGULAR.Helpers
                                 }
                             }
                         },
+                        // or
                         new FluentAPIEntityNode()
                         {
                             Methods = new List<FluentAPIMethodNode>()
@@ -1929,6 +2184,13 @@ namespace CS82ANGULAR.Helpers
                                 }
                             }
                         },
+
+                        //   
+                        // EF.Core
+                        //
+
+
+                        //or
                         new FluentAPIEntityNode()
                         {
                             Methods = new List<FluentAPIMethodNode>()
@@ -1938,6 +2200,7 @@ namespace CS82ANGULAR.Helpers
                                 }
                             }
                         },
+                        // or
                         new FluentAPIEntityNode()
                         {
                             Methods = new List<FluentAPIMethodNode>()
@@ -1956,7 +2219,7 @@ namespace CS82ANGULAR.Helpers
             result = new List<FluentAPIForeignKey>();
             foreach (FluentAPIEntityNode entityNode in entityNodes)
             {
-                FluentAPIForeignKey foreignKey = entityNode.FluentAPIEntityNodeToForeignKey();
+                FluentAPIForeignKey foreignKey = entityNode.FluentAPIEntityNodeToForeignKey(ignoreTheOpposite);
                 if (foreignKey != null)
                 {
                     if (!string.IsNullOrEmpty(foreignKey.GenericForeignKeyClassName))
@@ -2016,24 +2279,45 @@ namespace CS82ANGULAR.Helpers
             return result;
         }
         // ready
-        public static List<FluentAPIForeignKey> CollectForeignKeys(this CodeClass srcClass, CodeClass dbContext, List<string> propNameFilter = null)
+        public static List<FluentAPIForeignKey> CollectForeignKeys(this CodeClass srcClass, CodeClass dbContext, List<string> propNameFilter = null, bool ignoreTheOpposite = false)
         {
             List<FluentAPIForeignKey> result = null;
+            List<FluentAPIEntityNode> ignoreNodes = null;
             if (srcClass == null) return result;
             bool isCollectedByDbContext = false;
-            result = srcClass.CollectForeignKeysByDbContext(dbContext);
+            result = srcClass.CollectForeignKeysByDbContext(dbContext, ignoreTheOpposite);
             if (result != null)
             {
                 isCollectedByDbContext = result.Count > 0;
             }
             FluentAPIKey srcPrimKey = null;
             string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
+            if (dbContext != null)
+            {
+                CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
+                if (codeFunction != null)
+                {
+                    List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
+                    {
+                        new FluentAPIEntityNode()
+                        {
+                            Methods = new List<FluentAPIMethodNode>()
+                            {
+                                new FluentAPIMethodNode() {
+                                    MethodName = "Ignore"
+                                }
+                            }
+                        }
+                    };
+                    ignoreNodes = codeFunction.DoAnalyzeWithFilter(classNames, filter);
+                }
+            }
             foreach (CodeElement codeElement in srcClass.Members)
             {
                 if (codeElement.Kind != vsCMElement.vsCMElementProperty) continue;
                 CodeProperty codeProperty = codeElement as CodeProperty;
                 string codePropertyName = codeProperty.Name;
-                if ((propNameFilter != null) && (!isCollectedByDbContext))
+                if ((propNameFilter != null) && (!isCollectedByDbContext)) // (!isCollectedByDbContext) to remove from the result in the code below
                 {
                     if (!propNameFilter.Contains(codePropertyName)) continue;
                 }
@@ -2055,12 +2339,17 @@ namespace CS82ANGULAR.Helpers
 
                 if (isCollectedByDbContext)
                 {
+                    if (ignoreNodes != null)
+                    {
+                        if (ignoreNodes.HoldsIgnore(codePropertyName)) continue;
+                    }
+
                     FluentAPIForeignKey existedForeignKey =
                     result.FirstOrDefault(r =>
                         (r.NavigationName == codePropertyName) && (r.EntityName == classNames[0]) ||
                         (r.InverseNavigationName == codePropertyName) && (r.NavigationEntityName == classNames[0]));
 
-
+                    
 
                     if (existedForeignKey != null)
                     {
@@ -2119,18 +2408,72 @@ namespace CS82ANGULAR.Helpers
                             existedForeignKey.NavigationEntityFullName = masterCodeClass.FullName;
                             existedForeignKey.CodeElementNavigationRef = masterCodeClass as CodeElement;
                             existedForeignKey.CodeElementEntityRef = srcClass as CodeElement;
+                            bool isNotDefined = existedForeignKey.PrincipalKeyProps == null;
+                            if (!isNotDefined)
+                            {
+                                isNotDefined = existedForeignKey.PrincipalKeyProps.Count < 1;
+                            }
                             FluentAPIKey locPrimKey = new FluentAPIKey();
                             masterCodeClass.CollectPrimaryKeyPropsHelper(locPrimKey, dbContext);
-                            if (locPrimKey.KeyProperties != null)
+                            if (isNotDefined)
                             {
-                                if (locPrimKey.KeyProperties.Count > 0)
+                                if (locPrimKey.KeyProperties != null)
                                 {
-                                    existedForeignKey.PrincipalKeyProps = locPrimKey.KeyProperties;
-                                    existedForeignKey.PrincipalKeySource = locPrimKey.KeySource;
-                                    existedForeignKey.PrincipalKeySourceCount = locPrimKey.SourceCount;
+                                    if (locPrimKey.KeyProperties.Count > 0)
+                                    {
+                                        existedForeignKey.PrincipalKeyProps = locPrimKey.KeyProperties;
+                                        existedForeignKey.PrincipalKeySource = locPrimKey.KeySource;
+                                        existedForeignKey.PrincipalKeySourceCount = locPrimKey.SourceCount;
+                                    }
+                                }
+                            } 
+                            else
+                            {
+                                bool isIdentical = false;
+                                if (locPrimKey.KeyProperties != null)
+                                {
+                                    if (locPrimKey.KeyProperties.Count > 0)
+                                    {
+                                        isIdentical = locPrimKey.IsTheListOfNamesIdentical(existedForeignKey.PrincipalKeyProps);
+                                        if (isIdentical)
+                                        {
+                                            existedForeignKey.PrincipalKeyProps = locPrimKey.KeyProperties;
+                                            existedForeignKey.PrincipalKeySource = locPrimKey.KeySource;
+                                            existedForeignKey.PrincipalKeySourceCount = locPrimKey.SourceCount;
+                                        }
+                                    }
+                                }
+                                if(!isIdentical)
+                                {
+                                    List<FluentAPIKey> masterUniqueKeys = new List<FluentAPIKey>();
+                                    masterCodeClass.CollectAllUniqueKeysHelper(masterUniqueKeys, dbContext);
+                                    FluentAPIKey masterUniqueKey = masterUniqueKeys.GetFluentAPIKeyWithIdenticalListOfNames(existedForeignKey.PrincipalKeyProps);
+                                    if (masterUniqueKey != null)
+                                    {
+                                        existedForeignKey.PrincipalKeyProps = masterUniqueKey.KeyProperties;
+                                        existedForeignKey.PrincipalKeySource = masterUniqueKey.KeySource;
+                                        existedForeignKey.PrincipalKeySourceCount = masterUniqueKey.SourceCount;
+                                    } else
+                                    {
+                                        
+                                        existedForeignKey.PrincipalKeySourceCount = 0;
+                                        existedForeignKey.HasErrors = true;
+                                        if (string.IsNullOrEmpty(existedForeignKey.ErrorsText)) existedForeignKey.ErrorsText = "";
+                                        existedForeignKey.ErrorsText += "For the PrincipalKeyProps \r\n {";
+                                        string prfx = "";
+                                        foreach(FluentAPIProperty pkp in existedForeignKey.PrincipalKeyProps)
+                                        {
+                                            existedForeignKey.ErrorsText += prfx + pkp.PropName;
+                                            prfx = ", ";
+                                        }
+                                        existedForeignKey.ErrorsText += "}\r\n Could not find Prim or Uniq key";
+                                        existedForeignKey.PrincipalKeyProps = null;
+                                    }
                                 }
                             }
-                            bool isNotDefined = existedForeignKey.ForeignKeyProps == null;
+
+
+                            isNotDefined = existedForeignKey.ForeignKeyProps == null;
                             if (!isNotDefined)
                             {
                                 isNotDefined = existedForeignKey.ForeignKeyProps.Count < 1;
@@ -2159,13 +2502,6 @@ namespace CS82ANGULAR.Helpers
                     }
                 }
 
-                if (propNameFilter != null)
-                {
-                    if (!propNameFilter.Contains(codePropertyName))
-                    {
-                        continue;
-                    }
-                }
 
                 FluentAPIKey masterPrimKey = new FluentAPIKey();
                 masterCodeClass.CollectPrimaryKeyPropsHelper(masterPrimKey, dbContext);
@@ -2657,10 +2993,6 @@ namespace CS82ANGULAR.Helpers
                 });
             }
             return SelectedModel;
-        }
-        private static ObservableCollection<T> ObservableCollection<T>()
-        {
-            throw new NotImplementedException();
         }
     }
 
