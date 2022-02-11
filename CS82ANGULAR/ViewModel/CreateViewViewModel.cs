@@ -35,6 +35,7 @@ namespace CS82ANGULAR.ViewModel
         protected Visibility _AttributePropertyVisibility = Visibility.Collapsed;
         protected Visibility _FAPIAttributeVisibility = Visibility.Collapsed;
         protected Visibility _FAPIAttributePropertyVisibility = Visibility.Collapsed;
+        protected Visibility _UnuqieKeyVisibility = Visibility.Collapsed;
         protected Object _SelectedItem;
         protected string _SelectedItemViewName = null;
         protected string _CheckErrorsText = null;
@@ -250,6 +251,19 @@ namespace CS82ANGULAR.ViewModel
                 OnPropertyChanged();
             }
         }
+        public Visibility UnuqieKeyVisibility
+        {
+            get
+            {
+                return _UnuqieKeyVisibility;
+            }
+            set
+            {
+                if (_UnuqieKeyVisibility == value) return;
+                _UnuqieKeyVisibility = value;
+                OnPropertyChanged();
+            }
+        }
         public Visibility AttributeVisibility
         {
             get
@@ -385,6 +399,7 @@ namespace CS82ANGULAR.ViewModel
                         KeyPropertyVisibility = Visibility.Collapsed;
                         RootVisibility = Visibility.Collapsed;
                         ForeignKeyVisibility = Visibility.Collapsed;
+                        UnuqieKeyVisibility = Visibility.Collapsed;
                         AttributePropertyVisibility = Visibility.Collapsed;
                         AttributeVisibility = Visibility.Collapsed;
                         FAPIAttributePropertyVisibility = Visibility.Collapsed;
@@ -398,6 +413,7 @@ namespace CS82ANGULAR.ViewModel
                         KeyPropertyVisibility = Visibility.Collapsed;
                         PropertyVisibility = Visibility.Collapsed;
                         ForeignKeyVisibility = Visibility.Collapsed;
+                        UnuqieKeyVisibility = Visibility.Collapsed;
                         AttributePropertyVisibility = Visibility.Collapsed;
                         AttributeVisibility = Visibility.Collapsed;
                         FAPIAttributePropertyVisibility = Visibility.Collapsed;
@@ -426,6 +442,11 @@ namespace CS82ANGULAR.ViewModel
                                 HintVisibility = Visibility.Visible;
                             }
                             else if ("Entity Properties".Equals(treeViewItem.Tag))
+                            {
+                                // show tabled data in the future releases
+                                HintVisibility = Visibility.Visible;
+                            }
+                            else if ("UniqueKeys".Equals(treeViewItem.Tag))
                             {
                                 // show tabled data in the future releases
                                 HintVisibility = Visibility.Visible;
@@ -472,6 +493,11 @@ namespace CS82ANGULAR.ViewModel
                             SelectedItem = _selectedTreeViewItem;
                             SelectedItemViewName = (_selectedTreeViewItem as ModelViewForeignKey).ViewName;
                             ForeignKeyVisibility = Visibility.Visible;
+                        }
+                        else if (_selectedTreeViewItem is ModelViewUniqueKey)
+                        {
+                            SelectedItem = _selectedTreeViewItem;
+                            UnuqieKeyVisibility = Visibility.Visible;
                         }
                         else
                         {

@@ -33,6 +33,7 @@ namespace CS82ANGULAR.Model.Serializable
         public List<CommonStaffSerializable> CommonStaffs { get; set; }
         public List<ModelViewUIFormPropertySerializable> UIFormProperties { get; set; }
         public List<ModelViewUIListPropertySerializable> UIListProperties { get; set; }
+        public List<ModelViewUniqueKeySerializable> UniqueKeys { get; set; }
     }
 
 }

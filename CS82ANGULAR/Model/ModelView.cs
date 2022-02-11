@@ -175,6 +175,7 @@ namespace CS82ANGULAR.Model
         public ObservableCollection<ModelViewEntityProperty> AllProperties { get; set; }
         public ObservableCollection<ModelViewUIFormProperty> UIFormProperties { get; set; }
         public ObservableCollection<ModelViewUIListProperty> UIListProperties { get; set; }
+        public ObservableCollection<ModelViewUniqueKey> UniqueKeys { get; set; }
 
     }
 

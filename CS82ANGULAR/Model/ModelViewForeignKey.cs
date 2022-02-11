@@ -321,5 +321,6 @@ namespace CS82ANGULAR.Model
                 OnPropertyChanged();
             }
         }
+
     }
 }

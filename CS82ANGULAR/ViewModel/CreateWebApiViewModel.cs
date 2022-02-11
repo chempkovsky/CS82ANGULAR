@@ -46,6 +46,7 @@ namespace CS82ANGULAR.ViewModel
 
         protected Visibility _FAPIAttributeVisibility = Visibility.Collapsed;
         protected Visibility _FAPIAttributePropertyVisibility = Visibility.Collapsed;
+        protected Visibility _UnuqieKeyVisibility = Visibility.Collapsed;
 
         protected Object _SelectedItem;
         protected string _WebApiServiceName;
@@ -227,6 +228,7 @@ namespace CS82ANGULAR.ViewModel
                         KeyPropertyVisibility = Visibility.Collapsed;
                         RootVisibility = Visibility.Collapsed;
                         ForeignKeyVisibility = Visibility.Collapsed;
+                        UnuqieKeyVisibility = Visibility.Collapsed;
                         UIFormPropListVisibility = Visibility.Collapsed;
                         UIListPropListVisibility = Visibility.Collapsed;
                         UIFormPropertyVisibility = Visibility.Collapsed;
@@ -246,6 +248,7 @@ namespace CS82ANGULAR.ViewModel
                         PropertyVisibility = Visibility.Collapsed;
                         ScalarPropertyVisibility = Visibility.Collapsed;
                         ForeignKeyVisibility = Visibility.Collapsed;
+                        UnuqieKeyVisibility = Visibility.Collapsed;
                         UIFormPropListVisibility = Visibility.Collapsed;
                         UIListPropListVisibility = Visibility.Collapsed;
                         UIFormPropertyVisibility = Visibility.Collapsed;
@@ -289,6 +292,11 @@ namespace CS82ANGULAR.ViewModel
                             else if ("UI Form Properties".Equals(treeViewItem.Tag))
                             {
                                 UIFormPropListVisibility = Visibility.Visible;
+                            }
+                            else if ("UniqueKeys".Equals(treeViewItem.Tag))
+                            {
+                                // show tabled data in the future releases
+                                HintVisibility = Visibility.Visible;
                             }
                             else
                             {
@@ -386,6 +394,11 @@ namespace CS82ANGULAR.ViewModel
                             SelectedItem = _SelectedTreeViewItem;
                             UIListPropertyVisibility = Visibility.Visible;
                         }
+                        else if (_SelectedTreeViewItem is ModelViewUniqueKeySerializable)
+                        {
+                            SelectedItem = _SelectedTreeViewItem;
+                            UnuqieKeyVisibility = Visibility.Visible;
+                        }
                         else
                         {
                             HintVisibility = Visibility.Visible;
@@ -460,6 +473,20 @@ namespace CS82ANGULAR.ViewModel
                 OnPropertyChanged();
             }
         }
+        public Visibility UnuqieKeyVisibility
+        {
+            get
+            {
+                return _UnuqieKeyVisibility;
+            }
+            set
+            {
+                if (_UnuqieKeyVisibility == value) return;
+                _UnuqieKeyVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
         public Visibility ScalarPropertyVisibility
         {
             get

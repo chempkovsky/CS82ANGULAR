@@ -2992,6 +2992,44 @@ namespace CS82ANGULAR.Helpers
                     FAPIAttributes = scalarProperty.FAPIAttributes.CloneModelViewFAPIAttributeCollection()
                 });
             }
+            if (SelectedModel.UniqueKeys == null)
+            {
+                SelectedModel.UniqueKeys = new ObservableCollection<ModelViewUniqueKey>();
+            } else
+            {
+                SelectedModel.UniqueKeys.Clear();
+            }
+            IList<FluentAPIKey> UniqueKeys = new List<FluentAPIKey>();
+            srcClass.CollectAllUniqueKeysHelper(UniqueKeys, dbContext);
+            foreach (FluentAPIKey key in UniqueKeys)
+            {
+                ModelViewUniqueKey modelViewUniqueKey = new ModelViewUniqueKey();
+                modelViewUniqueKey.IsPrimary = key.IsPrimary;
+                modelViewUniqueKey.UniqueKeyName = key.KeyName;
+                modelViewUniqueKey.KeySource = key.KeySource;
+                if(key.KeyProperties != null)
+                {
+                    if (modelViewUniqueKey.UniqueKeyProperties == null) modelViewUniqueKey.UniqueKeyProperties = new List<ModelViewKeyProperty>();
+                    foreach (var property in key.KeyProperties)
+                    {
+                        ModelViewProperty pkp =
+                            SelectedModel.ScalarProperties.FirstOrDefault(sp => sp.OriginalPropertyName == property.PropName);
+                        if (pkp != null)
+                        {
+                            modelViewUniqueKey.UniqueKeyProperties.Add(new ModelViewKeyProperty()
+                            {
+                                OriginalPropertyName = pkp.OriginalPropertyName,
+                                TypeFullName = pkp.TypeFullName,
+                                IsNullable = pkp.IsNullable,
+                                IsRequired = pkp.IsRequired,
+                                UnderlyingTypeName = pkp.UnderlyingTypeName,
+                                ViewPropertyName = pkp.ViewPropertyName
+                            });
+                        }
+                    }
+                }
+                SelectedModel.UniqueKeys.Add(modelViewUniqueKey);
+            }
             return SelectedModel;
         }
     }

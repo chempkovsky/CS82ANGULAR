@@ -98,6 +98,7 @@
     <Compile Include="Model\ModelViewUIBaseProperty.cs" />
     <Compile Include="Model\ModelViewUIFormProperty.cs" />
     <Compile Include="Model\ModelViewUIListProperty.cs" />
+    <Compile Include="Model\ModelViewUniqueKey.cs" />
     <Compile Include="Model\NavigationTypeEnum.cs" />
     <Compile Include="Model\Serializable\AllowedFileTypeSerializable.cs" />
     <Compile Include="Model\Serializable\AllowedFileTypesSerializable.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="Model\Serializable\ModelViewUIFormPropertySerializable.cs" />
     <Compile Include="Model\Serializable\ModelViewUIListPropertySerializable.cs" />
     <Compile Include="Model\Serializable\ModelViewUIPropertySerializable.cs" />
+    <Compile Include="Model\Serializable\ModelViewUniqueKeySerializable.cs" />
     <Compile Include="Model\Serializable\UI\ModelViewPropertyOfVwNotified.cs" />
     <Compile Include="Model\SolutionCodeElement.cs" />
     <Compile Include="Model\SolutionProject.cs" />
@@ -259,6 +261,14 @@
     <Content Include="Templates\HasAlternateKeyTmplst\HasAlternateKey.Net.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\ViewModelTmplst\ViewModel.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\ViewPageModelTmplst\ViewModelPage.cs.t4">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>

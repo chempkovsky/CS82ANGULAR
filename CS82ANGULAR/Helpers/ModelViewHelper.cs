@@ -56,6 +56,11 @@ namespace CS82ANGULAR.Helpers
                 selectedModel.AllProperties = new ObservableCollection<ModelViewEntityProperty>();
             }
             selectedModel.AllProperties.Clear();
+            if (selectedModel.UniqueKeys == null)
+            {
+                selectedModel.UniqueKeys = new ObservableCollection<ModelViewUniqueKey>();
+            }
+            selectedModel.UniqueKeys.Clear();
             return selectedModel;
         }
         public static ModelViewSerializable ClearModelViewSerializable(this ModelViewSerializable selectedModel)
@@ -95,6 +100,12 @@ namespace CS82ANGULAR.Helpers
                 selectedModel.UIListProperties = new List<ModelViewUIListPropertySerializable>();
             }
             selectedModel.UIListProperties.Clear();
+
+            if (selectedModel.UniqueKeys == null)
+            {
+                selectedModel.UniqueKeys = new List<ModelViewUniqueKeySerializable>();
+            }
+            selectedModel.UniqueKeys.Clear();
 
             return selectedModel;
         }
@@ -386,12 +397,44 @@ namespace CS82ANGULAR.Helpers
             }
             return destForeignKey;
         }
+        public static ModelViewUniqueKeySerializable ModelViewUniqueKeyAssingTo(this ModelViewUniqueKey srcUniqueKey, ModelViewUniqueKeySerializable destUniqueKey)
+        {
+            if ((srcUniqueKey == null) || (destUniqueKey == null)) return null;
+            destUniqueKey.UniqueKeyName = srcUniqueKey.UniqueKeyName;
+            destUniqueKey.IsPrimary = srcUniqueKey.IsPrimary;
+            destUniqueKey.KeySource = srcUniqueKey.KeySource;
+            if (destUniqueKey.UniqueKeyProperties == null)
+            {
+                destUniqueKey.UniqueKeyProperties = new List<ModelViewKeyPropertySerializable>();
+            }
+            destUniqueKey.UniqueKeyProperties.Clear();
+            if(srcUniqueKey.UniqueKeyProperties != null)
+            {
+                foreach(ModelViewKeyProperty uniqueKey in srcUniqueKey.UniqueKeyProperties)
+                {
+                    destUniqueKey.UniqueKeyProperties.Add(uniqueKey.ModelViewKeyPropertyAssingTo(new ModelViewKeyPropertySerializable()));
+                }
+            }
+
+            return destUniqueKey;
+        }
         public static bool ModelViewForeignKeyIsRequired(this ModelViewForeignKey srcForeignKey)
         {
             if (srcForeignKey == null) return false;
             if (srcForeignKey.ForeignKeyProps == null) return false;
             if (srcForeignKey.ForeignKeyProps.Count < 1) return false;
             foreach (ModelViewKeyProperty prop in srcForeignKey.ForeignKeyProps)
+            {
+                if (!prop.IsRequired) return false;
+            }
+            return true;
+        }
+        public static bool ModelViewUniqueKeyIsRequired(this ModelViewUniqueKey srcUniqueKey)
+        {
+            if (srcUniqueKey == null) return false;
+            if (srcUniqueKey.UniqueKeyProperties == null) return false;
+            if (srcUniqueKey.UniqueKeyProperties.Count < 1) return false;
+            foreach (ModelViewKeyProperty prop in srcUniqueKey.UniqueKeyProperties)
             {
                 if (!prop.IsRequired) return false;
             }
@@ -452,6 +495,13 @@ namespace CS82ANGULAR.Helpers
                             destModel.ScalarProperties.Add(modelViewPropertySerializable);
                         }
                     }
+                }
+            }
+            if (srcModel.UniqueKeys != null)
+            {
+                foreach (ModelViewUniqueKey uniqueKey in srcModel.UniqueKeys)
+                {
+                    destModel.UniqueKeys.Add(uniqueKey.ModelViewUniqueKeyAssingTo(new ModelViewUniqueKeySerializable()));
                 }
             }
             if (srcModel.UIFormProperties != null)
@@ -775,6 +825,7 @@ namespace CS82ANGULAR.Helpers
                 GenerateJSonAttribute = srcModelViewSerializable.GenerateJSonAttribute,
                 ScalarProperties = srcModelViewSerializable.ScalarProperties,
                 ForeignKeys = srcModelViewSerializable.ForeignKeys,
+                UniqueKeys = srcModelViewSerializable.UniqueKeys,
                 PrimaryKeyProperties = srcModelViewSerializable.PrimaryKeyProperties,
                 AllProperties = srcModelViewSerializable.AllProperties,
                 CommonStaffs = srcModelViewSerializable.CommonStaffs,
@@ -793,6 +844,37 @@ namespace CS82ANGULAR.Helpers
                 WebApiServiceDefaultProjectNameSpace = srcModelViewSerializable.WebApiServiceDefaultProjectNameSpace,
                 WebApiServiceFolder = srcModelViewSerializable.WebApiServiceFolder
             };
+        }
+        public static ModelViewKeyProperty ModelViewKeyPropertySerializableAssingTo(this ModelViewKeyPropertySerializable srcProp, ModelViewKeyProperty destProp)
+        {
+            if ((srcProp == null) || (destProp == null)) return null;
+            destProp.OriginalPropertyName = srcProp.OriginalPropertyName;
+            destProp.TypeFullName = srcProp.TypeFullName;
+            destProp.IsNullable = srcProp.IsNullable;
+            destProp.IsRequired = srcProp.IsRequired;
+            destProp.UnderlyingTypeName = srcProp.UnderlyingTypeName;
+            destProp.ViewPropertyName = srcProp.ViewPropertyName;
+            destProp.JsonPropertyName = srcProp.JsonPropertyName;
+            return destProp;
+        }
+        public static ModelViewUniqueKey ModelViewUniqueKeySerializableAssingTo(this ModelViewUniqueKeySerializable srcUniqueKey, ModelViewUniqueKey destUniqueKey)
+        {
+            if ((srcUniqueKey == null) || (destUniqueKey == null)) return destUniqueKey;
+            destUniqueKey.UniqueKeyName = srcUniqueKey.UniqueKeyName;
+            destUniqueKey.IsPrimary = srcUniqueKey.IsPrimary;
+            destUniqueKey.KeySource = srcUniqueKey.KeySource;
+            if(destUniqueKey.UniqueKeyProperties == null)
+            {
+                destUniqueKey.UniqueKeyProperties = new List<ModelViewKeyProperty>();
+            }
+            destUniqueKey.UniqueKeyProperties.Clear();
+            if (srcUniqueKey.UniqueKeyProperties != null)
+            {
+                foreach (ModelViewKeyPropertySerializable uniqueKeyPropertie in srcUniqueKey.UniqueKeyProperties) {
+                    destUniqueKey.UniqueKeyProperties.Add(uniqueKeyPropertie.ModelViewKeyPropertySerializableAssingTo(new ModelViewKeyProperty()));
+                }
+            }
+            return destUniqueKey;
         }
         public static ModelView ModelViewSerializableAssingTo(this ModelViewSerializable srcModelView, ModelView destModelView, DbContextSerializable CurrentDbContext, bool copyHeader = true)
         {
@@ -875,6 +957,20 @@ namespace CS82ANGULAR.Helpers
                     }
                 }
             }
+            /*
+            Do not copy Prim and Unique keys
+                        if (srcModelView.UniqueKeys != null) 
+                        {
+                            if (destModelView.UniqueKeys == null)
+                            {
+                                destModelView.UniqueKeys = new ObservableCollection<ModelViewUniqueKey>();
+                            }
+                            foreach (ModelViewUniqueKeySerializable srcUniqueKey in srcModelView.UniqueKeys)
+                            {
+                                destModelView.UniqueKeys.Add(srcUniqueKey.ModelViewUniqueKeySerializableAssingTo(new ModelViewUniqueKey()));
+                            }
+                        }
+            */
             if (destModelView.UIFormProperties == null)
             {
                 destModelView.UIFormProperties = new ObservableCollection<ModelViewUIFormProperty>();
@@ -1163,7 +1259,6 @@ namespace CS82ANGULAR.Helpers
             }
             return GetViewsByForeignNameChain(context, fk.ViewName, string.Join(".", foreignKeys, 1, foreignKeys.Length - 1));
         }
-
         public static List<ModelViewAttributeSerializable> ListModelViewAttributeSerializableGetCopy(this List<ModelViewAttributeSerializable> Attributes)
         {
             List<ModelViewAttributeSerializable> result = new List<ModelViewAttributeSerializable>();
@@ -1348,6 +1443,23 @@ namespace CS82ANGULAR.Helpers
             }
             return result;
         }
+        public static List<ModelViewUniqueKeySerializable> ListModelViewUniqueKeySerializableGetCopy(this List<ModelViewUniqueKeySerializable> UniqueKeys)
+        {
+            List<ModelViewUniqueKeySerializable> result = new List<ModelViewUniqueKeySerializable>();
+            if (UniqueKeys == null) return result;
+            foreach (ModelViewUniqueKeySerializable modelViewUniqueKeySerializable in UniqueKeys)
+            {
+                result.Add(new ModelViewUniqueKeySerializable()
+                {
+                    UniqueKeyName = modelViewUniqueKeySerializable.UniqueKeyName,
+                    IsPrimary = modelViewUniqueKeySerializable.IsPrimary,
+                    KeySource = modelViewUniqueKeySerializable.KeySource,
+                    UniqueKeyProperties = ListModelViewKeyPropertySerializableGetCopy(modelViewUniqueKeySerializable.UniqueKeyProperties)
+                });
+            }
+            return result;
+        }
+
         public static List<ModelViewUIFormPropertySerializable> ListModelViewForeignKeySerializableGetCopy(this List<ModelViewUIFormPropertySerializable> UIFormProperties)
         {
             List<ModelViewUIFormPropertySerializable> result = new List<ModelViewUIFormPropertySerializable>();
@@ -1436,6 +1548,7 @@ namespace CS82ANGULAR.Helpers
             result.PrimaryKeyProperties = ListModelViewKeyPropertySerializableGetCopy(srcModelViewSerializable.PrimaryKeyProperties);
             result.AllProperties = ListModelViewEntityPropertySerializableGetCopy(srcModelViewSerializable.AllProperties);
             result.ForeignKeys = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.ForeignKeys, UniqueProjectName, EntityFullClassName);
+            result.UniqueKeys = ListModelViewUniqueKeySerializableGetCopy(srcModelViewSerializable.UniqueKeys);
             result.UIFormProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIFormProperties);
             result.UIListProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIListProperties);
             return result;
@@ -1474,11 +1587,11 @@ namespace CS82ANGULAR.Helpers
             result.PrimaryKeyProperties = ListModelViewKeyPropertySerializableGetCopy(srcModelViewSerializable.PrimaryKeyProperties);
             result.AllProperties = ListModelViewEntityPropertySerializableGetCopy(srcModelViewSerializable.AllProperties);
             result.ForeignKeys = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.ForeignKeys, srcModelViewSerializable.RootEntityUniqueProjectName, srcModelViewSerializable.RootEntityFullClassName);
+            result.UniqueKeys = ListModelViewUniqueKeySerializableGetCopy(srcModelViewSerializable.UniqueKeys);
             result.UIFormProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIFormProperties);
             result.UIListProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIListProperties);
             return result;
         }
-
         public static ModelViewAttribute CloneModelViewAttribute(this ModelViewAttribute src)
         {
             ModelViewAttribute dest = new ModelViewAttribute();
@@ -1515,7 +1628,6 @@ namespace CS82ANGULAR.Helpers
             }
             return dest;
         }
-
         public static ModelViewFAPIAttribute CloneModelViewFAPIAttribute(this ModelViewFAPIAttribute src)
         {
             ModelViewFAPIAttribute dest = new ModelViewFAPIAttribute();
