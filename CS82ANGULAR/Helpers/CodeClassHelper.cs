@@ -554,7 +554,10 @@ namespace CS82ANGULAR.Helpers
                     if(mthd.MethodArguments != null)
                     {
                         if (mthd.MethodArguments.Count > 0)
+                        {
                             key.KeyName = mthd.MethodArguments[0];
+                            if (!string.IsNullOrEmpty(key.KeyName)) key.KeyName = key.KeyName.Replace("\"", "");
+                        }
                     }
                 }
                 key.SourceCount = key.KeyProperties.Count;
@@ -875,6 +878,7 @@ namespace CS82ANGULAR.Helpers
             if (codeFunction != null)
             {
                 string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
+                if (!string.IsNullOrEmpty(UniqueKeyName)) UniqueKeyName = "\"" + UniqueKeyName.Replace("\"", "") + "\"";
                 List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
                     {
                         new FluentAPIEntityNode()
