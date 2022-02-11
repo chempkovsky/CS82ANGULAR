@@ -121,6 +121,7 @@
     <Compile Include="Model\Serializable\ModelViewUIFormPropertySerializable.cs" />
     <Compile Include="Model\Serializable\ModelViewUIListPropertySerializable.cs" />
     <Compile Include="Model\Serializable\ModelViewUIPropertySerializable.cs" />
+    <Compile Include="Model\Serializable\ModelViewUniqueKeyOfVwSerializable.cs" />
     <Compile Include="Model\Serializable\ModelViewUniqueKeySerializable.cs" />
     <Compile Include="Model\Serializable\UI\ModelViewPropertyOfVwNotified.cs" />
     <Compile Include="Model\SolutionCodeElement.cs" />
@@ -269,6 +270,42 @@
     <Content Include="Templates\ViewPageModelTmplst\ViewModelPage.cs.t4">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\DefaultWebApiService.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\WebApiAspNetBitAggrService.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\WebApiAspNetRoleService.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\WebApiAspNetUserMasksService.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\WebApiAspNetUserRoles.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\WebApiAspNetUserService.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\WebApiService.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\WebApiServiceBitAggr.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\DefaultWebApiService.Core.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
   </ItemGroup>
   <ItemGroup>
