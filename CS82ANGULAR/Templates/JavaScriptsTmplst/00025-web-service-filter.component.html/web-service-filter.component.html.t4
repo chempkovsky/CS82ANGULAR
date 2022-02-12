@@ -1,0 +1,125 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+    string AppearancePropName           = "appearance";
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string OverflowSelector             = "ovrflw";
+    string OverflowPropName             = "ovrflw";
+    string containerMenuItemsPropName           = "contMenuItems";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string showAddFltItemSelector       = "show-add-flt-item";
+    string showAddFltItemPropName       = "showAddFltItem";
+
+    string OnBackBtnMethodName          = "onBackBtnMd";
+    string OnBackBtnPropName            = "onBackBtn";
+    string showBackBtnPropName          = "showBackBtn";
+    string showBackBtnSelector          = "show-back-btn";
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+#>
+
+  <div>
+     <div fxLayout="row" fxLayoutAlign="flex-end space-around"> 
+         <label fxFlex fxLayoutAlign="flex-start space-around">{{<#= captionPropName #>}}</label>
+         <button mat-icon-button color="primary" (click)="<#= OnBackBtnMethodName #>()" *ngIf="<#= showBackBtnPropName #>"
+            matTooltip="Navigate back to master"> 
+            <mat-icon>arrow_back</mat-icon>
+        </button>         
+        <span fxFlex="3%"></span>  
+        <button mat-icon-button color="primary" (click)="addFilter()" *ngIf="showFilter && <#= showAddFltItemPropName #>"
+            matTooltip="Add filter item "> 
+            <mat-icon  >filter_9_plus</mat-icon>
+        </button>        
+        <span fxFlex="1%"></span>   
+        <button mat-icon-button color="warn" (click)="removeAllFilters()" *ngIf="showFilter && <#= showAddFltItemPropName #>"
+            matTooltip="Remove all filter items"> 
+            <mat-icon  >filter_none</mat-icon>
+        </button>       
+        <span fxFlex="1%"></span>  
+        <button mat-icon-button color="primary" (click)="onApplyFilterClicked()" 
+            matTooltip="Apply filter"> 
+            <mat-icon   >refresh</mat-icon>
+        </button>      
+        <span fxFlex="2%"></span>     
+        <ng-template ngFor let-item [ngForOf]="<#= containerMenuItemsPropName #>">
+            <span fxFlex="1%"></span>  
+            <button mat-icon-button [color]="item.iconColor" (click)="<#= onContainerMenuItemClickMethodName #>(item)" 
+                [matTooltip]="item.caption"> 
+                <mat-icon>{{item.iconName}}</mat-icon>
+            </button>     
+        </ng-template>            
+        <span fxFlex="1%"></span>
+     </div> 
+
+    <div *ngIf="showFilter" [style.maxHeight.em]="<#= MaxHeightPropName #>X" [style.overflow]="<#= OverflowPropName #>"> 
+        <div 
+            fxLayout
+            fxLayout.xs="column"
+            fxLayoutAlign="left"
+            fxLayoutGap="1px"
+            fxLayoutGap.xs="0px" *ngFor="let flt of webServiceFilters;" >
+            <span fxFlex="39%" fxFlex.xs="99%">
+                <span fxFlex="1%"></span>
+
+                <mat-form-field [appearance]="<#= AppearancePropName #>" fxFlex="99%">
+                    <mat-label>Column name</mat-label>
+                    <mat-select [formControl]="flt.fltrName" (selectionChange)="onSelectionChanged($event, flt)">
+                        <mat-option *ngFor="let fltDef of webServiceFilterDefs;" [value]="fltDef.fltrName">{{fltDef.fltrCaption}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </span>
+
+            <div fxFlex="59%" fxFlex.xs="99%" fxLayout="row">
+                <span fxFlex="1%"></span>
+
+                <mat-form-field [appearance]="<#= AppearancePropName #>" fxFlex="20%">
+                    <mat-label>Operator</mat-label>
+                    <mat-select [formControl]="flt.fltrOperator">
+                        <mat-option *ngFor="let oprtr of webServiceOperators;" [value]="oprtr.oName">{{oprtr.oCaption}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+
+                <span fxFlex="1%"></span>                
+                    
+                <mat-form-field *ngIf="flt.fltrDataType !== 'datetime'" [appearance]="<#= AppearancePropName #>" fxFlex="72%">
+                    <mat-label>Filter value</mat-label>
+                    <input  matInput placeholder="Placeholder" [formControl]="flt.fltrValue" [maxlength]="flt.fltrMaxLen">
+                    <mat-error *ngIf="flt.fltrValue.invalid">{{getErrorMessage(flt.fltrValue)}}</mat-error>
+                    <mat-hint align="end" *ngIf="flt.fltrMaxLen">{{flt.fltrValue.value?.length || 0}}/{{flt.fltrMaxLen}}</mat-hint>
+                </mat-form-field>
+
+                <ng-template [ngIf]="flt.fltrDataType === 'datetime'">
+                    <mat-form-field [appearance]="<#= AppearancePropName #>" fxFlex="72%">
+                        <mat-label>Filter value</mat-label>
+                        <input matNativeControl [matDatepicker]="apicker"  placeholder="Placeholder" [formControl]="flt.fltrValue" [min]="flt.fltrMin" [max]="flt.fltrMax" > 
+                        <mat-datepicker-toggle matSuffix [for]="apicker"></mat-datepicker-toggle>
+                        <mat-datepicker #apicker></mat-datepicker>
+                        <mat-error *ngIf="flt.fltrValue.invalid">{{getErrorMessage(flt.fltrValue)}}</mat-error>
+                    </mat-form-field>
+                </ng-template>
+                    
+                
+                <button mat-icon-button fxFlex="5%" aria-label="Clear" 
+                    matTooltip="Remove current filter item"
+                    color="warn" (click)="removeFltr(flt)">
+                    <mat-icon>delete_forever</mat-icon>
+                </button>     
+            </div>
+        </div>
+        
+    </div>
+</div>

@@ -1,0 +1,201 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+    string columnSelectorItemInterfaceFolder    = "00032-column-selector-item.interface.ts";
+    string columnSelectorComponentFolder        = "00033-column-selector.component.ts";
+    string columnSelectorDlgCssComponentFolder  = "00035-column-selector-dlg.component.css";
+    string columnSelectorDlgHtmlComponentFolder = "00035-column-selector-dlg.component.html";
+    string columnSelectorDlgComponentFolder     = "00035-column-selector-dlg.component.ts";
+
+    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, columnSelectorDlgComponentFolder);
+
+#>
+
+import { Component, ViewChild, Inject } from '@angular/core';
+import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+
+import { <#= GetModelClassName(Model, columnSelectorItemInterfaceFolder) #> } from '<#= GetFolderName(Model, columnSelectorItemInterfaceFolder, columnSelectorDlgComponentFolder)#>';
+import { <#= GetComponentClassName(Model, columnSelectorComponentFolder) #> } from '<#= GetFolderName(Model, columnSelectorComponentFolder, columnSelectorDlgComponentFolder)#>';
+
+@Component({
+  selector: 'app-<#= componentSelectorCommonPart #>',
+  templateUrl: '<#= GetFolderName(Model, columnSelectorDlgHtmlComponentFolder, columnSelectorDlgComponentFolder)#>.html',
+  styleUrls: ['<#= GetFolderName(Model, columnSelectorDlgCssComponentFolder, columnSelectorDlgComponentFolder)#>.css']
+})
+
+export class <#= GetComponentClassName(Model, columnSelectorDlgComponentFolder) #> { 
+    @ViewChild(<#= GetComponentClassName(Model, columnSelectorComponentFolder) #>) childForm: <#= GetComponentClassName(Model, columnSelectorComponentFolder) #>|any;
+    constructor(public dialogRef: MatDialogRef<<#= GetComponentClassName(Model, columnSelectorDlgComponentFolder) #>>, @Inject(MAT_DIALOG_DATA) public data: Array<<#=  GetModelClassName(Model, columnSelectorItemInterfaceFolder) #>>) { }
+    onCancel() {
+        this.dialogRef.close(null);
+    }
+    onOk() {
+        if (typeof this.childForm === 'undefined') return;
+        if (this.childForm === null) return;
+        let ind = this.childForm.colums.findIndex((e: { checked: boolean; }) => { return e.checked === true; })
+        if(ind < 0) {
+            this.childForm.shwoError('No columns selected');
+            return;
+        }
+        this.dialogRef.close(this.childForm.colums);
+    }
+}
+
+
+<#+
+    string GetInterfaceDlgName(ModelViewSerializable model) {
+        return "I"+model.ViewName+"Dlg";
+    }
+    string GetInterfaceName(ModelViewSerializable model) {
+        return "I"+model.ViewName;
+    }
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".interface","");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return "I" + sb.ToString();
+    }
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        return refItem.FileName.Replace(".component","");
+    }
+#>

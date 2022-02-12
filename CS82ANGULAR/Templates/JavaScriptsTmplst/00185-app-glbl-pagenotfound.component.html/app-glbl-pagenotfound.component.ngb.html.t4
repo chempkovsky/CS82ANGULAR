@@ -1,0 +1,27 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+
+
+<div class="pagenotfound-container">
+    <div class="pagenotfound-item-container" fxLayout="column" fxLayoutAlign="center space-between">
+
+        <h1 fxLayout="row" fxLayoutAlign="center"> 
+            <span class="badge badge-danger">
+              <i class="material-icons" type="button">error</i> 404 Page Not Found
+            </span>
+        </h1>
+        <router-outlet></router-outlet>
+    </div>
+</div>

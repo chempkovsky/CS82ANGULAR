@@ -1,0 +1,121 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+    string AppearancePropName           = "appearance";
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string OverflowSelector             = "ovrflw";
+    string OverflowPropName             = "ovrflw";
+    string containerMenuItemsPropName           = "contMenuItems";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string showAddFltItemSelector       = "show-add-flt-item";
+    string showAddFltItemPropName       = "showAddFltItem";
+
+    string OnBackBtnMethodName          = "onBackBtnMd";
+    string OnBackBtnPropName            = "onBackBtn";
+    string showBackBtnPropName          = "showBackBtn";
+    string showBackBtnSelector          = "show-back-btn";
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+#>
+
+  <div>
+     <div fxLayout="row" fxLayoutAlign="flex-end space-around"> 
+        <label fxFlex fxLayoutAlign="flex-start space-around">{{<#= captionPropName #>}}</label>
+        <button type="button" nglButtonIcon variant="bare" (click)="<#= OnBackBtnMethodName #>()" *ngIf="<#= showBackBtnPropName #>"
+            iconName="utility:settings" title="Navigate back to master" size="large">
+        </button>
+        <span fxFlex="3%"></span>  
+        <button type="button" nglButtonIcon variant="bare" (click)="addFilter()" *ngIf="showFilter && <#= showAddFltItemPropName #>"
+            iconName="utility:add" title="Add filter item" size="large">
+        </button>
+        <span fxFlex="1%"></span>   
+        <button type="button" nglButtonIcon variant="bare" (click)="removeAllFilters()" *ngIf="showFilter && <#= showAddFltItemPropName #>"
+            iconName="utility:recycle_bin_empty" title="Remove all filter items" size="large">
+        </button>
+        <span fxFlex="1%"></span>  
+        <button type="button" nglButtonIcon variant="bare" (click)="onApplyFilterClicked()" 
+            iconName="utility:refresh" title="Apply filter" size="large">
+        </button>
+
+        <span fxFlex="2%"></span>     
+
+        <ng-template ngFor let-item [ngForOf]="<#= containerMenuItemsPropName #>">
+            <span fxFlex="1%"></span>  
+            <button type="button" nglButtonIcon variant="bare" (click)="<#= onContainerMenuItemClickMethodName #>(item)" 
+                [iconName]="item.iconName" [title]="item.caption" size="large">
+            </button>
+        </ng-template>            
+        <span fxFlex="1%"></span>
+     </div> 
+
+    <div *ngIf="showFilter" [style.maxHeight.em]="<#= MaxHeightPropName #>X" [style.overflow]="<#= OverflowPropName #>"> 
+        <div 
+            fxLayout
+            fxLayout.xs="column"
+            fxLayoutAlign="left"
+            fxLayoutGap="1px"
+            fxLayoutGap.xs="0px" *ngFor="let flt of webServiceFilters;" >
+            <span fxFlex="39%" fxFlex.xs="99%">
+                <span fxFlex="1%"></span>
+
+                <ngl-select label="Column name"  fxFlex="99%">
+                    <select ngl [formControl]="flt.fltrName" (change)="onSelectionChanged($event.target, flt)">
+                        <option *ngFor="let fltDef of webServiceFilterDefs;" [value]="fltDef.fltrName">{{fltDef.fltrCaption}}</option>
+                    </select>                    
+                </ngl-select>
+
+            </span>
+
+            <div fxFlex="59%" fxFlex.xs="99%" fxLayout="row">
+                <span fxFlex="1%"></span>
+
+                <ngl-select label="Operator"  fxFlex="20%">
+                    <select ngl   [formControl]="flt.fltrOperator">
+                        <option *ngFor="let oprtr of webServiceOperators;" [value]="oprtr.oName">{{oprtr.oCaption}}</option>
+                    </select>                    
+                </ngl-select>
+
+                <span fxFlex="1%"></span>                
+                    
+               <div fxFlex="72%" fxLayout="column" class="slds-form-element__control"  *ngIf="flt.fltrDataType !== 'datetime'">
+                    <ngl-input fxFlex="100%" label="Filter value" [class.slds-has-error]="flt.fltrValue.invalid">
+                        <input ngl type="input" placeholder="Placeholder"  [formControl]="flt.fltrValue" [(maxlength)]="flt.fltrMaxLen">
+                    </ngl-input>
+                    <div class="slds-m-top_xx-small slds-text-color_error" *ngIf="flt.fltrValue.invalid" >{{getErrorMessage(flt.fltrValue)}}</div> 
+                    <div class="slds-form-element__help" *ngIf="flt.fltrMaxLen && flt.fltrValue.valid">{{flt.fltrValue.value?.length || 0}}/{{flt.fltrMaxLen}}</div> 
+                </div>
+
+                <div fxFlex="72%" fxLayout="column" class="slds-form-element__control" *ngIf="flt.fltrDataType === 'datetime'">
+                    <ngl-datepicker-input fxFlex="100%"  label="Filter value" [class.slds-has-error]="flt.fltrValue.invalid" [formControl]="flt.fltrValue"
+                        [min]="flt.fltrMin" [max]="flt.fltrMax" patternPlaceholder>
+                        <input nglDatepickerInput type="text">
+                    </ngl-datepicker-input>
+                    <div class="slds-m-top_xx-small slds-text-color_error" *ngIf="flt.fltrValue.invalid">{{getErrorMessage(flt.fltrValue)}}</div>   
+                </div>
+                   
+                
+                <span fxFlex="1%"></span>
+                <div class="slds-button-group" fxFlex="5%" fxFlexAlign="center" role="group" fxLayoutAlign>  
+                    <button  type="button" nglButtonIcon variant="error" iconName="utility:delete" title="Clear" (click)="removeFltr(flt)">
+                    </button>
+                </div>  
+
+
+            </div>
+        </div>
+        
+    </div>
+</div>

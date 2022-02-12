@@ -1,0 +1,73 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+    string AppearancePropName           = "appearance";
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string OverflowSelector             = "ovrflw";
+    string OverflowPropName             = "ovrflw";
+    string containerMenuItemsPropName           = "contMenuItems";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string showAddFltItemSelector       = "show-add-flt-item";
+    string showAddFltItemPropName       = "showAddFltItem";
+
+    string OnBackBtnMethodName          = "onBackBtnMd";
+    string OnBackBtnPropName            = "onBackBtn";
+    string showBackBtnPropName          = "showBackBtn";
+    string showBackBtnSelector          = "show-back-btn";
+
+#>
+
+<mat-card>
+    <mat-card-header>
+        <mat-card-subtitle>{{title}}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content >
+
+    <div [formGroup]="chngpswdFormGroup" (ngSubmit)="doSubmit()" fxLayout="column wrap">
+        <mat-form-field  [appearance]="appearance">
+            <mat-label>Old Password</mat-label>
+            <input  matInput placeholder="Old Password..." formControlName="oldpassword" [type]="oldpwdhide ? 'password' : 'text'">
+            <button mat-icon-button matSuffix (click)="oldpwdhide = !oldpwdhide">
+                <mat-icon>{{oldpwdhide ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="chngpswdFormGroup.controls['oldpassword'].invalid">{{getErrorMessage(chngpswdFormGroup.controls['oldpassword'])}}</mat-error>
+            <mat-hint align="end">Enter Old Password</mat-hint>
+        </mat-form-field>
+        <mat-form-field  [appearance]="appearance" >
+            <mat-label>New Password</mat-label>
+            <input  matInput placeholder="New Password..." formControlName="newPassword" [type]="pwdhide ? 'password' : 'text'">
+            <button mat-icon-button matSuffix (click)="pwdhide = !pwdhide">
+                <mat-icon>{{pwdhide ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="chngpswdFormGroup.controls['newPassword'].invalid">{{getErrorMessage(chngpswdFormGroup.controls['newPassword'])}}</mat-error>
+            <mat-hint align="end">Enter New Password</mat-hint>
+        </mat-form-field>
+        <mat-form-field  [appearance]="appearance">
+            <mat-label>Confirm Password</mat-label>
+            <input  matInput placeholder="Confirm Password..." formControlName="confirmPassword" [type]="cnfPwdhide ? 'password' : 'text'">
+            <button mat-icon-button matSuffix (click)="cnfPwdhide = !cnfPwdhide">
+                <mat-icon>{{cnfPwdhide ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="chngpswdFormGroup.controls['confirmPassword'].invalid">{{getErrorMessage(chngpswdFormGroup.controls['confirmPassword'])}}</mat-error>
+            <mat-hint align="end">Confirm Password</mat-hint>
+        </mat-form-field>
+    </div>
+
+    </mat-card-content>
+    <mat-card-actions>
+        <button mat-button (click)="onCancel()" cdkFocusInitial>Cancel</button>
+        <button mat-button (click)="doSubmit()">Ok</button>
+    </mat-card-actions>
+</mat-card>

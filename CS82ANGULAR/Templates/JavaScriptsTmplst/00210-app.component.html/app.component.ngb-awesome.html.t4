@@ -1,0 +1,58 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button"  (click)="isSideBarCollapsed = !isSideBarCollapsed">
+      <span class="navbar-toggler-icon"></span>
+    </button>  
+    <a class="navbar-brand" href="/">{{ apptitle }}</a>
+  <ul ngbNav class="navbar-right">
+     <li class="nav-item"  display="dynamic" placement="bottom-right" >
+        <span >
+        {{ userName }}
+        </span>
+     </li>
+     <li class="nav-item"  ngbDropdown display="dynamic" placement="bottom-right" >
+        <fa-icon [icon]="['fas', 'cog']" ngbDropdownToggle role="button"></fa-icon> 
+        <div ngbDropdownMenu class="dropdown-menu">
+          <a ngbDropdownItem routerLink="/authentication/login" routerLinkActive="active"> <fa-icon [icon]="['fas', 'sign-in-alt']"></fa-icon>             login</a>
+          <a ngbDropdownItem routerLink="/authentication/logout" routerLinkActive="active"> <fa-icon [icon]="['fas', 'sign-out-alt']"></fa-icon>  logout</a>
+          <a ngbDropdownItem routerLink="/authentication/register" routerLinkActive="active"> <fa-icon [icon]="['fas', 'user-plus']"></fa-icon> register</a>
+          <a ngbDropdownItem routerLink="/authentication/changepassword" routerLinkActive="active"> <fa-icon [icon]="['fas', 'user-cog']"></fa-icon> changepassword</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>  
+
+
+<div class="mt-5 pt-1" style="display:flex;flex-direction:row;background-color: lavender" >
+  <div  style="min-height: 0px; max-height: calc(94.9vh); overflow-y: auto;" [ngbCollapse]="isSideBarCollapsed">  
+    <nav class="navbar bg-light">
+      <ul ngbNav  orientation="vertical">
+        <li [ngbNavItem] >
+          <a ngbNavLink routerLink="/home" routerLinkActive="active">  <fa-icon [icon]="['fas', 'home']"></fa-icon> Home </a> 
+        </li>      
+        <!-- <li [ngbNavItem]>
+          <a ngbNavLink >Next menu item</a>
+        </li>      -->
+      </ul>
+    </nav>
+  </div>
+  <div style="flex: 1;min-width: 0px; padding-right: 15px;">
+    <app-toasts></app-toasts> 
+    <router-outlet></router-outlet>
+  </div>
+</div>

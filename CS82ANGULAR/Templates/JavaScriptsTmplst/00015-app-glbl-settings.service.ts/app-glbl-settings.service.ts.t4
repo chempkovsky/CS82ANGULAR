@@ -1,0 +1,322 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+    string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName   = GetServiceClassName(Model, appSettingServiceFolder);
+    string AppearancePropName           = "appearance";
+    string ShowErrorMethodName          = "showError";
+    string ShowMessageMethodName        = "showMsg";
+    string AppSettingServicePropName    = "appGlblSettings";
+
+#>
+
+import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { AbstractControl, ValidationErrors } from '@angular/forms';
+import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot, CanActivateChild, Route } from '@angular/router';
+import { MatFormFieldAppearance } from '@angular/material/form-field';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class <#= appSettingServiceClassName #> implements CanActivate, CanActivateChild {
+    public <#= AppearancePropName #>: MatFormFieldAppearance = 'outline';
+    public filterHeightAddition: number = 0.5;
+    public filterHeightFactor: number = 5;
+    public tableHeightAddition: number = 0;
+    public tableHeightFactor: number = 31;
+
+    constructor(private _snackBar: MatSnackBar) {}
+    public <#= ShowMessageMethodName #>(msg: string) {
+      this._snackBar.open(msg, 'Close', { duration: 4000 });
+    }
+    public <#= ShowErrorMethodName #>(errTp: string, errorStruct: any) {
+        let text: string = 'Error :';
+        if(!(typeof errTp === 'undefined')) {
+            if(!(errTp === null)) {
+                text = 'Error of type ' + errTp + ': ';
+            }
+        }
+        if(!(typeof errorStruct === 'undefined')) {
+            if(!(errorStruct === null)) {
+                if(!(typeof errorStruct.message === 'undefined')) {
+                    if(!(errorStruct.message === null)) {
+                        text = text + ' ' +  errorStruct.message;
+                    }
+                }
+                if(!(typeof errorStruct.statusText === 'undefined')) {
+                    if(!(errorStruct.statusText === null)) {
+                        text = text + ' ' +  errorStruct.statusText;
+                    }
+                }
+                if(!(typeof errorStruct.error === 'undefined')) {
+                  if(!(errorStruct.error === null)) {
+                    if(!(typeof errorStruct.error.ModelState === 'undefined')) {
+                      if(Array.isArray( errorStruct.error.ModelState[''] )) {
+                        errorStruct.error.ModelState[''].forEach(element => {
+                          text = text + ' ' +  element;
+                        });
+                      }
+                    }
+                  }
+                }
+            }
+        }
+        this._snackBar.open(text, 'Close', { duration: 4000 });
+    }
+    public getWebApiPrefix(vwNm: string): string {
+        let reslt: string = '';
+        if(!(vwNm === null)) {
+            if(!(vwNm === null)) {
+                //
+                // here: defining url by ViewName
+                //
+                reslt = 'http://localhost:50819/';
+            }
+        }
+        return reslt;
+    } 
+    public getSecurityWebApiPrefix(): string {
+        return 'http://localhost:50819/';
+    } 
+    getValidationErrorMessage(fc: AbstractControl): string {
+        let rslt: string = 'Validation Error. ';
+        if (typeof fc === 'undefined') {
+          return rslt;
+        }
+        if (fc === null) {
+          return rslt;
+        }
+        if (fc.errors === null) return rslt;
+        const errs: ValidationErrors = fc.errors as ValidationErrors;
+        Object.keys(errs).forEach(k => {
+          switch(k) {
+            case 'maxlength':
+              rslt +=' Required max length. ' + errs[k].requiredLength;
+              break;
+            case 'minlength':
+              rslt +=' Required min length: ' + errs[k].requiredLength;
+              break;
+            case 'required':
+              rslt +=' Required field. ' ;
+              break;
+            case 'max':
+              rslt +=' The value must be less than ' + errs[k].max;
+              break;
+            case 'min':
+              rslt +=' Value must be greater than ' + errs[k].min;
+              break;
+            case 'pattern':
+              rslt +=' Icorrect format.' ;
+              break;
+            case 'matDatepickerMin':
+              rslt +=' Value must be greater than ' + errs[k].min;
+              break;
+            case 'matDatepickerMax':
+              rslt +=' The value must be less than ' + errs[k].max;
+              break;
+            case 'matDatepickerParse':
+              rslt +=' Icorrect date format.' ;
+              break;
+            default:
+              rslt +=' Icorrect format.' ;
+              break;
+          }
+        });
+        return rslt;
+    } // end of getErrorMessage
+    public getDialogWidth(vwNm: string): string {
+        let rslt: string = '99vw';
+        if(!(vwNm === null)) {
+            if(!(vwNm === null)) {
+                //
+                // here: set dialog width for the given ViewName
+                //
+                return '99vw';        
+            }
+        }
+        return rslt;
+    }
+    public getDialogMaxWidth(vwNm: string): string {
+        let rslt: string = '100vw';
+        if(!(vwNm === null)) {
+            if(!(vwNm === null)) {
+                //
+                // here: set dialog max width for the given ViewName
+                //
+                return '100vw';        
+            }
+        }
+        return rslt;
+    }
+    
+    protected authInto: any = null;
+    public getAuthInto(): any {
+        return this.authInto;
+    }
+    public setAuthInto(info: any): any {
+        if(typeof info === 'undefined') {
+            this.authInto = null;
+        } else {
+            this.authInto = info;
+        }
+    }
+
+    public perms: number[] = [0,0,0,0,  0,0,0,0,  0,0,0,0,  0,0,  1,0,0];
+    vwModels:  { [key: string]: number } = {
+/*        
+        'LitAuthorView': 0,
+        'LitBookView': 1,
+        'LitCountryView':2,
+        'LitDialectView':3,
+        'LitEditionView':4,
+        'LitGenreView':5,
+        'LitLanguageView':6,
+        'LitManuscriptView':7,
+        'LitPublisherView':8,
+*/
+    };
+    dshBrds:  { [key: string]: number } = {
+/*
+      'FirstFtrComponent': 0
+*/
+    };
+    getViewModelMask(vwModel: string): number {
+      return 15; // delete this line when vwModels is ready
+      let pk = this.vwModels[vwModel];
+      if(typeof pk === 'undefined') return 0;
+      let rid: number = Math.floor(pk/7);
+      if(rid >= (this.perms.length-3))  return 0; 
+      let sft: number = (pk - rid * 7) * 4;
+      let rslt = this.perms[rid];
+      if(sft > 0) {
+        rslt = this.perms[rid] >> sft;
+      }
+      return rslt; 
+    }
+    getDashBrdMask(dshBrd: string): number {
+      return 1; // delete this line when dshBrds is ready
+      let pk = this.dshBrds[dshBrd];
+      if(typeof pk === 'undefined') return 0;
+      let rid: number = Math.floor(pk/31);
+      if(rid >= (this.perms.length-14))  return 0; 
+      let sft: number = (pk - rid * 31);
+      let rslt = (this.perms[rid+14])
+      if(sft > 0) {
+        rslt = (this.perms[rid+14]) >> sft;
+      }
+      return rslt; 
+    }
+    canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean  {
+      if (childRoute.routeConfig === null) return false;
+      if ( typeof ((childRoute.routeConfig as Route).path) === 'undefined') return false;
+      let pth: string[] = ((childRoute.routeConfig as Route).path as string).split('/');
+      let vnm: string = '';
+      let act: number = 1;
+      let vid: number = -1;
+      let cnt = 0;
+      for(let i = pth.length-1; i > -1; i-- ) {
+        if(!pth[i].startsWith(':')) {
+          if(cnt > 0) {
+            vnm = pth[i];
+            vid = i;
+            break;
+          } else cnt++;
+        }
+      }
+      if (vid < 0) {
+        if(pth.length>0) {
+          vnm = pth[0];
+          vid = 0;
+        } else return false;
+      }
+      if ( pth[pth.length-1].startsWith(':') ) {
+        switch( childRoute.url[childRoute.url.length-1].path ) {
+          case 'add':
+            act = 8;
+            break;
+          case 'update':
+            act = 4;
+            break;
+          case 'delete':
+            act = 2;
+            break;
+        };
+      } 
+      return (this.getViewModelMask(vnm) & act) === act;
+    }
+    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean  {
+      if(route.routeConfig === null) return false;
+      if( typeof ((route.routeConfig as Route).component) === 'undefined') return false;
+      return ( this.getDashBrdMask(((route.routeConfig as Route).component as any)['name']) & 1) === 1;
+
+    }
+    
+    public userName: string|null=null;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class <#= appSettingServiceClassName + "Activator" #> implements CanActivate {
+    constructor(protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {}
+    
+    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+        return this.<#= AppSettingServicePropName #>.canActivateChild(route, state);
+    }
+}
+
+<#+
+    string GetServiceClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".service","Service");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+#>

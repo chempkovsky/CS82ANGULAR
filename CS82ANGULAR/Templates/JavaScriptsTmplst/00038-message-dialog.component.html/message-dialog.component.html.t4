@@ -1,0 +1,26 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<h3 mat-dialog-title>{{data.title}}</h3>
+<div mat-dialog-content>
+    <mat-label mat-fab >
+        <mat-icon color="{{data.iconcolor}}">{{data.iconname}}</mat-icon>
+    </mat-label>
+    <span>&nbsp;&nbsp;</span>
+    <mat-label>{{data.message}}</mat-label>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onCancel()" cdkFocusInitial>No</button>
+  <button mat-button (click)="onOk()">Yes</button>
+</div>

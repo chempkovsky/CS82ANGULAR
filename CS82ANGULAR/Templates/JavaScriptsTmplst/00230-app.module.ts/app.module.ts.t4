@@ -1,0 +1,369 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+    string materialModuleFolder                     = "00010-app-material.module.ts";
+    string materialModuleClassName                  = GetModuleClassName(Model, materialModuleFolder);
+    string flexModuleFolder                         = "00011-app-flex-layout.module.ts";
+    string flexModuleClassName                      = GetModuleClassName(Model, flexModuleFolder);
+
+
+    string AppSettingServicePropName                = "appGlblSettings";
+    string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName               = GetServiceClassName(Model, appSettingServiceFolder);
+
+    string formatterModuleFolder                    = "00070-app-formatter.module.ts";
+    string formatterModuleClassName                 = GetModuleClassName(Model, formatterModuleFolder);
+
+    string appInterceptorFolder                     = "00200-app-glbl.interceptor.ts";
+    string appInterceptorClassName                  = GetInterceptorClassName(Model, appInterceptorFolder);
+
+
+    string appHtmlComponentFolder                   = "00210-app.component.html";
+    string appCssComponentFolder                    = "00210-app.component.css";
+    string appComponentFolder                       = "00210-app.component.ts";
+    string appComponentClassName                    = GetComponentClassName(Model, appComponentFolder);
+
+    string securityModuleFolder                     = "00170-app-glbl-security.module.ts";
+    string securityModuleClassName                  = GetModuleClassName(Model, securityModuleFolder);
+
+    string appRoutingModuleFolder                   = "00220-app-routing.module.ts";
+    string appRoutingModuleClassName                = GetModuleClassName(Model, appRoutingModuleFolder);    
+    string appModuleFolder                          = "00230-app.module.ts";
+    string appModuleClassName                       = GetModuleClassName(Model, appModuleFolder);    
+
+    string pagenotfoundComponentFolder              = "00185-app-glbl-pagenotfound.component.ts";
+    string pagenotfoundComponentClassName           = GetComponentClassName(Model, pagenotfoundComponentFolder);
+
+    string homeComponentFolder                      = "00180-app-glbl-home.component.ts";
+    string homeComponentClassName                   = GetComponentClassName(Model, homeComponentFolder);
+
+#>
+
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+
+
+import { <#= appRoutingModuleClassName #> } from '<#= GetFolderName(Model, appRoutingModuleFolder, appModuleFolder)#>';
+import { <#= appComponentClassName #> } from '<#= GetFolderName(Model, appComponentFolder, appModuleFolder)#>';
+import { <#= materialModuleClassName #> } from '<#= GetFolderName(Model, materialModuleFolder, appModuleFolder)#>';
+import { <#= flexModuleClassName #> } from '<#= GetFolderName(Model, flexModuleFolder, appModuleFolder)#>';
+import { <#= appInterceptorClassName #> } from '<#= GetFolderName(Model, appInterceptorFolder, appModuleFolder)#>';
+import { <#= formatterModuleClassName #> } from '<#= GetFolderName(Model, formatterModuleFolder, appModuleFolder)#>';
+<#
+    if(! string.IsNullOrEmpty(homeComponentClassName)) {
+#>
+import { <#= homeComponentClassName #> } from '<#= GetFolderName(Model, homeComponentFolder, appModuleFolder)#>';
+<#
+    }
+    if(! string.IsNullOrEmpty(pagenotfoundComponentClassName)) {
+#>
+import { <#= pagenotfoundComponentClassName #> } from '<#= GetFolderName(Model, pagenotfoundComponentFolder, appModuleFolder)#>';
+<#
+    }
+#>
+
+
+
+@NgModule({
+  declarations: [
+    <#= appComponentClassName #>,
+<#
+    if(! string.IsNullOrEmpty(homeComponentClassName)) {
+#>
+    <#= homeComponentClassName #>, 
+<#
+    }
+    if(! string.IsNullOrEmpty(pagenotfoundComponentClassName)) {
+#>
+    <#= pagenotfoundComponentClassName #>, 
+<#
+    }
+#>
+
+  ],
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    <#= appRoutingModuleClassName #>,
+    <#= materialModuleClassName #>,
+    <#= formatterModuleClassName #>,
+    <#= flexModuleClassName #>,
+    HttpClientModule,
+  ],
+  entryComponents: [
+  ],
+  exports: [
+  ],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: <#= appInterceptorClassName #>,
+      multi: true
+    },
+  ],
+  bootstrap: [<#= appComponentClassName #>]
+})
+export class <#= appModuleClassName #> { }
+
+<#+
+    string GetInterceptorClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".Interceptor","Interceptor").Replace(".interceptor","Interceptor");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetModuleFileName(ModelViewSerializable model, string fileType) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        CommonStaffSerializable curItem = model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (curItem == null) {
+            return result;
+        }
+        return result + curItem.FileFolder.Replace("\\","/").Replace("app/","").Replace("src/","") + "/" + GetModuleComponentFolderName(model, fileType, fileType).Replace("./","");
+    }
+    string GetModuleComponentFolderName(ModelViewSerializable model, string currFolder, string refFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(currFolder) || string.IsNullOrEmpty(refFolder) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetServiceClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".service","Service");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetModuleClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".module","Module").Replace(".routing","Routing");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+#>

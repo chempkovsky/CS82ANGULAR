@@ -1,0 +1,368 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+    string bootstrapModuleFolder        = "00009-app-bootstrap.module.ts";
+    string flexModuleFolder             = "00011-app-flex-layout.module.ts";
+
+    string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
+    string filterModelFolder            = "00021-web-service-filter.interface.ts";
+    string filterDefModelFolder         = "00022-web-service-filter-def.interface.ts";
+    string filterOperatorModelFolder    = "00023-web-service-filter-operator.interface.ts";
+    string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
+    string filterComponentCssFolder     = "00025-web-service-filter.component.css";
+    string filterComponentHtmlFolder    = "00025-web-service-filter.component.html";
+    string filterComponentFolder        = "00025-web-service-filter.component.ts";
+    string eformModeEnumlFolder         = "00026-eform-mode.enum.ts";
+    string columnSelectorItemInterfaceFolder    = "00032-column-selector-item.interface.ts";
+    string columnSelectorComponentFolder        = "00033-column-selector.component.ts";
+    string columnSelectorDlgComponentFolder     = "00035-column-selector-dlg.component.ts";
+
+    string messageDialogComponentCssFolder      = "00038-message-dialog.component.css";
+    string messageDialogComponentHtmlFolder     = "00038-message-dialog.component.html";
+    string messageDialogComponentFolder         = "00038-message-dialog.component.ts";
+    string messageDialogDataModelFolder         = "00037-message-dialog.interface.ts";
+
+
+    string filterModuleFolder           = "00050-web-service-filter.module.ts";
+
+    string eformModeEnumName = GetEnumClassName(Model, eformModeEnumlFolder);
+    string flexModuleClassName = GetModuleClassName(Model, flexModuleFolder);
+    string bootstrapModuleClassName = GetModuleClassName(Model, bootstrapModuleFolder);
+
+
+    string filterModelClassName = GetModelClassName(Model, filterModelFolder);
+    string filterDefModelClassName = GetModelClassName(Model, filterDefModelFolder);
+    string filterOperatorModelClassName = GetModelClassName(Model, filterOperatorModelFolder);
+    string filterResultModelClassName = GetModelClassName(Model, filterResultModelFolder);
+    string filterComponentClassName = GetComponentClassName(Model, filterComponentFolder);
+    string appSettingServiceClassName   = GetServiceClassName(Model, appSettingServiceFolder);
+    string appModuleClassName   = GetModuleClassName(Model, filterModuleFolder);
+    string columnSelectorComponentClassName = GetComponentClassName(Model, columnSelectorComponentFolder);
+    string columnSelectorDlgComponentClassName = GetComponentClassName(Model, columnSelectorDlgComponentFolder);
+    string messageDialogComponentClassName      = GetComponentClassName(Model, messageDialogComponentFolder);
+
+#>
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+
+
+import { <#= flexModuleClassName #> } from '<#= GetFolderName(Model, flexModuleFolder, filterModuleFolder)#>';
+import { <#= bootstrapModuleClassName #> } from '<#= GetFolderName(Model, bootstrapModuleFolder, filterModuleFolder)#>';
+import { <#= filterModelClassName #> } from '<#= GetFolderName(Model, filterModelFolder, filterModuleFolder)#>';
+import { <#= filterDefModelClassName #> } from '<#= GetFolderName(Model, filterDefModelFolder, filterModuleFolder)#>';
+import { <#= filterOperatorModelClassName #> } from '<#= GetFolderName(Model, filterOperatorModelFolder, filterModuleFolder)#>';
+import { <#= filterResultModelClassName #> } from '<#= GetFolderName(Model, filterResultModelFolder, filterModuleFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, filterModuleFolder)#>';
+import { <#= filterComponentClassName #> } from '<#= GetFolderName(Model, filterComponentFolder, filterModuleFolder)#>';
+import { <#= eformModeEnumName #> } from '<#= GetFolderName(Model, eformModeEnumlFolder, filterModuleFolder)#>';
+
+import { <#= columnSelectorComponentClassName #> } from '<#= GetFolderName(Model, columnSelectorComponentFolder, filterModuleFolder)#>';
+import { <#= columnSelectorDlgComponentClassName #> } from '<#= GetFolderName(Model, columnSelectorDlgComponentFolder, filterModuleFolder)#>';
+import { <#= messageDialogComponentClassName #> } from '<#= GetFolderName(Model, messageDialogComponentFolder, filterModuleFolder)#>';
+
+
+
+@NgModule({
+    declarations: [
+        <#= filterComponentClassName #>,
+        <#= columnSelectorComponentClassName #>,
+        <#= columnSelectorDlgComponentClassName #>,
+        <#= messageDialogComponentClassName #>,
+    ],
+    imports: [
+        CommonModule,
+        <#= bootstrapModuleClassName #>,
+        NgbModule,
+        FontAwesomeModule,
+        <#= flexModuleClassName #>,
+    ],
+    exports: [
+        <#= filterComponentClassName #>,
+        <#= columnSelectorComponentClassName #>,
+        <#= columnSelectorDlgComponentClassName #>,
+        <#= messageDialogComponentClassName #>,
+    ],
+    entryComponents: [
+        <#= columnSelectorDlgComponentClassName #>,
+        <#= messageDialogComponentClassName #>,
+    ]
+})
+export class <#= appModuleClassName #> { }
+
+
+<#+
+    string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        return refItem.FileName.Replace(".component","");
+    }
+
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetModuleClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".module","Module").Replace(".routing","Routing");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetServiceClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".service","Service");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".interface","");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return "I" + sb.ToString();
+    }
+
+    string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetEnumClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".enum","");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString();
+    }
+
+#>

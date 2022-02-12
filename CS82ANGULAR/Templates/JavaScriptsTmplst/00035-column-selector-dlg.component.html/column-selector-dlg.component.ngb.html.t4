@@ -1,0 +1,56 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+    string  columsToSelectSelector =   "colums-to-select";
+
+    string columnSelectorComponentFolder        = "00033-column-selector.component.ts";
+    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, columnSelectorComponentFolder);
+#>
+
+<div class="modal-header">
+  <h4 class="modal-title" >Columns To Show</h4>
+</div>
+<div class="modal-body">
+    <app-<#= componentSelectorCommonPart #> 
+      [<#= columsToSelectSelector #>]="data"
+    ></app-<#= componentSelectorCommonPart #>>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" ngbAutofocus>Cancel</button>
+  <button type="button" class="btn btn-outline-secondary" (click)="onOk()">Ok</button>
+</div>
+
+
+
+<#+
+    string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        return refItem.FileName.Replace(".component","");
+    }
+#>

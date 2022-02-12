@@ -1,0 +1,75 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "",
+    "1.",
+    "Please make sure that you selected src\\app folder",
+    "",
+    "2",
+    "The current Batch overrides the following preinstalled files",
+    "       app.component",
+    "       app-routing.module",
+    "       app.module",
+    "",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-home",
+      "GeneratorType": "00180-app-glbl-home.component.css",
+      "GeneratorSript": "app-glbl-home.component.css.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-home",
+      "GeneratorType": "00180-app-glbl-home.component.html",
+      "GeneratorSript": "app-glbl-home.component.html.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-home",
+      "GeneratorType": "00180-app-glbl-home.component.ts",
+      "GeneratorSript": "app-glbl-home.component.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-pagenotfound",
+      "GeneratorType": "00185-app-glbl-pagenotfound.component.css",
+      "GeneratorSript": "app-glbl-pagenotfound.component.css.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-pagenotfound",
+      "GeneratorType": "00185-app-glbl-pagenotfound.component.html",
+      "GeneratorSript": "app-glbl-pagenotfound.component.html.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-pagenotfound",
+      "GeneratorType": "00185-app-glbl-pagenotfound.component.ts",
+      "GeneratorSript": "app-glbl-pagenotfound.component.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00210-app.component.css",
+      "GeneratorSript": "app.component.css.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00210-app.component.html",
+      "GeneratorSript": "app.component.html.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00210-app.component.ts",
+      "GeneratorSript": "app.component.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00220-app-routing.module.ts",
+      "GeneratorSript": "app-routing.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00230-app.module.ts",
+      "GeneratorSript": "app.module.ts.t4"
+    }
+  ]
+
+}

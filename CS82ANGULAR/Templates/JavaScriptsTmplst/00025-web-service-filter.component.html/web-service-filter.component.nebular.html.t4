@@ -1,0 +1,130 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+    string AppearancePropName           = "appearance";
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string OverflowSelector             = "ovrflw";
+    string OverflowPropName             = "ovrflw";
+    string containerMenuItemsPropName           = "contMenuItems";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string showAddFltItemSelector       = "show-add-flt-item";
+    string showAddFltItemPropName       = "showAddFltItem";
+
+    string OnBackBtnMethodName          = "onBackBtnMd";
+    string OnBackBtnPropName            = "onBackBtn";
+    string showBackBtnPropName          = "showBackBtn";
+    string showBackBtnSelector          = "show-back-btn";
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+#>
+
+  <div>
+     <div fxLayout="row" fxLayoutAlign="flex-end space-around"> 
+        <label fxFlex fxLayoutAlign="flex-start space-around">{{<#= captionPropName #>}}</label>
+        <button nbButton ghost size="medium" nbTooltip="Navigate back to master"  (click)="<#= OnBackBtnMethodName #>()" *ngIf="<#= showBackBtnPropName #>">
+            <nb-icon icon="arrow-back" pack="eva" status="primary"></nb-icon>
+        </button>
+
+        <span fxFlex="3%"></span>  
+        <button nbButton ghost size="medium" nbTooltip="Add filter item"  (click)="addFilter()" *ngIf="showFilter && <#= showAddFltItemPropName #>">
+            <nb-icon icon="file-add" pack="eva" status="primary"></nb-icon>
+        </button>
+ 
+        <span fxFlex="1%"></span>   
+        <button nbButton ghost size="medium" nbTooltip="Remove all filter items"  (click)="removeAllFilters()" *ngIf="showFilter && <#= showAddFltItemPropName #>">
+            <nb-icon icon="file-remove" pack="eva" status="danger"></nb-icon>
+        </button>
+
+        <span fxFlex="1%"></span>  
+        <button nbButton ghost size="medium" nbTooltip="Apply filter"  (click)="onApplyFilterClicked()">
+            <nb-icon icon="refresh" pack="eva" status="primary"></nb-icon>
+        </button>
+
+
+        <span fxFlex="2%"></span>     
+        <ng-template ngFor let-item [ngForOf]="<#= containerMenuItemsPropName #>">
+            <span fxFlex="1%"></span>  
+            <button nbButton ghost size="medium" nbTooltip="item.caption"  (click)="<#= onContainerMenuItemClickMethodName #>(item)" >
+                <nb-icon icon="item.iconName" pack="eva" status="item.iconColor"></nb-icon>
+            </button>
+        </ng-template>            
+        <span fxFlex="1%"></span>
+     </div> 
+
+    <div *ngIf="showFilter" [style.maxHeight.em]="<#= MaxHeightPropName #>X" [style.overflow]="<#= OverflowPropName #>"> 
+        <div 
+            fxLayout
+            fxLayout.xs="column"
+            fxLayoutAlign="left"
+            fxLayoutGap="1px"
+            fxLayoutGap.xs="0px" *ngFor="let flt of webServiceFilters;" >
+            <span fxFlex="39%" fxFlex.xs="99%">
+                <span fxFlex="1%"></span>
+
+                <nb-form-field fxFlex="99%">
+                    <label class="caption-2">Column name</label>
+                    <nb-form-field >
+                      <nb-select placeholder="Column name"  (selectedChange)="onSelectionChanged($event, flt)" fullWidth> 
+                      <nb-option *ngFor="let fltDef of webServiceFilterDefs;" [value]="fltDef.fltrName">{{fltDef.fltrCaption}}</nb-option>
+                    </nb-select>
+                  </nb-form-field>
+                </nb-form-field>
+
+            </span>
+
+            <div fxFlex="59%" fxFlex.xs="99%" fxLayout="row">
+                <span fxFlex="1%"></span>
+
+                <nb-form-field fxFlex="20%">
+                    <label class="caption-2">Operator</label>
+                    <nb-form-field>
+                        <nb-select placeholder="Operator" [formControl]="flt.fltrOperator"  fullWidth>
+                            <nb-option *ngFor="let oprtr of webServiceOperators;" [value]="oprtr.oName">{{oprtr.oCaption}}</nb-option>
+                        </nb-select>
+                    </nb-form-field>
+                </nb-form-field>
+
+
+                <span fxFlex="1%"></span>                
+                    
+
+                <nb-form-field *ngIf="flt.fltrDataType !== 'datetime'" fxFlex="72%">
+                  <label class="caption-2">Filter value</label>
+                  <nb-form-field >
+                    <input nbInput type="text" [formControl]="flt.fltrValue" [(maxlength)]="flt.fltrMaxLen" fullWidth >   
+                  </nb-form-field>
+                  <span class="caption status-danger" *ngIf="flt.fltrValue.invalid">{{getErrorMessage(flt.fltrValue)}}</span >
+                  <span class="paragraph-2 text-hint" *ngIf="flt.fltrMaxLen && flt.fltrValue.valid">{{flt.fltrValue.value?.length || 0}}/{{flt.fltrMaxLen}}</span>
+                </nb-form-field>
+                    
+                <nb-form-field *ngIf="flt.fltrDataType === 'datetime'" fxFlex="72%">                
+                    <label class="caption-2">Filter value</label>
+                    <nb-form-field >
+                        <input nbInput type="text" [nbDatepicker]="dpctrl" [formControl]="flt.fltrValue" [(maxlength)]="flt.fltrMaxLen" fullWidth >   
+                        <nb-datepicker #dpctrl  [min]="flt.fltrMin" [max]="flt.fltrMax"></nb-datepicker>
+                    </nb-form-field>
+                    <span class="caption status-danger" *ngIf="flt.fltrValue.invalid">{{getErrorMessage(flt.fltrValue)}}</span >
+                </nb-form-field>
+
+                <button nbButton ghost status="danger" size="tiny" fxFlex="5%" (click)="removeFltr(flt)">
+                    <nb-icon icon="trash" pack="eva" status="danger"></nb-icon>
+                </button>
+
+            </div>
+        </div>
+        
+    </div>
+</div>

@@ -32,7 +32,7 @@ namespace CS82ANGULAR.Model
                     return prop.InputTypeWhenDelete;
             }
         }
-        string GetInterfaceEDlgName(CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        string GetInterfaceEDlgName(ModelViewSerializable model)
         {
             if (model == null)
             {
@@ -40,7 +40,7 @@ namespace CS82ANGULAR.Model
             }
             return "I" + model.ViewName + "Edlg";
         }
-        string GetInterfaceName(CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        string GetInterfaceName(ModelViewSerializable model)
         {
             if (model == null)
             {
@@ -48,7 +48,7 @@ namespace CS82ANGULAR.Model
             }
             return "I" + model.ViewName;
         }
-        string GetInterfaceNameEx(CS82ANGULAR.Model.Serializable.DbContextSerializable context, string viewName)
+        string GetInterfaceNameEx(DbContextSerializable context, string viewName)
         {
             if ((context == null) || string.IsNullOrEmpty(viewName))
             {
@@ -61,7 +61,7 @@ namespace CS82ANGULAR.Model
             }
             return GetInterfaceName(model);
         }
-        string GetInterfacePageName(CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        string GetInterfacePageName(ModelViewSerializable model)
         {
             if (model == null)
             {
@@ -69,7 +69,7 @@ namespace CS82ANGULAR.Model
             }
             return "I" + model.PageViewName;
         }
-        string GetInterfacePageNameEx(CS82ANGULAR.Model.Serializable.DbContextSerializable context, string viewName)
+        string GetInterfacePageNameEx(DbContextSerializable context, string viewName)
         {
             if ((context == null) || string.IsNullOrEmpty(viewName))
             {
@@ -82,11 +82,11 @@ namespace CS82ANGULAR.Model
             }
             return GetInterfacePageName(model);
         }
-        string GetInterfaceFilterName(CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        string GetInterfaceFilterName(ModelViewSerializable model)
         {
             return "I" + model.ViewName + "Filter";
         }
-        string GetInterfaceFilterNameEx(CS82ANGULAR.Model.Serializable.DbContextSerializable context, string viewName)
+        string GetInterfaceFilterNameEx(DbContextSerializable context, string viewName)
         {
             if ((context == null) || string.IsNullOrEmpty(viewName))
             {
@@ -99,7 +99,7 @@ namespace CS82ANGULAR.Model
             }
             return GetInterfaceFilterName(model);
         }
-        string GetModelClassName(CS82ANGULAR.Model.Serializable.DbContextSerializable context, string fileType)
+        string GetModelClassName(DbContextSerializable context, string fileType)
         {
             string result = "";
             if ((context == null) || string.IsNullOrEmpty(fileType))
@@ -146,7 +146,7 @@ namespace CS82ANGULAR.Model
             return "I" + sb.ToString();
         }
 
-        string GetPropertyTypeScriptTypeName(CS82ANGULAR.Model.Serializable.ModelViewPropertyOfVwSerializable prop)
+        string GetPropertyTypeScriptTypeName(ModelViewPropertyOfVwSerializable prop)
         {
             string result = "";
             switch (prop.UnderlyingTypeName.ToLower())
@@ -168,7 +168,7 @@ namespace CS82ANGULAR.Model
             }
             return result;
         }
-        string GetJavaScriptToStringMethod(CS82ANGULAR.Model.Serializable.ModelViewPropertyOfVwSerializable prop)
+        string GetJavaScriptToStringMethod(ModelViewPropertyOfVwSerializable prop)
         {
             string result = "";
             switch (prop.UnderlyingTypeName.ToLower())
@@ -186,24 +186,24 @@ namespace CS82ANGULAR.Model
             }
             return result;
         }
-        string GetCCharpDatatype(CS82ANGULAR.Model.Serializable.ModelViewPropertyOfVwSerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        string GetCCharpDatatype(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model)
         {
             if ((prop == null) || (model == null)) return "";
             return prop.UnderlyingTypeName.ToLower().Replace("system.", "");
         }
-        string GetCCharpDatatypeEx(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        string GetCCharpDatatypeEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model)
         {
             if ((prop == null) || (model == null)) return "";
             ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
             return GetCCharpDatatype(sclrProp, model);
         }
-        string GetCCharpDatatypeEx2(CS82ANGULAR.Model.Serializable.ModelViewUIListPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        string GetCCharpDatatypeEx2(ModelViewUIListPropertySerializable prop, ModelViewSerializable model)
         {
             if ((prop == null) || (model == null)) return "";
             ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
             return GetCCharpDatatype(sclrProp, model);
         }
-        string GetPropertyTypeName(CS82ANGULAR.Model.Serializable.ModelViewPropertyOfVwSerializable prop)
+        string GetPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
         {
             if ("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase))
             {
@@ -215,7 +215,7 @@ namespace CS82ANGULAR.Model
             }
             return prop.UnderlyingTypeName;
         }
-        string GetFolderName(CS82ANGULAR.Model.Serializable.ModelViewSerializable model, string refFolder, string currFolder)
+        string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder)
         {
             string result = "./";
             if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder))
@@ -264,7 +264,7 @@ namespace CS82ANGULAR.Model
             result += refItem.FileName;
             return result;
         }
-        String GetWebApiServicePrefix(CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        String GetWebApiServicePrefix(ModelViewSerializable model)
         {
             string result = model.WebApiServiceName;
             if (!string.IsNullOrEmpty(result))
@@ -277,7 +277,7 @@ namespace CS82ANGULAR.Model
             }
             return result;
         }
-        bool IsPrimaryKeyProperty(CS82ANGULAR.Model.Serializable.ModelViewPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        bool IsPrimaryKeyProperty(ModelViewPropertySerializable prop, ModelViewSerializable model)
         {
             if ((model == null) || (prop == null))
             {
@@ -343,7 +343,7 @@ namespace CS82ANGULAR.Model
                 return char.ToLower(str[0]) + str.Substring(1);
             return str.ToUpper();
         }
-        string GetTypeScriptPropertyName(CS82ANGULAR.Model.Serializable.ModelViewPropertyOfVwSerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        string GetTypeScriptPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model)
         {
             if ((model == null) || (prop == null))
             {
@@ -358,7 +358,7 @@ namespace CS82ANGULAR.Model
                 return FirstLetterToLower(prop.ViewPropertyName);
             }
         }
-        string GetFilterPropertyOperatorName(CS82ANGULAR.Model.Serializable.ModelViewPropertyOfVwSerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model, string operatorSufix)
+        string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix)
         {
             if (model.GenerateJSonAttribute)
             {
@@ -369,7 +369,7 @@ namespace CS82ANGULAR.Model
                 return FirstLetterToLower(prop.ViewPropertyName) + operatorSufix;
             }
         }
-        string GetTypeScriptPropertyNameEx(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        string GetTypeScriptPropertyNameEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model)
         {
             ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
             return GetTypeScriptPropertyName(sclrProp, model);
@@ -425,7 +425,7 @@ namespace CS82ANGULAR.Model
             }
             return null;
         }
-        List<string> GetValidators(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model, Dictionary<string, string> regExps)
+        List<string> GetValidators(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, Dictionary<string, string> regExps)
         {
             List<string> result = new List<string>();
             ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
@@ -525,29 +525,29 @@ namespace CS82ANGULAR.Model
             }
             return result;
         }
-        bool HasCombo(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        bool HasCombo(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model)
         {
             return (prop.InputTypeWhenAdd == InputTypeEnum.Combo) ||
                     (prop.InputTypeWhenUpdate == InputTypeEnum.Combo) ||
                     (prop.InputTypeWhenDelete == InputTypeEnum.Combo);
         }
-        bool HasButton(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        bool HasButton(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model)
         {
             return (prop.InputTypeWhenAdd == InputTypeEnum.SearchDialog) ||
                 (prop.InputTypeWhenUpdate == InputTypeEnum.SearchDialog) ||
                 (prop.InputTypeWhenDelete == InputTypeEnum.SearchDialog);
         }
-        bool HasTypeahead(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        bool HasTypeahead(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model)
         {
             return (prop.InputTypeWhenAdd == InputTypeEnum.Typeahead) ||
                 (prop.InputTypeWhenUpdate == InputTypeEnum.Typeahead) ||
                 (prop.InputTypeWhenDelete == InputTypeEnum.Typeahead);
         }
-        bool HasInitMethod(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        bool HasInitMethod(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model)
         {
             return HasCombo(prop, model) || HasButton(prop, model) || HasTypeahead(prop, model);
         }
-        bool HasInitMethodForInputMode(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model, int inputType)
+        bool HasInitMethodForInputMode(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, int inputType)
         {
             switch (inputType)
             {
@@ -569,7 +569,7 @@ namespace CS82ANGULAR.Model
             }
             return false;
         }
-        bool HasModelInitMethodForInputMode(CS82ANGULAR.Model.Serializable.ModelViewSerializable model, int inputType)
+        bool HasModelInitMethodForInputMode(ModelViewSerializable model, int inputType)
         {
             if (model == null)
             {
@@ -588,40 +588,40 @@ namespace CS82ANGULAR.Model
             }
             return false;
         }
-        string GetExpressionForControlList(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model, string sufix)
+        string GetExpressionForControlList(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string sufix)
         {
             return GetTypeScriptPropertyNameWithSufix(prop, model, sufix) + "Vals";
         }
 
-        string GetExpressionForOnFilterTypeaheadControlListMethod(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model, string typeaheadSufix)
+        string GetExpressionForOnFilterTypeaheadControlListMethod(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string typeaheadSufix)
         {
             return "OnFilter" + GetExpressionForControlList(prop, model, typeaheadSufix);
         }
-        string GetExpressionForOnUpdateComboControlListMethod(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model, string comboSufix)
+        string GetExpressionForOnUpdateComboControlListMethod(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string comboSufix)
         {
             return "OnUpdate" + GetExpressionForControlList(prop, model, comboSufix);
         }
-        string GetExpressionForOnValChangedMethod(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        string GetExpressionForOnValChangedMethod(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model)
         {
             return "OnValChanged" + GetTypeScriptPropertyNameEx(prop, model);
         }
-        string GetTypeScriptPropertyNameWithSufixBase(CS82ANGULAR.Model.Serializable.ModelViewPropertyOfVwSerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model, string sufix)
+        string GetTypeScriptPropertyNameWithSufixBase(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string sufix)
         {
             return GetTypeScriptPropertyName(prop, model) + sufix;
         }
-        string GetTypeScriptPropertyNameWithSufix(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model, string sufix)
+        string GetTypeScriptPropertyNameWithSufix(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string sufix)
         {
             return GetTypeScriptPropertyNameEx(prop, model) + sufix;
         }
-        string GetExpressionForOnInitMethod(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        string GetExpressionForOnInitMethod(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model)
         {
             return "OnInit" + GetTypeScriptPropertyNameEx(prop, model);
         }
 
 
-        List<string> CollectComboListInterfaces(CS82ANGULAR.Model.Serializable.DbContextSerializable context,
-                                                CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop,
-                                                CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        List<string> CollectComboListInterfaces(DbContextSerializable context,
+                                                ModelViewUIFormPropertySerializable prop,
+                                                ModelViewSerializable model)
         {
             List<string> result = new List<string>();
             ModelViewSerializable mv = null;
@@ -686,9 +686,9 @@ namespace CS82ANGULAR.Model
             }
             return result;
         }
-        List<string> CollectButtonItemInterfaces(CS82ANGULAR.Model.Serializable.DbContextSerializable context,
-                                                CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop,
-                                                CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        List<string> CollectButtonItemInterfaces(DbContextSerializable context,
+                                                ModelViewUIFormPropertySerializable prop,
+                                                ModelViewSerializable model)
         {
             List<string> result = new List<string>();
             ModelViewSerializable mv = null;
@@ -753,9 +753,9 @@ namespace CS82ANGULAR.Model
             }
             return result;
         }
-        List<string> CollectTypeaheadListInterfaces(CS82ANGULAR.Model.Serializable.DbContextSerializable context,
-                                                CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop,
-                                                CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        List<string> CollectTypeaheadListInterfaces(DbContextSerializable context,
+                                                ModelViewUIFormPropertySerializable prop,
+                                                ModelViewSerializable model)
         {
             List<string> result = new List<string>();
             ModelViewSerializable mv = null;
@@ -820,7 +820,7 @@ namespace CS82ANGULAR.Model
             }
             return result;
         }
-        string GetFormControlHiddenCondition(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model, string eformModePropName)
+        string GetFormControlHiddenCondition(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string eformModePropName)
         {
             if ((prop.InputTypeWhenAdd == InputTypeEnum.Hidden) &&
                 (prop.InputTypeWhenUpdate == InputTypeEnum.Hidden) &&
@@ -862,7 +862,7 @@ namespace CS82ANGULAR.Model
             }
             return wdths[1];
         }
-        string GetDisplayAttributeValueString(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model, string propName)
+        string GetDisplayAttributeValueString(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string propName)
         {
             ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
             if (sclrProp == null)
@@ -899,7 +899,7 @@ namespace CS82ANGULAR.Model
                 return attrProp.PropValue.Trim(charsToTrim);
             }
         }
-        bool IsDateInput(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        bool IsDateInput(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model)
         {
             ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
             if (sclrProp == null)
@@ -908,7 +908,7 @@ namespace CS82ANGULAR.Model
             }
             return "System.DateTime".Equals(sclrProp.UnderlyingTypeName) || "DateTime".Equals(sclrProp.UnderlyingTypeName);
         }
-        string GetCommonEnumClassName(CS82ANGULAR.Model.Serializable.DbContextSerializable context, string fileType)
+        string GetCommonEnumClassName(DbContextSerializable context, string fileType)
         {
             string result = "";
             if ((context == null) || string.IsNullOrEmpty(fileType))
@@ -954,7 +954,7 @@ namespace CS82ANGULAR.Model
             }
             return sb.ToString();
         }
-        string GetCommonServiceClassName(CS82ANGULAR.Model.Serializable.DbContextSerializable context, string fileType)
+        string GetCommonServiceClassName(DbContextSerializable context, string fileType)
         {
             string result = "";
             if ((context == null) || string.IsNullOrEmpty(fileType))
@@ -1001,7 +1001,7 @@ namespace CS82ANGULAR.Model
             return sb.ToString();
         }
 
-        string GetCommonFolderName(CS82ANGULAR.Model.Serializable.ModelViewSerializable model, CS82ANGULAR.Model.Serializable.DbContextSerializable context, string refFolder, string currFolder)
+        string GetCommonFolderName(ModelViewSerializable model, DbContextSerializable context, string refFolder, string currFolder)
         {
             string result = "./";
             if ((model == null) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder))
@@ -1051,7 +1051,7 @@ namespace CS82ANGULAR.Model
             return result;
         }
 
-        string GetCrossComponentFolderName(CS82ANGULAR.Model.Serializable.ModelViewSerializable model, string currFolder, CS82ANGULAR.Model.Serializable.DbContextSerializable context, string refViewName, string refFolder)
+        string GetCrossComponentFolderName(ModelViewSerializable model, string currFolder, DbContextSerializable context, string refViewName, string refFolder)
         {
             string result = "./";
             if ((model == null) || string.IsNullOrEmpty(currFolder) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(refViewName))
@@ -1110,7 +1110,7 @@ namespace CS82ANGULAR.Model
             return result;
         }
 
-        string GetComponentSelectorCommonPart(CS82ANGULAR.Model.Serializable.ModelViewSerializable model, string fileType)
+        string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType)
         {
             string result = "";
             if ((model == null) || string.IsNullOrEmpty(fileType))
@@ -1134,7 +1134,7 @@ namespace CS82ANGULAR.Model
             return refItem.FileName.Replace(".component", "");
         }
 
-        string GetComponentClassName(CS82ANGULAR.Model.Serializable.ModelViewSerializable model, string fileType)
+        string GetComponentClassName(ModelViewSerializable model, string fileType)
         {
             string result = "";
             if ((model == null) || string.IsNullOrEmpty(fileType))
@@ -1179,7 +1179,7 @@ namespace CS82ANGULAR.Model
             }
             return sb.ToString();
         }
-        string GetComponentClassNameEx(CS82ANGULAR.Model.Serializable.DbContextSerializable context, string viewName, string fileType)
+        string GetComponentClassNameEx(DbContextSerializable context, string viewName, string fileType)
         {
             string result = "";
             if ((context == null) || string.IsNullOrEmpty(fileType) || string.IsNullOrEmpty(viewName))
@@ -1190,7 +1190,7 @@ namespace CS82ANGULAR.Model
             return GetComponentClassName(model, fileType);
         }
 
-        string GetServiceClassName(CS82ANGULAR.Model.Serializable.ModelViewSerializable model, string fileType)
+        string GetServiceClassName(ModelViewSerializable model, string fileType)
         {
             string result = "";
             if ((model == null) || string.IsNullOrEmpty(fileType))
@@ -1236,7 +1236,7 @@ namespace CS82ANGULAR.Model
             return sb.ToString();
         }
 
-        string GetServiceClassNameEx(CS82ANGULAR.Model.Serializable.DbContextSerializable context, string ViewName, string fileType)
+        string GetServiceClassNameEx(DbContextSerializable context, string ViewName, string fileType)
         {
             if ((context == null) || string.IsNullOrEmpty(ViewName) || string.IsNullOrEmpty(fileType))
             {
@@ -1250,7 +1250,7 @@ namespace CS82ANGULAR.Model
             return GetServiceClassName(model, fileType);
         }
 
-        string GetViewByForeignNameChain(CS82ANGULAR.Model.Serializable.DbContextSerializable context, string ViewName, string foreignKeyNameChain)
+        string GetViewByForeignNameChain(DbContextSerializable context, string ViewName, string foreignKeyNameChain)
         {
             if ((context == null) || (string.IsNullOrEmpty(ViewName)))
             {
@@ -1283,7 +1283,7 @@ namespace CS82ANGULAR.Model
             return GetViewByForeignNameChain(context, fk.ViewName, string.Join(".", foreignKeys, 1, foreignKeys.Length - 1));
         }
 
-        string GetPrimKeyFilterForFindIndexMethod(CS82ANGULAR.Model.Serializable.DbContextSerializable context, string ViewName, string srcPrefix, string destPrefix)
+        string GetPrimKeyFilterForFindIndexMethod(DbContextSerializable context, string ViewName, string srcPrefix, string destPrefix)
         {
             if ((context == null) || (string.IsNullOrEmpty(ViewName)))
             {
@@ -1320,7 +1320,7 @@ namespace CS82ANGULAR.Model
             return result;
         }
 
-        string GetControlListPropertyName(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model, CS82ANGULAR.Model.Serializable.DbContextSerializable context, int inputType)
+        string GetControlListPropertyName(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, DbContextSerializable context, int inputType)
         {
             string viewNameForSel = "";
             switch (inputType)
@@ -1357,8 +1357,8 @@ namespace CS82ANGULAR.Model
             return GetTypeScriptPropertyName(propForSel, mv);
         }
 
-        CS82ANGULAR.Model.Serializable.ModelViewSerializable
-            GetViewForControlList(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model, CS82ANGULAR.Model.Serializable.DbContextSerializable context, int inputType)
+        ModelViewSerializable
+            GetViewForControlList(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, DbContextSerializable context, int inputType)
         {
             if ((prop == null) || (model == null) || (context == null))
             {
@@ -1388,9 +1388,9 @@ namespace CS82ANGULAR.Model
             return context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
         }
 
-        string GetViewNameForControlList(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model, CS82ANGULAR.Model.Serializable.DbContextSerializable context, int inputType)
+        string GetViewNameForControlList(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, DbContextSerializable context, int inputType)
         {
-            CS82ANGULAR.Model.Serializable.ModelViewSerializable mv =
+            ModelViewSerializable mv =
                 GetViewForControlList(prop, model, context, inputType);
             if (mv == null)
             {
@@ -1516,7 +1516,7 @@ namespace CS82ANGULAR.Model
             return result;
         }
 
-        List<ModelViewPropertyOfVwSerializable> GetPrimaryKeyProps(CS82ANGULAR.Model.Serializable.DbContextSerializable context, string viewName)
+        List<ModelViewPropertyOfVwSerializable> GetPrimaryKeyProps(DbContextSerializable context, string viewName)
         {
             List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
             if ((context == null) || string.IsNullOrEmpty(viewName))
@@ -1526,7 +1526,7 @@ namespace CS82ANGULAR.Model
             return GetModelPrimaryKeyProps(context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault());
         }
 
-        List<ModelViewPropertyOfVwSerializable> GetForeignKeyProps(CS82ANGULAR.Model.Serializable.DbContextSerializable context, CS82ANGULAR.Model.Serializable.ModelViewSerializable model,
+        List<ModelViewPropertyOfVwSerializable> GetForeignKeyProps(DbContextSerializable context, ModelViewSerializable model,
                                                 ModelViewUIFormPropertySerializable masterProp, ModelViewUIFormPropertySerializable detailProp, int inputType)
         {
             List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
@@ -1549,7 +1549,7 @@ namespace CS82ANGULAR.Model
             {
                 return result;
             }
-            CS82ANGULAR.Model.Serializable.ModelViewSerializable detailModel =
+            ModelViewSerializable detailModel =
                 GetViewForControlList(detailProp, model, context, inputType);
             if (detailModel == null)
             {
@@ -1581,7 +1581,7 @@ namespace CS82ANGULAR.Model
             return result;
         }
 
-        List<ModelViewPropertyOfVwSerializable> GetForeignKeyPropsBase(CS82ANGULAR.Model.Serializable.DbContextSerializable context, CS82ANGULAR.Model.Serializable.ModelViewSerializable model,
+        List<ModelViewPropertyOfVwSerializable> GetForeignKeyPropsBase(DbContextSerializable context, ModelViewSerializable model,
                                                 ModelViewUIFormPropertySerializable masterProp)
         {
             List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
@@ -1643,8 +1643,8 @@ namespace CS82ANGULAR.Model
             return result;
         }
 
-        List<string> GetFKViewsList(CS82ANGULAR.Model.Serializable.ModelViewSerializable model,
-                                         CS82ANGULAR.Model.Serializable.DbContextSerializable context,
+        List<string> GetFKViewsList(ModelViewSerializable model,
+                                         DbContextSerializable context,
                                          List<string> fkViewsDict)
         {
             if ((model == null) || (context == null) || (fkViewsDict == null))
@@ -1726,8 +1726,8 @@ namespace CS82ANGULAR.Model
             return fkViewsDict;
         }
 
-        List<string> GetSearchDialogViewsList(CS82ANGULAR.Model.Serializable.ModelViewSerializable model,
-                                             CS82ANGULAR.Model.Serializable.DbContextSerializable context,
+        List<string> GetSearchDialogViewsList(ModelViewSerializable model,
+                                             DbContextSerializable context,
                                              List<string> sdViewsDict)
         {
             if ((model == null) || (context == null) || (sdViewsDict == null))
@@ -1805,9 +1805,9 @@ namespace CS82ANGULAR.Model
 
 
         List<CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable>
-            GetDirectMasters(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop,
-                             CS82ANGULAR.Model.Serializable.ModelViewSerializable model,
-                             CS82ANGULAR.Model.Serializable.DbContextSerializable context, int inputType)
+            GetDirectMasters(ModelViewUIFormPropertySerializable prop,
+                             ModelViewSerializable model,
+                             DbContextSerializable context, int inputType)
         {
             List<CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable> result = new List<CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable>();
             if ((prop == null) || (model == null) || (context == null))
@@ -1880,9 +1880,9 @@ namespace CS82ANGULAR.Model
         }
 
         List<CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable>
-            GetDependentScalarProps(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop,
-                                    CS82ANGULAR.Model.Serializable.ModelViewSerializable model,
-                                    CS82ANGULAR.Model.Serializable.DbContextSerializable context, int inputType)
+            GetDependentScalarProps(ModelViewUIFormPropertySerializable prop,
+                                    ModelViewSerializable model,
+                                    DbContextSerializable context, int inputType)
         {
             List<CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable> result = new List<CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable>();
             if ((prop == null) || (model == null) || (context == null))
@@ -1931,9 +1931,9 @@ namespace CS82ANGULAR.Model
         }
 
         List<CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable>
-            GetDirectDetails(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop,
-                             CS82ANGULAR.Model.Serializable.ModelViewSerializable model,
-                             CS82ANGULAR.Model.Serializable.DbContextSerializable context, int inputType)
+            GetDirectDetails(ModelViewUIFormPropertySerializable prop,
+                             ModelViewSerializable model,
+                             DbContextSerializable context, int inputType)
         {
             List<CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable> result = new List<CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable>();
             if ((prop == null) || (model == null) || (context == null))
@@ -1986,9 +1986,9 @@ namespace CS82ANGULAR.Model
             return result;
         }
 
-        bool MustHaveDirectDetails(CS82ANGULAR.Model.Serializable.ModelViewUIFormPropertySerializable prop,
-                             CS82ANGULAR.Model.Serializable.ModelViewSerializable model,
-                             CS82ANGULAR.Model.Serializable.DbContextSerializable context)
+        bool MustHaveDirectDetails(ModelViewUIFormPropertySerializable prop,
+                             ModelViewSerializable model,
+                             DbContextSerializable context)
         {
             bool result = false;
             if ((prop == null) || (model == null) || (context == null))
@@ -2017,7 +2017,7 @@ namespace CS82ANGULAR.Model
             return "pkp" + pkpModelViewUIFormPropertySerializable.ViewPropertyName;
         }
 
-        List<ModelViewPropertyOfVwSerializable> GetAllForeignKeyProps(CS82ANGULAR.Model.Serializable.ModelViewSerializable model)
+        List<ModelViewPropertyOfVwSerializable> GetAllForeignKeyProps(ModelViewSerializable model)
         {
             List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
             if (model == null)
@@ -2048,7 +2048,7 @@ namespace CS82ANGULAR.Model
             }
             return result;
         }
-        ModelViewPropertyOfVwSerializable GetOnValChangeViewPropName(CS82ANGULAR.Model.Serializable.DbContextSerializable context, CS82ANGULAR.Model.Serializable.ModelViewSerializable model,
+        ModelViewPropertyOfVwSerializable GetOnValChangeViewPropName(DbContextSerializable context, ModelViewSerializable model,
                                     ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable, ModelViewUIFormPropertySerializable dependentScalarProp, int inputType)
         {
             if (dependentScalarProp == null)
@@ -2084,7 +2084,7 @@ namespace CS82ANGULAR.Model
                 view.ScalarProperties.Where(p => (p.OriginalPropertyName == dependentScalarProp.OriginalPropertyName) && (p.ForeignKeyNameChain == dependentForeignKeyNameChain)).FirstOrDefault();
         }
 
-        bool HasOnValChangedMethod(CS82ANGULAR.Model.Serializable.DbContextSerializable context, CS82ANGULAR.Model.Serializable.ModelViewSerializable model,
+        bool HasOnValChangedMethod(DbContextSerializable context, ModelViewSerializable model,
                                     ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable)
         {
             bool result = false;

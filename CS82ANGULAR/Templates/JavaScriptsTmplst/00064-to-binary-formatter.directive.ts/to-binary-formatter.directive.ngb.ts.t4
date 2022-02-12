@@ -1,0 +1,307 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+    string toBinaryPipeFolder                       = "00062-to-binary.pipe.ts";
+    string toBinaryFormatterDirectiveFolder         = "00064-to-binary-formatter.directive.ts";
+
+    string toBinaryPipeClassName                    = GetPipeClassName(Model, toBinaryPipeFolder);
+    string toBinaryPipeSelectorName                 = GetPipeSelectorName(Model, toBinaryPipeFolder);
+
+    string toBinaryFormatterDirectiveClassName      = GetDirectiveClassName(Model, toBinaryFormatterDirectiveFolder);
+    string toBinaryFormatterDirectiveSelectorName   = GetDirectiveSelectorName(Model, toBinaryFormatterDirectiveFolder);
+#>
+
+import { Directive, HostListener, ElementRef, OnInit, Input, forwardRef } from "@angular/core";
+// import { MAT_INPUT_VALUE_ACCESSOR } from '@angular/material/input';
+import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
+import { <#= toBinaryPipeClassName #> } from '<#= GetFolderName(Model, toBinaryPipeFolder, toBinaryFormatterDirectiveFolder) #>';
+
+ @Directive({ 
+   selector: '[<#= toBinaryFormatterDirectiveSelectorName #>]',
+   providers: [
+     //{
+       //provide: MAT_INPUT_VALUE_ACCESSOR, 
+       //useExisting: forwardRef(() => <#= toBinaryFormatterDirectiveClassName #>)
+     //},
+     {
+       provide: NG_VALUE_ACCESSOR,
+       useExisting: forwardRef(() => <#= toBinaryFormatterDirectiveClassName #>),
+       multi: true,
+     }
+   ],   
+ })
+export class <#= toBinaryFormatterDirectiveClassName #> implements ControlValueAccessor, OnInit {
+  protected _value: string | null = null;
+    
+    constructor(protected elementRef: ElementRef<HTMLInputElement>, protected tobinaryPipe: <#= toBinaryPipeClassName #>) {
+    }
+  
+    ngOnInit() {
+      
+    }
+    @Input('value')
+    get value(): string | null {
+      return this._value;
+    }    
+    set value(value: string | null) {
+      this._value = value;
+      this.formatValue();
+    }
+    private formatValue() {
+      if (this._value !== null) { 
+        this.elementRef.nativeElement.value = this.tobinaryPipe.transform(this._value);
+      } else {
+        this.elementRef.nativeElement.value = '';
+      }
+    }
+    private unFormatValue() {
+      if (this._value) {
+        this.elementRef.nativeElement.value = this._value; 
+      } else {
+        this.elementRef.nativeElement.value = '';
+      }
+    }
+    @HostListener('input', ['$event.target.value'])
+    onInput(value: any) {
+      this._value = this.tobinaryPipe.parse(value);
+      this._onChange(this._value);
+    }    
+    _onChange(value: any): void {
+    }    
+    @HostListener('blur')
+    _onBlur() {
+      this._value = this.tobinaryPipe.parse(this.elementRef.nativeElement.value);
+      this.formatValue(); 
+    }   
+    @HostListener('focus')
+    onFocus() {
+      this.unFormatValue(); 
+    }     
+    writeValue(value: any): void {
+      this._value = this.tobinaryPipe.parse(value);
+      this.formatValue(); 
+    }
+    registerOnChange(fn: (value: any) => void) {
+      this._onChange = fn;
+    }
+    registerOnTouched(fn: any): void {
+      
+    }
+}
+
+<#+
+
+    string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetDirectiveClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".directive","Directive");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetDirectiveSelectorName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".directive","");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = false; // the name starts from lower case letter
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+
+    string GetPipeClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".pipe","Pipe");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+    string GetPipeSelectorName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".pipe","");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = false; // the name starts from lower case letter
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+#>

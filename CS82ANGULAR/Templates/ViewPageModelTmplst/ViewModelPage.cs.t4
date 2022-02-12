@@ -66,7 +66,7 @@ namespace <#= GetModelNameSpace(Model) #> {
                 return char.ToLower(str[0]) + str.Substring(1);
             return str.ToUpper();
         }
-        string GetTypeScriptPropertyName(CS82ANGULAR.Model.Serializable.ModelViewPropertyOfVwSerializable prop, CS82ANGULAR.Model.Serializable.ModelViewSerializable model) {
+        string GetTypeScriptPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
             if (model.GenerateJSonAttribute) {
                 return prop.ViewPropertyName;
             } else {

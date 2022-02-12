@@ -1,0 +1,79 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+    string AppearancePropName           = "appearance";
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string OverflowSelector             = "ovrflw";
+    string OverflowPropName             = "ovrflw";
+    string containerMenuItemsPropName           = "contMenuItems";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string showAddFltItemSelector       = "show-add-flt-item";
+    string showAddFltItemPropName       = "showAddFltItem";
+
+    string OnBackBtnMethodName          = "onBackBtnMd";
+    string OnBackBtnPropName            = "onBackBtn";
+    string showBackBtnPropName          = "showBackBtn";
+    string showBackBtnSelector          = "show-back-btn";
+
+#>
+
+<div class="card">
+    <div class="card-header">
+        {{title}}
+    </div>
+    <div class="card-body">
+
+    <div [formGroup]="registerFormGroup" (ngSubmit)="doSubmit()"> 
+        <div class="form-group">
+            <label>Email</label>
+            <input  class="form-control" placeholder="Email..." formControlName="email">
+            <small class="text-danger" *ngIf="registerFormGroup.controls['email'].invalid && registerFormGroup.controls['email'].touched">{{getErrorMessage(registerFormGroup.controls['email'])}}</small>
+            <small class="text-muted" *ngIf="!(registerFormGroup.controls['email'].invalid && registerFormGroup.controls['email'].touched)">Enter Email</small>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <div class="input-group" >
+                <input  class="form-control" placeholder="Password..." formControlName="password" [type]="pwdhide ? 'password' : 'text'">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary " type="button"   (click)="pwdhide = !pwdhide" data-toggle="tooltip" title="Show (hide) password" >
+                        <i class="material-icons md-18">{{pwdhide ? 'visibility_off' : 'visibility'}}</i>
+                   </button>
+                </div>
+            </div>
+            <small class="text-danger" *ngIf="registerFormGroup.controls['password'].invalid  && registerFormGroup.controls['password'].touched">{{getErrorMessage(registerFormGroup.controls['password'])}}</small>
+            <small class="text-muted" *ngIf="!(registerFormGroup.controls['password'].invalid && registerFormGroup.controls['password'].touched)">Enter Password</small>
+        </div>
+        <div class="form-group">
+            <label>Confirm Password</label>
+            <div class="input-group" >
+                <input  class="form-control" placeholder="Confirm Password..." formControlName="confirmPassword" [type]="cnfPwdhide ? 'password' : 'text'">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary " type="button"   (click)="cnfPwdhide = !cnfPwdhide" data-toggle="tooltip" title="Show (hide) password" >
+                        <i class="material-icons md-18">{{cnfPwdhide ? 'visibility_off' : 'visibility'}}</i>
+                    </button>
+                </div>
+            </div>
+            <small class="text-danger" *ngIf="registerFormGroup.controls['confirmPassword'].invalid && registerFormGroup.controls['confirmPassword'].touched">{{getErrorMessage(registerFormGroup.controls['confirmPassword'])}}</small>
+            <small class="text-muted" *ngIf="!(registerFormGroup.controls['confirmPassword'].invalid && registerFormGroup.controls['confirmPassword'].touched)">Confirm Password</small>
+        </div>
+    </div>
+
+    </div>
+
+    <div class="card-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" ngbAutofocus>Cancel</button>
+        <button type="button" class="btn btn-outline-secondary" (click)="doSubmit()">Ok</button>
+    </div>
+</div>

@@ -1,0 +1,199 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+    string appSettingServiceFolder          = "00015-app-glbl-settings.service.ts";
+    string appRegisterInterfaceFolder       = "00118-app-glbl-register.interface.ts";
+    string appLoginInterfaceFolder          = "00120-app-glbl-login.interface.ts";
+    string appLoginServiceFolder            = "00130-app-glbl-login.service.ts";
+    string appChangePasswordInterfaceFolder = "00122-app-glbl-chngpswd.interface.ts";
+
+    string appRegisterModelClassName        = GetModelClassName(Model, appRegisterInterfaceFolder);
+    string appLoginModelClassName           = GetModelClassName(Model, appLoginInterfaceFolder);
+    string appChangePasswordModelClassName  = GetModelClassName(Model, appChangePasswordInterfaceFolder);
+    string appSettingServiceClassName       = GetServiceClassName(Model, appSettingServiceFolder);
+    string appLoginServiceClassName         = GetServiceClassName(Model, appLoginServiceFolder);
+
+    string AppearancePropName           = "appearance";
+    string ShowErrorMethodName          = "showError";
+    string AppSettingServicePropName    = "appGlblSettings";
+#>
+
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, appLoginServiceFolder)#>';
+import { <#= appRegisterModelClassName #> } from '<#= GetFolderName(Model, appRegisterInterfaceFolder, appLoginServiceFolder)#>';
+import { <#= appLoginModelClassName #> } from '<#= GetFolderName(Model, appLoginInterfaceFolder, appLoginServiceFolder)#>';
+import { <#= appChangePasswordModelClassName #> } from '<#= GetFolderName(Model, appChangePasswordInterfaceFolder, appLoginServiceFolder)#>';
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class <#= appLoginServiceClassName #> {
+    serviceUrl: string;  
+    constructor(private http: HttpClient, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {
+        this.serviceUrl = this.<#= AppSettingServicePropName #>.getSecurityWebApiPrefix();  
+    }
+    login(usrNm: string, pssWrd: string): Observable<any> {
+        /*
+            let rqDt: <#= appLoginModelClassName #> = {
+                username: usrNm, 
+                password: pssWrd,
+                grant_type: 'password'
+            };
+            return this.http.post<<#= appLoginModelClassName #>>(this.serviceUrl+'token', rqDt); 
+        */
+        let params: HttpParams  = new HttpParams();
+        params = params.append('username', usrNm);
+        params = params.append('password', pssWrd);
+        params = params.append('grant_type', 'password');
+        return this.http.post(this.serviceUrl+'token', params.toString());
+    }
+    register(rqDt: <#= appRegisterModelClassName #>): Observable<any> {
+        return this.http.post<<#= appLoginModelClassName #>>(this.serviceUrl+'api/Account/Register', rqDt); 
+    }
+    logout(): Observable<any> {
+        return this.http.post(this.serviceUrl+'api/Account/Logout', null); 
+    }
+    changePassword(chPwd: <#= appChangePasswordModelClassName #>): Observable<any> {
+        return this.http.post<<#= appChangePasswordModelClassName #>>(this.serviceUrl+'api/Account/ChangePassword', chPwd); 
+    }
+}
+
+<#+
+    string GetServiceClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".service","Service");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".interface","");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return "I"+sb.ToString();
+    }
+
+#>

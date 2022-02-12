@@ -1,0 +1,26 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<div class="modal-header">
+  <h4 class="modal-title" >{{data.title}}</h4>
+</div>
+<div class="modal-body">
+    <fa-icon [icon]="['fas', data.iconname]"  size="2x" class="{{'text-'+ data.iconcolor}}"></fa-icon> 
+    <span>&nbsp;&nbsp;</span>
+    <label>{{data.message}}</label>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" ngbAutofocus>Cancel</button>
+  <button type="button" class="btn btn-outline-secondary" (click)="onOk()">Ok</button>
+</div>

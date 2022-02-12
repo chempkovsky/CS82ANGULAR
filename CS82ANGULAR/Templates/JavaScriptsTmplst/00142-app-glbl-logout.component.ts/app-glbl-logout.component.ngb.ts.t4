@@ -1,0 +1,270 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+    string appSettingServiceFolder          = "00015-app-glbl-settings.service.ts";
+    string appRegisterInterfaceFolder       = "00118-app-glbl-register.interface.ts";
+    string appLoginInterfaceFolder          = "00120-app-glbl-login.interface.ts";
+    string appLoginServiceFolder            = "00130-app-glbl-login.service.ts";
+
+
+    string appLoginHtmlComponentFolder      = "00140-app-glbl-login.component.html";
+    string appLoginCssComponentFolder       = "00140-app-glbl-login.component.css";
+    string appLoginComponentFolder          = "00140-app-glbl-login.component.ts";
+
+
+    string appLogoutCssComponentFolder      = "00142-app-glbl-logout.component.css";
+    string appLogoutHtmlComponentFolder     = "00142-app-glbl-logout.component.html";
+    string appLogoutComponentFolder         = "00142-app-glbl-logout.component.ts";
+
+    string appRegisterModelClassName        = GetModelClassName(Model, appRegisterInterfaceFolder);
+    string appLoginModelClassName           = GetModelClassName(Model, appLoginInterfaceFolder);
+    string appSettingServiceClassName       = GetServiceClassName(Model, appSettingServiceFolder);
+    string appLoginServiceClassName         = GetServiceClassName(Model, appLoginServiceFolder);
+    string appLoginComponentClassName       = GetComponentClassName(Model, appLoginComponentFolder);
+    string appLogoutComponentClassName      = GetComponentClassName(Model, appLogoutComponentFolder);
+
+    string appLogoutComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, appLogoutComponentFolder);
+
+    string AppearancePropName           = "appearance";
+    string ShowErrorMethodName          = "showError";
+    string securityServiceName          = "scrtSvr";
+    string registerMethodName           = "register";
+    string loginMethodName              = "login";
+    string logoutMethodName             = "logout";
+    string AppSettingServicePropName    = "appGlblSettings";
+    string getAuthIntoMethodName        = "getAuthInto";
+    string setAuthIntoMethodName        = "setAuthInto";
+                                
+#>
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+
+import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, appLogoutComponentFolder)#>';
+import { <#= appLoginServiceClassName #> } from '<#= GetFolderName(Model, appLoginServiceFolder, appLogoutComponentFolder)#>';
+
+
+@Component({
+  selector: 'app-<#= appLogoutComponentSelectorCommonPart #>',
+  templateUrl: '<#= GetFolderName(Model, appLogoutHtmlComponentFolder, appLogoutComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderName(Model, appLogoutCssComponentFolder, appLogoutComponentFolder) #>.css']
+})
+export class <#= appLogoutComponentClassName #> {
+    title: string = 'Do you want to Sign Out?';
+    public appearance: string = 'outline';
+
+    constructor(private <#= securityServiceName #>: <#= appLoginServiceClassName #>, protected router: Router, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #> ) {
+        this.appearance = this.<#= AppSettingServicePropName #>.appearance;
+    } 
+    doSubmit() {
+        this.<#= securityServiceName #>.<#= logoutMethodName #>()
+        .subscribe(
+            (respdata: any ) => { // success path
+                this.<#= AppSettingServicePropName #>.perms = [0,0,0,0,  0,0,0,0,  0,0,0,0,  0,0,  1,0,0];
+                this.<#= AppSettingServicePropName #>.<#= setAuthIntoMethodName #>(null);
+                this.<#= AppSettingServicePropName #>.userName = null;
+                this.router.navigate(['/']);
+            },
+            error => { // error path
+                this.appGlblSettings.showError('http', error)
+            }
+        );
+    }
+    onCancel(){
+        this.router.navigate(['/']);
+    }
+}
+
+
+<#+
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetServiceClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".service","Service");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+    string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        return refItem.FileName.Replace(".component","");
+    }
+    string GetModelClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".interface","");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return "I" + sb.ToString();
+    }
+    string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+
+
+#>
