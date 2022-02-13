@@ -24,6 +24,7 @@
     string AddOneMethodName             = "addone";
     string DeleteOneMethodName          = "deleteone";
     string AppSettingServicePropName    = "appGlblSettings";
+    string GetOneByMethodNamePrefix     = "getoneby";
 
 
     string src2destMethodName       = "src2dest";
@@ -34,50 +35,14 @@
     string viewInterfaceFltFolder   = "01300-Filter.interface.ts";
     string viewServiceFolder        = "01400-.service.ts";
     string appSettingServiceClassName = GetCommonServiceClassName(Context, appSettingServiceFolder);
-    List<ModelViewPropertyOfVwSerializable> primKeys= new List<ModelViewPropertyOfVwSerializable>();
 
+    List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
     {
-        // collect primkey props
-        if ((Model.PrimaryKeyProperties != null) && (Model.ScalarProperties != null)) {
-            foreach(ModelViewKeyPropertySerializable pk in Model.PrimaryKeyProperties) {
-                ModelViewPropertyOfVwSerializable scProp= 
-                    Model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
-                if(scProp == null) {
-                    if (Model.ForeignKeys != null) {
-                        foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
-                            if ((fk.ForeignKeyProps != null) && (fk.PrincipalKeyProps != null)) {
-                                int cnt = fk.ForeignKeyProps.Count;
-                                if (cnt < fk.PrincipalKeyProps.Count)
-                                {
-                                    cnt = fk.PrincipalKeyProps.Count;
-                                }
-                                for(int i = 0; i < cnt; i++)
-                                {
-                                    if(fk.ForeignKeyProps[i].OriginalPropertyName == pk.OriginalPropertyName)
-                                    {
-                                        scProp=
-                                            Model.ScalarProperties.Where(p =>
-                                            ((p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (p.ForeignKeyNameChain == fk.NavigationName))).FirstOrDefault();
-                                    }
-                                    if(scProp != null) {
-                                        break;
-                                    }
-                                }
-                            }
-                            if(scProp != null) {
-                                break;
-                            }
-                        }
-                    }
-                }
-                if(scProp != null) {
-                    primKeys.Add(scProp);
-                }
-            }
-        }
-    }
-
-
+        ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
+        if (pk != null) uniqueKeys.Add(pk);
+        
+        GetModelUniqueKeys(Model, uniqueKeys);
+    } // primKeys
 
 #>
 import { Injectable } from '@angular/core';
@@ -242,11 +207,32 @@ export class <#= GetJavaScriptServiceName(Model) #> {
 
 <# 
     if (Model.IsWebApiSelectOneByPrimarykey) { 
+        foreach(ModelViewUniqueKeyOfVwSerializable pk in uniqueKeys) {
+            List<ModelViewPropertyOfVwSerializable> primKeys = null;
+            string indErrrorText = "";
+            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, pk, out indErrrorText);
+            string localRouteName = GetOneMethodName;
+            if (!pk.IsPrimary) {
+                    
+                localRouteName = GetOneByMethodNamePrefix + pk.UniqueKeyName;
+            }
+            if (!indIsCorrect) {
+#>
+//
+// Could not generate <#= localRouteName #>
+// Primary/Unique Index Is not correct:
+// <#= indErrrorText #>
+//
+<#
+            } else {
+                primKeys = pk.UniqueKeyProperties;
+#>
+
 #>
     // 
     // HowTo: {prm1, prm2, ..., prmN} -- primary key
     //
-    // this.serviceRefInYourCode.<#= GetOneMethodName #>(prm1, prm2, ..., prmN ).subscibe(value =>{
+    // this.serviceRefInYourCode.<#= localRouteName #>(prm1, prm2, ..., prmN ).subscibe(value =>{
     //    // handling value of type <#= GetInterfaceName(Model) #>
     // },
     // error => {
@@ -254,7 +240,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
     // });
     // 
 
-    <#= GetOneMethodName #>(<# 
+    <#= localRouteName #>(<# 
         {
             int counter = 0;
             foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
@@ -265,9 +251,10 @@ export class <#= GetJavaScriptServiceName(Model) #> {
         #>): Observable<<#= GetInterfaceName(Model) #>> {
         let params: HttpParams  = new HttpParams();
         let hasFilter: boolean = false;
+
 <#
         foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
-            if(! (primKeys.Contains(prop))) {
+            if(!(primKeys.Contains(prop))) {
                 continue;
             }
 #>
@@ -281,12 +268,13 @@ export class <#= GetJavaScriptServiceName(Model) #> {
     }
 #>
         const options = hasFilter ? { params } : {};
-        return this.http.get<<#= GetInterfaceName(Model) #>>(this.serviceUrl+'/<#= GetOneMethodName #>', options);
+        return this.http.get<<#= GetInterfaceName(Model) #>>(this.serviceUrl+'/<#= localRouteName #>', options);
           // .pipe(
-          //   catchError(this.handleError('<#= GetOneMethodName #>', []))
+          //   catchError(this.handleError('<#= localRouteName #>', []))
           // );
     }
 <#
+        }
     }
 #>
 
@@ -356,6 +344,28 @@ export class <#= GetJavaScriptServiceName(Model) #> {
 
 <# 
     if (Model.IsWebApiDelete) { 
+        List<ModelViewPropertyOfVwSerializable> primKeys = null;
+        ModelViewUniqueKeyOfVwSerializable locPrimKey = GetModelPrimKeyFromList(uniqueKeys);
+        string indErrrorText = "";
+        bool indIsCorrect = locPrimKey != null;
+        if (!indIsCorrect) {
+            indErrrorText = "Could not find primary key";
+        }
+        if (indIsCorrect) {
+            indIsCorrect = CheckModelIfIndexIsCorrect(Model, locPrimKey, out indErrrorText);
+        }
+        if(!indIsCorrect) {
+#>
+//
+// Could not generate <#= DeleteOneMethodName #>
+// Primary Index Is not correct:
+// <#= indErrrorText #>
+//
+<#
+
+        } else {
+            primKeys = locPrimKey.UniqueKeyProperties;
+
 #>
     // 
     // HowTo: item is of type <#= GetInterfaceName(Model) #> 
@@ -400,6 +410,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
         // );   
     }
 <#
+        }
     } 
 #>
 
@@ -747,6 +758,161 @@ export class <#= GetJavaScriptServiceName(Model) #> {
                 
         }
         return sb.ToString();
+    }
+
+    ModelViewPropertyOfVwSerializable GetModelScalarPropByKeyProp(ModelViewSerializable model, ModelViewKeyPropertySerializable pk) {
+        ModelViewPropertyOfVwSerializable rslt = null;
+        if ((model == null) || (pk == null)) return null;
+        if (model.ScalarProperties == null) return null;
+        ModelViewPropertyOfVwSerializable scProp = 
+            Model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+        if (scProp != null) return scProp;
+        if (Model.ForeignKeys != null) {
+            foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+                scProp = null;
+                if ((fk.ForeignKeyProps != null) && (fk.PrincipalKeyProps != null)) {
+                    int cnt = fk.ForeignKeyProps.Count;
+                    if (cnt < fk.PrincipalKeyProps.Count)
+                    {
+                        cnt = fk.PrincipalKeyProps.Count;
+                    }
+                    for(int i = 0; i < cnt; i++)
+                    {
+                        if(fk.ForeignKeyProps[i].OriginalPropertyName == pk.OriginalPropertyName)
+                        {
+                            scProp=
+                                Model.ScalarProperties.Where(p =>
+                                ((p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (p.ForeignKeyNameChain == fk.NavigationName))).FirstOrDefault();
+                        }
+                        if(scProp != null) return scProp;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    ModelViewUniqueKeyOfVwSerializable GetModelPrimaryKey(ModelViewSerializable model) {
+        ModelViewUniqueKeyOfVwSerializable rslt = null;    
+        if(model == null) return rslt;
+        if((model.PrimaryKeyProperties == null) || (model.ScalarProperties == null)) return rslt;
+        if((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1)) return rslt;
+        foreach(ModelViewKeyPropertySerializable pk in model.PrimaryKeyProperties) {
+            ModelViewPropertyOfVwSerializable scProp = 
+                Model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+            if(scProp == null) {
+                scProp = GetModelScalarPropByKeyProp(model, pk);
+            }
+            if(scProp != null) {
+                if(rslt == null) rslt = new ModelViewUniqueKeyOfVwSerializable() {
+                    UniqueKeyName = null,
+                    IsPrimary = true,
+                    UniqueKeyProperties = new List<ModelViewPropertyOfVwSerializable>()
+                };
+                rslt.UniqueKeyProperties.Add(scProp);
+            }
+        }
+        return rslt;
+    }
+    List<ModelViewUniqueKeyOfVwSerializable> GetModelUniqueKeys(ModelViewSerializable model, List<ModelViewUniqueKeyOfVwSerializable> rsltKeys) {
+        if((model == null) || (rsltKeys == null)) return rsltKeys;
+        if ((model.UniqueKeys == null) || (model.ScalarProperties == null)) return rsltKeys;
+        foreach(ModelViewUniqueKeySerializable uk in model.UniqueKeys) {
+            if(uk.UniqueKeyProperties == null) continue;
+            if(uk.UniqueKeyProperties.Count < 1) continue;
+            ModelViewUniqueKeyOfVwSerializable rslt = null; 
+            foreach(ModelViewKeyPropertySerializable pk in uk.UniqueKeyProperties) {
+                ModelViewPropertyOfVwSerializable scProp = 
+                    Model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+                if(scProp == null) {
+                    scProp = GetModelScalarPropByKeyProp(model, pk);
+                }
+                if(scProp != null) {
+                    if(rslt == null) rslt = new ModelViewUniqueKeyOfVwSerializable() {
+                        UniqueKeyName = uk.UniqueKeyName,
+                        IsPrimary = false,
+                        UniqueKeyProperties = new List<ModelViewPropertyOfVwSerializable>()
+                    };
+                    rslt.UniqueKeyProperties.Add(scProp);
+                }
+            }
+            if(rslt != null) {
+                rsltKeys.Add(rslt);
+            }
+        }
+        return rsltKeys;
+    }
+    ModelViewUniqueKeyOfVwSerializable GetModelPrimKeyFromList(List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys) {
+        if(uniqueKeys == null) return null;
+        return uniqueKeys.Where(u => u.IsPrimary).FirstOrDefault();
+    }
+    ModelViewUniqueKeyOfVwSerializable GetModelUniqueKeyByNameFromList(List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys, string name) {
+        if (uniqueKeys == null) return null;
+        if(string.IsNullOrEmpty(name)) {
+            return uniqueKeys.Where(u => string.IsNullOrEmpty(u.UniqueKeyName)).FirstOrDefault();
+        } else {
+            return uniqueKeys.Where(u => u.UniqueKeyName == name).FirstOrDefault();
+        }
+    }
+    ModelViewUniqueKeySerializable GetModelUniqueKeyByNameFromModel(ModelViewSerializable model, string name) {
+        if (model == null) return null;
+        if (model.UniqueKeys == null) return null;
+        if(string.IsNullOrEmpty(name)) {
+            return model.UniqueKeys.Where(u => string.IsNullOrEmpty(u.UniqueKeyName)).FirstOrDefault();
+        } else {
+            return model.UniqueKeys.Where(u => u.UniqueKeyName == name).FirstOrDefault();
+        }
+    }
+    bool CheckModelIfIndexIsCorrect(ModelViewSerializable model,ModelViewUniqueKeyOfVwSerializable indx, out string error) {
+        if((model == null) || (indx == null)) {
+            error = "Input params is not defined";
+            return false;
+        }
+        if(indx.UniqueKeyProperties == null) {
+            error = "UniqueKeyProperties of the Index are not defined";
+            return false;
+        }
+        if(indx.UniqueKeyProperties.Count < 1) {
+            if(indx.IsPrimary)
+                error = "UniqueKeyProperties.Count of the Primary Index is less than 1";
+            else 
+                error = "UniqueKeyProperties.Count of the Unique Index (UniqueKeyName == "+ indx.UniqueKeyName + ") is less than 1";
+            return false;
+        }
+
+        if(indx.IsPrimary) {
+            if(model.PrimaryKeyProperties == null) {
+                error = "PrimaryKeyProperties of the model are not defined";
+                return false;
+            }
+            if (model.PrimaryKeyProperties.Count != indx.UniqueKeyProperties.Count) {
+                error = "Not all Index fields are included in the Model";
+                return false;
+            }
+        } else {
+            if(model.UniqueKeys == null) {
+                error = "UniqueKeys of the model are not defined (UniqueKeyName == "+ indx.UniqueKeyName + ")";
+                return false;
+            }
+            if(string.IsNullOrEmpty(indx.UniqueKeyName)) {
+                error = "The Name of the Index is not defined (UniqueKeyName)";
+                return false;
+            }
+            ModelViewUniqueKeySerializable mindx = model.UniqueKeys.Where(i => i.UniqueKeyName == indx.UniqueKeyName).FirstOrDefault();
+            if(mindx == null) {
+                error = "Could not find index in model by name (Unique Index Name == "+ indx.UniqueKeyName + ")";
+                return false;
+            }
+            if(mindx.UniqueKeyProperties == null) {
+                error = "UniqueKeyProperties of the Unique Index (Unique Index Name == "+ indx.UniqueKeyName + ") are not defined";
+                return false;
+            }
+            if(mindx.UniqueKeyProperties.Count != indx.UniqueKeyProperties.Count) {
+                error = "Not all Unique Index fields are included in the Model (Unique Index Name == "+ indx.UniqueKeyName + ")";
+                return false;
+            }
+        }
+        error = "";
+        return true;
     }
 
 #>
