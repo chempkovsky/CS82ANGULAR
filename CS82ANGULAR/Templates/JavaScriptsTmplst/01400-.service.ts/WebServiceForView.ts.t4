@@ -257,7 +257,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
     <#= GetOneMethodName #>(<# 
         {
             int counter = 0;
-            foreach(.ModelViewPropertyOfVwSerializable prop in primKeys) {
+            foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
                 if(counter > 0) { #>, <#} #><#= GetTypeScriptPropertyName(prop, Model) #>: <#= GetPropertyTypeScriptTypeName(prop) #> <#
                 counter++;
             }
@@ -266,7 +266,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
         let params: HttpParams  = new HttpParams();
         let hasFilter: boolean = false;
 <#
-        foreach(.ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
             if(! (primKeys.Contains(prop))) {
                 continue;
             }
@@ -370,7 +370,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
     <#= DeleteOneMethodName #>(<# 
         {
             int counter = 0;
-            foreach(.ModelViewPropertyOfVwSerializable prop in primKeys) {
+            foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
                 if(counter > 0) { #>, <#} #><#= GetTypeScriptPropertyName(prop, Model) #>: <#= GetPropertyTypeScriptTypeName(prop) #> <#
                 counter++;
             }
@@ -379,7 +379,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
         let params: HttpParams  = new HttpParams();
         let hasFilter: boolean = false;
 <#
-        foreach(.ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
             if(! (primKeys.Contains(prop))) {
                 continue;
             }
@@ -407,7 +407,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
         if ((typeof src === 'undefined') || (typeof dest === 'undefined')) return;
         if ((src === null) || (dest === null)) return;
 <#
-            foreach(.ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
 #>
         if(typeof src.<#= GetTypeScriptPropertyName(prop, Model) #> === 'undefined') {
             dest['<#= GetTypeScriptPropertyName(prop, Model) #>'] = null;
