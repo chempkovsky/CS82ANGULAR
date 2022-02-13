@@ -104,14 +104,14 @@ export class <#= appChangePasswordComponentClassName #> {
            ConfirmPassword: this.chngpswdFormGroup.controls['confirmPassword'].value,
         }
         this.<#= securityServiceName #>.<#= changePasswordMethodName #>(chPwd)
-        .subscribe(
-            (respdata: any ) => { // success path
+        .subscribe({
+            next: (respdata: any ) => { // success path
                 this.router.navigate(['/']);
             },
-            error => { // error path
+            error: (error) => { // error path
                 this.appGlblSettings.showError('http', error)
             }
-        );
+        });
     }
     onCancel(){
         this.router.navigate(['/']);

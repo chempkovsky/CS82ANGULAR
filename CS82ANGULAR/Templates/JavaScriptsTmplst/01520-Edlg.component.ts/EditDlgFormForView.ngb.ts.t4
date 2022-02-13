@@ -12,76 +12,87 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
-    string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
-    string appSettingServiceClassName               = GetServiceClassName(Model, appSettingServiceFolder);
 
-    string appHtmlComponentFolder                   = "00210-app.component.html";
-    string appCssComponentFolder                    = "00210-app.component.css";
-    string appComponentFolder                       = "00210-app.component.ts";
-    string appComponentClassName                    = GetComponentClassName(Model, appComponentFolder);
+    string EformModePropName            = "eformMode";
+    string FormControlModelPropName     = "eformControlModel";
+    string FormControlNewModelPropName  = "eformNewControlModel";
+    string OnAfterSubmitMethodName      = "onAfterSubmit";
 
-    string AppSettingServicePropName                = "appGlblSettings";
+    string viewInterfaceFolder          = "01100-.interface.ts";
+
+    string eformComponentFolder         = "01500-Eform.component.ts";
+    string edlgCssFolder                = "01520-Edlg.component.css";
+    string edlgHtmlFolder               = "01520-Edlg.component.html";
+    string edlgComponentFolder          = "01520-Edlg.component.ts";
+
+    string viewInterfaceEDlgFolder      = "01510-Edlg.interface.ts";
+    string eformModeEnumlFolder         = "00026-eform-mode.enum.ts";
+
+    string eformModeEnumName = GetCommonEnumClassName(Context, eformModeEnumlFolder);
+    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, edlgComponentFolder);
+    string componentClassName = GetComponentClassName(Model, edlgComponentFolder);
 
 #>
 
-import { Component, OnInit } from '@angular/core';
-import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
-import { Observable } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
-import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, appComponentFolder)#>';
-
-
+import { Component,  Input, Output, EventEmitter, ViewChild, Inject } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { <#= GetInterfaceEDlgName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceEDlgFolder, edlgComponentFolder)#>';
+import { <#= GetComponentClassName(Model, eformComponentFolder) #> } from '<#=  GetFolderName(Model, eformComponentFolder, edlgComponentFolder) #>';
+import { <#= GetInterfaceName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceFolder, edlgComponentFolder)#>';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: '<#= GetFolderName(Model, appHtmlComponentFolder, appComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderName(Model, appCssComponentFolder, appComponentFolder) #>.css']
+  selector: 'app-<#= componentSelectorCommonPart #>',
+  templateUrl: '<#= GetFolderName(Model, edlgHtmlFolder, edlgComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderName(Model, edlgCssFolder, edlgComponentFolder) #>.css']
 })
-export class AppComponent implements OnInit {
-    apptitle = 'BLitApp';
-    isSideBarCollapsed: boolean = false;
+export class <#= componentClassName #>  {
 
-    constructor(private breakpointObserver: BreakpointObserver, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {
-    //<#= AppSettingServicePropName #>.appearance = 'fill';
+    @ViewChild(<#= GetComponentClassName(Model, eformComponentFolder) #>) childForm: <#= GetComponentClassName(Model, eformComponentFolder) #>|any;
+    @Input('data')
+    public data: <#= GetInterfaceEDlgName(Model) #> | any;
+    constructor(public dialogRef: NgbActiveModal) { }
+        // public dialogRef: MatDialogRef<<#= componentClassName #>>) { }
+    <#= OnAfterSubmitMethodName #>(newVal: <#= GetInterfaceName(Model) #>) {
+        this.data.<#= FormControlNewModelPropName #> = newVal; 
+        this.dialogRef.close(this.data);
     }
-    ngOnInit() {
-    this.breakpointObserver
-        .observe(Breakpoints.Handset)
-        .subscribe({
-            next: (state: BreakpointState) => {
-                if (state.matches) {
-                    this.isSideBarCollapsed = true;
-                } else {
-                    this.isSideBarCollapsed = false;
-                }
-            }
-        });
+    onCancel() {
+        this.dialogRef.dismiss();
     }
-
-    get userName(): string|null {
-        return this.<#= AppSettingServicePropName #>.userName;
-    }  
+    onOk() {
+        if (typeof this.childForm === 'undefined') return;
+        if (this.childForm === null) return;
+        this.childForm.doSubmit();
+    }
 }
 
 <#+
-
-    string GetServiceClassName(ModelViewSerializable model, string fileType) {
+    string GetInterfaceName(ModelViewSerializable model) {
+        if(model == null) {
+            return "I";
+        }
+        return "I"+model.ViewName;
+    }
+    string GetInterfaceEDlgName(ModelViewSerializable model) {
+        return "I"+model.ViewName+"Edlg";
+    }
+    string GetCommonEnumClassName(DbContextSerializable context, string fileType) {
         string result="";
-        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
             return result;
         }
-        if (model.CommonStaffs == null) {
+        if (context.CommonStaffs == null) {
             return result;
         }
         CommonStaffSerializable refItem= 
-            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
         if (refItem == null) {
             return result;
         }
         if(string.IsNullOrEmpty(refItem.FileName)) {
             return result;
         }
-        string fn = refItem.FileName.Replace(".service","Service");
+        string fn = refItem.FileName.Replace(".enum","");
         StringBuilder sb = new StringBuilder();
         bool toUpper = true;
         foreach (char c in fn)
@@ -101,10 +112,28 @@ export class AppComponent implements OnInit {
                     sb.Append(c);
                 }
             }
+                
         }
         return sb.ToString();
     }
-
+    string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        return refItem.FileName.Replace(".component","");
+    }
     string GetComponentClassName(ModelViewSerializable model, string fileType) {
         string result="";
         if ((model == null) || string.IsNullOrEmpty(fileType) ) {
@@ -144,7 +173,6 @@ export class AppComponent implements OnInit {
         }
         return sb.ToString();
     }
-
     string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
         string result="./";
         if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
@@ -177,7 +205,7 @@ export class AppComponent implements OnInit {
             cnt++;
         }
         if(currLen > cnt) {
-            result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
         }
         if(refLen > cnt) {
             result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
@@ -185,5 +213,4 @@ export class AppComponent implements OnInit {
         result += refItem.FileName;
         return result;
     }
-
 #>

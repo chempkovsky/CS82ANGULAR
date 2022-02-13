@@ -475,35 +475,37 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         }
         this.inQuery = true;
         this.<#= formRootService #>.<#= GetWithFilterMethodName #>(flt)
-            .subscribe((v: <#= GetInterfacePageName(Model) #>) =>{
-                this.inQuery = false;
-                let pl: number = 0;
-                if (!(typeof v.total === 'undefined')) {
-                    if(!(v.total === null)) {
-                        pl = v.total;
+            .subscribe({
+                next: (v: <#= GetInterfacePageName(Model) #>) =>{
+                    this.inQuery = false;
+                    let pl: number = 0;
+                    if (!(typeof v.total === 'undefined')) {
+                        if(!(v.total === null)) {
+                            pl = v.total;
+                        }
                     }
-                }
-                this.matPaginatorLen = pl;
-                let rslt: Array<<#= GetInterfaceName(Model) #>> = [];
-                if (!(typeof v.items === 'undefined')) {
-                    if(!(v.items === null)) {
-                        rslt = v.items;
+                    this.matPaginatorLen = pl;
+                    let rslt: Array<<#= GetInterfaceName(Model) #>> = [];
+                    if (!(typeof v.items === 'undefined')) {
+                        if(!(v.items === null)) {
+                            rslt = v.items;
+                        }
                     }
-                }
-                this.dataSource = rslt;
-                this.<#= applyFilterPropName #>.emit(this);
-                let currow: <#= GetInterfaceName(Model) #> | null = null;
-                if(Array.isArray(this.dataSource)) {
-                    if(this.dataSource.length > 0) {
-                        currow = this.dataSource[0];
+                    this.dataSource = rslt;
+                    this.<#= applyFilterPropName #>.emit(this);
+                    let currow: <#= GetInterfaceName(Model) #> | null = null;
+                    if(Array.isArray(this.dataSource)) {
+                        if(this.dataSource.length > 0) {
+                            currow = this.dataSource[0];
+                        }
                     }
+                    this.onSelectRow(currow);
+                    this.cd.detectChanges();
+                },
+                error: (error) => {
+                    this.inQuery = false;
+                    this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
                 }
-                this.onSelectRow(currow);
-                this.cd.detectChanges();
-            },
-            error => {
-                this.inQuery = false;
-                this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error)
             });
     }
 
@@ -560,14 +562,16 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
               maxWidth: '100vw',
               width: '65vw',
             });
-        dialogRef.afterClosed().subscribe(rslt => {
-            if (!(typeof rslt === 'undefined')) {
-                if (!(rslt === null)) {
-                    let r: string[] = ['<#= SelectColumnDefProperty #>'];
-                    rslt.forEach((e: { checked: any; name: string; }) => { if (e.checked) { r.push(e.name) }});
-                    r.push('<#= ActionColumnDefProperty #>');
-                    this.<#= DisplayedColumnsProperty #> = r;
-                    this.cd.detectChanges();
+        dialogRef.afterClosed().subscribe({
+            next: (rslt: any) => {
+                if (!(typeof rslt === 'undefined')) {
+                    if (!(rslt === null)) {
+                        let r: string[] = ['<#= SelectColumnDefProperty #>'];
+                        rslt.forEach((e: { checked: any; name: string; }) => { if (e.checked) { r.push(e.name) }});
+                        r.push('<#= ActionColumnDefProperty #>');
+                        this.<#= DisplayedColumnsProperty #> = r;
+                        this.cd.detectChanges();
+                    }
                 }
             }
         });

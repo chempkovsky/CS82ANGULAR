@@ -69,17 +69,17 @@ export class <#= appLogoutComponentClassName #> {
     } 
     doSubmit() {
         this.<#= securityServiceName #>.<#= logoutMethodName #>()
-        .subscribe(
-            (respdata: any ) => { // success path
+        .subscribe({
+            next: (respdata: any ) => { // success path
                 this.<#= AppSettingServicePropName #>.perms = [0,0,0,0,  0,0,0,0,  0,0,0,0,  0,0,  1,0,0];
                 this.<#= AppSettingServicePropName #>.<#= setAuthIntoMethodName #>(null);
                 this.<#= AppSettingServicePropName #>.userName = null;
                 this.router.navigate(['/']);
             },
-            error => { // error path
+            error: (error) => { // error path
                 this.appGlblSettings.showError('http', error)
             }
-        );
+        });
     }
     onCancel(){
         this.router.navigate(['/']);

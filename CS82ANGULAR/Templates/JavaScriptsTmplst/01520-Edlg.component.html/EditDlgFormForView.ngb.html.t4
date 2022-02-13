@@ -1,0 +1,68 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+    string HiddenFilterSelector         = "hidden-filter";
+    string HiddenFilterPropName         = "hiddenFilter";
+    string EformModeSelector            = "eform-mode";
+    string EformModePropName            = "eformMode";
+    string FormControlModelSelector     = "eform-control-model";
+    string FormControlModelPropName     = "eformControlModel";
+    string BeforeSubmitSelector         = "before-submit";
+    string BeforeSubmitPropName         = "beforeSubmit";
+    string AfterSubmitSelector          = "after-submit";
+    string AfterSubmitPropName          = "afterSubmit";
+    string OnAfterSubmitMethodName      = "onAfterSubmit";
+
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+    string eformComponentFolder     = "01500-Eform.component.ts";
+    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, eformComponentFolder);
+#>
+<!-- <h3 mat-dialog-title>{{data.title}}</h3> -->
+<div class="modal-body"> 
+    <app-<#= componentSelectorCommonPart #> 
+        [<#= captionSelector #>]="data.title" 
+        [<#= HiddenFilterSelector #>]="data.<#= HiddenFilterPropName #>"
+        [<#= FormControlModelSelector #>]="data.<#= FormControlModelPropName #>"
+        [<#= EformModeSelector #>]="data.<#= EformModePropName #>"
+        (<#= AfterSubmitSelector #>)="<#= OnAfterSubmitMethodName #>($event)"
+    ></app-<#= componentSelectorCommonPart #>>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" ngbAutofocus>Cancel</button>
+  <button type="button" class="btn btn-outline-secondary" (click)="onOk()">Ok</button>
+</div>
+
+<#+
+    string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        return refItem.FileName.Replace(".component","");
+    }
+#>
