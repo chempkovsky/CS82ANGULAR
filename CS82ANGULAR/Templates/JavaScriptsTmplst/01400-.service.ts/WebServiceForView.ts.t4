@@ -1,0 +1,752 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+    string OperatorSufix = "Oprtr";
+    string EqualOperator = "eq";
+
+
+    string GetAllMethodName             = "getall";
+    string GetWithFilterMethodName      = "getwithfilter";
+    string GetOneMethodName             = "getone";
+    string UpdateOneMethodName          = "updateone";
+    string AddOneMethodName             = "addone";
+    string DeleteOneMethodName          = "deleteone";
+    string AppSettingServicePropName    = "appGlblSettings";
+
+
+    string src2destMethodName       = "src2dest";
+
+    string appSettingServiceFolder  = "00015-app-glbl-settings.service.ts";
+    string viewInterfaceFolder      = "01100-.interface.ts";
+    string viewInterfacePageFolder  = "01200-Page.interface.ts";
+    string viewInterfaceFltFolder   = "01300-Filter.interface.ts";
+    string viewServiceFolder        = "01400-.service.ts";
+    string appSettingServiceClassName = GetCommonServiceClassName(Context, appSettingServiceFolder);
+    List<ModelViewPropertyOfVwSerializable> primKeys= new List<ModelViewPropertyOfVwSerializable>();
+
+    {
+        // collect primkey props
+        if ((Model.PrimaryKeyProperties != null) && (Model.ScalarProperties != null)) {
+            foreach(ModelViewKeyPropertySerializable pk in Model.PrimaryKeyProperties) {
+                ModelViewPropertyOfVwSerializable scProp= 
+                    Model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+                if(scProp == null) {
+                    if (Model.ForeignKeys != null) {
+                        foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+                            if ((fk.ForeignKeyProps != null) && (fk.PrincipalKeyProps != null)) {
+                                int cnt = fk.ForeignKeyProps.Count;
+                                if (cnt < fk.PrincipalKeyProps.Count)
+                                {
+                                    cnt = fk.PrincipalKeyProps.Count;
+                                }
+                                for(int i = 0; i < cnt; i++)
+                                {
+                                    if(fk.ForeignKeyProps[i].OriginalPropertyName == pk.OriginalPropertyName)
+                                    {
+                                        scProp=
+                                            Model.ScalarProperties.Where(p =>
+                                            ((p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (p.ForeignKeyNameChain == fk.NavigationName))).FirstOrDefault();
+                                    }
+                                    if(scProp != null) {
+                                        break;
+                                    }
+                                }
+                            }
+                            if(scProp != null) {
+                                break;
+                            }
+                        }
+                    }
+                }
+                if(scProp != null) {
+                    primKeys.Add(scProp);
+                }
+            }
+        }
+    }
+
+
+
+#>
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs/internal/Observable';
+import { <#= GetInterfaceName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceFolder, viewServiceFolder)#>';
+import { <#= GetInterfacePageName(Model) #> } from '<#= GetFolderName(Model, viewInterfacePageFolder, viewServiceFolder)#>';
+import { <#= GetInterfaceFilterName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceFltFolder, viewServiceFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, viewServiceFolder)#>';
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class <#= GetJavaScriptServiceName(Model) #> {
+    serviceUrl: string;  
+    constructor(private http: HttpClient, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {
+       this.serviceUrl = this.<#= AppSettingServicePropName #>.getWebApiPrefix('<#= Model.ViewName #>') + '<#= GetWebApiServicePrefix(Model) #>';  
+    }
+
+<# 
+    if (Model.IsWebApiSelectAll) { 
+#>
+
+    // 
+    // HowTo:
+    //
+    // this.serviceRefInYourCode.<#= GetAllMethodName #>().subscibe(value =>{
+    //    // handling value of type <#= GetInterfaceName(Model) #>[] 
+    // },
+    // error => {
+    //    // handling error 
+    // });
+    // 
+    <#= GetAllMethodName #>(): Observable<<#= GetInterfaceName(Model) #>[]> {
+
+        return this.http.get<<#= GetInterfaceName(Model) #>[]>(this.serviceUrl+'/<#= GetAllMethodName #>');
+        //    .pipe(
+        //        catchError(this.handleError('<#= GetAllMethodName #>', []))
+        //    );
+    }
+
+<#
+    }
+#>
+
+
+<# 
+    if (Model.IsWebApiSelectManyWithPagination) { 
+#>
+    // 
+    // HowTo: flt is of type <#=GetInterfaceFilterName(Model)#> 
+    //
+    // this.serviceRefInYourCode.<#= GetWithFilterMethodName #>(flt).subscibe(value =>{
+    //    // handling value of type <#= GetInterfacePageName(Model) #>
+    // },
+    // error => {
+    //    // handling error 
+    // });
+    // 
+    <#= GetWithFilterMethodName #>(filter: <#=GetInterfaceFilterName(Model)#>): Observable<<#= GetInterfacePageName(Model) #>> {
+        let params: HttpParams  = new HttpParams();
+        let hasFilter: boolean = false;
+        if (!(typeof filter === 'undefined')) {
+            if (!(filter === null )) {
+<#
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if (! prop.IsUsedByfilter) {
+                continue;
+            }
+#>
+                if (!(typeof filter.<#= GetTypeScriptPropertyName(prop, Model)#> === 'undefined')) {
+                    if ( Array.isArray(filter.<#= GetTypeScriptPropertyName(prop, Model)#> )) {
+<#          if(prop.IsNullable) { #>
+                        let hasNull: boolean = false;
+<#          } #>
+                        filter.<#= GetTypeScriptPropertyName(prop, Model)#>.forEach(function (value) {
+                            if(!(typeof value === 'undefined')) {
+                                if(!(value === null)) {
+                                    params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', value<#= GetJavaScriptToStringMethod(prop) #>);
+                                    hasFilter = true;
+                                } 
+<#          if(prop.IsNullable) { #>
+                                else {
+                                    hasNull = true;
+                                }
+<#          } #>
+                            }
+                        });
+<#          if(prop.IsNullable) { #>
+                        if(hasNull) {
+                            params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', '');
+                        }
+<#          } #>
+                    } // if ( Array.isArray(filter.<#= GetTypeScriptPropertyName(prop, Model)#> ))
+                } // if (!(typeof filter.<#= GetTypeScriptPropertyName(prop, Model)#> === 'undefined'))
+<#
+        }
+#>
+
+
+<#
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if (! prop.IsUsedByfilter) {
+                continue;
+            }
+#>
+                if (!(typeof  filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> === 'undefined')) {
+                    if (Array.isArray(filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> )) {
+                        filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#>.forEach(function (value) {
+                            if(!(typeof value === 'undefined')) {
+                                if(value === null) {
+                                    params = params.append('<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>', '<#= EqualOperator #>');
+                                } 
+                                else {
+                                    params = params.append('<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>', value<#=GetJavaScriptToStringMethod(prop)#>);
+                                }
+                            }
+                        });
+                    } // if (Array.isArray(filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#>))
+                } // if (!(typeof  filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> === 'undefined'))
+<#
+        }
+#>
+
+                if (!(typeof filter.orderby === 'undefined')) {
+                    if ( Array.isArray(filter.orderby)) {
+                        filter.orderby.forEach(function (value) {
+                            if (!(typeof value === 'undefined')) {
+                                if(!(value === null)) {
+                                    params = params.append('orderby', value);
+                                    hasFilter = true;
+                                }
+                            }
+                        });
+                    }
+                }
+                if (!(typeof filter.page === 'undefined')) {
+                    if (!(filter.page === null)) {
+                        params = params.append('page', filter.page.toString());
+                        hasFilter = true;
+                    }
+                }
+                if (!(typeof filter.pagesize === 'undefined')) {
+                    if (!(filter.pagesize === null)) {
+                        params = params.append('pagesize', filter.pagesize.toString());
+                        hasFilter = true;
+                    }
+                }
+            } // if (!(filter === null ))
+        } // if (!(typeof filter === 'undefined'))
+        const options = hasFilter ? { params } : {};
+        return this.http.get<<#= GetInterfacePageName(Model) #>>(this.serviceUrl+'/<#= GetWithFilterMethodName #>', options);
+          //    .pipe(
+          //        catchError(this.handleError('<#= GetWithFilterMethodName #>', []))
+          //    );
+    }
+<#
+    }
+#>
+
+<# 
+    if (Model.IsWebApiSelectOneByPrimarykey) { 
+#>
+    // 
+    // HowTo: {prm1, prm2, ..., prmN} -- primary key
+    //
+    // this.serviceRefInYourCode.<#= GetOneMethodName #>(prm1, prm2, ..., prmN ).subscibe(value =>{
+    //    // handling value of type <#= GetInterfaceName(Model) #>
+    // },
+    // error => {
+    //    // handling error 
+    // });
+    // 
+
+    <#= GetOneMethodName #>(<# 
+        {
+            int counter = 0;
+            foreach(.ModelViewPropertyOfVwSerializable prop in primKeys) {
+                if(counter > 0) { #>, <#} #><#= GetTypeScriptPropertyName(prop, Model) #>: <#= GetPropertyTypeScriptTypeName(prop) #> <#
+                counter++;
+            }
+        }
+        #>): Observable<<#= GetInterfaceName(Model) #>> {
+        let params: HttpParams  = new HttpParams();
+        let hasFilter: boolean = false;
+<#
+        foreach(.ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(! (primKeys.Contains(prop))) {
+                continue;
+            }
+#>
+        if (!(typeof <#= GetTypeScriptPropertyName(prop, Model) #> === 'undefined')) {
+            if (!(<#= GetTypeScriptPropertyName(prop, Model) #> === null)) {
+                params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', <#= GetTypeScriptPropertyName(prop, Model) #><#= GetJavaScriptToStringMethod(prop) #>);
+                hasFilter = true;
+            }
+        }
+<#
+    }
+#>
+        const options = hasFilter ? { params } : {};
+        return this.http.get<<#= GetInterfaceName(Model) #>>(this.serviceUrl+'/<#= GetOneMethodName #>', options);
+          // .pipe(
+          //   catchError(this.handleError('<#= GetOneMethodName #>', []))
+          // );
+    }
+<#
+    }
+#>
+
+<# 
+    if (Model.IsWebApiUpdate) { 
+#>
+    // 
+    // HowTo: item is of type <#= GetInterfaceName(Model) #> 
+    //
+    // this.serviceRefInYourCode.<#= UpdateOneMethodName #>(item).subscibe(value =>{
+    //    // handling value of type <#= GetInterfaceName(Model) #>
+    // },
+    // error => {
+    //    // handling error 
+    // });
+    // 
+    <#= UpdateOneMethodName #>(item: <#= GetInterfaceName(Model) #>): Observable<<#= GetInterfaceName(Model) #>> {
+
+        return this.http.put<<#= GetInterfaceName(Model) #>>(this.serviceUrl+'/<#= UpdateOneMethodName #>', item); //, httpOptions);
+        //  .pipe(
+        //    catchError(this.handleError('<#= UpdateOneMethodName #>', item))
+        //  );
+    }
+<#
+    } 
+#>
+
+<# 
+    if (Model.IsWebApiAdd) { 
+        List<ModelViewPropertyOfVwSerializable> identProps = GetDatabaseGeneratedProp(Model);
+#>
+    // 
+    // HowTo: item is of type <#= GetInterfaceName(Model) #> 
+    //
+    // this.serviceRefInYourCode.<#= AddOneMethodName #>(item).subscibe(value =>{
+    //    // handling value of type <#= GetInterfaceName(Model) #>
+    // },
+    // error => {
+    //    // handling error 
+    // });
+    // 
+    <#= AddOneMethodName #>(item: <#=GetInterfaceName(Model)#>): Observable<<#=GetInterfaceName(Model)#>> {
+<#
+        foreach (ModelViewPropertyOfVwSerializable identProp in identProps) {
+#>
+        if(!(typeof item === 'undefined')) {
+            if(!(item === null)) {
+                if(typeof item.<#= GetTypeScriptPropertyName(identProp, Model) #> === 'undefined') {
+                    item['<#= GetTypeScriptPropertyName(identProp, Model) #>'] = <#= GetDefaultVal(identProp) #>;
+                }
+                if(item.<#= GetTypeScriptPropertyName(identProp, Model) #> === null) {
+                    item['<#= GetTypeScriptPropertyName(identProp, Model) #>'] = <#= GetDefaultVal(identProp) #>;
+                }
+            }
+        }
+<#
+        }
+#>
+        return this.http.post<<#=GetInterfaceName(Model)#>>(this.serviceUrl+'/<#= AddOneMethodName #>', item); //, httpOptions);
+        // .pipe(
+        //      catchError(this.handleError('<#= AddOneMethodName #>', item))
+        // );   
+    }
+<#
+    } 
+#>
+
+<# 
+    if (Model.IsWebApiDelete) { 
+#>
+    // 
+    // HowTo: item is of type <#= GetInterfaceName(Model) #> 
+    //
+    // this.serviceRefInYourCode.<#= DeleteOneMethodName #>(item).subscibe(value =>{
+    //    // handling value of type <#= GetInterfaceName(Model) #>
+    // },
+    // error => {
+    //    // handling error 
+    // });
+    // 
+    <#= DeleteOneMethodName #>(<# 
+        {
+            int counter = 0;
+            foreach(.ModelViewPropertyOfVwSerializable prop in primKeys) {
+                if(counter > 0) { #>, <#} #><#= GetTypeScriptPropertyName(prop, Model) #>: <#= GetPropertyTypeScriptTypeName(prop) #> <#
+                counter++;
+            }
+        }
+        #>): Observable<<#= GetInterfaceName(Model) #>> {
+        let params: HttpParams  = new HttpParams();
+        let hasFilter: boolean = false;
+<#
+        foreach(.ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(! (primKeys.Contains(prop))) {
+                continue;
+            }
+#>
+        if (!(typeof <#= GetTypeScriptPropertyName(prop, Model) #> === 'undefined')) {
+            if (!(<#= GetTypeScriptPropertyName(prop, Model) #> === null)) {
+                params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', <#= GetTypeScriptPropertyName(prop, Model) #><#= GetJavaScriptToStringMethod(prop) #>);
+                hasFilter = true;
+            }
+        }
+<#
+    }
+#>
+        const options = hasFilter ? { params } : {};
+        return this.http.delete<<#=GetInterfaceName(Model)#>>(this.serviceUrl+'/<#= DeleteOneMethodName #>', options); //, httpOptions);
+        // .pipe(
+        //      catchError(this.handleError('<#= DeleteOneMethodName #>', item))
+        // );   
+    }
+<#
+    } 
+#>
+
+    <#= src2destMethodName #>(src: <#= GetInterfaceName(Model) #>, dest: <#= GetInterfaceName(Model) #>) {
+        if ((typeof src === 'undefined') || (typeof dest === 'undefined')) return;
+        if ((src === null) || (dest === null)) return;
+<#
+            foreach(.ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+#>
+        if(typeof src.<#= GetTypeScriptPropertyName(prop, Model) #> === 'undefined') {
+            dest['<#= GetTypeScriptPropertyName(prop, Model) #>'] = null;
+        } else {
+            dest['<#= GetTypeScriptPropertyName(prop, Model) #>'] = src.<#= GetTypeScriptPropertyName(prop, Model) #>;
+        }
+<#                
+            }
+#>        
+    }
+
+
+}
+
+<#+
+
+    string GetInterfaceName(ModelViewSerializable model) {
+        return "I"+model.ViewName;
+    }
+    string GetInterfacePageName(ModelViewSerializable model) {
+        return "I"+model.PageViewName;
+    }
+    string GetInterfaceFilterName(ModelViewSerializable model) {
+        return "I"+model.ViewName + "Filter";
+    }
+    string GetJavaScriptServiceName(ModelViewSerializable model) {
+        string  result = model.ViewName + "Service";
+        return result.First().ToString().ToUpper() + result.Substring(1);
+    }
+    bool HasAtributeWithValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName, string attrVal) {
+        if ((sclrProp != null) && (!string.IsNullOrEmpty(attrName)) && (!string.IsNullOrEmpty(attrVal)) ) {
+            if (sclrProp.Attributes != null) {
+                foreach(ModelViewAttributeSerializable a in sclrProp.Attributes) {
+                    if (attrName.Equals(a.AttrName, StringComparison.InvariantCultureIgnoreCase)) {
+                        if (a.VaueProperties != null) {
+                            foreach(ModelViewAttributePropertySerializable v in a.VaueProperties) {
+                                if(!string.IsNullOrEmpty( v.PropValue )) {
+                                    if(v.PropValue.ToLower().Contains(attrVal)) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    bool HasAtribute(ModelViewPropertyOfVwSerializable sclrProp, string attrName) {
+        if ((sclrProp != null) && (!string.IsNullOrEmpty(attrName))) {
+            if (sclrProp.Attributes != null) {
+                foreach(ModelViewAttributeSerializable a in sclrProp.Attributes) {
+                    if (attrName.Equals(a.AttrName, StringComparison.InvariantCultureIgnoreCase)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    bool HasFluentAtributeWithValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName, string attrVal) {
+        if ((sclrProp != null) && (!string.IsNullOrEmpty(attrName)) && (!string.IsNullOrEmpty(attrVal)) ) {
+            if (sclrProp.FAPIAttributes != null) {
+                foreach(ModelViewFAPIAttributeSerializable a in sclrProp.FAPIAttributes) {
+                    if (attrName.Equals(a.AttrName, StringComparison.InvariantCultureIgnoreCase)) {
+                        if (a.VaueProperties != null) {
+                            foreach(ModelViewFAPIAttributePropertySerializable v in a.VaueProperties) {
+                                if(!string.IsNullOrEmpty( v.PropValue )) {
+                                    if(v.PropValue.ToLower().Contains(attrVal)) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    bool HasFluentAtribute(ModelViewPropertyOfVwSerializable sclrProp, string[] attrName) {
+        if ((sclrProp != null) && (attrName != null)  ) {
+            if ((sclrProp.FAPIAttributes != null) && (attrName.Length > 0)) {
+                return sclrProp.FAPIAttributes.Any(a => attrName.Contains(a.AttrName));
+            }
+        }
+        return false;
+    }
+
+    bool IsIdentityProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (HasAtribute(prop, "ConcurrencyCheck") || HasAtribute(prop, "Timestamp")) {
+            return true;
+        }
+        if (HasAtributeWithValue(prop, "DatabaseGenerated", "identity") || HasAtributeWithValue(prop, "DatabaseGenerated", "computed")) {
+            return true;
+        }
+        if(HasFluentAtribute(prop, new string[] {"UseSqlServerIdentityColumn", "ForSqlServerUseSequenceHiLo", "ValueGeneratedOnAdd", "ValueGeneratedOnAddOrUpdate", "IsConcurrencyToken", "IsRowVersion"} )) {
+            return true;
+        }
+        return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "identity") || HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "computed");
+    }
+    List<ModelViewPropertyOfVwSerializable> GetDatabaseGeneratedProp(ModelViewSerializable model) {
+        List<ModelViewPropertyOfVwSerializable> rslt = new List<ModelViewPropertyOfVwSerializable>();
+        if(model == null) return null;
+        if(model.ScalarProperties == null) return null;
+        foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in model.ScalarProperties) {
+            if(IsIdentityProperty(modelViewPropertyOfVwSerializable, model)) {
+                rslt.Add(modelViewPropertyOfVwSerializable);
+            }
+        }
+        return rslt;
+    }
+    string GetDefaultVal(ModelViewPropertyOfVwSerializable prop) {
+        if(prop == null) {
+            return "0";
+        }
+        string result = "";
+        switch(prop.UnderlyingTypeName.ToLower()) {
+            case "system.boolean": 
+                result =  "false";
+                break;
+            case "system.guid":
+            case "system.string":
+                result =  "'0'";
+                break;
+            default:
+                result =  "0";
+                break;
+        }
+        return result;
+    }
+
+    string GetPropertyTypeScriptTypeName(ModelViewPropertyOfVwSerializable prop) {
+        string result = "";
+        switch(prop.UnderlyingTypeName.ToLower()) {
+            case "system.boolean": 
+                result =  "boolean";
+                break;
+            case "system.guid":
+            case "system.string":
+                result =  "string";
+                break;
+            default:
+                result =  "number";
+                break;
+        }
+        if(prop.IsNullable || (!prop.IsRequiredInView)) {
+            return result + " | null";
+        }
+        return result;
+    }
+    string GetJavaScriptToStringMethod(ModelViewPropertyOfVwSerializable prop) {
+        string result = "";
+        switch(prop.UnderlyingTypeName.ToLower()) {
+            case "system.datetime": 
+                result =  ".toString()"; // .toDateString()
+                break;
+            case "system.guid":
+            case "system.string":
+                result =  "";
+                break;
+            default:
+                result =  ".toString()";
+                break;
+        }
+        return result;
+    }
+    string GetPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
+    {
+        if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
+            return prop.UnderlyingTypeName;
+        }
+        if(prop.IsNullable || (!prop.IsRequiredInView)) {
+            return prop.UnderlyingTypeName + " ?";
+        }
+        return prop.UnderlyingTypeName;
+    }
+    string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetCommonFolderName(ModelViewSerializable model, DbContextSerializable context,  string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if ((model.CommonStaffs == null) || (context.CommonStaffs == null)) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+
+    String GetWebApiServicePrefix(ModelViewSerializable model) {
+        string result = model.WebApiServiceName;
+        if( !string.IsNullOrEmpty( result ) ) {
+            if(result.EndsWith("Controller")) {
+                result = result.Substring(0, result.LastIndexOf("Controller"));
+            }
+            result = result.ToLower();
+        }
+        return result;
+    }
+    public string FirstLetterToUpper(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToUpper(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    public string FirstLetterToLower(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToLower(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    string GetTypeScriptPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName + operatorSufix;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName) + operatorSufix;
+        }
+    }
+    string GetCommonServiceClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".service","Service");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString();
+    }
+
+#>
