@@ -648,8 +648,8 @@
                 return attrProp.PropValue.Trim(charsToTrim);
             }
     }
-    bool HasButton(CS2ANGULAR.Model.InputTypeEnum inputType) {
-        if (inputType == CS2ANGULAR.Model.InputTypeEnum.SearchDialog) {
+    bool HasButton(InputTypeEnum inputType) {
+        if (inputType == InputTypeEnum.SearchDialog) {
             return true;
         }
         return false;
