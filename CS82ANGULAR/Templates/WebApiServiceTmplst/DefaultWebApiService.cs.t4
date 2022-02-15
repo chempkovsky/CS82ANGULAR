@@ -1026,10 +1026,10 @@ namespace <#= webApiServiceNameSpace #> {
         if ((model == null) || (pk == null)) return null;
         if (model.ScalarProperties == null) return null;
         ModelViewPropertyOfVwSerializable scProp = 
-            Model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+            model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
         if (scProp != null) return scProp;
-        if (Model.ForeignKeys != null) {
-            foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+        if (model.ForeignKeys != null) {
+            foreach(ModelViewForeignKeySerializable fk in model.ForeignKeys) {
                 scProp = null;
                 if ((fk.ForeignKeyProps != null) && (fk.PrincipalKeyProps != null)) {
                     int cnt = fk.ForeignKeyProps.Count;
@@ -1042,7 +1042,7 @@ namespace <#= webApiServiceNameSpace #> {
                         if(fk.ForeignKeyProps[i].OriginalPropertyName == pk.OriginalPropertyName)
                         {
                             scProp=
-                                Model.ScalarProperties.Where(p =>
+                                model.ScalarProperties.Where(p =>
                                 ((p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (p.ForeignKeyNameChain == fk.NavigationName))).FirstOrDefault();
                         }
                         if(scProp != null) return scProp;
@@ -1059,7 +1059,7 @@ namespace <#= webApiServiceNameSpace #> {
         if((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1)) return rslt;
         foreach(ModelViewKeyPropertySerializable pk in model.PrimaryKeyProperties) {
             ModelViewPropertyOfVwSerializable scProp = 
-                Model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+                model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
             if(scProp == null) {
                 scProp = GetModelScalarPropByKeyProp(model, pk);
             }
@@ -1083,7 +1083,7 @@ namespace <#= webApiServiceNameSpace #> {
             ModelViewUniqueKeyOfVwSerializable rslt = null; 
             foreach(ModelViewKeyPropertySerializable pk in uk.UniqueKeyProperties) {
                 ModelViewPropertyOfVwSerializable scProp = 
-                    Model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+                    model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
                 if(scProp == null) {
                     scProp = GetModelScalarPropByKeyProp(model, pk);
                 }

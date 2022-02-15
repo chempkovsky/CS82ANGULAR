@@ -1,0 +1,1127 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+    string OperatorSufix = "Oprtr";
+    string EqualOperator = "eq";
+
+
+    string GetAllMethodName                 = "getall";
+    string GetWithFilterMethodName          = "getwithfilter";
+    string GetOneMethodName                 = "getone";
+    string UpdateOneMethodName              = "updateone";
+    string AddOneMethodName                 = "addone";
+    string DeleteOneMethodName              = "deleteone";
+    string AppSettingServicePropName        = "appGlblSettings";
+    string GetOneByMethodNamePrefix         = "getoneby";
+    string src2destMethodName               = "src2dest";
+    string formRootService                  = "frmRootSrv";
+
+
+    string CurrentViewNameFieldName         = "CurrentViewName";
+    string ClientViewNameFieldName          = "ClientViewName";
+    string DirectNavigationFieldName        = "DirectNavigation";
+    string IsTopDetailFieldName             = "IsTopDetail";
+    string IsDefinedFieldName               = "IsDefined";
+    string ValuesFieldName                  = "Values";
+    string ClientToMasterFieldsMapFieldName = "ClientToMasterFieldsMap";
+    string MasterToClientFieldsMapFieldName = "MasterToClientFieldsMap";
+    string OnDetailChangedPropName          = "OnDetailChanged";
+    string OnMasterChangedPropName          = "OnMasterChanged";
+    string OnIsDefinedChangedPropName       = "OnIsDefinedChanged";
+    string submitOnDetailChangedMethodName  = "submitOnDetailChanged";
+    string submitOnMasterChangedMethodName  = "submitOnMasterChanged";
+    string LengthFieldName                  = "Length";
+    string KeysFieldName                    = "Keys";
+    string ValueFieldName                   = "Value";
+    string ClearMethodName                  = "clear";
+
+    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName           = GetCommonServiceClassName(Context, appSettingServiceFolder);
+
+    string viewModelPrimaryInterfaceFolder      = "00600-view-model-primary.interface.ts";
+    string viewModelPrimaryInterfaceClassName   = GetModelClassName(Context, viewModelPrimaryInterfaceFolder);
+
+
+    string viewInterfaceFolder                  = "01100-.interface.ts";
+    string viewInterfacePageFolder              = "01200-Page.interface.ts";
+    string viewInterfaceFltFolder               = "01300-Filter.interface.ts";
+    string viewServiceFolder                    = "01400-.service.ts";
+
+    string viewPrimaryClassFolder               = "01418-Primary.class.ts";
+
+    string serviceClassName = GetServiceClassName(Model, viewServiceFolder);
+
+    List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
+    {
+        ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
+        if (pk != null) uniqueKeys.Add(pk);
+        
+        GetModelUniqueKeys(Model, uniqueKeys);
+    } 
+
+#>
+import { EventEmitter } from "@angular/core";
+
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, viewPrimaryClassFolder) #>';
+import { <#= viewModelPrimaryInterfaceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  viewModelPrimaryInterfaceFolder, viewPrimaryClassFolder) #>';
+
+import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, viewPrimaryClassFolder, Context, Model.ViewName, viewServiceFolder) #>';
+
+export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implements <#= viewModelPrimaryInterfaceClassName #> {
+    protected readonly _<#= CurrentViewNameFieldName #>: string  = '<#= Model.ViewName #>';
+    protected readonly _<#= ClientViewNameFieldName #>: string | any;
+    protected readonly _<#= DirectNavigationFieldName #>: string | any;
+    protected _<#= IsTopDetailFieldName #>: boolean = false;
+    protected _<#= IsDefinedFieldName #>: boolean = false;
+    protected _<#= ValuesFieldName #>: {[key: string]: any} = {
+<#
+    if (Model.ScalarProperties != null) {
+        foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+#>
+      <#= GetTypeScriptPropertyName(prop, Model) #>: undefined,  // <#= GetPropertyTypeScriptTypeName(prop) #>, <#= GetPropertyTypeName(prop) #>
+<#
+
+        }
+    }
+#>
+    };
+<#
+    {
+        List<string> errors = new List<string>();
+        List<ModelViewSerializable> clVms = CollectClientToMasterFieldsMapModelViews(Model, Context, errors);
+        foreach(string error in  errors) {
+#>
+<#= error #>
+<#
+        }
+#>
+    // first key is Client View Name, 
+    // second key is Direct Navigation Name, 
+    // third key is Client View Property Name, 
+    // value is a Master View Property Name, i.e. Property Name of the Current View 
+    protected _<#= ClientToMasterFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = {
+<#
+        if(clVms != null) {
+            foreach(ModelViewSerializable clVm in clVms) {
+                errors.Clear();
+                List<ModelViewForeignKeySerializable> mlFks = CollectMasterToClientFieldsMapForMasterView(clVm, Model.ViewName, errors);
+                foreach(string error in  errors) {
+#>
+<#= error #>
+<#
+                }
+                if (mlFks != null) {
+#>
+                '<#= clVm.ViewName #>' : {
+<#
+                    foreach(ModelViewForeignKeySerializable mlFk in mlFks) {
+#>
+                    '<#= mlFk.NavigationName #>' : {
+<#
+                        for(int i = 0; i < mlFk.ForeignKeyProps.Count; i++) {
+#>
+                        '<#= GetTypeScriptPropertyNameByKeyProperty(clVm, mlFk.ForeignKeyProps[i]) #>' : '<#= GetTypeScriptPropertyNameByKeyProperty(Model, mlFk.PrincipalKeyProps[i]) #>',
+<#
+                        }
+#>
+                    },
+<#
+                    }
+#>
+                },
+<#
+                }
+            } // end of: foreach(ModelViewSerializable clVm in clVms) {...}
+        } // end of: if(clVms != null) {...}
+#>
+    };
+
+<#
+    }
+    {
+        List<string> errors = new List<string>();
+        List<ModelViewForeignKeySerializable> mtcfks = CollectMasterToClientFieldsMap(Model, errors);
+        foreach(string error in  errors) {
+#>
+<#= error #>
+<#
+        }
+#>
+    //
+    // first key is Master View Name, 
+    // second key is Direct Navigation Name, 
+    // third key is Master View Property Name, 
+    // value is a  Client View Property Name, i.e. Property Name of the Current View 
+    protected _<#= MasterToClientFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = {
+<#
+        if (mtcfks != null) {
+            string currentMasterView = "";
+            ModelViewSerializable masterModel = null;
+            foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) {
+                if (currentMasterView != mtcfk.ViewName) {
+                    masterModel = GetModelViewByViewName(Context, mtcfk.ViewName);
+#>
+                '<#= mtcfk.ViewName #>' : {
+<#
+                }
+#>
+                    '<#= mtcfk.NavigationName #>' : {
+<#
+                for(int i = 0; i < mtcfk.PrincipalKeyProps.Count; i++) {
+#>
+                        '<#= GetTypeScriptPropertyNameByKeyProperty(masterModel, mtcfk.PrincipalKeyProps[i]) #>' : '<#= GetTypeScriptPropertyNameByKeyProperty(Model, mtcfk.ForeignKeyProps[i]) #>',
+<#
+                }
+#>
+                    },
+<#
+                if (currentMasterView != mtcfk.ViewName) {
+#>
+                },
+<#
+                }
+                currentMasterView = mtcfk.ViewName;
+            } // end of: for(mtcfk in mtcfks) {...}
+        } // end of: if (mtcfks != null) {...}
+#>
+    };
+<#
+    }
+#>
+
+
+    constructor(private <#= formRootService #>: <#= serviceClassName #>,
+                <#= ClientViewNameFieldName #>: string | null | undefined, 
+                <#= DirectNavigationFieldName #>: string | any) {
+        this._<#= ClientViewNameFieldName #> = <#= ClientViewNameFieldName #>;
+        this._<#= DirectNavigationFieldName #> = <#= DirectNavigationFieldName #>;
+    }
+
+    public <#= OnDetailChangedPropName #>: EventEmitter<<#= viewModelPrimaryInterfaceClassName #>> = new EventEmitter<<#= viewModelPrimaryInterfaceClassName #>>();
+    public <#= OnMasterChangedPropName #>: EventEmitter<<#= viewModelPrimaryInterfaceClassName #>> = new EventEmitter<<#= viewModelPrimaryInterfaceClassName #>>();
+    public <#= OnIsDefinedChangedPropName #>: EventEmitter<<#= viewModelPrimaryInterfaceClassName #>> = new EventEmitter<<#= viewModelPrimaryInterfaceClassName #>>();
+
+    public get<#= IsTopDetailFieldName #>(): boolean {
+        return this._<#= IsTopDetailFieldName #>;
+    }
+    public set<#= IsTopDetailFieldName #>(v: boolean): void {
+        this._<#= IsTopDetailFieldName #> = v;
+    }
+    public get<#= IsDefinedFieldName #>(): boolean {
+        return this._<#= IsDefinedFieldName #>;
+    }
+    public get<#= CurrentViewNameFieldName #>(): string {
+        return this._<#= CurrentViewNameFieldName #>;
+    }
+    public get<#= ClientViewNameFieldName #>(): string | any {
+        return this._<#= ClientViewNameFieldName #>;
+    }
+    public get<#= DirectNavigationFieldName #>(): string|any {
+        return this._<#= DirectNavigationFieldName #>;
+    }
+    public get<#= LengthFieldName #>(): number {
+        return Object.keys(this._<#= ValuesFieldName #>).length;
+    }
+    public get<#= KeysFieldName #>(): string[] {
+        return Object.keys(this._<#= ValuesFieldName #>);
+    }
+    public get<#= ValueFieldName #>(key: string): any {
+        return this._<#= ValuesFieldName #>[key];
+    }
+    public set<#= ValueFieldName #>(key: string, value: any): void {
+        return this._<#= ValuesFieldName #>[key] = value;
+    }
+    public <#= ClearMethodName #>(): void {
+        let hasChanged: boolean = false;
+        for(let i in this._<#= ValuesFieldName #>) {
+            if (typeof this._<#= ValuesFieldName #>[i] !== 'undefined') hasChanged = true;
+            this._<#= ValuesFieldName #>[i] = undefined;
+        }
+        if(this._<#= IsDefinedFieldName #>) {
+            this._<#= IsDefinedFieldName #> = false;
+            this.<#= OnIsDefinedChangedPropName #>.emit(this);
+        }
+        if(hasChanged) {
+            this.<#= OnDetailChangedPropName #>.emit(this);
+            this.<#= OnMasterChangedPropName #>.emit(this);
+        }
+    }
+
+    public <#= submitOnDetailChangedMethodName #>(v: <#= viewModelPrimaryInterfaceClassName #>): void {
+        if ((typeof this._<#= ClientViewNameFieldName #> === 'undefined') || (typeof this._<#= DirectNavigationFieldName #> === 'undefined')) return;
+        if ((this._<#= ClientViewNameFieldName #> === null) || (this._<#= DirectNavigationFieldName #> === null)) return;
+        if(v.get<#= CurrentViewNameFieldName #>() !== this._<#= ClientViewNameFieldName #>) return;
+        // add code here
+    }
+
+    public <#= submitOnMasterChangedMethodName #>(v: <#= viewModelPrimaryInterfaceClassName #>): void {
+        let masterDirNav: string | any = v.get<#= DirectNavigationFieldName #>();
+        let masterClnt: string | any = v.get<#= ClientViewNameFieldName #>();
+
+        if ((typeof masterDirNav === 'undefined') || (typeof masterClnt == 'undefined')) return;
+        if ((masterDirNav === null) || (masterClnt === null)) return;
+        if (masterClnt !== this.get<#= CurrentViewNameFieldName #>()) return;
+        // add code here
+        // case by navigations
+    }
+}
+
+<#+
+
+    string GetInterfaceName(ModelViewSerializable model) {
+        return "I"+model.ViewName;
+    }
+    string GetInterfacePageName(ModelViewSerializable model) {
+        return "I"+model.PageViewName;
+    }
+    string GetInterfaceFilterName(ModelViewSerializable model) {
+        return "I"+model.ViewName + "Filter";
+    }
+    string GetJavaScriptServiceName(ModelViewSerializable model) {
+        string  result = model.ViewName + "Service";
+        return result.First().ToString().ToUpper() + result.Substring(1);
+    }
+    string GetJavaScriptClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".class","");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetModelClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".interface","");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return "I" + sb.ToString();
+    }
+    string GetServiceClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".service","Service");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+
+    bool HasAtributeWithValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName, string attrVal) {
+        if ((sclrProp != null) && (!string.IsNullOrEmpty(attrName)) && (!string.IsNullOrEmpty(attrVal)) ) {
+            if (sclrProp.Attributes != null) {
+                foreach(ModelViewAttributeSerializable a in sclrProp.Attributes) {
+                    if (attrName.Equals(a.AttrName, StringComparison.InvariantCultureIgnoreCase)) {
+                        if (a.VaueProperties != null) {
+                            foreach(ModelViewAttributePropertySerializable v in a.VaueProperties) {
+                                if(!string.IsNullOrEmpty( v.PropValue )) {
+                                    if(v.PropValue.ToLower().Contains(attrVal)) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    bool HasAtribute(ModelViewPropertyOfVwSerializable sclrProp, string attrName) {
+        if ((sclrProp != null) && (!string.IsNullOrEmpty(attrName))) {
+            if (sclrProp.Attributes != null) {
+                foreach(ModelViewAttributeSerializable a in sclrProp.Attributes) {
+                    if (attrName.Equals(a.AttrName, StringComparison.InvariantCultureIgnoreCase)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    bool HasFluentAtributeWithValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName, string attrVal) {
+        if ((sclrProp != null) && (!string.IsNullOrEmpty(attrName)) && (!string.IsNullOrEmpty(attrVal)) ) {
+            if (sclrProp.FAPIAttributes != null) {
+                foreach(ModelViewFAPIAttributeSerializable a in sclrProp.FAPIAttributes) {
+                    if (attrName.Equals(a.AttrName, StringComparison.InvariantCultureIgnoreCase)) {
+                        if (a.VaueProperties != null) {
+                            foreach(ModelViewFAPIAttributePropertySerializable v in a.VaueProperties) {
+                                if(!string.IsNullOrEmpty( v.PropValue )) {
+                                    if(v.PropValue.ToLower().Contains(attrVal)) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    bool HasFluentAtribute(ModelViewPropertyOfVwSerializable sclrProp, string[] attrName) {
+        if ((sclrProp != null) && (attrName != null)  ) {
+            if ((sclrProp.FAPIAttributes != null) && (attrName.Length > 0)) {
+                return sclrProp.FAPIAttributes.Any(a => attrName.Contains(a.AttrName));
+            }
+        }
+        return false;
+    }
+
+    bool IsIdentityProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (HasAtribute(prop, "ConcurrencyCheck") || HasAtribute(prop, "Timestamp")) {
+            return true;
+        }
+        if (HasAtributeWithValue(prop, "DatabaseGenerated", "identity") || HasAtributeWithValue(prop, "DatabaseGenerated", "computed")) {
+            return true;
+        }
+        if(HasFluentAtribute(prop, new string[] {"UseSqlServerIdentityColumn", "ForSqlServerUseSequenceHiLo", "ValueGeneratedOnAdd", "ValueGeneratedOnAddOrUpdate", "IsConcurrencyToken", "IsRowVersion"} )) {
+            return true;
+        }
+        return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "identity") || HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "computed");
+    }
+    List<ModelViewPropertyOfVwSerializable> GetDatabaseGeneratedProp(ModelViewSerializable model) {
+        List<ModelViewPropertyOfVwSerializable> rslt = new List<ModelViewPropertyOfVwSerializable>();
+        if(model == null) return null;
+        if(model.ScalarProperties == null) return null;
+        foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in model.ScalarProperties) {
+            if(IsIdentityProperty(modelViewPropertyOfVwSerializable, model)) {
+                rslt.Add(modelViewPropertyOfVwSerializable);
+            }
+        }
+        return rslt;
+    }
+    string GetDefaultVal(ModelViewPropertyOfVwSerializable prop) {
+        if(prop == null) {
+            return "0";
+        }
+        string result = "";
+        switch(prop.UnderlyingTypeName.ToLower()) {
+            case "system.boolean": 
+                result =  "false";
+                break;
+            case "system.guid":
+            case "system.string":
+                result =  "'0'";
+                break;
+            default:
+                result =  "0";
+                break;
+        }
+        return result;
+    }
+
+    string GetPropertyTypeScriptTypeName(ModelViewPropertyOfVwSerializable prop) {
+        string result = "";
+        switch(prop.UnderlyingTypeName.ToLower()) {
+            case "system.boolean": 
+                result =  "boolean";
+                break;
+            case "system.guid":
+            case "system.string":
+                result =  "string";
+                break;
+            default:
+                result =  "number";
+                break;
+        }
+        if(prop.IsNullable || (!prop.IsRequiredInView)) {
+            return result + " | null";
+        }
+        return result;
+    }
+    string GetJavaScriptToStringMethod(ModelViewPropertyOfVwSerializable prop) {
+        string result = "";
+        switch(prop.UnderlyingTypeName.ToLower()) {
+            case "system.datetime": 
+                result =  ".toString()"; // .toDateString()
+                break;
+            case "system.guid":
+            case "system.string":
+                result =  "";
+                break;
+            default:
+                result =  ".toString()";
+                break;
+        }
+        return result;
+    }
+    string GetPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
+    {
+        if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
+            return prop.UnderlyingTypeName;
+        }
+        if(prop.IsNullable || (!prop.IsRequiredInView)) {
+            return prop.UnderlyingTypeName + " ?";
+        }
+        return prop.UnderlyingTypeName;
+    }
+    string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetCommonFolderName(ModelViewSerializable model, DbContextSerializable context,  string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if ((model.CommonStaffs == null) || (context.CommonStaffs == null)) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetCrossComponentFolderName(ModelViewSerializable model, string currFolder, DbContextSerializable context, string refViewName, string refFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(currFolder) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(refViewName)) {
+            return result;
+        }
+        if ((model.CommonStaffs == null) || (context.ModelViews == null)) {
+            return result;
+        }
+        ModelViewSerializable refModel = context.ModelViews.Where(v => v.ViewName == refViewName).FirstOrDefault();
+        if (refModel == null) {
+            return result;
+        }
+        if (refModel.CommonStaffs == null)  {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            refModel.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+
+    String GetWebApiServicePrefix(ModelViewSerializable model) {
+        string result = model.WebApiServiceName;
+        if( !string.IsNullOrEmpty( result ) ) {
+            if(result.EndsWith("Controller")) {
+                result = result.Substring(0, result.LastIndexOf("Controller"));
+            }
+            result = result.ToLower();
+        }
+        return result;
+    }
+    public string FirstLetterToUpper(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToUpper(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    public string FirstLetterToLower(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToLower(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    string GetTypeScriptPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName + operatorSufix;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName) + operatorSufix;
+        }
+    }
+    string GetCommonServiceClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".service","Service");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString();
+    }
+
+    ModelViewPropertyOfVwSerializable GetModelScalarPropByKeyProp(ModelViewSerializable model, ModelViewKeyPropertySerializable pk) {
+        ModelViewPropertyOfVwSerializable rslt = null;
+        if ((model == null) || (pk == null)) return null;
+        if (model.ScalarProperties == null) return null;
+        ModelViewPropertyOfVwSerializable scProp = 
+            model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+        if (scProp != null) return scProp;
+        if (model.ForeignKeys != null) {
+            foreach(ModelViewForeignKeySerializable fk in model.ForeignKeys) {
+                scProp = null;
+                if ((fk.ForeignKeyProps != null) && (fk.PrincipalKeyProps != null)) {
+                    int cnt = fk.ForeignKeyProps.Count;
+                    if (cnt < fk.PrincipalKeyProps.Count)
+                    {
+                        cnt = fk.PrincipalKeyProps.Count;
+                    }
+                    for(int i = 0; i < cnt; i++)
+                    {
+                        if(fk.ForeignKeyProps[i].OriginalPropertyName == pk.OriginalPropertyName)
+                        {
+                            scProp=
+                                model.ScalarProperties.Where(p =>
+                                ((p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (p.ForeignKeyNameChain == fk.NavigationName))).FirstOrDefault();
+                        }
+                        if(scProp != null) return scProp;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    ModelViewUniqueKeyOfVwSerializable GetModelPrimaryKey(ModelViewSerializable model) {
+        ModelViewUniqueKeyOfVwSerializable rslt = null;    
+        if(model == null) return rslt;
+        if((model.PrimaryKeyProperties == null) || (model.ScalarProperties == null)) return rslt;
+        if((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1)) return rslt;
+        foreach(ModelViewKeyPropertySerializable pk in model.PrimaryKeyProperties) {
+            ModelViewPropertyOfVwSerializable scProp = 
+                model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+            if(scProp == null) {
+                scProp = GetModelScalarPropByKeyProp(model, pk);
+            }
+            if(scProp != null) {
+                if(rslt == null) rslt = new ModelViewUniqueKeyOfVwSerializable() {
+                    UniqueKeyName = null,
+                    IsPrimary = true,
+                    UniqueKeyProperties = new List<ModelViewPropertyOfVwSerializable>()
+                };
+                rslt.UniqueKeyProperties.Add(scProp);
+            }
+        }
+        return rslt;
+    }
+    List<ModelViewUniqueKeyOfVwSerializable> GetModelUniqueKeys(ModelViewSerializable model, List<ModelViewUniqueKeyOfVwSerializable> rsltKeys) {
+        if((model == null) || (rsltKeys == null)) return rsltKeys;
+        if ((model.UniqueKeys == null) || (model.ScalarProperties == null)) return rsltKeys;
+        foreach(ModelViewUniqueKeySerializable uk in model.UniqueKeys) {
+            if(uk.UniqueKeyProperties == null) continue;
+            if(uk.UniqueKeyProperties.Count < 1) continue;
+            ModelViewUniqueKeyOfVwSerializable rslt = null; 
+            foreach(ModelViewKeyPropertySerializable pk in uk.UniqueKeyProperties) {
+                ModelViewPropertyOfVwSerializable scProp = 
+                    model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+                if(scProp == null) {
+                    scProp = GetModelScalarPropByKeyProp(model, pk);
+                }
+                if(scProp != null) {
+                    if(rslt == null) rslt = new ModelViewUniqueKeyOfVwSerializable() {
+                        UniqueKeyName = uk.UniqueKeyName,
+                        IsPrimary = false,
+                        UniqueKeyProperties = new List<ModelViewPropertyOfVwSerializable>()
+                    };
+                    rslt.UniqueKeyProperties.Add(scProp);
+                }
+            }
+            if(rslt != null) {
+                rsltKeys.Add(rslt);
+            }
+        }
+        return rsltKeys;
+    }
+    ModelViewUniqueKeyOfVwSerializable GetModelPrimKeyFromList(List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys) {
+        if(uniqueKeys == null) return null;
+        return uniqueKeys.Where(u => u.IsPrimary).FirstOrDefault();
+    }
+    ModelViewUniqueKeyOfVwSerializable GetModelUniqueKeyByNameFromList(List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys, string name) {
+        if (uniqueKeys == null) return null;
+        if(string.IsNullOrEmpty(name)) {
+            return uniqueKeys.Where(u => string.IsNullOrEmpty(u.UniqueKeyName)).FirstOrDefault();
+        } else {
+            return uniqueKeys.Where(u => u.UniqueKeyName == name).FirstOrDefault();
+        }
+    }
+    ModelViewUniqueKeySerializable GetModelUniqueKeyByNameFromModel(ModelViewSerializable model, string name) {
+        if (model == null) return null;
+        if (model.UniqueKeys == null) return null;
+        if(string.IsNullOrEmpty(name)) {
+            return model.UniqueKeys.Where(u => string.IsNullOrEmpty(u.UniqueKeyName)).FirstOrDefault();
+        } else {
+            return model.UniqueKeys.Where(u => u.UniqueKeyName == name).FirstOrDefault();
+        }
+    }
+    bool CheckModelIfIndexIsCorrect(ModelViewSerializable model,ModelViewUniqueKeyOfVwSerializable indx, out string error) {
+        if((model == null) || (indx == null)) {
+            error = "Input params is not defined";
+            return false;
+        }
+        if(indx.UniqueKeyProperties == null) {
+            error = "UniqueKeyProperties of the Index are not defined";
+            return false;
+        }
+        if(indx.UniqueKeyProperties.Count < 1) {
+            if(indx.IsPrimary)
+                error = "UniqueKeyProperties.Count of the Primary Index is less than 1";
+            else 
+                error = "UniqueKeyProperties.Count of the Unique Index (UniqueKeyName == "+ indx.UniqueKeyName + ") is less than 1";
+            return false;
+        }
+
+        if(indx.IsPrimary) {
+            if(model.PrimaryKeyProperties == null) {
+                error = "PrimaryKeyProperties of the model are not defined";
+                return false;
+            }
+            if (model.PrimaryKeyProperties.Count != indx.UniqueKeyProperties.Count) {
+                error = "Not all Index fields are included in the Model";
+                return false;
+            }
+        } else {
+            if(model.UniqueKeys == null) {
+                error = "UniqueKeys of the model are not defined (UniqueKeyName == "+ indx.UniqueKeyName + ")";
+                return false;
+            }
+            if(string.IsNullOrEmpty(indx.UniqueKeyName)) {
+                error = "The Name of the Index is not defined (UniqueKeyName)";
+                return false;
+            }
+            ModelViewUniqueKeySerializable mindx = model.UniqueKeys.Where(i => i.UniqueKeyName == indx.UniqueKeyName).FirstOrDefault();
+            if(mindx == null) {
+                error = "Could not find index in model by name (Unique Index Name == "+ indx.UniqueKeyName + ")";
+                return false;
+            }
+            if(mindx.UniqueKeyProperties == null) {
+                error = "UniqueKeyProperties of the Unique Index (Unique Index Name == "+ indx.UniqueKeyName + ") are not defined";
+                return false;
+            }
+            if(mindx.UniqueKeyProperties.Count != indx.UniqueKeyProperties.Count) {
+                error = "Not all Unique Index fields are included in the Model (Unique Index Name == "+ indx.UniqueKeyName + ")";
+                return false;
+            }
+        }
+        error = "";
+        return true;
+    }
+
+    List<ModelViewForeignKeySerializable> CollectMasterToClientFieldsMap(ModelViewSerializable model, List<string> errors) {
+        List<ModelViewForeignKeySerializable> rslt = null;
+        if(model == null) {
+            if(errors != null) {
+                errors.Add("// CollectMasterToClientFieldsMap: Input param is not defined");
+            }
+            return rslt;
+        }
+        if (model.ForeignKeys == null) {
+            return rslt;
+        }
+        List<string> passedViews = new List<string>();
+        foreach(ModelViewForeignKeySerializable mlFk in model.ForeignKeys) {
+            if(string.IsNullOrEmpty(mlFk.ViewName)) {
+                if(errors != null) {
+                    errors.Add("//");
+                    errors.Add("// Error: CollectMasterToClientFieldsMap:");
+                    errors.Add("//        Foreigkey is not completely defined");
+                    errors.Add("//        ViewName = " + mlFk.ViewName);
+                    errors.Add("//        NavigationName = " + mlFk.NavigationName);
+                    errors.Add("//        NavigationEntityName = " + mlFk.NavigationEntityName);
+                    errors.Add("//");
+                }
+                continue;
+            }
+            if(passedViews.Any(e => mlFk.ViewName == e)) { 
+                continue;
+            }
+            passedViews.Add(mlFk.ViewName);
+            List<ModelViewForeignKeySerializable> intlpFks = model.ForeignKeys.Where(f => f.ViewName == mlFk.ViewName).ToList();
+            foreach(ModelViewForeignKeySerializable intlpFk in intlpFks) {
+                if (
+                    string.IsNullOrEmpty(intlpFk.NavigationName) ||
+                    string.IsNullOrEmpty(intlpFk.NavigationEntityName) ||
+                    string.IsNullOrEmpty(intlpFk.ViewName) ||
+                    intlpFk.PrincipalKeyProps == null ||
+                    intlpFk.ForeignKeyProps == null
+                   ) 
+                {
+                    if(errors != null) {
+                        errors.Add("//");
+                        errors.Add("// Error: CollectMasterToClientFieldsMap:");
+                        errors.Add("//        Foreigkey is not completely defined");
+                        errors.Add("//        ViewName = " + intlpFk.ViewName);
+                        errors.Add("//        NavigationName = " + intlpFk.NavigationName);
+                        errors.Add("//        NavigationEntityName = " + intlpFk.NavigationEntityName);
+                        errors.Add("//");
+                    }
+                    continue;
+                }
+                if (
+                    (intlpFk.PrincipalKeyProps.Count != intlpFk.ForeignKeyProps.Count) || 
+                    (intlpFk.PrincipalKeyProps.Count < 1) ||
+                    (intlpFk.ForeignKeyProps.Count < 1) 
+                    ) 
+                {
+                    if(errors != null) {
+                        errors.Add("//");
+                        errors.Add("// Error: CollectMasterToClientFieldsMap:");
+                        errors.Add("//        Foreigkey is not completely defined");
+                        errors.Add("//        ViewName = " + intlpFk.ViewName);
+                        errors.Add("//        NavigationName = " + intlpFk.NavigationName);
+                        errors.Add("//        NavigationEntityName = " + intlpFk.NavigationEntityName);
+                        errors.Add("//");
+                    }
+                    continue;
+                }
+                if(rslt == null) {
+                    rslt = new List<ModelViewForeignKeySerializable>();
+                }
+                rslt.Add(intlpFk);
+            }
+        }
+        return rslt;
+    }
+    List<ModelViewForeignKeySerializable> CollectMasterToClientFieldsMapForMasterView(ModelViewSerializable clentModel, string masterViewName, List<string> errors) {
+        List<ModelViewForeignKeySerializable> rslt = null; 
+        if(clentModel == null) {
+            if(errors != null) {
+                errors.Add("// CollectMasterToClientFieldsMapForMasterView: Input param is not defined");
+            }
+            return rslt;
+        }
+        if ((clentModel.ForeignKeys == null) || (string.IsNullOrEmpty(masterViewName))) {
+            return rslt;
+        }
+        List<ModelViewForeignKeySerializable> intlpFks = clentModel.ForeignKeys.Where(f => f.ViewName == masterViewName).ToList();
+        foreach(ModelViewForeignKeySerializable intlpFk in intlpFks) {
+            if (
+                string.IsNullOrEmpty(intlpFk.NavigationName) ||
+                string.IsNullOrEmpty(intlpFk.NavigationEntityName) ||
+                string.IsNullOrEmpty(intlpFk.ViewName) ||
+                intlpFk.PrincipalKeyProps == null ||
+                intlpFk.ForeignKeyProps == null
+                ) 
+            {
+                if(errors != null) {
+                    errors.Add("//");
+                    errors.Add("// Error: CollectMasterToClientFieldsMapForMasterView:");
+                    errors.Add("//        Foreigkey is not completely defined");
+                    errors.Add("//        ViewName = " + intlpFk.ViewName);
+                    errors.Add("//        NavigationName = " + intlpFk.NavigationName);
+                    errors.Add("//        NavigationEntityName = " + intlpFk.NavigationEntityName);
+                    errors.Add("//");
+                }
+                continue;
+            }
+            if (
+                (intlpFk.PrincipalKeyProps.Count != intlpFk.ForeignKeyProps.Count) || 
+                (intlpFk.PrincipalKeyProps.Count < 1) ||
+                (intlpFk.ForeignKeyProps.Count < 1) 
+                ) 
+            {
+                if(errors != null) {
+                    errors.Add("//");
+                    errors.Add("// Error: CollectMasterToClientFieldsMapForMasterView:");
+                    errors.Add("//        Foreigkey is not completely defined");
+                    errors.Add("//        ViewName = " + intlpFk.ViewName);
+                    errors.Add("//        NavigationName = " + intlpFk.NavigationName);
+                    errors.Add("//        NavigationEntityName = " + intlpFk.NavigationEntityName);
+                    errors.Add("//");
+                }
+                continue;
+            }
+            if(rslt == null) {
+                rslt = new List<ModelViewForeignKeySerializable>();
+            }
+            rslt.Add(intlpFk);
+        }
+        return rslt;
+    }
+    List<ModelViewSerializable> CollectClientToMasterFieldsMapModelViews(ModelViewSerializable model, DbContextSerializable context, List<string> errors) {
+        List<ModelViewSerializable> rslt = null;
+        if ((model == null) || (context == null)) {
+            if(errors != null) {
+                errors.Add("// CollectClientToMasterFieldsMapModelViews: Input param is not defined");
+            }
+            return rslt;
+        }
+        if(context.ModelViews == null) {
+            if(errors != null) {
+                errors.Add("// CollectClientToMasterFieldsMapModelViews: Input param is not defined : Context.ModelViews is empty");
+            }
+            return rslt;
+        }
+        foreach(ModelViewSerializable modelView in context.ModelViews) {
+            if(modelView.ForeignKeys == null) continue;
+            if (modelView.ForeignKeys.Any(f => f.ViewName == model.ViewName)) {
+                if(rslt == null) rslt = new List<ModelViewSerializable>();
+                rslt.Add(modelView);
+            }
+        }
+        return rslt;
+    }
+
+    ModelViewPropertyOfVwSerializable GetModelScalarPropByAnyKeyProp(ModelViewSerializable model, ModelViewKeyPropertySerializable pk) {
+        ModelViewPropertyOfVwSerializable rslt = null;
+        if ((model == null) || (pk == null)) return null;
+        if (model.ScalarProperties == null) return null;
+        ModelViewPropertyOfVwSerializable scProp = 
+            model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+        if (scProp != null) return scProp;
+        if (model.ForeignKeys != null) {
+            foreach(ModelViewForeignKeySerializable fk in model.ForeignKeys) {
+                scProp = null;
+                if ((fk.ForeignKeyProps != null) && (fk.PrincipalKeyProps != null)) {
+                    int cnt = fk.ForeignKeyProps.Count;
+                    if (cnt < fk.PrincipalKeyProps.Count)
+                    {
+                        cnt = fk.PrincipalKeyProps.Count;
+                    }
+                    for(int i = 0; i < cnt; i++)
+                    {
+                        if(fk.ForeignKeyProps[i].OriginalPropertyName == pk.OriginalPropertyName)
+                        {
+                            scProp=
+                                model.ScalarProperties.Where(p =>
+                                ((p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (p.ForeignKeyNameChain == fk.NavigationName))).FirstOrDefault();
+                        }
+                        if(scProp != null) return scProp;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    string GetTypeScriptPropertyNameByKeyProperty(ModelViewSerializable model, ModelViewKeyPropertySerializable pk) {
+        ModelViewPropertyOfVwSerializable prop = GetModelScalarPropByKeyProp(model, pk);
+        return GetTypeScriptPropertyName(prop, model);
+    }
+    ModelViewSerializable GetModelViewByViewName(DbContextSerializable context, string ViewName) {
+        if(context == null) return null;
+        if(context.ModelViews == null) return null;
+        return context.ModelViews.Where(mv => mv.ViewName == ViewName).FirstOrDefault();
+    }
+    
+#>
