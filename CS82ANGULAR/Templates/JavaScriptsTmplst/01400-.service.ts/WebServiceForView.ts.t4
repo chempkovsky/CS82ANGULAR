@@ -231,7 +231,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
 #>
 
     // 
-    // HowTo: {prm1, prm2, ..., prmN} -- primary key
+    // HowTo: {prm1, prm2, ..., prmN} -- primary/unique key
     //
     // this.serviceRefInYourCode.<#= localRouteName #>(prm1, prm2, ..., prmN ).subscibe(value =>{
     //    // handling value of type <#= GetInterfaceName(Model) #>
@@ -851,16 +851,16 @@ export class <#= GetJavaScriptServiceName(Model) #> {
         }
         return rsltKeys;
     }
-    ModelViewUniqueKeyOfVwSerializable GetModelPrimKeyFromList(List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys) {
-        if(uniqueKeys == null) return null;
-        return uniqueKeys.Where(u => u.IsPrimary).FirstOrDefault();
+    ModelViewUniqueKeyOfVwSerializable GetModelPrimKeyFromList(List<ModelViewUniqueKeyOfVwSerializable> inuniqueKeys) {
+        if(inuniqueKeys == null) return null;
+        return inuniqueKeys.Where(u => u.IsPrimary).FirstOrDefault();
     }
-    ModelViewUniqueKeyOfVwSerializable GetModelUniqueKeyByNameFromList(List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys, string name) {
-        if (uniqueKeys == null) return null;
+    ModelViewUniqueKeyOfVwSerializable GetModelUniqueKeyByNameFromList(List<ModelViewUniqueKeyOfVwSerializable> inuniqueKeys, string name) {
+        if (inuniqueKeys == null) return null;
         if(string.IsNullOrEmpty(name)) {
-            return uniqueKeys.Where(u => string.IsNullOrEmpty(u.UniqueKeyName)).FirstOrDefault();
+            return inuniqueKeys.Where(u => string.IsNullOrEmpty(u.UniqueKeyName)).FirstOrDefault();
         } else {
-            return uniqueKeys.Where(u => u.UniqueKeyName == name).FirstOrDefault();
+            return inuniqueKeys.Where(u => u.UniqueKeyName == name).FirstOrDefault();
         }
     }
     ModelViewUniqueKeySerializable GetModelUniqueKeyByNameFromModel(ModelViewSerializable model, string name) {

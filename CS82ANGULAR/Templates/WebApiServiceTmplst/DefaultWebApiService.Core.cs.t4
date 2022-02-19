@@ -114,15 +114,15 @@ namespace <#= webApiServiceNameSpace #> {
         foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
             if (prop.IsUsedByfilter) { 
 #>                
-            [System.Web.Http.FromUri] <#= GetNullableType(prop)#>[] <#= GetFilterPropertyName(prop, Model) #>, 
-            [System.Web.Http.FromUri] string[] <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>,
+            [FromQuery] <#= GetNullableType(prop)#>[] <#= GetFilterPropertyName(prop, Model) #>, 
+            [FromQuery] string[] <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>,
 <#
             }
         } 
 #>                 
-            [System.Web.Http.FromUri] string[] orderby = null, 
-            [System.Web.Http.FromUri] int? page =null, 
-            [System.Web.Http.FromUri] int? pagesize = null)
+            [FromQuery] string[] orderby = null, 
+            [FromQuery] int? page =null, 
+            [FromQuery] int? pagesize = null)
         {
 
             string[] EqualOperators = { "eq", "lk" };
@@ -552,11 +552,11 @@ namespace <#= webApiServiceNameSpace #> {
         foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
             if(counter > 0) { 
 #>                
-            ,[System.Web.Http.FromUri] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model) #>
+            ,[FromQuery] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model) #>
 <#
             } else { 
 #>                
-             [System.Web.Http.FromUri] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model) #>
+             [FromQuery] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model) #>
 <#
                 counter++;
             }
@@ -623,7 +623,7 @@ namespace <#= webApiServiceNameSpace #> {
 #>
         [HttpPut]
         [Route("[controller]/<#= UpdateOneMethodName #>")]
-        public async Task<ActionResult<<#= Model.ViewName #>>> <#= UpdateOneMethodName #>([System.Web.Http.FromBody] <#= Model.ViewName#> viewToUpdate)
+        public async Task<ActionResult<<#= Model.ViewName #>>> <#= UpdateOneMethodName #>([FromBody] <#= Model.ViewName#> viewToUpdate)
         {
             if (!ModelState.IsValid)
             {
@@ -716,7 +716,7 @@ namespace <#= webApiServiceNameSpace #> {
 #>
         [HttpPost]
         [Route("[controller]/<#= AddOneMethodName #>")]
-        public async Task<ActionResult<<#= Model.ViewName #>>> <#= AddOneMethodName #>([System.Web.Http.FromBody] <#= Model.ViewName#> viewToAdd)
+        public async Task<ActionResult<<#= Model.ViewName #>>> <#= AddOneMethodName #>([FromBody] <#= Model.ViewName#> viewToAdd)
         {
             if (!ModelState.IsValid)
             {
@@ -807,11 +807,11 @@ namespace <#= webApiServiceNameSpace #> {
         foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
             if(counter > 0) { 
 #>                
-            ,[System.Web.Http.FromUri] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
+            ,[FromQuery] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
 <#
             } else { 
 #>                
-             [System.Web.Http.FromUri] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
+             [FromQuery] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
 <#
                 counter++;
             } 

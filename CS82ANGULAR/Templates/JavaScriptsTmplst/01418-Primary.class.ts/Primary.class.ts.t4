@@ -29,30 +29,32 @@
     string formRootService                  = "frmRootSrv";
 
 
-    string CurrentViewNameFieldName         = "CurrentViewName";
-    string ClientViewNameFieldName          = "ClientViewName";
-    string DirectNavigationFieldName        = "DirectNavigation";
-    string IsTopDetailFieldName             = "IsTopDetail";
-    string IsDefinedFieldName               = "IsDefined";
-    string ValuesFieldName                  = "Values";
-    string ClientToMasterFieldsMapFieldName = "ClientToMasterFieldsMap";
-    string MasterToClientFieldsMapFieldName = "MasterToClientFieldsMap";
-    string OnDetailChangedPropName          = "OnDetailChanged";
-    string OnMasterChangedPropName          = "OnMasterChanged";
-    string OnIsDefinedChangedPropName       = "OnIsDefinedChanged";
-    string submitOnDetailChangedMethodName  = "submitOnDetailChanged";
-    string submitOnMasterChangedMethodName  = "submitOnMasterChanged";
-    string LengthFieldName                  = "Length";
-    string KeysFieldName                    = "Keys";
-    string ValueFieldName                   = "Value";
-    string ClearMethodName                  = "clear";
+    string ShowErrorMethodName                  = "showError";
+    string CurrentViewNameFieldName             = "CurrentViewName";
+    string ClientViewNameFieldName              = "ClientViewName";
+    string DirectNavigationFieldName            = "DirectNavigation";
+    string IsTopDetailFieldName                 = "IsTopDetail";
+    string IsDefinedFieldName                   = "IsDefined";
+    string ValuesFieldName                      = "Values";
+    string ClientToMasterFieldsMapFieldName     = "ClientToMasterFieldsMap";
+    string MasterToClientKeyFieldsMapFieldName  = "MasterToClientKeyFieldsMap";
+    string MasterToClientFieldsMapFieldName     = "MasterToClientFieldsMap";
+    string OnDetailChangedPropName              = "OnDetailChanged";
+    string OnMasterChangedPropName              = "OnMasterChanged";
+    string OnIsDefinedChangedPropName           = "OnIsDefinedChanged";
+    string submitOnDetailChangedMethodName      = "submitOnDetailChanged";
+    string submitOnMasterChangedMethodName      = "submitOnMasterChanged";
+    string LengthFieldName                      = "Length";
+    string KeysFieldName                        = "Keys";
+    string ValueFieldName                       = "Value";
+    string ClearMethodName                      = "clear";
+    string Interface2ValuesMethodName           = "Interface2Values";
 
     string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
     string appSettingServiceClassName           = GetCommonServiceClassName(Context, appSettingServiceFolder);
 
     string viewModelPrimaryInterfaceFolder      = "00600-view-model-primary.interface.ts";
     string viewModelPrimaryInterfaceClassName   = GetModelClassName(Context, viewModelPrimaryInterfaceFolder);
-
 
     string viewInterfaceFolder                  = "01100-.interface.ts";
     string viewInterfacePageFolder              = "01200-Page.interface.ts";
@@ -62,7 +64,7 @@
     string viewPrimaryClassFolder               = "01418-Primary.class.ts";
 
     string serviceClassName = GetServiceClassName(Model, viewServiceFolder);
-
+    
     List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
     {
         ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
@@ -76,6 +78,7 @@ import { EventEmitter } from "@angular/core";
 
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, viewPrimaryClassFolder) #>';
 import { <#= viewModelPrimaryInterfaceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  viewModelPrimaryInterfaceFolder, viewPrimaryClassFolder) #>';
+import { <#=  GetInterfaceNameEx(Context, Model.ViewName) #> } from '<#=  GetCrossComponentFolderName(Model, viewPrimaryClassFolder, Context, Model.ViewName, viewInterfaceFolder) #>';
 
 import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, viewPrimaryClassFolder, Context, Model.ViewName, viewServiceFolder) #>';
 
@@ -164,18 +167,26 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
     // second key is Direct Navigation Name, 
     // third key is Master View Property Name, 
     // value is a  Client View Property Name, i.e. Property Name of the Current View 
-    protected _<#= MasterToClientFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = {
+    protected _<#= MasterToClientKeyFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = {
 <#
         if (mtcfks != null) {
             string currentMasterView = "";
+            bool isOpened = false;
             ModelViewSerializable masterModel = null;
             foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) {
                 if (currentMasterView != mtcfk.ViewName) {
                     masterModel = GetModelViewByViewName(Context, mtcfk.ViewName);
+                    if(currentMasterView == "") {
 #>
                 '<#= mtcfk.ViewName #>' : {
 <#
-                }
+                    } else {
+#>
+                },
+                '<#= mtcfk.ViewName #>' : {
+<#
+                    } // if(currentMasterView == "") {...} else {...}
+                } // if (currentMasterView != mtcfk.ViewName) {...}
 #>
                     '<#= mtcfk.NavigationName #>' : {
 <#
@@ -187,14 +198,76 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
 #>
                     },
 <#
+                currentMasterView = mtcfk.ViewName;
+            } // foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) { ... }
+            if (currentMasterView != "") {
+#>
+                }
+<#
+            }
+        } // if (mtcfks != null) {...}
+#>
+    };
+<#
+    }
+    {
+        List<string> errors = new List<string>();
+        List<ModelViewForeignKeySerializable> mtcfks = CollectMasterToClientFieldsMap(Model, errors);
+        foreach(string error in  errors) {
+#>
+<#= error #>
+<#
+        }
+#>
+    //
+    // first key is Master View Name, 
+    // second key is Direct Navigation Name, 
+    // third key is Master View Property Name, 
+    // value is a  Client View Property Name, i.e. Property Name of the Current View 
+    protected _<#= MasterToClientFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = {
+<#
+        if (mtcfks != null) {
+            string currentMasterView = "";
+            ModelViewSerializable masterModel = null;
+            foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) {
                 if (currentMasterView != mtcfk.ViewName) {
+                    masterModel = GetModelViewByViewName(Context, mtcfk.ViewName);
+                    if(currentMasterView == "") {
+#>
+                '<#= mtcfk.ViewName #>' : {
+<#
+                    } else {
 #>
                 },
+                '<#= mtcfk.ViewName #>' : {
 <#
+                    }
+                } // if (currentMasterView != mtcfk.ViewName) { ... }
+#>
+                    '<#= mtcfk.NavigationName #>' : {
+<#
+                foreach(ModelViewPropertyOfFkSerializable clntPrp in mtcfk.ScalarProperties) {
+                    if(clntPrp.IsSelected) {
+                        ModelViewPropertyOfVwSerializable modelPrp = GetScalarPropertyByViewPropertyName(Model, clntPrp.ViewPropertyName);
+                        ModelViewPropertyOfVwSerializable masterProp = GetDirectMasterScalarPropertyByViewPropertyName(Model, clntPrp.ViewPropertyName, Context);
+                        if ((modelPrp != null) && (masterProp != null)) {
+#>
+                        '<#= GetTypeScriptPropertyName(masterProp, masterModel) #>' : '<#= GetTypeScriptPropertyName(modelPrp, Model) #>',
+<#
+                        }
+                    }
                 }
+#>
+                    },
+<#
                 currentMasterView = mtcfk.ViewName;
-            } // end of: for(mtcfk in mtcfks) {...}
-        } // end of: if (mtcfks != null) {...}
+            } // foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) { ... }
+            if (currentMasterView != "") {
+#>
+                }
+<#
+            }
+        } // if (mtcfks != null) { ... }
 #>
     };
 <#
@@ -203,6 +276,7 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
 
 
     constructor(private <#= formRootService #>: <#= serviceClassName #>,
+                protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>,
                 <#= ClientViewNameFieldName #>: string | null | undefined, 
                 <#= DirectNavigationFieldName #>: string | any) {
         this._<#= ClientViewNameFieldName #> = <#= ClientViewNameFieldName #>;
@@ -259,11 +333,209 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
         }
     }
 
+    public isEqual(src: any, dest: any): boolean {
+        if (typeof src === 'undefined') {
+            return typeof dest === 'undefined';
+        }
+        if (typeof dest === 'undefined') {
+            return false;
+        }
+        if (src === null) {
+            return dest === null;
+        }
+        if(dest === null) {
+            return true;
+        }
+        return src === dest;
+    }
+    public <#= Interface2ValuesMethodName #>(data: <#= GetInterfaceNameEx(Context, Model.ViewName) #> | null): void {
+        if(typeof data === 'undefined') {
+            this.<#= ClearMethodName #>();
+            return;
+        }
+        if(data === null) {
+            this.<#= ClearMethodName #>();
+            return;
+        }
+        let hasChanged: boolean = false;
+        let isDef: boolean = true;
+<#
+        if (Model.ScalarProperties != null) {
+            foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+#>
+        if(!this.isEqual(this.get<#= ValueFieldName #>('<#= GetTypeScriptPropertyName(prop, Model) #>'), data.<#= GetTypeScriptPropertyName(prop, Model) #>)) {
+            this.set<#= ValueFieldName #>('<#= GetTypeScriptPropertyName(prop, Model) #>', data.<#= GetTypeScriptPropertyName(prop, Model) #>);
+            hasChanged = true;
+            if(isDef) {
+                if(typeof data.<#= GetTypeScriptPropertyName(prop, Model) #> === 'undefined') {
+                    isDef = false;
+                } 
+<#
+                if (prop.IsRequiredInView) {
+#>
+                else {
+                    if(data.<#= GetTypeScriptPropertyName(prop, Model) #> === null) {
+                        isDef = false;
+                    }
+                }
+<#
+                }
+#>
+            }
+        }
+<#
+            }
+        }
+#>
+        if(this._<#= IsDefinedFieldName #> !== isDef) {
+            this._<#= IsDefinedFieldName #> = isDef;
+            this.<#= OnIsDefinedChangedPropName #>.emit(this);
+        }
+        if(hasChanged) {
+            this.<#= OnDetailChangedPropName #>.emit(this);
+            this.<#= OnMasterChangedPropName #>.emit(this);
+        }
+    }
+
     public <#= submitOnDetailChangedMethodName #>(v: <#= viewModelPrimaryInterfaceClassName #>): void {
         if ((typeof this._<#= ClientViewNameFieldName #> === 'undefined') || (typeof this._<#= DirectNavigationFieldName #> === 'undefined')) return;
         if ((this._<#= ClientViewNameFieldName #> === null) || (this._<#= DirectNavigationFieldName #> === null)) return;
         if(v.get<#= CurrentViewNameFieldName #>() !== this._<#= ClientViewNameFieldName #>) return;
-        // add code here
+
+        let clntNtChngd = true;
+        for(let i in this._<#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>][this._<#= DirectNavigationFieldName #>]) {
+            let src: any = v.get<#= ValueFieldName #>(i);
+            let dst: any = this.get<#= ValueFieldName #>(this._<#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>][this._<#= DirectNavigationFieldName #>][i]);
+            if (this.isEqual(src, dst)) continue;
+            clntNtChngd = false;
+            this.set<#= ValueFieldName #>(this._<#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>][this._<#= DirectNavigationFieldName #>][i], src);
+        }
+        if (clntNtChngd) return;
+<#
+        {
+            List<string> errors = new List<string>();
+            if (Model.IsWebApiSelectOneByPrimarykey) { 
+                List<ModelViewSerializable> clVms = CollectClientToMasterFieldsMapModelViews(Model, Context, errors);
+                foreach(string error in  errors) {
+#>
+<#= error #>
+<#
+                }
+                bool isFirstClnt = true;
+
+                if(clVms != null) {
+                    foreach(ModelViewSerializable clVm in clVms) {
+                        errors.Clear();
+                        List<ModelViewForeignKeySerializable> mlFks = CollectMasterToClientFieldsMapForMasterView(clVm, Model.ViewName, errors);
+                        foreach(string error in  errors) {
+#>
+<#= error #>
+<#
+                        }
+                        if (mlFks != null) {
+                            if (isFirstClnt) {
+                                isFirstClnt = false;
+#>
+            if (this._<#= ClientViewNameFieldName #> === '<#= clVm.ViewName #>') {
+<#
+                            } else {
+#>
+            else if (this._<#= ClientViewNameFieldName #> === '<#= clVm.ViewName #>') {
+<#
+                            }
+                            bool ismlFk = true;
+                            foreach(ModelViewForeignKeySerializable mlFk in mlFks) {
+                                if (ismlFk) {
+                                    ismlFk = false;
+#>
+                if (this._<#= DirectNavigationFieldName #> === '<#= mlFk.NavigationName #>') {
+<#
+                                } else {
+#>
+                else if (this._<#= DirectNavigationFieldName #> === '<#= mlFk.NavigationName #>') {
+<#
+                                }
+                                ModelViewUniqueKeyOfVwSerializable mvuk = GetIndexByPrincipalKeyProps(uniqueKeys, mlFk.PrincipalKeyProps);
+                                if(mvuk == null) {
+#>
+//
+// Error: For the detail = '<#= clVm.ViewName #>', master = '<#= Model.ViewName #>' and navigation name = '<#= mlFk.NavigationName #>'
+//        Could not find unique or primary index in the '<#= Model.ViewName #>' to be used as a Principal Key
+//        
+<#
+                                } else {
+#>
+                    let isKeyCrrct = true;
+                    let dtFrTst: any;
+<# 
+                                    foreach(ModelViewPropertyOfVwSerializable prop in mvuk.UniqueKeyProperties) {
+                                        if(prop.IsRequiredInView) {
+#>
+                    if(isKeyCrrct) {
+                        dtFrTst = this.get<#= ValueFieldName #>('<#= GetTypeScriptPropertyName(prop, Model) #>');
+                        if(typeof dtFrTst === 'undefined') { 
+                            isKeyCrrct = false;
+                        } else if (dtFrTst === null) {
+                            isKeyCrrct = false;
+                        }
+                    }
+<#
+                                        }
+                                    }
+
+
+                                    string localRouteName = GetOneMethodName;
+                                    if (!mvuk.IsPrimary) {
+                    
+                                        localRouteName = GetOneByMethodNamePrefix + mvuk.UniqueKeyName;
+                                    }
+#>
+                    if(isKeyCrrct) {
+                        this.<#= formRootService #>.<#= localRouteName #>(
+<#
+                                    {
+                                        int counter = 0;
+                                        foreach(ModelViewPropertyOfVwSerializable prop in mvuk.UniqueKeyProperties) {
+                                            if(counter > 0) { 
+#>
+                            ,this.get<#= ValueFieldName #>('<#= GetTypeScriptPropertyName(prop, Model) #>')
+<#
+                                            } else {
+#>
+                             this.get<#= ValueFieldName #>('<#= GetTypeScriptPropertyName(prop, Model) #>')
+<#
+                                                counter++;
+                                            }
+                                        }
+                                    }
+#>
+                        ).subscribe({
+                            next: (data: <#= GetInterfaceNameEx(Context, Model.ViewName) #> ) => {
+                                this.<#= Interface2ValuesMethodName #>(data);
+                            },
+                            error: (error) => { // error path
+                                this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
+                                this.<#= ClearMethodName #>();
+                            }
+                        });
+                    } else {
+                        this.<#= ClearMethodName #>();
+                    }
+<#
+                                }
+#>
+                }
+<#
+                            }
+#>
+            }
+<#
+                        }
+                    }
+                }
+            }
+        }
+#>
     }
 
     public <#= submitOnMasterChangedMethodName #>(v: <#= viewModelPrimaryInterfaceClassName #>): void {
@@ -273,8 +545,52 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
         if ((typeof masterDirNav === 'undefined') || (typeof masterClnt == 'undefined')) return;
         if ((masterDirNav === null) || (masterClnt === null)) return;
         if (masterClnt !== this.get<#= CurrentViewNameFieldName #>()) return;
-        // add code here
-        // case by navigations
+        let clntNtChngd = true;
+        for(let i in this._<#= MasterToClientKeyFieldsMapFieldName #>[masterClnt][masterDirNav]) {
+            let src: any = v.get<#= ValueFieldName #>(i);
+            let dst: any = this.get<#= ValueFieldName #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[masterClnt][masterDirNav][i]);
+            if (this.isEqual(src, dst)) continue;
+            clntNtChngd = false;
+            this.set<#= ValueFieldName #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[masterClnt][masterDirNav][i], src);
+        }
+        for(let i in this._<#= MasterToClientFieldsMapFieldName #>[masterClnt][masterDirNav]) {
+            let src: any = v.get<#= ValueFieldName #>(i);
+            let dst: any = this.get<#= ValueFieldName #>(this._<#= MasterToClientFieldsMapFieldName #>[masterClnt][masterDirNav][i]);
+            if (this.isEqual(src, dst)) continue;
+            clntNtChngd = false;
+            this.set<#= ValueFieldName #>(this._<#= MasterToClientFieldsMapFieldName #>[masterClnt][masterDirNav][i], src);
+        }
+        if (clntNtChngd) return;
+        let isDef: boolean = true;
+<#
+        if (Model.ScalarProperties != null) {
+            foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+#>
+        if(isDef) {
+            let v: any = this.get<#= ValueFieldName #>('<#= GetTypeScriptPropertyName(prop, Model) #>');
+            if(typeof v === 'undefined') {
+                isDef = false;
+            } 
+<#
+                if (prop.IsRequiredInView) {
+#>
+            else if(v === null) { 
+                isDef = false; 
+            }
+<#
+                } // if (prop.IsRequiredInView) { }
+#>
+        }
+<#
+            } // foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { }
+        } // if (Model.ScalarProperties != null) { }
+#>
+        if(this._<#= IsDefinedFieldName #> !== isDef) {
+            this._<#= IsDefinedFieldName #> = isDef;
+            this.<#= OnIsDefinedChangedPropName #>.emit(this);
+        }
+        this.<#= OnDetailChangedPropName #>.emit(this);
+        this.<#= OnMasterChangedPropName #>.emit(this);
     }
 }
 
@@ -282,6 +598,16 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
 
     string GetInterfaceName(ModelViewSerializable model) {
         return "I"+model.ViewName;
+    }
+    string GetInterfaceNameEx(DbContextSerializable context, string viewName) {
+        if ((context == null) || string.IsNullOrEmpty(viewName)) {
+            return "I";
+        }
+        ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+        if (model == null) {
+            return "I";
+        }
+        return GetInterfaceName(model);
     }
     string GetInterfacePageName(ModelViewSerializable model) {
         return "I"+model.PageViewName;
@@ -771,7 +1097,7 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
         }
         return sb.ToString();
     }
-
+    
     ModelViewPropertyOfVwSerializable GetModelScalarPropByKeyProp(ModelViewSerializable model, ModelViewKeyPropertySerializable pk) {
         ModelViewPropertyOfVwSerializable rslt = null;
         if ((model == null) || (pk == null)) return null;
@@ -803,6 +1129,7 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
         }
         return null;
     }
+    
     ModelViewUniqueKeyOfVwSerializable GetModelPrimaryKey(ModelViewSerializable model) {
         ModelViewUniqueKeyOfVwSerializable rslt = null;    
         if(model == null) return rslt;
@@ -853,16 +1180,16 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
         }
         return rsltKeys;
     }
-    ModelViewUniqueKeyOfVwSerializable GetModelPrimKeyFromList(List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys) {
-        if(uniqueKeys == null) return null;
-        return uniqueKeys.Where(u => u.IsPrimary).FirstOrDefault();
+    ModelViewUniqueKeyOfVwSerializable GetModelPrimKeyFromList(List<ModelViewUniqueKeyOfVwSerializable> inuniqueKeys) {
+        if(inuniqueKeys == null) return null;
+        return inuniqueKeys.Where(u => u.IsPrimary).FirstOrDefault();
     }
-    ModelViewUniqueKeyOfVwSerializable GetModelUniqueKeyByNameFromList(List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys, string name) {
-        if (uniqueKeys == null) return null;
+    ModelViewUniqueKeyOfVwSerializable GetModelUniqueKeyByNameFromList(List<ModelViewUniqueKeyOfVwSerializable> inuniqueKeys, string name) {
+        if (inuniqueKeys == null) return null;
         if(string.IsNullOrEmpty(name)) {
-            return uniqueKeys.Where(u => string.IsNullOrEmpty(u.UniqueKeyName)).FirstOrDefault();
+            return inuniqueKeys.Where(u => string.IsNullOrEmpty(u.UniqueKeyName)).FirstOrDefault();
         } else {
-            return uniqueKeys.Where(u => u.UniqueKeyName == name).FirstOrDefault();
+            return inuniqueKeys.Where(u => u.UniqueKeyName == name).FirstOrDefault();
         }
     }
     ModelViewUniqueKeySerializable GetModelUniqueKeyByNameFromModel(ModelViewSerializable model, string name) {
@@ -1118,10 +1445,57 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
         ModelViewPropertyOfVwSerializable prop = GetModelScalarPropByKeyProp(model, pk);
         return GetTypeScriptPropertyName(prop, model);
     }
+    ModelViewPropertyOfVwSerializable GetScalarPropertyByViewPropertyName(ModelViewSerializable model, string viewPropertyName) {
+        if ((model == null) || (string.IsNullOrEmpty(viewPropertyName))) return null;
+        return model.ScalarProperties.Where(p => p.ViewPropertyName == viewPropertyName).FirstOrDefault();
+    }
+    ModelViewPropertyOfVwSerializable GetDirectMasterScalarPropertyByViewPropertyName(ModelViewSerializable model, string viewPropertyName, DbContextSerializable context) {
+        if(context == null) return null;
+        ModelViewPropertyOfVwSerializable prop = GetScalarPropertyByViewPropertyName(model, viewPropertyName);
+        if ((prop == null) || (model.ForeignKeys == null) || (context.ModelViews ==null)) return null;
+        if(string.IsNullOrEmpty(prop.ForeignKeyName) || string.IsNullOrEmpty(prop.ForeignKeyNameChain)) return null;
+        ModelViewForeignKeySerializable fk = model.ForeignKeys.Where(f => f.NavigationName == prop.ForeignKeyName).FirstOrDefault();
+        if(fk == null) return null;
+        ModelViewSerializable masterVw = context.ModelViews.Where(m => m.ViewName == fk.ViewName).FirstOrDefault();
+        if(masterVw == null) return null;
+        ModelViewPropertyOfVwSerializable masterProp = null;
+        if(prop.ForeignKeyName == prop.ForeignKeyNameChain) {
+            return masterVw.ScalarProperties.Where(p => ((p.OriginalPropertyName == prop.OriginalPropertyName) && string.IsNullOrEmpty(p.ForeignKeyNameChain))).FirstOrDefault();
+        } else {
+            string flt = "";
+            if(prop.ForeignKeyNameChain.StartsWith(prop.ForeignKeyName+".")) {
+                flt = prop.ForeignKeyNameChain.Substring(prop.ForeignKeyName.Length, prop.ForeignKeyNameChain.Length);
+            } else {
+                flt = prop.ForeignKeyNameChain.Substring(prop.ForeignKeyName.Length-1, prop.ForeignKeyNameChain.Length);
+            }
+            return masterVw.ScalarProperties.Where(p => ((p.OriginalPropertyName == prop.OriginalPropertyName) && (p.ForeignKeyNameChain == flt))).FirstOrDefault();
+        }
+    }
+    string GetTypeScriptPropertyNameByViewPropertyName(ModelViewSerializable model, string viewPropertyName) {
+        ModelViewPropertyOfVwSerializable prop = GetScalarPropertyByViewPropertyName(model, viewPropertyName);
+        return GetTypeScriptPropertyName(prop, model);
+    }
     ModelViewSerializable GetModelViewByViewName(DbContextSerializable context, string ViewName) {
         if(context == null) return null;
         if(context.ModelViews == null) return null;
         return context.ModelViews.Where(mv => mv.ViewName == ViewName).FirstOrDefault();
+    }
+    ModelViewUniqueKeyOfVwSerializable GetIndexByPrincipalKeyProps(List<ModelViewUniqueKeyOfVwSerializable> inuniqueKeys, List<ModelViewKeyPropertySerializable>  principalKeyProps) {
+        if ((inuniqueKeys == null) || (principalKeyProps == null)) return null;
+        if (principalKeyProps.Count < 1) return null;
+        foreach(ModelViewUniqueKeyOfVwSerializable uk in inuniqueKeys) {
+            if(uk.UniqueKeyProperties == null) continue;
+            if (uk.UniqueKeyProperties.Count != principalKeyProps.Count) continue;
+            bool isFound = true;
+            foreach(ModelViewPropertyOfVwSerializable ukp in uk.UniqueKeyProperties) {
+                if(!principalKeyProps.Any(p => p.OriginalPropertyName == ukp.OriginalPropertyName)) {
+                    isFound = false;
+                    break;
+                }
+            }
+            if(isFound) return uk;
+        }
+        return null;
     }
     
 #>

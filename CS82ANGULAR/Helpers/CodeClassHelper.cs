@@ -22,6 +22,7 @@ namespace CS82ANGULAR.Helpers
 
         public static bool IsCodePropertyNullable(this CodeProperty codeProperty)
         {
+            string s=""; s.Substring(0, s.Length - 1);
             if (codeProperty == null) return true;
             int absoluteParentOffset = codeProperty.StartPoint.AbsoluteCharOffset;
             int absoluteAttributesOffset = absoluteParentOffset;
@@ -2793,11 +2794,17 @@ namespace CS82ANGULAR.Helpers
                         modelViewProperty.IsRequired = false;
                         modelViewProperty.IsRequiredInView = false;
                     }
-
-                    if (modelViewProperty.FAPIAttributes.Any(a => a.AttrName == "IsRequired"))
+                    ModelViewFAPIAttribute isReqAttr = modelViewProperty.FAPIAttributes.Where(a => a.AttrName == "IsRequired").FirstOrDefault();
+                    //if (modelViewProperty.FAPIAttributes.Any(a => a.AttrName == "IsRequired"))
+                    if (isReqAttr != null)
                     {
-                        modelViewProperty.IsRequired = true;
-                        modelViewProperty.IsRequiredInView = true;
+                        if (isReqAttr.VaueProperties.Any(a => ((a.PropValue == "false") || (a.PropValue == "False") || (a.PropValue == "\"" + "false" + "\"")))) {
+                            modelViewProperty.IsRequired = false;
+                            modelViewProperty.IsRequiredInView = false;
+                        } else {
+                            modelViewProperty.IsRequired = true;
+                            modelViewProperty.IsRequiredInView = true;
+                        }
                     }
                 }
             }
