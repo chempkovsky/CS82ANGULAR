@@ -22,7 +22,6 @@ namespace CS82ANGULAR.Helpers
 
         public static bool IsCodePropertyNullable(this CodeProperty codeProperty)
         {
-            string s=""; s.Substring(0, s.Length - 1);
             if (codeProperty == null) return true;
             int absoluteParentOffset = codeProperty.StartPoint.AbsoluteCharOffset;
             int absoluteAttributesOffset = absoluteParentOffset;

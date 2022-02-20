@@ -49,6 +49,10 @@
     string ValueFieldName                       = "Value";
     string ClearMethodName                      = "clear";
     string Interface2ValuesMethodName           = "Interface2Values";
+    string CurrDirectMastersFieldName           = "CurrentlyDirectMasters";
+    string HiddenFilterFieldName                = "HiddenFilter";
+    string GetCllctByCurrDirMstrsMethodName     = "GetCllctByCurrDirMstrs";
+
 
     string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
     string appSettingServiceClassName           = GetCommonServiceClassName(Context, appSettingServiceFolder);
@@ -78,7 +82,11 @@ import { EventEmitter } from "@angular/core";
 
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, viewPrimaryClassFolder) #>';
 import { <#= viewModelPrimaryInterfaceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  viewModelPrimaryInterfaceFolder, viewPrimaryClassFolder) #>';
-import { <#=  GetInterfaceNameEx(Context, Model.ViewName) #> } from '<#=  GetCrossComponentFolderName(Model, viewPrimaryClassFolder, Context, Model.ViewName, viewInterfaceFolder) #>';
+import { <#=  GetInterfaceName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewPrimaryClassFolder, Context, Model.ViewName, viewInterfaceFolder) #>';
+import { <#=  GetInterfacePageName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewPrimaryClassFolder, Context, Model.ViewName, viewInterfacePageFolder) #>';
+import { <#=  GetInterfaceFilterName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewPrimaryClassFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
+
+
 
 import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, viewPrimaryClassFolder, Context, Model.ViewName, viewServiceFolder) #>';
 
@@ -88,6 +96,10 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
     protected readonly _<#= DirectNavigationFieldName #>: string | any;
     protected _<#= IsTopDetailFieldName #>: boolean = false;
     protected _<#= IsDefinedFieldName #>: boolean = false;
+    // master name, navigation names
+    protected _<#= CurrDirectMastersFieldName #>: {[key: string]: string[]} | any;
+    // master name, navigation name, master filed, master filed value
+    protected _<#= HiddenFilterFieldName #>: {[key: string]: {[key: string]: {[key: string]: any}}} | any;
     protected _<#= ValuesFieldName #>: {[key: string]: any} = {
 <#
     if (Model.ScalarProperties != null) {
@@ -278,9 +290,13 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
     constructor(private <#= formRootService #>: <#= serviceClassName #>,
                 protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>,
                 <#= ClientViewNameFieldName #>: string | null | undefined, 
-                <#= DirectNavigationFieldName #>: string | any) {
+                <#= DirectNavigationFieldName #>: string | any,
+                <#= CurrDirectMastersFieldName #>: {[key: string]: string[]} | any,
+                <#= HiddenFilterFieldName #>: {[key: string]: {[key: string]: {[key: string]: any}}} | any) {
         this._<#= ClientViewNameFieldName #> = <#= ClientViewNameFieldName #>;
         this._<#= DirectNavigationFieldName #> = <#= DirectNavigationFieldName #>;
+        this._<#= CurrDirectMastersFieldName #> = <#= CurrDirectMastersFieldName #>;
+        this._<#= HiddenFilterFieldName #> = <#= HiddenFilterFieldName #>; 
     }
 
     public <#= OnDetailChangedPropName #>: EventEmitter<<#= viewModelPrimaryInterfaceClassName #>> = new EventEmitter<<#= viewModelPrimaryInterfaceClassName #>>();
@@ -317,6 +333,9 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
     public set<#= ValueFieldName #>(key: string, value: any): void {
         return this._<#= ValuesFieldName #>[key] = value;
     }
+    public clear<#= ValueFieldName #>(key: string): void {
+        return this._<#= ValuesFieldName #>[key] = undefined;
+    }
     public <#= ClearMethodName #>(): void {
         let hasChanged: boolean = false;
         for(let i in this._<#= ValuesFieldName #>) {
@@ -348,7 +367,7 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
         }
         return src === dest;
     }
-    public <#= Interface2ValuesMethodName #>(data: <#= GetInterfaceNameEx(Context, Model.ViewName) #> | null): void {
+    public <#= Interface2ValuesMethodName #>(data: <#= GetInterfaceName(Model) #> | null): void {
         if(typeof data === 'undefined') {
             this.<#= ClearMethodName #>();
             return;
@@ -510,7 +529,7 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
                                     }
 #>
                         ).subscribe({
-                            next: (data: <#= GetInterfaceNameEx(Context, Model.ViewName) #> ) => {
+                            next: (data: <#= GetInterfaceName(Model) #> ) => {
                                 this.<#= Interface2ValuesMethodName #>(data);
                             },
                             error: (error) => { // error path
@@ -555,12 +574,46 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
         }
         for(let i in this._<#= MasterToClientFieldsMapFieldName #>[masterClnt][masterDirNav]) {
             let src: any = v.get<#= ValueFieldName #>(i);
-            let dst: any = this.get<#= ValueFieldName #>(this._<#= MasterToClientFieldsMapFieldName #>[masterClnt][masterDirNav][i]);
-            if (this.isEqual(src, dst)) continue;
+            if (this.isEqual(src, this.get<#= ValueFieldName #>(this._<#= MasterToClientFieldsMapFieldName #>[masterClnt][masterDirNav][i]))) continue;
             clntNtChngd = false;
             this.set<#= ValueFieldName #>(this._<#= MasterToClientFieldsMapFieldName #>[masterClnt][masterDirNav][i], src);
         }
         if (clntNtChngd) return;
+
+        // clear primary/unique key props of the current ViewModel
+        if(!this._<#= IsTopDetailFieldName #>) {
+            // collect props that map to the principals of all currently set masters
+            let fldsToExclude:  Array<string> = [];
+            if (!(typeof this._<#= CurrDirectMastersFieldName #> === 'undefined')) {
+                for(let i in this._<#= CurrDirectMastersFieldName #>) {
+                    let navgs: string[] = this._<#= CurrDirectMastersFieldName #>[i];
+                    if (!(typeof navgs === 'undefined')) {
+                        navgs.forEach(j => {
+                            for(let k in this._<#= MasterToClientFieldsMapFieldName #>[i][j]) {
+                                fldsToExclude.push( this._<#= MasterToClientFieldsMapFieldName #>[i][j][k] );
+                            }
+                        });
+                    }
+                }
+            }
+<#
+    {
+        List<string> passedFlds = new List<string>();
+        foreach(ModelViewUniqueKeyOfVwSerializable uk in uniqueKeys) {
+            foreach(ModelViewPropertyOfVwSerializable sclrProp in uk.UniqueKeyProperties) {
+                if (passedFlds.Any(e => e == sclrProp.ViewPropertyName)) continue;
+                passedFlds.Add(sclrProp.ViewPropertyName);
+#>
+            if(fldsToExclude.indexOf('<#= GetTypeScriptPropertyName(sclrProp, Model) #>') < 0) {
+                this.clear<#= ValueFieldName #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>');
+            }
+<#
+            }
+        }
+    }
+#>
+        }
+
         let isDef: boolean = true;
 <#
         if (Model.ScalarProperties != null) {
@@ -568,15 +621,11 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
 #>
         if(isDef) {
             let v: any = this.get<#= ValueFieldName #>('<#= GetTypeScriptPropertyName(prop, Model) #>');
-            if(typeof v === 'undefined') {
-                isDef = false;
-            } 
+            if(typeof v === 'undefined') { isDef = false; } 
 <#
                 if (prop.IsRequiredInView) {
 #>
-            else if(v === null) { 
-                isDef = false; 
-            }
+            else if(v === null) { isDef = false; }
 <#
                 } // if (prop.IsRequiredInView) { }
 #>
@@ -592,6 +641,21 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
         this.<#= OnDetailChangedPropName #>.emit(this);
         this.<#= OnMasterChangedPropName #>.emit(this);
     }
+
+    public <#= GetCllctByCurrDirMstrsMethodName #>(): Observable<Array<<#= GetInterfaceName(Model) #>>> {
+        let flt: <#=  GetInterfaceFilterName(Model) #> = {};
+        let fltIsNtSet = false;
+        if(!(typeof this._<#= CurrDirectMastersFieldName #> === 'undefined')) {
+            
+        }
+        //
+        // <#= GetInterfacePageName(Model) #>
+        // <#= GetInterfaceName(Model) #>
+        // Array<number>
+        //
+    }
+    // add master requires prim/unique keys table in this class
+    // get is readonly for the fields
 }
 
 <#+
