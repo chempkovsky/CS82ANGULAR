@@ -49,8 +49,8 @@ export interface <#= viewModelPrimaryInterfaceClassName #> {
     get<#= LengthFieldName #>(): number;
     get<#= KeysFieldName #>(): string[];
     get<#= ValueFieldName #>(key: string): any;
-    set<#= ValueFieldName #>(key: string, value: any): void;
-    <#= ClearMethodName #>(): void;
+//    set<#= ValueFieldName #>(key: string, value: any): void;
+//    <#= ClearMethodName #>(): void;
     <#= OnDetailChangedPropName #>: EventEmitter<<#= viewModelPrimaryInterfaceClassName #>>;
     <#= OnMasterChangedPropName #>: EventEmitter<<#= viewModelPrimaryInterfaceClassName #>>;
     <#= OnIsDefinedChangedPropName #>: EventEmitter<<#= viewModelPrimaryInterfaceClassName #>>;
