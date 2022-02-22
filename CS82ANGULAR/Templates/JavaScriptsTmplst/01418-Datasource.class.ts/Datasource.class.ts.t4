@@ -66,18 +66,18 @@
     
 
 
-    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
-    string appSettingServiceClassName           = GetCommonServiceClassName(Context, appSettingServiceFolder);
+    string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName               = GetCommonServiceClassName(Context, appSettingServiceFolder);
 
-    string viewModelPrimaryInterfaceFolder      = "00600-view-model-primary.interface.ts";
-    string viewModelPrimaryInterfaceClassName   = GetModelClassName(Context, viewModelPrimaryInterfaceFolder);
+    string viewModelDatasourceInterfaceFolder       = "00600-view-model-datasource.interface.ts";
+    string viewModelDatasourceInterfaceClassName    = GetModelClassName(Context, viewModelDatasourceInterfaceFolder);
 
     string viewInterfaceFolder                  = "01100-.interface.ts";
     string viewInterfacePageFolder              = "01200-Page.interface.ts";
     string viewInterfaceFltFolder               = "01300-Filter.interface.ts";
     string viewServiceFolder                    = "01400-.service.ts";
 
-    string viewPrimaryClassFolder               = "01418-Primary.class.ts";
+    string viewDatasourceClassFolder            = "01418-Datasource.class.ts";
 
     string serviceClassName = GetServiceClassName(Model, viewServiceFolder);
     
@@ -93,17 +93,17 @@
 import { EventEmitter } from "@angular/core";
 import { Observable } from "rxjs";
 
-import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, viewPrimaryClassFolder) #>';
-import { <#= viewModelPrimaryInterfaceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  viewModelPrimaryInterfaceFolder, viewPrimaryClassFolder) #>';
-import { <#=  GetInterfaceName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewPrimaryClassFolder, Context, Model.ViewName, viewInterfaceFolder) #>';
-import { <#=  GetInterfacePageName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewPrimaryClassFolder, Context, Model.ViewName, viewInterfacePageFolder) #>';
-import { <#=  GetInterfaceFilterName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewPrimaryClassFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, viewDatasourceClassFolder) #>';
+import { <#= viewModelDatasourceInterfaceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  viewModelDatasourceInterfaceFolder, viewDatasourceClassFolder) #>';
+import { <#=  GetInterfaceName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewDatasourceClassFolder, Context, Model.ViewName, viewInterfaceFolder) #>';
+import { <#=  GetInterfacePageName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewDatasourceClassFolder, Context, Model.ViewName, viewInterfacePageFolder) #>';
+import { <#=  GetInterfaceFilterName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewDatasourceClassFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
 
 
 
-import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, viewPrimaryClassFolder, Context, Model.ViewName, viewServiceFolder) #>';
+import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, viewDatasourceClassFolder, Context, Model.ViewName, viewServiceFolder) #>';
 
-export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implements <#= viewModelPrimaryInterfaceClassName #> {
+export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> implements <#= viewModelDatasourceInterfaceClassName #> {
     protected readonly _<#= CurrentViewNameFieldName #>: string  = '<#= Model.ViewName #>';
     protected readonly _<#= ClientViewNameFieldName #>: string | any;
     protected readonly _<#= DirectNavigationFieldName #>: string | any;
@@ -336,12 +336,12 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
         this.define<#= UnderHiddenFilterFieldsFieldName #>();
     }
 
-    public <#= OnDetailChangedPropName #>: EventEmitter<<#= viewModelPrimaryInterfaceClassName #>> = new EventEmitter<<#= viewModelPrimaryInterfaceClassName #>>();
-    public <#= OnMasterChangedPropName #>: EventEmitter<<#= viewModelPrimaryInterfaceClassName #>> = new EventEmitter<<#= viewModelPrimaryInterfaceClassName #>>();
-    public <#= OnIsDefinedChangedPropName #>: EventEmitter<<#= viewModelPrimaryInterfaceClassName #>> = new EventEmitter<<#= viewModelPrimaryInterfaceClassName #>>();
-    public <#= OnUpdatePropName #>: EventEmitter<<#= viewModelPrimaryInterfaceClassName #>> = new EventEmitter<<#= viewModelPrimaryInterfaceClassName #>>();
-    public <#= OnAddPropName #>: EventEmitter<<#= viewModelPrimaryInterfaceClassName #>> = new EventEmitter<<#= viewModelPrimaryInterfaceClassName #>>();
-    public <#= OnDeletePropName #>: EventEmitter<<#= viewModelPrimaryInterfaceClassName #>> = new EventEmitter<<#= viewModelPrimaryInterfaceClassName #>>();
+    public <#= OnDetailChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
+    public <#= OnMasterChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
+    public <#= OnIsDefinedChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
+    public <#= OnUpdatePropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
+    public <#= OnAddPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
+    public <#= OnDeletePropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
 
     public get<#= IsTopDetailFieldName #>(): boolean {
         return this._<#= IsTopDetailFieldName #>;
@@ -473,7 +473,7 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
         };
     }
 
-    public <#= submitOnDetailChangedMethodName #>(v: <#= viewModelPrimaryInterfaceClassName #>): void {
+    public <#= submitOnDetailChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
         if ((typeof this._<#= ClientViewNameFieldName #> === 'undefined') || (typeof this._<#= DirectNavigationFieldName #> === 'undefined')) return;
         if ((this._<#= ClientViewNameFieldName #> === null) || (this._<#= DirectNavigationFieldName #> === null)) return;
         if(v.get<#= CurrentViewNameFieldName #>() !== this._<#= ClientViewNameFieldName #>) return;
@@ -617,7 +617,7 @@ export class <#= GetJavaScriptClassName(Model, viewPrimaryClassFolder) #> implem
 #>
     }
 
-    public <#= submitOnMasterChangedMethodName #>(v: <#= viewModelPrimaryInterfaceClassName #>): void {
+    public <#= submitOnMasterChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
         let masterDirNav: string | any = v.get<#= DirectNavigationFieldName #>();
         let masterClnt: string | any = v.get<#= ClientViewNameFieldName #>();
         if ((typeof masterDirNav === 'undefined') || (typeof masterClnt == 'undefined')) return;

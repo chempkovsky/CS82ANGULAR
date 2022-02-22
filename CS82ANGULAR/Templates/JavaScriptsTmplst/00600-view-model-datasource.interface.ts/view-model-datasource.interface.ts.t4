@@ -14,8 +14,8 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
 
-    string viewModelPrimaryInterfaceFolder      = "00600-view-model-primary.interface.ts";
-    string viewModelPrimaryInterfaceClassName   = GetModelClassName(Model, viewModelPrimaryInterfaceFolder);
+    string viewModelDatasourceInterfaceFolder       = "00600-view-model-datasource.interface.ts";
+    string viewModelDatasourceInterfaceClassName    = GetModelClassName(Model, viewModelDatasourceInterfaceFolder);
 
     string CurrentViewNameFieldName         = "CurrentViewName";
     string ClientViewNameFieldName          = "ClientViewName";
@@ -40,7 +40,7 @@
 
 import { EventEmitter } from "@angular/core";
 
-export interface <#= viewModelPrimaryInterfaceClassName #> {
+export interface <#= viewModelDatasourceInterfaceClassName #> {
     get<#= CurrentViewNameFieldName #>(): string;
     get<#= ClientViewNameFieldName #>(): string | any;
     get<#= DirectNavigationFieldName #>(): string | any;
@@ -51,11 +51,11 @@ export interface <#= viewModelPrimaryInterfaceClassName #> {
     get<#= ValueFieldName #>(key: string): any;
 //    set<#= ValueFieldName #>(key: string, value: any): void;
 //    <#= ClearMethodName #>(): void;
-    <#= OnDetailChangedPropName #>: EventEmitter<<#= viewModelPrimaryInterfaceClassName #>>;
-    <#= OnMasterChangedPropName #>: EventEmitter<<#= viewModelPrimaryInterfaceClassName #>>;
-    <#= OnIsDefinedChangedPropName #>: EventEmitter<<#= viewModelPrimaryInterfaceClassName #>>;
-    <#= submitOnDetailChangedMethodName #>(v: <#= viewModelPrimaryInterfaceClassName #>): void;
-    <#= submitOnMasterChangedMethodName #>(v: <#= viewModelPrimaryInterfaceClassName #>): void
+    <#= OnDetailChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
+    <#= OnMasterChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
+    <#= OnIsDefinedChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
+    <#= submitOnDetailChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void;
+    <#= submitOnMasterChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void
 }
 
 <#+
