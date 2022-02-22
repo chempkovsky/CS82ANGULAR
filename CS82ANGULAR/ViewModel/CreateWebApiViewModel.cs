@@ -1169,6 +1169,30 @@ namespace CS82ANGULAR.ViewModel
                             IsViewHasAllRequiredProperties =
                                 SelectedModel.ScalarProperties.Any(p =>
                                 ((p.OriginalPropertyName == prop.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain))));
+                            if (!_IsViewHasAllRequiredProperties)
+                            {
+                                if(SelectedModel.ForeignKeys != null)
+                                {
+                                    foreach (ModelViewForeignKeySerializable foreignKey in SelectedModel.ForeignKeys)
+                                    {
+                                        if ((foreignKey.ForeignKeyProps == null) || (foreignKey.PrincipalKeyProps == null)) continue;
+                                        int cnt = foreignKey.ForeignKeyProps.Count;
+                                        if (cnt < foreignKey.PrincipalKeyProps.Count) cnt = foreignKey.PrincipalKeyProps.Count;
+                                        for(int i = 0; i < cnt; i++)
+                                        {
+                                            if(foreignKey.ForeignKeyProps[i].OriginalPropertyName == prop.OriginalPropertyName)
+                                            {
+                                                IsViewHasAllRequiredProperties = foreignKey.ScalarProperties.Any(s => (s.IsSelected &&
+                                                    (s.OriginalPropertyName == foreignKey.PrincipalKeyProps[i].OriginalPropertyName) &&
+                                                    // next line is correct: we do not look for deeper
+                                                    (s.ForeignKeyNameChain == foreignKey.NavigationName)));
+                                                if (_IsViewHasAllRequiredProperties) break;
+                                            }
+                                        }
+                                        if (_IsViewHasAllRequiredProperties) break;
+                                    }
+                                }
+                            }
                             if (!_IsViewHasAllRequiredProperties) break;
                         }
                     }

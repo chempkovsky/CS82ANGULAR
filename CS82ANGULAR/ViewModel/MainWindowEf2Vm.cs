@@ -443,6 +443,7 @@ namespace CS82ANGULAR.ViewModel
                 existedModelViewSerializable.AllProperties = modelViewSerializable.AllProperties;
                 existedModelViewSerializable.UIFormProperties = modelViewSerializable.UIFormProperties;
                 existedModelViewSerializable.UIListProperties = modelViewSerializable.UIListProperties;
+                existedModelViewSerializable.UniqueKeys = modelViewSerializable.UniqueKeys;
             }
             else
             {

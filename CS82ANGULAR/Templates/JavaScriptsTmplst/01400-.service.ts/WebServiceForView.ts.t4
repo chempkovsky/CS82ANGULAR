@@ -40,9 +40,8 @@
     {
         ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
         if (pk != null) uniqueKeys.Add(pk);
-        
         GetModelUniqueKeys(Model, uniqueKeys);
-    } // primKeys
+    } 
 
 #>
 import { Injectable } from '@angular/core';
@@ -801,56 +800,6 @@ export class <#= GetJavaScriptServiceName(Model) #> {
         }
         return null;
     }
-    ModelViewUniqueKeyOfVwSerializable GetModelPrimaryKey(ModelViewSerializable model) {
-        ModelViewUniqueKeyOfVwSerializable rslt = null;    
-        if(model == null) return rslt;
-        if((model.PrimaryKeyProperties == null) || (model.ScalarProperties == null)) return rslt;
-        if((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1)) return rslt;
-        foreach(ModelViewKeyPropertySerializable pk in model.PrimaryKeyProperties) {
-            ModelViewPropertyOfVwSerializable scProp = 
-                model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
-            if(scProp == null) {
-                scProp = GetModelScalarPropByKeyProp(model, pk);
-            }
-            if(scProp != null) {
-                if(rslt == null) rslt = new ModelViewUniqueKeyOfVwSerializable() {
-                    UniqueKeyName = null,
-                    IsPrimary = true,
-                    UniqueKeyProperties = new List<ModelViewPropertyOfVwSerializable>()
-                };
-                rslt.UniqueKeyProperties.Add(scProp);
-            }
-        }
-        return rslt;
-    }
-    List<ModelViewUniqueKeyOfVwSerializable> GetModelUniqueKeys(ModelViewSerializable model, List<ModelViewUniqueKeyOfVwSerializable> rsltKeys) {
-        if((model == null) || (rsltKeys == null)) return rsltKeys;
-        if ((model.UniqueKeys == null) || (model.ScalarProperties == null)) return rsltKeys;
-        foreach(ModelViewUniqueKeySerializable uk in model.UniqueKeys) {
-            if(uk.UniqueKeyProperties == null) continue;
-            if(uk.UniqueKeyProperties.Count < 1) continue;
-            ModelViewUniqueKeyOfVwSerializable rslt = null; 
-            foreach(ModelViewKeyPropertySerializable pk in uk.UniqueKeyProperties) {
-                ModelViewPropertyOfVwSerializable scProp = 
-                    model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
-                if(scProp == null) {
-                    scProp = GetModelScalarPropByKeyProp(model, pk);
-                }
-                if(scProp != null) {
-                    if(rslt == null) rslt = new ModelViewUniqueKeyOfVwSerializable() {
-                        UniqueKeyName = uk.UniqueKeyName,
-                        IsPrimary = false,
-                        UniqueKeyProperties = new List<ModelViewPropertyOfVwSerializable>()
-                    };
-                    rslt.UniqueKeyProperties.Add(scProp);
-                }
-            }
-            if(rslt != null) {
-                rsltKeys.Add(rslt);
-            }
-        }
-        return rsltKeys;
-    }
     ModelViewUniqueKeyOfVwSerializable GetModelPrimKeyFromList(List<ModelViewUniqueKeyOfVwSerializable> inuniqueKeys) {
         if(inuniqueKeys == null) return null;
         return inuniqueKeys.Where(u => u.IsPrimary).FirstOrDefault();
@@ -923,6 +872,123 @@ export class <#= GetJavaScriptServiceName(Model) #> {
         }
         error = "";
         return true;
+    }
+    List<ModelViewPropertyOfVwSerializable> GetModelPrimaryKeyProps(ModelViewSerializable model) {
+        List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
+        if (model == null)
+        {
+            return result;
+        }
+        if ((model.PrimaryKeyProperties == null) || (model.ScalarProperties == null)) {
+            return result;
+        }
+        foreach(ModelViewKeyPropertySerializable modelViewKeyPropertySerializable in model.PrimaryKeyProperties) {
+            ModelViewPropertyOfVwSerializable prop =
+                model.ScalarProperties.Where(p => p.ViewPropertyName == modelViewKeyPropertySerializable.ViewPropertyName).FirstOrDefault();
+            if(prop != null) {
+                result.Add(prop);
+            } else {
+                if(model.ForeignKeys != null) {
+                    foreach(ModelViewForeignKeySerializable modelViewForeignKeySerializable in model.ForeignKeys) {
+                        if ((modelViewForeignKeySerializable.PrincipalKeyProps != null) && (modelViewForeignKeySerializable.ForeignKeyProps != null)) {
+                            for(int i = 0; i < modelViewForeignKeySerializable.ForeignKeyProps.Count; i++) {
+                                if(modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName == modelViewKeyPropertySerializable.OriginalPropertyName ) {
+                                    if(i < modelViewForeignKeySerializable.PrincipalKeyProps.Count) {
+                                        prop =
+                                        model.ScalarProperties.Where(p => 
+                                            (p.OriginalPropertyName == modelViewForeignKeySerializable.PrincipalKeyProps[i].OriginalPropertyName)
+                                            &&
+                                            // next line is correct: we do not look for deeper
+                                            (p.ForeignKeyNameChain == modelViewForeignKeySerializable.NavigationName)
+                                        ).FirstOrDefault();
+                                    }
+                                }
+                                if(prop != null) break;
+                            }
+                        }
+                        if(prop != null) break;
+                    }
+                    if(prop != null) {
+                        result.Add(prop);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    ModelViewUniqueKeyOfVwSerializable GetModelPrimaryKey(ModelViewSerializable model) {
+        if (model == null)  return null;
+        if (model.PrimaryKeyProperties == null) return null;
+        if (model.PrimaryKeyProperties.Count < 1) return null;
+        List<ModelViewPropertyOfVwSerializable> props = GetModelPrimaryKeyProps(model);
+        if(props.Count != model.PrimaryKeyProperties.Count) return null;
+        return new ModelViewUniqueKeyOfVwSerializable() {
+            UniqueKeyName = null,
+            IsPrimary = true,
+            UniqueKeyProperties = props
+        };
+    }
+    List<ModelViewPropertyOfVwSerializable> GetModelUniqueKeyProps(ModelViewSerializable model, ModelViewUniqueKeySerializable uk) {
+        List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
+        if ((model == null) || (uk == null))
+        {
+            return result;
+        }
+        if ((uk.UniqueKeyProperties == null) || (model.ScalarProperties == null)) {
+            return result;
+        }
+        foreach(ModelViewKeyPropertySerializable modelViewKeyPropertySerializable in uk.UniqueKeyProperties) {
+            ModelViewPropertyOfVwSerializable prop =
+                model.ScalarProperties.Where(p => p.ViewPropertyName == modelViewKeyPropertySerializable.ViewPropertyName).FirstOrDefault();
+            if(prop != null) {
+                result.Add(prop);
+            } else {
+                if(model.ForeignKeys != null) {
+                    foreach(ModelViewForeignKeySerializable modelViewForeignKeySerializable in model.ForeignKeys) {
+                        if ((modelViewForeignKeySerializable.PrincipalKeyProps != null) && (modelViewForeignKeySerializable.ForeignKeyProps != null)) {
+                            if(modelViewForeignKeySerializable.PrincipalKeyProps.Count == modelViewForeignKeySerializable.ForeignKeyProps.Count) {
+                                for(int i = 0; i < modelViewForeignKeySerializable.ForeignKeyProps.Count; i++) {
+                                    if(modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName == modelViewKeyPropertySerializable.OriginalPropertyName ) {
+                                        if(i < modelViewForeignKeySerializable.PrincipalKeyProps.Count) {
+                                            prop =
+                                            model.ScalarProperties.Where(p => 
+                                                (p.OriginalPropertyName == modelViewForeignKeySerializable.PrincipalKeyProps[i].OriginalPropertyName)
+                                                &&
+                                                // next line is correct: we do not look for deeper
+                                                (p.ForeignKeyNameChain == modelViewForeignKeySerializable.NavigationName)
+                                            ).FirstOrDefault();
+                                        }
+                                    }
+                                    if(prop != null) break;
+                                }
+                            }
+                        }
+                        if(prop != null) break;
+                    }
+                    if(prop != null) {
+                        if (!result.Any(p => p == prop)) result.Add(prop);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    List<ModelViewUniqueKeyOfVwSerializable> GetModelUniqueKeys(ModelViewSerializable model, List<ModelViewUniqueKeyOfVwSerializable> rsltKeys) {
+        if((model == null) || (rsltKeys == null)) return rsltKeys;
+        if ((model.UniqueKeys == null) || (model.ScalarProperties == null)) return rsltKeys;
+        foreach(ModelViewUniqueKeySerializable uk in model.UniqueKeys) {
+            if(uk.UniqueKeyProperties == null) continue;
+            if(uk.UniqueKeyProperties.Count < 1) continue;
+            List<ModelViewPropertyOfVwSerializable> ukprops = GetModelUniqueKeyProps(model, uk);
+            if (ukprops.Count == uk.UniqueKeyProperties.Count) {
+                rsltKeys.Add( new ModelViewUniqueKeyOfVwSerializable() {
+                    UniqueKeyName = uk.UniqueKeyName,
+                    IsPrimary = false,
+                    UniqueKeyProperties = ukprops
+                });
+            }
+        }
+        return rsltKeys;
     }
 
 #>

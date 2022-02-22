@@ -71,8 +71,6 @@ namespace <#= webApiServiceNameSpace #> {
         private int maxPageSize = 150;
         private readonly <#= Context.DbContextClassName #> db;
 
-        private readonly LitDbContext _context;
-
         public <#= Model.WebApiServiceName #>(<#= Context.DbContextClassName #> context)
         {
             db = context;
@@ -497,7 +495,7 @@ namespace <#= webApiServiceNameSpace #> {
                     }
                 }
                 if(isFirstTime) {                
-                    orderedQuery = query.OrderBy(p => p.<#=            GetFirstPrimKeyProperty(Model)#>);
+                    orderedQuery = query.OrderBy(p => p.<#= GetFirstPrimKeyProperty(Model)#>);
                 } // totals pageCount currentPageSize
                 <#= Model.PageViewName #> resultObject = new <#= Model.PageViewName #>() {
                     page = (currentPage > 0) ? (currentPage-1) : currentPage,
@@ -566,10 +564,10 @@ namespace <#= webApiServiceNameSpace #> {
             <#= Model.ViewName #> result = await db.<#= Model.RootEntityDbContextPropertyName #>
 <#
         for(int pkId= 0; pkId < primKeys.Count; pkId++) {
-            ModelViewPropertyOfVwSerializable primKeyProp = primKeys[pkId];
+            ModelViewEntityPropertySerializable entityProp =  GetRootEntityProperty(primKeys[pkId], Model);
             
 #>
-                    .Where(p => p.<#= Model.PrimaryKeyProperties[pkId].OriginalPropertyName #> == <#= GetFilterPropertyName(primKeyProp, Model) #>)
+                    .Where(p => p.<#= entityProp.OriginalPropertyName #> == <#= GetFilterPropertyName(primKeys[pkId], Model) #>)
 <#
         }
 #>
@@ -629,12 +627,12 @@ namespace <#= webApiServiceNameSpace #> {
             {
                 return BadRequest(ModelState);
             }
-            <#= Model.RootEntityClassName#> resultEntity = await db.<#= Model.RootEntityDbContextPropertyName #>
+            <#= Model.RootEntityClassName #> resultEntity = await db.<#= Model.RootEntityDbContextPropertyName #>
 <#
         for(int pkId= 0; pkId < primKeys.Count; pkId++) {
-            ModelViewPropertyOfVwSerializable primKeyProp = primKeys[pkId];
+            ModelViewEntityPropertySerializable entityProp =  GetRootEntityProperty(primKeys[pkId], Model);
 #>
-                    .Where(p => p.<#= Model.PrimaryKeyProperties[pkId].OriginalPropertyName #> == viewToUpdate.<#= GetTypeScriptPropertyName(primKeyProp, Model)#>)
+                    .Where(p => p.<#= entityProp.OriginalPropertyName #> == viewToUpdate.<#= GetTypeScriptPropertyName(primKeys[pkId], Model)#>)
 <#
         }
 #>
@@ -648,11 +646,10 @@ namespace <#= webApiServiceNameSpace #> {
             if(primKeys.Contains(prop)) {
                 continue;
             }
-            if( ! IsRootEntityProperty(prop, Model) ) {
-                continue;
-            }
+            ModelViewEntityPropertySerializable entityProp =  GetRootEntityProperty(prop, Model);
+            if( entityProp == null ) continue;
 #>
-            resultEntity.<#=               GetChainedPropertyName(prop)#> =  viewToUpdate.<#=                GetTypeScriptPropertyName(prop, Model)#>;
+            resultEntity.<#= entityProp.OriginalPropertyName #> =  viewToUpdate.<#= GetTypeScriptPropertyName(prop, Model)#>;
 <#
         }
 #>
@@ -661,9 +658,9 @@ namespace <#= webApiServiceNameSpace #> {
             <#= Model.ViewName#> result = await db.<#= Model.RootEntityDbContextPropertyName #>
 <#
         for(int pkId= 0; pkId < primKeys.Count; pkId++) {
-            ModelViewPropertyOfVwSerializable primKeyProp = primKeys[pkId];
+            ModelViewEntityPropertySerializable entityProp =  GetRootEntityProperty(primKeys[pkId], Model);
 #>
-                    .Where(p => p.<#= Model.PrimaryKeyProperties[pkId].OriginalPropertyName #> == viewToUpdate.<#= GetTypeScriptPropertyName(primKeyProp, Model)#>)
+                    .Where(p => p.<#= entityProp.OriginalPropertyName #> == viewToUpdate.<#= GetTypeScriptPropertyName(primKeys[pkId], Model)#>)
 <#
         }
 #>
@@ -722,22 +719,15 @@ namespace <#= webApiServiceNameSpace #> {
             {
                 return BadRequest(ModelState);
             }
-            <#=            Model.RootEntityClassName#> entityToAdd = new <#= Model.RootEntityClassName#>();
+            <#= Model.RootEntityClassName#> entityToAdd = new <#= Model.RootEntityClassName#>();
 <#
         foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
-            if( IsRootEntityProperty(prop, Model) ) {
+            ModelViewEntityPropertySerializable entityProp =  GetRootEntityProperty(prop, Model);
+            if(entityProp != null) {
 #>
-            entityToAdd.<#=  GetChainedPropertyName(prop)#> =  viewToAdd.<#=  GetTypeScriptPropertyName(prop, Model)#>;
+            entityToAdd.<#=  entityProp.OriginalPropertyName #> =  viewToAdd.<#=  GetTypeScriptPropertyName(prop, Model) #>;
 <#
-            } else {
-                int pkId = primKeys.IndexOf(prop);
-                if(pkId > -1) {
-#>
-            entityToAdd.<#=  Model.PrimaryKeyProperties[pkId].OriginalPropertyName #> =  viewToAdd.<#=  GetTypeScriptPropertyName(prop, Model)#>;
-<#
-                }
             }
-
         }
 #>
             db.<#= Model.RootEntityDbContextPropertyName #>.Add(entityToAdd);
@@ -746,9 +736,9 @@ namespace <#= webApiServiceNameSpace #> {
             <#= Model.ViewName #> result = await db.<#= Model.RootEntityDbContextPropertyName #>
 <#
         for(int pkId= 0; pkId < primKeys.Count; pkId++) {
-            // ModelViewPropertyOfVwSerializable primKeyProp = primKeys[pkId];
+            ModelViewEntityPropertySerializable entityProp = GetRootEntityProperty(primKeys[pkId], Model);
 #>
-                    .Where(p => p.<#= Model.PrimaryKeyProperties[pkId].OriginalPropertyName #> == entityToAdd.<#= Model.PrimaryKeyProperties[pkId].OriginalPropertyName #>)
+                    .Where(p => p.<#= entityProp.OriginalPropertyName #> == entityToAdd.<#= entityProp.OriginalPropertyName #>)
 <#
         }
 #>
@@ -822,9 +812,9 @@ namespace <#= webApiServiceNameSpace #> {
                 <#= Model.ViewName#> result = await db.<#= Model.RootEntityDbContextPropertyName #>
 <#
         for(int pkId= 0; pkId < primKeys.Count; pkId++) {
-             ModelViewPropertyOfVwSerializable primKeyProp = primKeys[pkId];
+            ModelViewEntityPropertySerializable entityProp = GetRootEntityProperty(primKeys[pkId], Model);
 #>
-                    .Where(p => p.<#= Model.PrimaryKeyProperties[pkId].OriginalPropertyName #> == <#= GetFilterPropertyName(primKeyProp, Model)#>)
+                    .Where(p => p.<#= entityProp.OriginalPropertyName #> == <#= GetFilterPropertyName(primKeys[pkId], Model)#>)
 <#
         }
 #>
@@ -847,9 +837,9 @@ namespace <#= webApiServiceNameSpace #> {
                 <#= Model.RootEntityClassName#> entityToDelete = await db.<#= Model.RootEntityDbContextPropertyName #>
 <#
         for(int pkId= 0; pkId < primKeys.Count; pkId++) {
-             ModelViewPropertyOfVwSerializable primKeyProp = primKeys[pkId];
+            ModelViewEntityPropertySerializable entityProp = GetRootEntityProperty(primKeys[pkId], Model);
 #>
-                    .Where(p => p.<#= Model.PrimaryKeyProperties[pkId].OriginalPropertyName #> == result.<#= GetTypeScriptPropertyName(primKeyProp, Model)#>)
+                    .Where(p => p.<#= entityProp.OriginalPropertyName #> == result.<#= GetTypeScriptPropertyName(primKeys[pkId], Model)#>)
 <#
         }
 #>
@@ -989,14 +979,35 @@ namespace <#= webApiServiceNameSpace #> {
     bool IsRootEntityProperty(ModelViewPropertySerializable prop, ModelViewSerializable model) {
         return string.IsNullOrEmpty(prop.ForeignKeyNameChain);
     }
-    public string FirstLetterToUpper(string str) {
+    ModelViewEntityPropertySerializable  GetRootEntityProperty(ModelViewPropertySerializable prop, ModelViewSerializable model) {
+        if (string.IsNullOrEmpty(prop.ForeignKeyNameChain)) {
+            if (model.AllProperties != null) {
+                return model.AllProperties.Where(p => p.OriginalPropertyName == prop.OriginalPropertyName).FirstOrDefault();
+            }
+            return null;
+        }
+        if(model.ForeignKeys == null) return null;
+        ModelViewForeignKeySerializable fk = model.ForeignKeys.Where(f => f.NavigationName == prop.ForeignKeyNameChain).FirstOrDefault();
+        if(fk == null) return null;
+        if((fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) return null;
+        int cnt = fk.PrincipalKeyProps.Count;
+        if (cnt > fk.ForeignKeyProps.Count) cnt = fk.ForeignKeyProps.Count;
+        for(int i = 0; i < cnt; i++) {
+            if(fk.PrincipalKeyProps[i].OriginalPropertyName == prop.OriginalPropertyName) {
+                return model.AllProperties.Where(p => p.OriginalPropertyName == fk.ForeignKeyProps[i].OriginalPropertyName).FirstOrDefault();
+            }
+        }
+        return null;
+    }
+
+    string FirstLetterToUpper(string str) {
         if (str == null)
             return null;
         if (str.Length > 1)
             return char.ToUpper(str[0]) + str.Substring(1);
         return str.ToUpper();
     }
-    public string FirstLetterToLower(string str) {
+    string FirstLetterToLower(string str) {
         if (str == null)
             return null;
         if (str.Length > 1)
