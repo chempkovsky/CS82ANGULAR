@@ -1,0 +1,793 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+    string OperatorSufix = "Oprtr";
+    string EqualOperator = "eq";
+    int percentEq100 = 99;
+
+    
+    string ButtonDisable            = "BttnDsnbl";
+
+    string DisplayLabelProperty     = "Name";
+    string DisplayHintProperty      = "Prompt";
+
+    string MainFormGroupName        = "mainFormGroup";
+    string ComboSufix               = "CmbCntrl";
+    string TypeaheadSufix           = "TphdCntrl";
+    string TypeaheadDisplaySufix    = "DsplFn";
+    string SearchClickSufix         = "SrchClck";
+    string AppearancePropName       = "appearance";
+    string captionPropName          = "caption";
+
+    string containerMenuItemsPropName           = "contMenuItems";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+
+    int typeAheadNo = 0;
+    int dateTmPickNo = 0;
+
+    int XXXCnt = 0;
+    int XXX2Cnt = 0;
+    int XXX3Cnt = 0;
+    int   XXX1Wdth = 0;
+    int[] XXX2Wdth = new int[] {0, 0};
+    int[] XXX3Wdth = new int[] {0, 0};
+
+    int InputTypeId = 1;
+
+#>
+     <div fxLayout="row" fxLayoutAlign="flex-end space-around" style="margin-bottom: 12px;"> 
+        <label fxFlex fxLayoutAlign="flex-start space-around">{{<#= captionPropName #>}}</label>
+        <ng-template ngFor let-item [ngForOf]="<#= containerMenuItemsPropName #>">
+            <span fxFlex="1%"></span>  
+            <button mat-icon-button (click)="<#= onContainerMenuItemClickMethodName #>(item)" 
+                [matTooltip]="item.caption"> 
+                <mat-icon  [color]="item.iconColor" >{{item.iconName}}</mat-icon>
+            </button>     
+        </ng-template>            
+        <span fxFlex="1%"></span>
+     </div> 
+<#
+
+
+#>
+    <div [formGroup]="<#= MainFormGroupName #>" (ngSubmit)="doSubmit()" fxLayout="row wrap" fxLayoutAlign="space-between" style="margin: 0 15px;">
+<#
+
+    bool isNewLine = false;
+    for(int i = 0; i < Model.UIFormProperties.Count; i++) {
+        ModelViewUIFormPropertySerializable 
+                modelViewUIFormPropertySerializable = Model.UIFormProperties[i];
+        if (isNewLine || i == 0) {
+            isNewLine = false;
+
+            for (int k = i; k < Model.UIFormProperties.Count; k++) {
+                if (Model.UIFormProperties[k].IsShownInView && (Model.UIFormProperties[k].InputTypeWhenUpdate != InputTypeEnum.Hidden)) {
+                    XXXCnt++;
+                }
+                if (Model.UIFormProperties[k].IsNewLineAfter) break;
+            }
+
+            if(XXXCnt == 0) {
+                    XXX1Wdth = percentEq100;
+                    XXX2Wdth[0] = percentEq100;
+                    XXX2Wdth[1] = percentEq100;
+                    XXX3Wdth[0] = percentEq100;
+                    XXX3Wdth[1] = percentEq100;
+            } else {
+                XXX1Wdth = 100 / XXXCnt;
+                XXX2Cnt = XXXCnt >> 1;
+                if (XXX2Cnt < 1) { 
+                    XXX2Wdth[0] = percentEq100;
+                } else {
+                    XXX2Wdth[0] = 100 / XXX2Cnt;
+                }
+                XXX2Wdth[1] = 100 / (XXXCnt - XXX2Cnt);
+
+
+                XXX3Cnt = XXXCnt / 3;
+                if(XXX3Cnt < 1) {
+                    XXX3Wdth[0] = percentEq100;
+                    XXX3Wdth[1] = percentEq100;
+                } else {
+                    if(XXX3Cnt == 1) {
+                        XXX3Wdth[0] = percentEq100;
+                    } else {                    
+                        XXX3Wdth[0] = 100 / XXX3Cnt;
+                    }
+                    XXX3Cnt = XXX3Cnt * 3;
+                    if ((XXXCnt - XXX3Cnt) > 1) {
+                        XXX3Wdth[1] = 100 / (XXXCnt - XXX3Cnt);
+                    } else {
+                        XXX3Wdth[1] = percentEq100;
+                    }
+                }
+            }
+
+            XXXCnt = 0;
+        }
+        if (! modelViewUIFormPropertySerializable.IsShownInView ) {
+#>
+                <input type="hidden" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+<#
+        } // if ((! modelViewUIFormPropertySerializable.IsShownInView ) || (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Hidden)) {
+        else if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Hidden)  {
+#>
+                <input type="hidden" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+<#
+        } // else if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Hidden) {
+
+        if (modelViewUIFormPropertySerializable.IsShownInView) {
+                if (XXX1Wdth == 100) {
+                    XXX1Wdth = percentEq100;
+                }
+                if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate != InputTypeEnum.Hidden) {
+                    if(modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Combo) {
+#>
+
+                <input type="hidden"  formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+                <mat-form-field  [appearance]="<#= AppearancePropName #>" fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#= GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#= GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#= percentEq100.ToString() #>">
+                    <mat-label><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#></mat-label>
+                    <mat-select [formControl]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">
+                        <mat-option *ngFor="let aVal of <#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>;" [value]="aVal">{{ aVal.<#= GetComboControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #> }}</mat-option>
+                    </mat-select>
+                    <!-- <mat-error *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">{{getErrorMessage(<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>)}}</mat-error> -->
+                    <mat-error *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</mat-error>
+                    <mat-hint align="end"><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#></mat-hint>
+                </mat-form-field>
+<#
+                    } /// if(modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Combo) {}
+                    else if(modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead) {
+#>
+
+                <input type="hidden"  formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+                <mat-form-field  [appearance]="<#= AppearancePropName #>" fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#= GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#= GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#= percentEq100.ToString() #>">
+                    <mat-label><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#></mat-label>
+                    <input type="text" placeholder="Placeholder..." matInput [formControl]="<#= 
+                                GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>" [matAutocomplete]="typeAhead<#= typeAheadNo #>">
+<#
+                            if(InputTypeId == 1) {
+#>
+                    <mat-autocomplete autoActiveFirstOption #typeAhead<#= typeAheadNo #>="matAutocomplete" [displayWith]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadAddDisplaySufix)#>">
+<#
+                            } else { 
+                                if(InputTypeId == 2) {              
+#>
+                    <mat-autocomplete autoActiveFirstOption #typeAhead<#= typeAheadNo #>="matAutocomplete" [displayWith]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadUpdDisplaySufix)#>">
+<#
+                                } else {
+#>
+                    <mat-autocomplete autoActiveFirstOption #typeAhead<#= typeAheadNo #>="matAutocomplete" [displayWith]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadDelDisplaySufix)#>">
+<#
+                                }
+                            }
+#>
+                        <mat-option *ngFor="let aVal of (<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> | async);" [value]="aVal">{{ aVal.<#= GetTypeaheadControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #> }}</mat-option>
+                    </mat-autocomplete>
+                    <!-- <mat-error *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>">{{getErrorMessage(<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>)}}</mat-error> -->
+                    <mat-error *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</mat-error>
+                    <mat-hint align="end"><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#></mat-hint>
+                </mat-form-field>
+<#
+
+                        typeAheadNo++;
+                    } /// if(modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead) {}
+                    else  
+                    {
+                            bool hasButton = HasButton(modelViewUIFormPropertySerializable.InputTypeWhenUpdate);
+                            if (hasButton && false) {
+#>
+                <div   fxLayout="row" fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#= GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#= GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#= percentEq100.ToString() #>">
+                    <mat-form-field [appearance]="<#= AppearancePropName #>" fxFlex="94">
+<#
+                            } else {
+#>
+                    <mat-form-field  [appearance]="<#= AppearancePropName #>" fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#=  GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#=  GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#=  percentEq100.ToString() #>">
+<#
+                            }
+                            if(!IsBooleanInput(modelViewUIFormPropertySerializable, Model)) {
+#>
+                        <mat-label><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#></mat-label>
+<#
+                            }
+                            if (IsDateInput(modelViewUIFormPropertySerializable, Model)) {
+                                if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.ReadOnly) {
+#>
+                        <input matInput [matDatepicker]="apicker<#= dateTmPickNo #>" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true">
+                        <mat-datepicker-toggle matSuffix [for]="apicker<#= dateTmPickNo #>" disabled></mat-datepicker-toggle>
+<#
+                                } else {
+#>
+                        <input matInput [matDatepicker]="apicker<#= dateTmPickNo #>" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+                        <mat-datepicker-toggle matSuffix [for]="apicker<#= dateTmPickNo #>"></mat-datepicker-toggle>
+<#
+                                }
+#>
+                        <mat-datepicker #apicker<#= dateTmPickNo #>></mat-datepicker>
+<#
+                                dateTmPickNo++;
+                            } else {
+                                if(IsMemoInput(modelViewUIFormPropertySerializable, Model)) {
+                                    if (hasButton || (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.ReadOnly)) {
+#>
+                        <textarea  matInput placeholder="Placeholder..." formControlName="<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true"></textarea>
+<#
+                                    } else {
+#>
+                        <textarea  matInput placeholder="Placeholder..." formControlName="<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"></textarea>
+<#
+                                    }
+                                } else {
+                                    if( IsBooleanInput(modelViewUIFormPropertySerializable, Model) ) {
+#>
+                        <input matInput style="display: none" >
+<#
+                                        if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.ReadOnly) { 
+#>
+                        <mat-checkbox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"  [disabled]="true"> <#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty) #> </mat-checkbox>
+<#
+                                        } else {
+#>
+                        <mat-checkbox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"> <#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty) #> </mat-checkbox>
+<#
+                                        }
+                                    }
+                                    else
+				                    {
+                                        if (hasButton || (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.ReadOnly)) { 
+#>
+                        <input <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #> matInput placeholder="Placeholder..." formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true">
+<#
+                                            if (hasButton) {                           
+#>
+                        <button color="primary" mat-icon-button matSuffix (click)="<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>()" [disabled]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonDisable) #>"  >
+                          <mat-icon>search</mat-icon>
+                        </button>
+<#
+                                            }
+                                        } else {
+#>
+                        <input <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #> matInput placeholder="Placeholder..." formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+<#
+                                        }
+                                    }
+
+                                }
+                            }
+#>
+                        <mat-error *ngIf="<#=  GetExpressionForInvalid(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</mat-error>
+                        <mat-hint align="end"><#=  GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#></mat-hint>
+                    </mat-form-field>
+<#
+                            if (hasButton && false) {
+#>
+                    <button mat-icon-button fxFlex="5" aria-label="Search"
+                        matTooltip="Select Item"
+                        color="primary" (click)="<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>()">
+                        <mat-icon>search</mat-icon>
+                    </button>
+                </div>
+<#
+                            }
+                    } // if (!((modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Combo) || (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead))) {}
+                    XXXCnt++;
+                } // if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate != InputTypeEnum.Hidden) {
+        } // if (modelViewUIFormPropertySerializable.IsShownInView) {
+
+        if(modelViewUIFormPropertySerializable.IsNewLineAfter) {
+#>
+                <hr fxFlex="100"/>
+<#
+            isNewLine = true;
+            XXXCnt = 0;
+        }
+
+            }   // for(int i = 0; i < Model.UIFormProperties.Count; i++) {
+
+#> 
+    </div>
+
+<#+
+    string GetInterfaceName(ModelViewSerializable model) {
+        return "I"+model.ViewName;
+    }
+    string GetInterfacePageName(ModelViewSerializable model) {
+        return "I"+model.PageViewName;
+    }
+    string GetInterfaceFilterName(ModelViewSerializable model) {
+        return "I"+model.ViewName + "Filter";
+    }
+    String GetJavaScriptServiceName(ModelViewSerializable model) {
+        string  result = model.ViewName + "Service";
+        return result.First().ToString().ToUpper() + result.Substring(1);
+    }
+    string GetPropertyTypeScriptTypeName(ModelViewPropertyOfVwSerializable prop) {
+        string result = "";
+        switch(prop.UnderlyingTypeName.ToLower()) {
+            case "system.boolean": 
+                result =  "boolean";
+                break;
+            case "system.guid":
+            case "system.string":
+                result =  "string";
+                break;
+            default:
+                result =  "number";
+                break;
+        }
+        if(prop.IsNullable || (!prop.IsRequiredInView)) {
+            return result + " | null";
+        }
+        return result;
+    }
+    string GetJavaScriptToStringMethod(ModelViewPropertyOfVwSerializable prop) {
+        string result = "";
+        switch(prop.UnderlyingTypeName.ToLower()) {
+            case "system.datetime": 
+                result =  ".toString()"; // .toDateString()
+                break;
+            case "system.guid":
+            case "system.string":
+                result =  "";
+                break;
+            default:
+                result =  ".toString()";
+                break;
+        }
+        return result;
+    }
+    string GetPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
+    {
+        if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
+            return prop.UnderlyingTypeName;
+        }
+        if(prop.IsNullable || (!prop.IsRequiredInView)) {
+            return prop.UnderlyingTypeName + " ?";
+        }
+        return prop.UnderlyingTypeName;
+    }
+    string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    String GetWebApiServicePrefix(ModelViewSerializable model) {
+        string result = model.WebApiServiceName;
+        if( !string.IsNullOrEmpty( result ) ) {
+            if(result.EndsWith("Controller")) {
+                result = result.Substring(0, result.LastIndexOf("Controller"));
+            }
+            result = result.ToLower();
+        }
+        return result;
+    }
+    public string FirstLetterToUpper(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToUpper(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    public string FirstLetterToLower(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToLower(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    string GetTypeScriptPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName + operatorSufix;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName) + operatorSufix;
+        }
+    }
+    string GetTypeScriptPropertyNameEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "";
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        return GetTypeScriptPropertyName(sclrProp, model);
+    }
+    string GetTypeScriptPropertyNameWithSufix(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string sufix) {
+        return GetTypeScriptPropertyNameEx(prop, model) + sufix;
+    }
+    string GetExpressionForFormControl(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string mainFormGroupName) {
+        return mainFormGroupName + ".controls['" + GetTypeScriptPropertyNameEx(prop, model) + "']";
+    }
+    string GetExpressionForInvalid(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string mainFormGroupName) {
+        return GetExpressionForFormControl(prop, model, mainFormGroupName) + ".invalid";
+    }
+    string GetExpressionForControlList(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string sufix) {
+        return  GetTypeScriptPropertyNameWithSufix(prop, model, sufix) + "Vals";
+    }
+    string GetExpressionForControlInvalid(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string sufix) {
+        return  GetTypeScriptPropertyNameWithSufix(prop, model, sufix) + ".invalid";
+    }
+
+    string GetViewByForeignNameChain(DbContextSerializable context, string ViewName, string foreignKeyNameChain) {
+        if ( (context == null) || (string.IsNullOrEmpty(ViewName)) ) {
+            return "";
+        }
+        ModelViewSerializable mv = context.ModelViews.Where(v => v.ViewName == ViewName).FirstOrDefault();
+        if (mv == null)
+        {
+            return "";
+        }
+        if (string.IsNullOrEmpty(foreignKeyNameChain))
+        {
+            return ViewName;
+        }
+        string[] foreignKeys = foreignKeyNameChain.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+        if (foreignKeys.Length < 1)
+        {
+            return "";
+        }
+        ModelViewForeignKeySerializable fk = 
+            mv.ForeignKeys.Where(f => f.NavigationName == foreignKeys[0]).FirstOrDefault();
+        if (fk == null)
+        {
+            return "";
+        }
+        if (foreignKeys.Length == 1)
+        {
+            return GetViewByForeignNameChain(context, fk.ViewName, "");
+        }
+        return GetViewByForeignNameChain(context, fk.ViewName, string.Join(".", foreignKeys, 1, foreignKeys.Length - 1));
+    }
+    string GetComboControlListPropertyName(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, DbContextSerializable context, int inputType){
+        string viewNameForSel = "";
+        switch(inputType) {
+            case 1: // add
+                viewNameForSel = prop.ForeifKeyViewNameForAdd;
+                break;
+            case 2: // Upd
+                viewNameForSel = prop.ForeifKeyViewNameForUpd;
+                break;
+            default: // Del == 3 
+                viewNameForSel = prop.ForeifKeyViewNameForDel;
+                break;
+        }
+        if (string.IsNullOrEmpty(viewNameForSel)) {
+            viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+        }
+        if (string.IsNullOrEmpty(viewNameForSel)) {
+            return "NoName";
+        }
+        ModelViewSerializable mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
+        if (mv == null)
+        {
+            return "NoName";
+        }
+        ModelViewPropertyOfVwSerializable propForSel =
+            mv.ScalarProperties.Where(p => (string.IsNullOrEmpty(p.ForeignKeyNameChain) && p.OriginalPropertyName == prop.OriginalPropertyName)).FirstOrDefault();
+        if (propForSel == null) {
+            return "NoName";
+        }
+        return GetTypeScriptPropertyName(propForSel, mv);
+    }
+    string GetTypeaheadControlListPropertyName(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, DbContextSerializable context, int inputType){
+        string viewNameForSel = "";
+        switch(inputType) {
+            case 1: // add
+                viewNameForSel = prop.ForeifKeyViewNameForAdd;
+                break;
+            case 2: // Upd
+                viewNameForSel = prop.ForeifKeyViewNameForUpd;
+                break;
+            default: // Del == 3 
+                viewNameForSel = prop.ForeifKeyViewNameForDel;
+                break;
+        }
+        if (string.IsNullOrEmpty(viewNameForSel)) {
+            viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+        }
+        if (string.IsNullOrEmpty(viewNameForSel)) {
+            return "NoName";
+        }
+        ModelViewSerializable mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
+        if (mv == null)
+        {
+            return "NoName";
+        }
+        ModelViewPropertyOfVwSerializable propForSel =
+            mv.ScalarProperties.Where(p => (string.IsNullOrEmpty(p.ForeignKeyNameChain) && p.OriginalPropertyName == prop.OriginalPropertyName)).FirstOrDefault();
+        if (propForSel == null) {
+            return "NoName";
+        }
+        return GetTypeScriptPropertyName(propForSel, model);
+    }
+
+
+    string GetFormControlHiddenCondition(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string eformModePropName) {
+        if ((prop.InputTypeWhenAdd == InputTypeEnum.Hidden) &&
+            (prop.InputTypeWhenUpdate == InputTypeEnum.Hidden) &&
+            (prop.InputTypeWhenDelete == InputTypeEnum.Hidden)) {
+            return "";
+        }
+        string result= "*ngIf = \"";
+        bool setOr = false;
+        if (prop.InputTypeWhenAdd == InputTypeEnum.Hidden) {
+            result = result + "(" + eformModePropName + "==1)";
+            setOr = true;
+        }
+        if (prop.InputTypeWhenUpdate == InputTypeEnum.Hidden) {
+            if (setOr) {
+                result = result + "||";
+            }
+            result = result + "(" + eformModePropName + "==2)";
+            setOr = true;
+        }
+        if (prop.InputTypeWhenDelete == InputTypeEnum.Hidden) {
+            if (setOr) {
+                result = result + "||";
+            }
+            result = result + "(" + eformModePropName + "==3)";
+        }
+        return result + "\"";
+    }
+    int GetXXX1Wdth(int w, int inPercentEq100) {
+        if ((w > 5) && (w < inPercentEq100)) {
+            w-=1;
+        }
+        return w;
+    }
+    int GetGreaterThanPercent(int currCnt, int maxCnt, int[] wdths, int inPercentEq100) {
+        int result = wdths[1];
+        if (currCnt < maxCnt) {
+            result = wdths[0];
+        } 
+        if (result == 100) {
+            result = inPercentEq100;
+        }
+        if ((result > 5) && (result < inPercentEq100)) result -= 1;
+        return result;
+    }
+    string GetDisplayAttributeValueString(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string propName) {
+            ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+            if (sclrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if(sclrProp.Attributes == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributeSerializable attr =
+                sclrProp.Attributes.Where(a => a.AttrName == "Display").FirstOrDefault();
+            if (attr == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (attr.VaueProperties == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            ModelViewAttributePropertySerializable attrProp = 
+                attr.VaueProperties.Where(v => v.PropName == propName).FirstOrDefault();
+            if (attrProp == null)
+            {
+                return prop.ViewPropertyName;
+            }
+            if (string.IsNullOrEmpty( attrProp.PropValue ) )
+            {
+                return prop.ViewPropertyName;
+            } else
+            {
+                char[] charsToTrim = { '"', ' '};
+                return attrProp.PropValue.Trim(charsToTrim);
+            }
+    }
+    bool HasButton(InputTypeEnum inputType) {
+        if (inputType == InputTypeEnum.SearchDialog) {
+            return true;
+        }
+        return false;
+    }
+    bool IsDateInput(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        if((prop == null) || (model == null)) return false;
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        if (sclrProp == null)
+        {
+            return false;
+        }
+        return ("System.DateTime".Equals(sclrProp.UnderlyingTypeName) || "DateTime".Equals(sclrProp.UnderlyingTypeName));
+    }
+    bool IsBooleanInput(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        if((prop == null) || (model == null)) return false;
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        if (sclrProp == null)
+        {
+            return false;
+        }
+        return"System.Boolean".Equals(sclrProp.UnderlyingTypeName) || "Boolean".Equals(sclrProp.UnderlyingTypeName) || "bool".Equals(sclrProp.UnderlyingTypeName);
+    }
+    bool IsMemoInput(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        if((prop == null) || (model == null)) return false;
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        if (sclrProp == null)
+        {
+            return false;
+        }
+        if (!("System.String".Equals(sclrProp.UnderlyingTypeName) || "String".Equals(sclrProp.UnderlyingTypeName))) {
+            return false;
+        }
+        if(sclrProp.Attributes != null) {
+            if(sclrProp.Attributes.Where(a => (a.AttrName == "MaxLength") || (a.AttrName == "StringLength")).Any()) {
+                return false;
+            }
+        }
+        if(sclrProp.FAPIAttributes != null) {
+            if(sclrProp.FAPIAttributes.Where(a => a.AttrName == "HasMaxLength").Any()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    string GetCommonEnumClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".enum","");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString();
+    }
+
+    string GetCommonFolderName(ModelViewSerializable model, DbContextSerializable context,  string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if ((model.CommonStaffs == null) || (context.CommonStaffs == null)) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetAtributeUnNamedValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName) {
+        if(sclrProp != null) {
+            if (sclrProp.Attributes != null) {
+                ModelViewAttributeSerializable modelViewAttributeSerializable =
+                    sclrProp.Attributes.Where(a => a.AttrName == attrName).FirstOrDefault();
+                if(modelViewAttributeSerializable != null) {
+                    if (modelViewAttributeSerializable.VaueProperties != null) {
+                    
+                        ModelViewAttributePropertySerializable modelViewAttributePropertySerializable =
+                            modelViewAttributeSerializable.VaueProperties.Where(p => (string.IsNullOrEmpty(p.PropName) || (p.PropName == "..."))).FirstOrDefault();
+                        if (modelViewAttributePropertySerializable != null) {
+                            return modelViewAttributePropertySerializable.PropValue;
+                        }
+                    }
+                }
+            }
+        }
+        return null;                
+    }
+    string GetFormatters(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        if((prop == null) || (model == null)) return "";
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        if(sclrProp == null) return "";
+        string rsltStr = GetAtributeUnNamedValue(sclrProp, "DataType");
+        if(string.IsNullOrEmpty(rsltStr)) return "";
+        if(rsltStr.Replace("\"", "").ToLower() == "tobinaryformatter") {
+            return "toBinaryFormatter";
+        }          
+        return "";
+    }
+#>

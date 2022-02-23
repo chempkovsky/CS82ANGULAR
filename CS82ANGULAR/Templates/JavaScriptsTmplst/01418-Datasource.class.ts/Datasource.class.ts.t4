@@ -55,6 +55,7 @@
     string Values2InterfaceMethodName           = "Values2Interface";
     string CurrDirectMastersFieldName           = "CurrentlyDirectMasters";
     string HiddenFilterFieldName                = "HiddenFilter";
+    string HiddenFilterByFltRsltMethodName      = "HiddenFilterByFltRslt";
     string GetCllctByCurrDirMstrsMethodName     = "GetCllctionByCurrDirMstrs";
     string GetCllctByFldFilterMethodName        = "GetCllctionByFldFilter";
     string GetFilterByCurrDirMstrsMethodName    = "GetFilterByCurrDirMstrs";
@@ -62,12 +63,17 @@
     string UnderHiddenFilterFieldsFieldName     = "UnderHiddenFilterFields";
     string UpdateByHiddenFilterFieldsMethodName = "UpdateByHiddenFilterFields";
     string IsNewFieldName                       = "IsNew";
+    string FieldsToExcludeFieldName             = "FieldsToExclude";
     
     
 
 
     string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
     string appSettingServiceClassName               = GetCommonServiceClassName(Context, appSettingServiceFolder);
+
+    string filterResultModelFolder                  = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName               = GetModelClassName(Context, filterResultModelFolder);
+
 
     string viewModelDatasourceInterfaceFolder       = "00600-view-model-datasource.interface.ts";
     string viewModelDatasourceInterfaceClassName    = GetModelClassName(Context, viewModelDatasourceInterfaceFolder);
@@ -95,9 +101,10 @@ import { Observable } from "rxjs";
 
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, viewDatasourceClassFolder) #>';
 import { <#= viewModelDatasourceInterfaceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  viewModelDatasourceInterfaceFolder, viewDatasourceClassFolder) #>';
-import { <#=  GetInterfaceName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewDatasourceClassFolder, Context, Model.ViewName, viewInterfaceFolder) #>';
-import { <#=  GetInterfacePageName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewDatasourceClassFolder, Context, Model.ViewName, viewInterfacePageFolder) #>';
-import { <#=  GetInterfaceFilterName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewDatasourceClassFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, viewDatasourceClassFolder) #>';
+import { <#= GetInterfaceName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewDatasourceClassFolder, Context, Model.ViewName, viewInterfaceFolder) #>';
+import { <#= GetInterfacePageName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewDatasourceClassFolder, Context, Model.ViewName, viewInterfacePageFolder) #>';
+import { <#= GetInterfaceFilterName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewDatasourceClassFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
 
 
 
@@ -112,9 +119,10 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
     // master name, navigation names
     protected _<#= CurrDirectMastersFieldName #>: {[key: string]: string[]} | any;
     // master name, navigation name, master filed, master filed value
-    protected _<#= HiddenFilterFieldName #>: {[key: string]: {[key: string]: {[key: string]: any}}} | any;
+    protected _<#= HiddenFilterFieldName #>: {[key: string]: {[key: string]: {[key: string]: any}}} | any = {};
     protected _<#= UnderHiddenFilterFieldsFieldName #>: string[] = [];
     protected _<#= IsNewFieldName #>: boolean = true;
+    protected _<#= FieldsToExcludeFieldName #>: string[] = [];
     protected _<#= ValuesFieldName #>: {[key: string]: {isinprimkey: boolean, required: boolean, dbgenerated: boolean, value: any}} = {
 <#
     if (Model.ScalarProperties != null) {
@@ -327,13 +335,11 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
     constructor(private <#= formRootService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>,
                 <#= ClientViewNameFieldName #>: string | null | undefined, 
                 <#= DirectNavigationFieldName #>: string | any,
-                <#= CurrDirectMastersFieldName #>: {[key: string]: string[]} | any,
-                <#= HiddenFilterFieldName #>: {[key: string]: {[key: string]: {[key: string]: any}}} | any) {
+                <#= CurrDirectMastersFieldName #>: {[key: string]: string[]} | any) {
         this._<#= ClientViewNameFieldName #> = <#= ClientViewNameFieldName #>;
         this._<#= DirectNavigationFieldName #> = <#= DirectNavigationFieldName #>;
         this._<#= CurrDirectMastersFieldName #> = <#= CurrDirectMastersFieldName #>;
-        this._<#= HiddenFilterFieldName #> = <#= HiddenFilterFieldName #>;
-        this.define<#= UnderHiddenFilterFieldsFieldName #>();
+        this.set<#= FieldsToExcludeFieldName #>();
     }
 
     public <#= OnDetailChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
@@ -343,6 +349,53 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
     public <#= OnAddPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
     public <#= OnDeletePropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
 
+    protected set<#= FieldsToExcludeFieldName #>(): void {
+        this._<#= FieldsToExcludeFieldName #> = [];
+        if (!(typeof this._<#= CurrDirectMastersFieldName #> === 'undefined')) {
+            for(let i in this._<#= CurrDirectMastersFieldName #>) {
+                if( Object.keys(this._<#= MasterToClientFieldsMapFieldName #>).indexOf(i) > -1) {
+                    let navgs: string[] = this._<#= CurrDirectMastersFieldName #>[i];
+                    if (!(typeof navgs === 'undefined')) {
+                        navgs.forEach(j => {
+                            if( Object.keys(this._<#= MasterToClientFieldsMapFieldName #>[i]).indexOf(j) > -1) {
+                                for(let k in this._<#= MasterToClientFieldsMapFieldName #>[i][j]) {
+                                    this._<#= FieldsToExcludeFieldName #>.push( this._<#= MasterToClientFieldsMapFieldName #>[i][j][k] );
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    public get<#= HiddenFilterByFltRsltMethodName #>(fr:  Array<<#= filterResultModelClassName #>> | any): {[key: string]: {[key: string]: {[key: string]: any}}} {
+        let rslt: {[key: string]: {[key: string]: {[key: string]: any}}} = {};
+        if ((typeof fr === 'undefined') || (typeof this._<#= MasterToClientKeyFieldsMapFieldName #> === 'undefined')) return rslt;
+        if ((fr === null) || (this._<#= MasterToClientKeyFieldsMapFieldName #> === null)) return rslt;
+        let currMstr: string = "";
+        let currNav: string = "";
+        for(let i in this._<#= MasterToClientKeyFieldsMapFieldName #>) {
+            for(let j in this._<#= MasterToClientKeyFieldsMapFieldName #>[i]) {
+                for(let k in this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
+                    let fld = this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k];
+                    let r: <#= filterResultModelClassName #> = fr.find((e:<#= filterResultModelClassName #> | any) => e.fltrName = fld);
+                    if (typeof r === 'undefined') continue;
+                    if (currMstr !== i) { currMstr = i; rslt[currMstr] = {} }
+                    if (currNav !== j) { currNav = j; rslt[currMstr][currNav] = {} }
+                    rslt[currMstr][currNav][k] = r.fltrValue;
+                }
+            }
+        }
+        return rslt;
+    }
+    public get<#= HiddenFilterFieldName #>(): {[key: string]: {[key: string]: {[key: string]: any}}} {
+        return this._<#= HiddenFilterFieldName #>;
+    }
+    public set<#= HiddenFilterFieldName #>(fltr: {[key: string]: {[key: string]: {[key: string]: any}}}): void {
+        this._<#= HiddenFilterFieldName #> = fltr;
+        this.set<#= UnderHiddenFilterFieldsFieldName #>();
+    }
     public get<#= IsTopDetailFieldName #>(): boolean {
         return this._<#= IsTopDetailFieldName #>;
     }
@@ -648,24 +701,6 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         if (clntNtChngd) return;
         // clear primary/unique key props of the current ViewModel
         if(!this.get<#= IsTopDetailFieldName #>()) {
-            // collect props that map to the principals of all currently set masters
-            let fldsToExclude:  Array<string> = [];
-            if (!(typeof this._<#= CurrDirectMastersFieldName #> === 'undefined')) {
-                for(let i in this._<#= CurrDirectMastersFieldName #>) {
-                    if( Object.keys(this._<#= MasterToClientFieldsMapFieldName #>).indexOf(i) > -1) {
-                        let navgs: string[] = this._<#= CurrDirectMastersFieldName #>[i];
-                        if (!(typeof navgs === 'undefined')) {
-                            navgs.forEach(j => {
-                                if( Object.keys(this._<#= MasterToClientFieldsMapFieldName #>[i]).indexOf(j) > -1) {
-                                    for(let k in this._<#= MasterToClientFieldsMapFieldName #>[i][j]) {
-                                        fldsToExclude.push( this._<#= MasterToClientFieldsMapFieldName #>[i][j][k] );
-                                    }
-                                }
-                            });
-                        }
-                    }
-                }
-            }
 <#
     {
         List<string> passedFlds = new List<string>();
@@ -674,7 +709,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
                 if (passedFlds.Any(e => e == sclrProp.ViewPropertyName)) continue;
                 passedFlds.Add(sclrProp.ViewPropertyName);
 #>
-            if(fldsToExclude.indexOf('<#= GetTypeScriptPropertyName(sclrProp, Model) #>') < 0) {
+            if(this._<#= FieldsToExcludeFieldName #>.indexOf('<#= GetTypeScriptPropertyName(sclrProp, Model) #>') < 0) {
                 this.clear<#= ValueFieldName #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>');
             }
 <#
@@ -1027,7 +1062,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 #>
     }
 
-    protected define<#= UnderHiddenFilterFieldsFieldName #>(): void {
+    protected set<#= UnderHiddenFilterFieldsFieldName #>(): void {
         this._<#= UnderHiddenFilterFieldsFieldName #> = [];
         if(typeof this._<#= HiddenFilterFieldName #> === 'undefined') return;
         if(this._<#= HiddenFilterFieldName #> === null) return;
