@@ -37,6 +37,7 @@
     string ButtonSufix                  = "BttnItm";
     string ButtonDisable                = "BttnDsnbl";
     string TypeaheadSufix               = "TphdCntrl";
+    string DataSourceSufix              = "DtSrc";
 
     string TypeaheadAddDisplaySufix     = "AddDsplFn";
     string TypeaheadUpdDisplaySufix     = "UpdDsplFn";
@@ -47,17 +48,14 @@
     string formServicePrefix            = "frmSrv";
 
     string MainFormGroupName            = "mainFormGroup";
+    string RootDataSource               = "rootDataSource";
 
-    string EformModeSelector            = "eform-mode";
-    string EformModePropName            = "eformMode";
     
     string FormControlModelSelector     = "eform-control-model";
     string FormControlModelPropName     = "eformControlModel";
 
     string HiddenFilterSelector         = "hidden-filter";
     string HiddenFilterPropName         = "hiddenFilter";
-    string ShowFilterSelector           = "show-filter";
-    string ShowFilterPropName           = "showFilter";
     string CanAddSelector               = "can-add";
     string CanAddPropName               = "canAdd";
     string CanUpdSelector               = "can-update";
@@ -72,6 +70,21 @@
     string MaxHeightPropName            = "maxHeight";
     string FilterMaxHeightPropSelector  = "filter-max-height";
     string FilterMaxHeightPropName      = "filterMaxHeight";
+
+    string SubscriptionsPropName                = "Subscriptions";
+    string OnMasterChangedPropName              = "OnMasterChanged";
+    string submitOnMasterChangedMethodName      = "submitOnMasterChanged";
+    string OnDetailChangedPropName              = "OnDetailChanged";
+    string submitOnDetailChangedMethodName      = "submitOnDetailChanged";
+    string AfterMasterChangedPropName           = "AfterMasterChanged";
+    string OnIsDefinedChangedPropName           = "OnIsDefinedChanged";
+    string OnUpdatePropName                     = "OnUpdate";
+    string OnAddPropName                        = "OnAdd";
+    string OnDeletePropName                     = "OnDelete";
+    string ClearNoCurrMasterPropsMethodName     = "clearNoCurrMasterProps";
+    string GetCllctByFldFilterMethodName        = "GetCllctionByFldFilter";
+    string Interface2ValuesMethodName           = "Interface2Values";
+    string GetCllctByCurrDirMstrsMethodName     = "GetCllctionByCurrDirMstrs";
 
 
     string TitlePropName                        = "title";
@@ -93,32 +106,78 @@
 
     int CurrentInputTypeId = 3;
 
-    List<string> FKViewsDict =  GetFKViewsList(Model, Context, CurrentInputTypeId, new List<string>());
-    if (! FKViewsDict.Contains(Model.ViewName) ) {
-        FKViewsDict.Add(Model.ViewName);
+
+    List<string> SearchDialogViewsList = new List<string>();
+    List<string> ViewsList = new List<string>();
+    // ForeignKeyNameChain is a first argument
+    // ModelView is a second argument
+    // ModelViewUIFormPropertySerializable is a third argument
+    // InputTypeEnum is a fourth argument
+    List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> ForeignKeyNameChainList = 
+        //////////
+        // refactor: check if it is not hidden
+        /////////
+        GetForeignKeyNameChainStructList(Model, Context, CurrentInputTypeId, new List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>>());
+    foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+        if (string.IsNullOrEmpty(fk.Item1)) {
+            throw new Exception("[Foreign Key Name Chain] Can not be empty string");
+        }
+        if (fk.Item2 == null) {
+            throw new Exception("For [Foreign Key Name Chain]=" + ForeignKeyNameChainList + " can not find ViewModel");
+        }
+        
+        if (ForeignKeyNameChainList.Count(f => f.Item1 == fk.Item1) > 1) {
+            throw new Exception("[Foreign Key Name Chain]=" +  fk + " occurs more than once");
+        }
+
+        if (fk.Item3.InputTypeWhenDelete == InputTypeEnum.SearchDialog) {
+            if(!SearchDialogViewsList.Contains(fk.Item2.ViewName)) {
+                SearchDialogViewsList.Add(fk.Item2.ViewName);
+            }
+        }
+        if(!ViewsList.Contains(fk.Item2.ViewName)) {
+            ViewsList.Add(fk.Item2.ViewName);
+        }
     }
-    List<string> SDViewsDict = GetSearchDialogViewsList(Model, Context, CurrentInputTypeId, new List<string>());
-    List<string> NavChains = GetSearchDialogViewsList(Model, Context, CurrentInputTypeId, new List<string>());
+    if(!ViewsList.Contains(Model.ViewName)) {
+        ViewsList.Add(Model.ViewName);
+    }
+    foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+        string[] fks = fk.Item1.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+        if (fks.Length <= 1) continue;
+        string subfk = string.Join(".", fks, 1, fks.Length - 1);
+        if( !ForeignKeyNameChainList.Any(f => f.Item1 == subfk) ) {
+            throw new Exception("[Foreign Key Name Chain]=" +  fk.Item1 + " could not find direct detail with [Foreign Key Name Chain] = " + subfk);
+        }
+    }
+    // ForeignKeyNameChainList.Add(new Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>('', Model, null, InputTypeEnum.Default));
 
 
-    string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
-    string eventEmitterDataModelFolder  = "00018-event-emitter-data.interface.ts";
-    string menuItemDataModelFolder      = "00017-menu-item-data.interface.ts";
-    string eventEmitterPubModelFolder   = "00019-event-emitter-pub.interface.ts";
-    string filterModelFolder            = "00021-web-service-filter.interface.ts";
-    string filterDefModelFolder         = "00022-web-service-filter-def.interface.ts";
-    string filterOperatorModelFolder    = "00023-web-service-filter-operator.interface.ts";
-    string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
-    string filterComponentCssFolder     = "00025-web-service-filter.component.css";
-    string filterComponentHtmlFolder    = "00025-web-service-filter.component.html";
-    string filterComponentFolder        = "00025-web-service-filter.component.ts";
-    string eformModeEnumlFolder         = "00026-eform-mode.enum.ts";
+
+
+
+
+    string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
+    string eventEmitterDataModelFolder              = "00018-event-emitter-data.interface.ts";
+    string menuItemDataModelFolder                  = "00017-menu-item-data.interface.ts";
+    string eventEmitterPubModelFolder               = "00019-event-emitter-pub.interface.ts";
+    string filterModelFolder                        = "00021-web-service-filter.interface.ts";
+    string filterDefModelFolder                     = "00022-web-service-filter-def.interface.ts";
+    string filterOperatorModelFolder                = "00023-web-service-filter-operator.interface.ts";
+    string filterResultModelFolder                  = "00024-web-service-filter-rslt.interface.ts";
+    string filterComponentCssFolder                 = "00025-web-service-filter.component.css";
+    string filterComponentHtmlFolder                = "00025-web-service-filter.component.html";
+    string filterComponentFolder                    = "00025-web-service-filter.component.ts";
+    string eformModeEnumlFolder                     = "00026-eform-mode.enum.ts";
+    string viewModelDatasourceInterfaceFolder       = "00600-view-model-datasource.interface.ts";
 
 
     string viewInterfaceFolder          = "01100-.interface.ts";
     string viewInterfacePageFolder      = "01200-Page.interface.ts";
     string viewInterfaceFltFolder       = "01300-Filter.interface.ts";
     string viewServiceFolder            = "01400-.service.ts";
+    string viewDatasourceClassFolder    = "01418-Datasource.class.ts";
+
 
     string viewformCssFolder            = "01500-Viewform.component.css";
     string viewformHtmlFolder           = "01500-Viewform.component.html";
@@ -127,11 +186,13 @@
     string sformComponentFolder         = "01420-Sform.component.ts";
     string viewInterfaceDlgFolder       = "01430-Dlg.interface.ts";
     string sdlgComponentFolder          = "01440-Sdlg.component.ts";
+    
 
 
-    string eventEmitterDataModelClassName   = GetModelClassName(Context, eventEmitterDataModelFolder);
-    string menuItemDataModelClassName       = GetModelClassName(Context, menuItemDataModelFolder);
-    string eventEmitterPubModelClassName    = GetModelClassName(Context, eventEmitterPubModelFolder);
+    string viewModelDatasourceInterfaceClassName    = GetModelClassName(Context, viewModelDatasourceInterfaceFolder);
+    string eventEmitterDataModelClassName           = GetModelClassName(Context, eventEmitterDataModelFolder);
+    string menuItemDataModelClassName               = GetModelClassName(Context, menuItemDataModelFolder);
+    string eventEmitterPubModelClassName            = GetModelClassName(Context, eventEmitterPubModelFolder);
 
 
     string eformModeEnumName = GetCommonEnumClassName(Context, eformModeEnumlFolder);
@@ -142,70 +203,10 @@
     string filterResultModelClassName = GetModelClassName(Context, filterResultModelFolder);
     string appSettingServiceClassName = GetCommonServiceClassName(Context, appSettingServiceFolder);
 
-    bool ModeAddEqualUpdate = true;
-    bool ModeAddEqualDelete = true;
-    bool ModeUpdateEqualDelete = true;
-
-    foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-        if (ModeAddEqualUpdate) {
-            if ((modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Combo) ||
-                (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Typeahead) ||
-                (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.SearchDialog) ||
-
-            (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Combo) ||
-            (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead) ||
-            (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.SearchDialog)) {
-                ModeAddEqualUpdate = (modelViewUIFormPropertySerializable.InputTypeWhenAdd == modelViewUIFormPropertySerializable.InputTypeWhenUpdate);
-                if (ModeAddEqualUpdate) {
-                    if( (!string.IsNullOrEmpty( modelViewUIFormPropertySerializable.ForeifKeyViewNameForAdd )) ||
-                        (!string.IsNullOrEmpty( modelViewUIFormPropertySerializable.ForeifKeyViewNameForUpd ))) {
-                        ModeAddEqualUpdate =
-                            modelViewUIFormPropertySerializable.ForeifKeyViewNameForAdd ==  modelViewUIFormPropertySerializable.ForeifKeyViewNameForUpd;
-                    }
-                }
-            }
-        }
-        if (ModeAddEqualDelete) {
-            if ((modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Combo) ||
-                (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Typeahead) ||
-                (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.SearchDialog) ||
-
-            (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Combo) ||
-            (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Typeahead) ||
-            (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.SearchDialog)) {
-                ModeAddEqualDelete = (modelViewUIFormPropertySerializable.InputTypeWhenAdd == modelViewUIFormPropertySerializable.InputTypeWhenDelete);
-                if (ModeAddEqualDelete) {
-                    if( (!string.IsNullOrEmpty( modelViewUIFormPropertySerializable.ForeifKeyViewNameForAdd )) ||
-                        (!string.IsNullOrEmpty( modelViewUIFormPropertySerializable.ForeifKeyViewNameForDel ))) {
-                        ModeAddEqualDelete =
-                            modelViewUIFormPropertySerializable.ForeifKeyViewNameForAdd ==  modelViewUIFormPropertySerializable.ForeifKeyViewNameForDel;
-                    }
-                }
-            }
-        }
-        if (ModeUpdateEqualDelete) {
-            if ((modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Combo) ||
-                (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead) ||
-                (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.SearchDialog) ||
-
-            (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Combo) ||
-            (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Typeahead) ||
-            (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.SearchDialog)) {
-                ModeUpdateEqualDelete = (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == modelViewUIFormPropertySerializable.InputTypeWhenDelete);
-                if (ModeUpdateEqualDelete) {
-                    if( (!string.IsNullOrEmpty( modelViewUIFormPropertySerializable.ForeifKeyViewNameForAdd )) ||
-                        (!string.IsNullOrEmpty( modelViewUIFormPropertySerializable.ForeifKeyViewNameForDel ))) {
-                        ModeUpdateEqualDelete =
-                            modelViewUIFormPropertySerializable.ForeifKeyViewNameForUpd ==  modelViewUIFormPropertySerializable.ForeifKeyViewNameForDel;
-                    }
-                }
-            }
-        }
-    }
 
 #>
 
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { FormControl, Validators, ValidatorFn, FormGroup, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatSelectChange } from '@angular/material/select';
 import { MatDialog } from '@angular/material/dialog';
@@ -213,6 +214,7 @@ import { Observable } from 'rxjs/internal/Observable';
 import { switchMap,  catchError, debounceTime } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
+import { Subscription } from 'rxjs';
 
 import { <#= eformModeEnumName #> } from '<#=  GetCommonFolderName(Model, Context,  eformModeEnumlFolder, viewformComponentFolder)#>';
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, viewformComponentFolder)#>';
@@ -220,26 +222,24 @@ import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Mode
 import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, viewformComponentFolder)#>';
 import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  menuItemDataModelFolder, viewformComponentFolder)#>';
 import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Model, Context,  eventEmitterPubModelFolder, viewformComponentFolder)#>';
+import { <#= viewModelDatasourceInterfaceClassName #> } from '<#= GetCommonFolderName(Model, Context,  viewModelDatasourceInterfaceFolder, viewformComponentFolder)#>';
 
 <#
-    foreach(string viewNm in FKViewsDict) {
+    foreach(string viewNm in ViewsList) {
 #>
 import { <#=  GetInterfaceNameEx(Context, viewNm) #> } from '<#=  GetCrossComponentFolderName(Model, viewformComponentFolder, Context, viewNm, viewInterfaceFolder) #>';
 import { <#=  GetInterfacePageNameEx(Context, viewNm) #> } from '<#=  GetCrossComponentFolderName(Model, viewformComponentFolder, Context, viewNm, viewInterfacePageFolder) #>';
 import { <#=  GetInterfaceFilterNameEx(Context, viewNm) #> } from '<#= GetCrossComponentFolderName(Model, viewformComponentFolder, Context, viewNm, viewInterfaceFltFolder) #>';
 import { <#=  GetServiceClassNameEx(Context, viewNm, viewServiceFolder) #> } from '<#= GetCrossComponentFolderName(Model, viewformComponentFolder, Context, viewNm, viewServiceFolder) #>';
+import { <#=  GetJavaScriptClassNameEx(Context, viewNm, viewDatasourceClassFolder) #> } from '<#= GetCrossComponentFolderName(Model, viewformComponentFolder, Context, viewNm, viewDatasourceClassFolder) #>';
+
 <#
     }
-    foreach(string viewNm in SDViewsDict) {
+    foreach(string viewNm in SearchDialogViewsList) {
 #>
 import { <#=  GetComponentClassNameEx(Context, viewNm, sdlgComponentFolder) #> } from '<#= GetCrossComponentFolderName(Model, viewformComponentFolder, Context, viewNm, sdlgComponentFolder) #>';
 import { <#=  GetInterfaceDlgNameEx(Context, viewNm) #> } from '<#= GetCrossComponentFolderName(Model, viewformComponentFolder, Context, viewNm, viewInterfaceDlgFolder) #>';
 <#
-        if (!FKViewsDict.Contains(viewNm)) {
-#>
-import { <#=  GetInterfaceNameEx(Context, viewNm) #> } from '<#=  GetCrossComponentFolderName(Model, viewformComponentFolder, Context, viewNm, viewInterfaceFolder) #>';
-<#
-        }
     }
 #>
 
@@ -248,10 +248,16 @@ import { <#=  GetInterfaceNameEx(Context, viewNm) #> } from '<#=  GetCrossCompon
   templateUrl: '<#= GetFolderName(Model, viewformHtmlFolder, viewformComponentFolder)#>.html',
   styleUrls: ['<#= GetFolderName(Model, viewformCssFolder, viewformComponentFolder)#>.css']
 })
-export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #> {
+export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEmitterPubModelClassName #> {
+    ngOnDestroy(): void {
+        this._<#= SubscriptionsPropName #>.forEach((s: Subscription) => { s.unsubscribe(); });
+    }
+    ngOnInit(): void {
+        this.ngOnInitCalled = true;
+    }
+
     // start: variable declaration section
     @Input('<#= captionSelector #>') <#= captionPropName #>: string|any = 'Review Item';
-
     @Output('<#= onContainerMenuItemClickSelector #>') <#= onContainerMenuItemClickEmitter #> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
     @Input('<#= containerMenuItemsSelector #>') <#= containerMenuItemsPropName #>: Array<<#= menuItemDataModelClassName #>> = [];
     <#= onContainerMenuItemClickMethodName #>(v: <#= menuItemDataModelClassName #>)  {
@@ -262,63 +268,48 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         }
         this.<#= onContainerMenuItemClickEmitter #>.emit(e);
     }
-
-
-
     public <#= AppearancePropName #>: MatFormFieldAppearance = 'outline';
     private ngOnInitCalled: boolean = false;
-    private _eformMode: <#= eformModeEnumName #> = <#= eformModeEnumName #>.DeleteMode;
     public <#= MainFormGroupName #>: FormGroup|any = null;
-<#    //////////////////////////// start helper variable and FormControl -generator 
+    public <#= RootDataSource #>: <#=  GetJavaScriptClassNameEx(Context, Model.ViewName, viewDatasourceClassFolder) #> | any = null;
+<#    
+    //////////////////////////// start helper variable and FormControl -generator 
     foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-        if (HasCombo(modelViewUIFormPropertySerializable, Model) && modelViewUIFormPropertySerializable.IsShownInView) { 
+        if ((!modelViewUIFormPropertySerializable.IsShownInView) || (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Hidden)) continue;
+        if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Combo) { 
+            Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk = ForeignKeyNameChainList.Where(f => f.Item1 == modelViewUIFormPropertySerializable.ForeignKeyNameChain).FirstOrDefault();
+            
 #>
     public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>: FormControl | any = null;
-    public <#=  GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> : <#= 
-                string.Join(" | ", CollectComboListInterfaces(Context, modelViewUIFormPropertySerializable, Model)) #> | any = null;
+    public <#=  GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> : <#= string.Join(" | ", CollectComboListInterfacesEx(Context, modelViewUIFormPropertySerializable, Model, CurrentInputTypeId)) #> | any = null;
+    public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>: <#=  GetJavaScriptClassNameEx(Context, fk.Item2.ViewName, viewDatasourceClassFolder) #> | any = null;
 <#
-        } // if (HasCombo(modelViewUIFormPropertySerializable, Model)) {
-        if (HasButton(modelViewUIFormPropertySerializable, Model)  && modelViewUIFormPropertySerializable.IsShownInView) {  
+        } // if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Combo) { ... }
+        else if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.SearchDialog) {  
+            Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk = ForeignKeyNameChainList.Where(f => f.Item1 == modelViewUIFormPropertySerializable.ForeignKeyNameChain).FirstOrDefault();
 #>
-    public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>: <#= string.Join(" | ", CollectButtonItemInterfaces(Context, modelViewUIFormPropertySerializable, Model)) #> | any = null;
+    public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>: <#= string.Join(" | ", CollectButtonItemInterfacesEx(Context, modelViewUIFormPropertySerializable, Model, CurrentInputTypeId)) #> | any = null;
     public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonDisable) #>: boolean = true;
-
+    public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>: <#=  GetJavaScriptClassNameEx(Context, fk.Item2.ViewName, viewDatasourceClassFolder) #> | any = null;
 <#
-        } // if (HasButton(modelViewUIFormPropertySerializable, Model)) { 
-        if (HasTypeahead(modelViewUIFormPropertySerializable, Model)  && modelViewUIFormPropertySerializable.IsShownInView) {  
+        } // if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.SearchDialog) { ... }
+        else if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Typeahead) {  
+            Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk = ForeignKeyNameChainList.Where(f => f.Item1 == modelViewUIFormPropertySerializable.ForeignKeyNameChain).FirstOrDefault();
 #>
     public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>: FormControl | any = null;
     public <#=  GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> : <#= 
-                string.Join(" | ", CollectTypeaheadListInterfaces(Context, modelViewUIFormPropertySerializable, Model)) #> | any = null;
+                string.Join(" | ", CollectTypeaheadListInterfacesEx(Context, modelViewUIFormPropertySerializable, Model, CurrentInputTypeId)) #> | any = null;
+    public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>: <#=  GetJavaScriptClassNameEx(Context, fk.Item2.ViewName, viewDatasourceClassFolder) #> | any = null;
 <#
-        } // if (HasTypeahead(modelViewUIFormPropertySerializable, Model)) {  
+        } // if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Typeahead) { ... } 
     } // end of foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
     //////////////////////////// end helper variable and FormControl -generator 
 #>
+
+    _<#= SubscriptionsPropName #> : Subscription[] = [];
     // end: variable declaration section
+
     // start: input variable declaration section
-<#    //////////////////////////// start Input FormMode -generator 
-#>
-    @Input('<#= EformModeSelector #>')
-        set <#= EformModePropName #>(inEformMode: <#= eformModeEnumName #>) {
-            if (typeof inEformMode === 'undefined') {
-                return;
-            }
-            if (this._eformMode != inEformMode) {
-                this._eformMode = inEformMode;
-                if (this.ngOnInitCalled) {
-                    this.OnEformModeChanged();
-                    this.InputToControls();
-                    this.DoClearControls();
-                    this.DoInit();
-                }
-            }
-        }
-        get <#= EformModePropName #>(): <#= eformModeEnumName #> {
-            return this._eformMode;
-        }
-<#    //////////////////////////// end Input FormMode -generator 
-#>
 <#    //////////////////////////// start Input Model -generator 
 #>
     protected _<#= FormControlModelPropName #>: <#= GetInterfaceName(Model) #> | any = null;
@@ -341,7 +332,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         }
         get <#=  FormControlModelPropName #>(): <#= GetInterfaceName(Model) #> | any {
             return this._<#= FormControlModelPropName #>;
-        } // end of get <#=        FormControlModelPropName #>
+        } // end of get <#= FormControlModelPropName #>
 <#    //////////////////////////// end Input Model -generator 
 #>
     protected _<#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
@@ -366,1917 +357,233 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
 
     // end: input variable declaration section
 
-    DefCntrlByHddn(proNm: string): boolean {
-        let val = this.<#= HiddenFilterPropName #>.find(v => { return v.fltrName === proNm });
-        if (typeof val === 'undefined') {
-            return false;
-        }
-        if(typeof val.fltrValue == 'undefined') {
-            return false;
-        }
-        this.<#=  MainFormGroupName #>.patchValue({[proNm]: val.fltrValue });
-        return true;
-    }
-    DefCntrlByModel(proNm: string) {
-        if(typeof this._eformControlModel[proNm] === 'undefined') {
-            this.<#=  MainFormGroupName #>.patchValue({[proNm]: null});
-        } else {
-            this.<#=  MainFormGroupName #>.patchValue({[proNm]: this._<#= FormControlModelPropName #>[proNm]});
-        }
-    }
 
-    InputToControls() {
-        let isInputNull: boolean = true;
-        if (typeof this._<#= FormControlModelPropName #> !== 'undefined') {
-            isInputNull = (this._<#= FormControlModelPropName #> === null);
-        }
-        let val: any = null;
-        if(! isInputNull) {
-<#
-    foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
+<#    
+    {
+        string constructorParams = "";
+        foreach(string viewNm in ViewsList) {
+            if (constructorParams != "") {
+                constructorParams += ", ";
+            }
+            constructorParams += "private " +  formServicePrefix + viewNm + ": " + GetServiceClassNameEx(Context, viewNm, viewServiceFolder);
+        } 
 #>
-            if(!this.DefCntrlByHddn('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>')) { this.DefCntrlByModel('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'); }
-<#
-    }
-#>
-        } else {
-<#
-    foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-#>
-            if(!this.DefCntrlByHddn('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>') ) { this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>': null}); };
-<#
-    }
-#>
-        }
-    }
-
-
-<#    //////////////////////////// start constructor-generator 
-    string constructorParams = "";
-    foreach(string viewNm in FKViewsDict) {
-        if (constructorParams != "") {
-            constructorParams += ", ";
-        }
-        constructorParams += "private " +  formServicePrefix + viewNm + ": " + GetServiceClassNameEx(Context, viewNm, viewServiceFolder);
-    } 
-#>
-
     constructor(<#= constructorParams #>, public dialog: MatDialog, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #> ) {
         this.<#= AppearancePropName #> = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
-        this.<#= MainFormGroupName #> =  new FormGroup({});
+        this.<#=        MainFormGroupName #> =  new FormGroup({});
         let locValidators: ValidatorFn[]; 
+        let v: any;
 <#
-    foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-        if (IsBooleanInput(modelViewUIFormPropertySerializable, Model)) {
+        foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
+            if ((!modelViewUIFormPropertySerializable.IsShownInView) || (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Hidden)) continue;
+            if (IsBooleanInput(modelViewUIFormPropertySerializable, Model)) {
 #>
-        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: false, disabled: true}));
-<#    
-        } else {
-            if (IsIdentityPropertyEx(modelViewUIFormPropertySerializable, Model)) {
-#>
+        v = false;
         locValidators = [ ];
 <#    
             } else {
 #>
+        v = null;
+<#    
+                if (IsIdentityPropertyEx(modelViewUIFormPropertySerializable, Model)) {
+#>
+        locValidators = [ ];
+<#    
+                } else {
+#>
         locValidators = [ <#= string.Join(",", GetValidators(modelViewUIFormPropertySerializable, Model, RegExps)) #> ];
 <#    
+                }
             }
 #>
-        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: null, disabled: true}, locValidators));
-<#    
-        }
-    } //foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-#>
-    } // end of constructor
-<#    //////////////////////////// end constructor-generator
-#>
-    private handleError<T> (result?: T) {
-        return (error: any): Observable<T> => {
-          this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error)
-          return of(result as T);
-        };
-    }
-<#    //////////////////////////// start ngOnInit()-generator
-#>
-    ngOnInit(): void {
-        this.InputToControls();
-        this.OnEformModeChanged();
-        this.DoClearControls();
-        this.DoInit();
-        this.ngOnInitCalled = true;
-    }
-
-    getErrorMessage(fc: AbstractControl): string {
-        return this.<#= AppSettingServicePropName #>.getValidationErrorMessage(fc);
-    } // end of getErrorMessage
-<#    //////////////////////////// end ngOnInit()-generator
-#>
-
-<#    //////////////////////////// start OnEformModeChanged()-generator
-#>
-    OnEformModeChanged(): void {
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: v, disabled: true}, locValidators));
 <#
-    for(int inptTp = 1; inptTp < 4; inptTp++) {
-        if ((inptTp ==2) && (ModeAddEqualUpdate)) continue;
-        if ((inptTp ==3) && (ModeAddEqualDelete || ModeUpdateEqualDelete)) continue;
-        if (inptTp ==1) {
+            if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.Combo) {
 #>
-        if ((this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
-<#
-        } else if (inptTp == 2) {
-#>
-        if ((this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
-<#
-        } else {
-#>
-        if (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
-<#
-        }
-        foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-            if (modelViewUIFormPropertySerializable.IsShownInView) { 
-                if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Default) {
-                    if (string.IsNullOrEmpty(modelViewUIFormPropertySerializable.ForeignKeyNameChain)) {
-#>
-            this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].enable( {emitEvent: false} );
-<#    
+        this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = new FormControl({ value: null, disabled: true }, [ 
+                (fc)=>{  if ((typeof fc.value === 'string') || (typeof fc.value === 'undefined') || (fc.value === null)) { 
+                            this.<#=  MainFormGroupName #>.patchValue({'<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>': null });
+                            return  this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].errors; }  
+                        return null; }]);
+        this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.valueChanges
+            .subscribe({
+                next: (val: any) => { 
+                    if(val) {
+                        this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= Interface2ValuesMethodName #>(val, true); 
                     } else {
-#>
-            this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].disable( {emitEvent: false} );
-<#    
+                        this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= ClearNoCurrMasterPropsMethodName #>(true);
                     }
-                } // if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Default) {
-                else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.ReadOnly) {
-#>
-            this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].enable( {emitEvent: false} );
+                }
+            });
+
 <#    
-                } // else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.ReadOnly) {
-                else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
+            } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.Typeahead) {
 #>
-            this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].enable( {emitEvent: false} );
-            this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = new FormControl({ value: null, disabled: true }, [ 
-                (fc)=>{  if ((typeof fc.value === 'string') || (typeof fc.value === 'undefined') || (fc.value === null)) { 
-                            this.<#=  MainFormGroupName #>.patchValue({'<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>': null });
-                            return  this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].errors; }  
-                        return null; }]);
-<#   
-                    if (HasOnValChangedMethod(Context, Model, modelViewUIFormPropertySerializable)) {
-#>                                
-            this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.valueChanges
-                .subscribe({
-                    next: (val: any) => { this.<#=  GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(val, true); }
-                });
-<#    
+        this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> = new FormControl({ value: null, disabled: true }, [ 
+            (fc)=>{  if ((typeof fc.value === 'string') || (typeof fc.value === 'undefined') || (fc.value === null)) { 
+                    this.<#=  MainFormGroupName #>.patchValue({'<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>': null });
+                    return  this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].errors; }  
+                return null; }]);
+
+
+        this.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> =
+            this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.valueChanges.pipe(
+                debounceTime(100),
+                switchMap((value: any) => {
+                    if(typeof value === 'string') {  
+                        this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= ClearNoCurrMasterPropsMethodName #>(true);
+                        return this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= GetCllctByFldFilterMethodName #>('<#= GetControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, CurrentInputTypeId) #>', value);
+                    } else {
+                        this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= Interface2ValuesMethodName #>(value, true);
                     }
-                } // else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-                else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-#>
-            this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].enable( {emitEvent: false} );
-            this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> = new FormControl({ value: null, disabled: true }, [ 
-                (fc)=>{  if ((typeof fc.value === 'string') || (typeof fc.value === 'undefined') || (fc.value === null)) { 
-                            this.<#=  MainFormGroupName #>.patchValue({'<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>': null });
-                            return  this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].errors; }  
-                        return null; }]);
-            this.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> =
-                    this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.valueChanges
-                    .pipe(
-                            debounceTime(100),
-                            switchMap(value => {
-                              if(typeof value === 'string') {  
-<#    
-                    if (HasInitMethod(modelViewUIFormPropertySerializable, Model) && HasOnValChangedMethod(Context, Model, modelViewUIFormPropertySerializable)) {
-#>
-                                this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
+                    return of([]);
+                })
+            );
 <#
-                    }
-#> 
-                                return this.<#= GetExpressionForOnFilterTypeaheadControlListMethod(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>(value);
-                              } else {
-<#    
-                    if (HasInitMethod(modelViewUIFormPropertySerializable, Model) && HasOnValChangedMethod(Context, Model, modelViewUIFormPropertySerializable)) {
+            } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.SearchDialog) {
 #>
-                                this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(value, true);
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: v, disabled: true}, locValidators));
 <#
-                    }
-#> 
-                                return of([]);
-                            }})
-                          );
-<#   
-                } // else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-                else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
+            }
+        } // foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) { ... }
 #>
-            this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].enable( {emitEvent: false} ); 
-<#    
-                } // else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
-                else { // GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) === Hidden
-#>
-            this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].enable( {emitEvent: false} );
-<#    
-                } // GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) === Hidden
-            } // if (modelViewUIFormPropertySerializable.IsShownInView) { 
-        } //foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-#>
-        } 
+        this.<#= RootDataSource #> = new <#= GetJavaScriptClassNameEx(Context, Model.ViewName, viewDatasourceClassFolder) #> (this.<#= formServicePrefix + Model.ViewName #>,
+            this.<#= AppSettingServicePropName #>, null, null, [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, "") #>],'');
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#= RootDataSource #>
+                .<#= OnIsDefinedChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnIsDefinedChangedPropName #>(v) } })
+        );
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#= RootDataSource #>
+                .<#= OnUpdatePropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnUpdatePropName #>(v) } })
+        );
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#= RootDataSource #>
+                .<#= OnAddPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnAddPropName #>(v) } })
+        );
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#= RootDataSource #>
+                .<#= OnDeletePropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnDeletePropName #>(v) } })
+        );
 <#
-    } // for(int inptTp = 1; inptTp < 4; inptTp++) {
+        foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+            Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> detailFk = GetDirectDetail(ForeignKeyNameChainList, fk.Item1);
+            string detailViewName = Model.ViewName;
+            string directNavigation = GetDirectNavName(fk.Item1);
+            if(detailFk != null) {
+                detailViewName = detailFk.Item2.ViewName;
+            }
+            if(string.IsNullOrEmpty(directNavigation)){
+                throw new Exception("For [Foreign Key Name Chain]=" + fk.Item1 + " can not find direct detail");
+            }
 #>
-    } // end of EformMode
-<# //////////////////////////// end OnEformModeChanged()-generator
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #> = new <#= GetJavaScriptClassNameEx(Context, fk.Item2.ViewName, viewDatasourceClassFolder) #> (this.<#= formServicePrefix + fk.Item2.ViewName #>,
+            this.<#= AppSettingServicePropName #>, '<#= detailViewName #>', '<#= directNavigation #>', [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, fk.Item1) #>],'<#= fk.Item1 #>');
+<#
+        }
+        foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+            Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> detailFk = GetDirectDetail(ForeignKeyNameChainList, fk.Item1);
+            string detailViewName = Model.ViewName;
+            string directNavigation = GetDirectNavName(fk.Item1);
+            if(detailFk != null) {
+                detailViewName = detailFk.Item2.ViewName;
+            } 
+            if(string.IsNullOrEmpty(directNavigation)){
+                throw new Exception("For [Foreign Key Name Chain]=" + fk.Item1 + " can not find direct detail");
+            }
+#>
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>
+                .<#= OnIsDefinedChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, OnIsDefinedChangedPropName) #>(v) } })
+        );
+<#
+            if(fk.Item4 == InputTypeEnum.Combo) {
+#>
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>
+                .<#= AfterMasterChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(v) } })
+        );
+<#
+            }
+            if(detailFk == null) {
+#>
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>
+                .<#= OnMasterChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource #>.<#= submitOnMasterChangedMethodName #>(v) } })
+        );
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#= RootDataSource #>
+            .<#= OnDetailChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= submitOnDetailChangedMethodName #>(v) } })
+        );
+
+<#
+            } else {
+#>
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>
+                .<#= OnMasterChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= GetTypeScriptPropertyNameWithSufix(detailFk.Item3, Model, DataSourceSufix) #>.<#= submitOnMasterChangedMethodName #>(v) } });
+        );
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#= GetTypeScriptPropertyNameWithSufix(detailFk.Item3, Model, DataSourceSufix) #>
+            .<#= OnDetailChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= submitOnDetailChangedMethodName #>(v) } })
+        );
+<#
+            }
+        }
+#>
+    }
+<#
+    }
 #>
 
-<# //////////////////////////// start DoClearControls()-generator 
-#>
-    DoClearControls(): void {
+
+    public <#= RootDataSource + OnUpdatePropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
+    }
+    public <#= RootDataSource + OnAddPropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
+    }
+    public <#= RootDataSource + OnDeletePropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
+    }
+    public <#= RootDataSource + OnIsDefinedChangedPropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
+    }
 <#
     {
-        for(int inptTp = 1; inptTp < 4; inptTp++) {
-            if ((inptTp ==2) && (ModeAddEqualUpdate)) continue;
-            if ((inptTp ==3) && (ModeAddEqualDelete || ModeUpdateEqualDelete)) continue;
-            if (inptTp ==1) {
-#>
-        if ((this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
-<#
-            } else if (inptTp == 2) {
-#>
-        else if ((this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
-<#
-            } else {
-#>
-        else if (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
-<#
-            }
-            foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-                if (modelViewUIFormPropertySerializable.IsShownInView) { 
-                    if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-#>
-            this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.patchValue(null, {emitEvent: false});
-            this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.disable( {emitEvent: false} );
-            this.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = null;
-<#    
-                    } // if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-                    else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-#>
-            this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.patchValue(null, {emitEvent: false});
-
-<#    
-                    } // else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-                    else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-            this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #> = null;
-            this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonDisable) #> = true;
-<#    
-                    } // else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
-                } // if (modelViewUIFormPropertySerializable.IsShownInView) { 
-            } // foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-#>
-        } 
-<#    
-        } // for(int inptTp = 1; inptTp < 4; inptTp++) {
-    }
-#>
-    }
-<# //////////////////////////// end DoClearControls()-generator
-#>
-
-
-//
-// TODO: check if DoInit()-method is required
-//
-    DoInit() {
-<#  //////////////////////////// start OnInit()-generator
-    {
-        bool genElse = false;
-        for(int inptTp = 1; inptTp < 4; inptTp++) {
-            if (HasModelInitMethodForInputMode(Model, inptTp)) {
-            if ((inptTp ==2) && (ModeAddEqualUpdate)) continue;
-            if ((inptTp ==3) && (ModeAddEqualDelete || ModeUpdateEqualDelete)) continue;
-            if (inptTp ==1) {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
-<#
-            } else if (inptTp == 2) {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
-<#
-            } else {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
-<#
-            }
-                foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-                    if (modelViewUIFormPropertySerializable.IsShownInView) { 
-                        if(HasInitMethodForInputMode(modelViewUIFormPropertySerializable, Model, inptTp)) {
-                            if ( GetDirectDetails(modelViewUIFormPropertySerializable, Model, Context, inptTp).Count < 1) {
-#>
-            this.<#= GetExpressionForOnInitMethod(modelViewUIFormPropertySerializable, Model) #>();
-<#    
-                            }
-                        } // if(HasInitMethod(modelViewUIFormPropertySerializable, Model)) {
-                    } // if (modelViewUIFormPropertySerializable.IsShownInView) { 
-                } // foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-#>
-        }
-<#    
-            }
-        } // for(int inptTp = 1; inptTp < 4; inptTp++) {
-    }
-#>
-    } // DoInit() 
-
-<#  //////////////////////////// start OnInit...()-generator
-        foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-            if (modelViewUIFormPropertySerializable.IsShownInView) { 
-                if(HasInitMethod(modelViewUIFormPropertySerializable, Model)) {
-#>
-    <#= GetExpressionForOnInitMethod(modelViewUIFormPropertySerializable, Model) #>(): void {
-<#  
-                    bool genElse = false;
-                    for(int inptTp = 1; inptTp < 4; inptTp++) {
-
-                        if ((inptTp ==2) && (ModeAddEqualUpdate)) continue;
-                        if ((inptTp ==3) && (ModeAddEqualDelete || ModeUpdateEqualDelete)) continue;
-//
-// GetViewNameForControlList()
-// ForeignKeys-chain defines the View for which we generate current method
-// not direct MasterView (!!!) but the View that has current ForeignKeys-chain
-// 
-// So.
-// 1.
-// GetViewNameForControlList() returns the ViewName which can be or can not be equal to Model.ViewName;
-// 2.
-// GetPrimaryKeyProps() returns PrimaryKey Properties of the ViewName, not Model.ViewName
-//
-// 3.
-// GetDirectMasters() returns direct masters for the current ViewName, not Model.ViewName
-// we need them to call OnInit...() after defining current ViewName
-// GetDirectMasters() returns only those masters which have combo/typeahead/searchBox control in the Model
-//
-// 4.
-// GetDirectDetails() returns direct details for the ViewName not Model.ViewName
-// GetDirectDetails() returns only those Details which have combo/typeahead/searchBox control in the Model
-// 
-
-
-                        string viewName =  GetViewNameForControlList(modelViewUIFormPropertySerializable, Model, Context, inptTp);
-                        string servisPropNm  = formServicePrefix + viewName;
-                        List<ModelViewPropertyOfVwSerializable> primKeyProps = GetPrimaryKeyProps(Context, viewName);
-                        if(HasInitMethodForInputMode(modelViewUIFormPropertySerializable, Model, inptTp)) {
-                            List<ModelViewUIFormPropertySerializable> directMasters = 
-                             GetDirectMasters(modelViewUIFormPropertySerializable, Model, Context, inptTp);
-
-        if (inptTp ==1) {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
-<#
-        } else if (inptTp == 2) {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
-<#
-        } else {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
-<#
-        }
-                            if (primKeyProps.Count > 0) {
-                                foreach(ModelViewPropertyOfVwSerializable pkpModelViewPropertyOfVwSerializable in primKeyProps) {
-#>
-            let <#= GetPrimKeyVarName(pkpModelViewPropertyOfVwSerializable) #>: any = null;
-<#  
-                                }
-                            } else {
-#>
-// error: could not find primary key for the given view: <#= viewName #> which was detected by the property: <#= modelViewUIFormPropertySerializable.ViewPropertyName #>
-<#  
-                            }
-                            if ( MustHaveDirectDetails(modelViewUIFormPropertySerializable, Model, Context) ) {
-                                List<ModelViewUIFormPropertySerializable> details = 
-                                    GetDirectDetails(modelViewUIFormPropertySerializable, Model, Context, inptTp);
-                                foreach(ModelViewUIFormPropertySerializable dtlModelViewUIFormPropertySerializable in details) {
-                                    ModelViewSerializable detailView = GetViewForControlList(dtlModelViewUIFormPropertySerializable, Model, Context, inptTp);
-                                    List<ModelViewPropertyOfVwSerializable> foreignKeyProps = GetForeignKeyProps(Context, Model, modelViewUIFormPropertySerializable, dtlModelViewUIFormPropertySerializable, inptTp);
-                                    if(foreignKeyProps.Count != primKeyProps.Count) {
-#>
-// error: Primary and Foreign keys have different number of properties for the given master view: <#= viewName #> which was detected by the property <#= modelViewUIFormPropertySerializable.ViewPropertyName #>
-//    method[GetForeignKeyProps]                     foreignKey Props Count = [<#= foreignKeyProps.Count #>] and prim Key Props Count = [<#= primKeyProps.Count #>] 
-<#  
-                                }
-                                    for(int loci = 0; loci < primKeyProps.Count; loci++) {
-                                        if(foreignKeyProps.Count > loci) {
-                                            ModelViewPropertyOfVwSerializable primKpModelViewPropertyOfVwSerializable = primKeyProps[loci];
-                                            ModelViewPropertyOfVwSerializable frgnKpModelViewPropertyOfVwSerializable = foreignKeyProps[loci];
-                                            if (GetInputTypeWhenXXX(dtlModelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-#>
-            if(!(typeof this.<#= GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ComboSufix) #>.value === 'undefined')) {
-                if(!(this.<#= GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ComboSufix) #>.value === null)) {
-                    if(!(typeof this.<#= GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ComboSufix) #>.value.<#= GetTypeScriptPropertyName(frgnKpModelViewPropertyOfVwSerializable, detailView)#>  === 'undefined')) {
-                        <#= GetPrimKeyVarName(primKpModelViewPropertyOfVwSerializable) #> = this.<#= GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ComboSufix) #>.value.<#= GetTypeScriptPropertyName(frgnKpModelViewPropertyOfVwSerializable, detailView)#>;
-                    }
-                }
-            }
-<#
-                                            } else if (GetInputTypeWhenXXX(dtlModelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-#>
-            if(!(typeof this.<#= GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.value === 'undefined')) {
-                if(!(this.<#= GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.value === null)) {
-                    if(!(typeof this.<#= GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.value.<#= GetTypeScriptPropertyName(frgnKpModelViewPropertyOfVwSerializable, detailView)#>  === 'undefined')) {
-                        <#= GetPrimKeyVarName(primKpModelViewPropertyOfVwSerializable) #> = this.<#= GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.value.<#= GetTypeScriptPropertyName(frgnKpModelViewPropertyOfVwSerializable, detailView)#>;
-                    }
-                }
-            }
-<#
-                                            }  else if (GetInputTypeWhenXXX(dtlModelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-            if(!(typeof this.<#= GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ButtonSufix) #> === 'undefined')) {
-                if(!(this.<#= GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ButtonSufix) #> === null)) {
-                    if(!(typeof this.<#= GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ButtonSufix) #>.<#= GetTypeScriptPropertyName(frgnKpModelViewPropertyOfVwSerializable, detailView)#>  === 'undefined')) {
-                        <#= GetPrimKeyVarName(primKpModelViewPropertyOfVwSerializable) #> = this.<#= GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ButtonSufix) #>.<#= GetTypeScriptPropertyName(frgnKpModelViewPropertyOfVwSerializable, detailView)#>;
-                    }
-                }
-            }
-<#                                    
-                                            }                                                   
-                                        }
-                                    } // for(int loci = 0; loci < primKeyProps.Count; loci++)
-                                } // foreach(ModelViewUIFormPropertySerializable dtlModelViewUIFormPropertySerializable in details)
-#>
-            let isPkNtDf: boolean = <# {int i = 0;
-                            foreach(ModelViewPropertyOfVwSerializable primKpModelViewPropertyOfVwSerializable in primKeyProps) { if (i > 0)  { #> || <# } 
-                                    #> (typeof <#= GetPrimKeyVarName(primKpModelViewPropertyOfVwSerializable) #> === 'undefined') <#
-                                    i++;
-                                }} #>  ;
-            isPkNtDf = isPkNtDf ? isPkNtDf : <# {int i = 0;
-                            foreach(ModelViewPropertyOfVwSerializable primKpModelViewPropertyOfVwSerializable in primKeyProps) { if (i > 0)  { #> || <# } 
-                                    #> (<#= GetPrimKeyVarName(primKpModelViewPropertyOfVwSerializable) #> === null) <#
-                                    i++;
-                                }} #>  ;
-            if (isPkNtDf) { 
-<#
-                            if(directMasters.Count < 1) {
-#>
-                this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
-<#
-                                if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-#>
-                this.<#= GetExpressionForOnUpdateComboControlListMethod(modelViewUIFormPropertySerializable, Model, ComboSufix) #>();
-<#
-                                }
-                            } else {
-                                foreach(ModelViewUIFormPropertySerializable directMaster in directMasters) {
-#>
-                this.<#=  GetExpressionForOnInitMethod(directMaster, Model) #>();
-<#
-                                }
-                            }
-#>
-            } else {
-                this.<#= servisPropNm #>.<#= GetOneMethodName #>(<# {int i = 0;
-                            foreach(ModelViewPropertyOfVwSerializable primKpModelViewPropertyOfVwSerializable in primKeyProps) { if (i > 0)  { #>, <# } 
-                                    #><#= GetPrimKeyVarName(primKpModelViewPropertyOfVwSerializable) #><#
-                                    i++;
-                                }} #> )
-                .subscribe({
-                    next: (data: <#= GetInterfaceNameEx(Context, viewName) #> ) => { // success path
-                        if (!(typeof data === 'undefined')) {
-                            if (!(data === null)) {
-<#
-                            if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-#>
-                                this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.patchValue(data, {emitEvent: false});
-                                
-<#
-                            }  else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-#>
-                                this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.patchValue(data, {emitEvent: false});
-<#
-                            }  else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-                                this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #> = data;
-<#
-                            }
-#>
-                            }
-                        }
-<#
-                            if(directMasters.Count < 1) {
-                                if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-#>
-                        this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.value, false);
-                        this.<#= GetExpressionForOnUpdateComboControlListMethod(modelViewUIFormPropertySerializable, Model, ComboSufix) #>();
-<#
-                                }  else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-#>
-                        this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.value, false);
-<#
-                                }  else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-                        this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>, false);
-<#
-                                }
-                            } else {
-                                foreach(ModelViewUIFormPropertySerializable directMaster in directMasters) {
-#>
-                        this.<#= GetExpressionForOnInitMethod(directMaster, Model) #>();
-<#
-                                }
-                            }
-#>
-                    },
-                    error: (error) => { // error path
-<#
-                            if(directMasters.Count < 1) {
-                                if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-#>
-                        this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
-                        this.<#= GetExpressionForOnUpdateComboControlListMethod(modelViewUIFormPropertySerializable, Model, ComboSufix) #>();
-<#
-                                }  else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-#>
-                        this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
-<#
-                                }  else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-                        this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
-<#
-                                }
-                            } else {
-                                foreach(ModelViewUIFormPropertySerializable directMaster in directMasters) {
-#>
-                        this.<#= GetExpressionForOnInitMethod(directMaster, Model) #>();
-<#
-                                }
-                            }
-#>
-                        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error)
-                    } 
-                }); // end of .subscribe
-            }
-<#
-                            } else { // if ( MustHaveDirectDetails(modelViewUIFormPropertySerializable, Model, Context) )
-                                List<ModelViewPropertyOfVwSerializable> foreignKeyProps = GetForeignKeyPropsBase(Context, Model, modelViewUIFormPropertySerializable);
-                                if(foreignKeyProps.Count != primKeyProps.Count) {
-#>
-// error: Primary and Foreign keys have different number of properties for the given master view: <#= viewName #> which was detected by the property <#= modelViewUIFormPropertySerializable.ViewPropertyName #>
-//   method [GetForeignKeyPropsBase]                      foreignKey Props Count = [<#= foreignKeyProps.Count #>] and prim Key Props Count = [<#= primKeyProps.Count #>] 
-<#  
-                                }
-                                for(int loci = 0; loci < primKeyProps.Count; loci++) {
-                                    if(foreignKeyProps.Count > loci) {
-                                        ModelViewPropertyOfVwSerializable primKpModelViewPropertyOfVwSerializable = primKeyProps[loci];
-                                        ModelViewPropertyOfVwSerializable frgnKpModelViewPropertyOfVwSerializable = foreignKeyProps[loci];
-#>
-            if(!(typeof this.<#=  MainFormGroupName #>.controls['<#= GetTypeScriptPropertyName(frgnKpModelViewPropertyOfVwSerializable, Model) #>'].value === 'undefined')) {
-                if(!(this.<#=  MainFormGroupName #>.controls['<#= GetTypeScriptPropertyName(frgnKpModelViewPropertyOfVwSerializable, Model) #>'].value === null)) {
-                    <#= GetPrimKeyVarName(primKpModelViewPropertyOfVwSerializable) #> = this.<#=  MainFormGroupName #>.controls['<#= GetTypeScriptPropertyName(frgnKpModelViewPropertyOfVwSerializable, Model) #>'].value;
-                }
-            }
-<#
-                                    }
-                                } // for(int loci = 0; loci < primKeyProps.Count; loci++)
-#>
-            let isPkNtDf: boolean = <# {int i = 0;
-                            foreach(ModelViewPropertyOfVwSerializable primKpModelViewPropertyOfVwSerializable in primKeyProps) { if (i > 0)  { #> || <# } 
-                                    #> (typeof <#= GetPrimKeyVarName(primKpModelViewPropertyOfVwSerializable) #> === 'undefined') <#
-                                    i++;
-                                }} #>  ;
-            isPkNtDf = isPkNtDf ? isPkNtDf : <# {int i = 0;
-                            foreach(ModelViewPropertyOfVwSerializable primKpModelViewPropertyOfVwSerializable in primKeyProps) { if (i > 0)  { #> || <# } 
-                                    #> (<#= GetPrimKeyVarName(primKpModelViewPropertyOfVwSerializable) #> === null) <#
-                                    i++;
-                                }} #>  ;
-            if (isPkNtDf) { 
-<#
-                            if(directMasters.Count < 1) {
-#>
-                this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
-<#
-                                if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-#>
-                this.<#= GetExpressionForOnUpdateComboControlListMethod(modelViewUIFormPropertySerializable, Model, ComboSufix) #>();
-<#
-                                }
-                            } else {
-                                foreach(ModelViewUIFormPropertySerializable directMaster in directMasters) {
-#>
-                this.<#=  GetExpressionForOnInitMethod(directMaster, Model) #>();
-<#
-                                }
-                            }
-#>
-            } else {
-                this.<#= servisPropNm #>.<#= GetOneMethodName #>(<# {int i = 0;
-                            foreach(ModelViewPropertyOfVwSerializable primKpModelViewPropertyOfVwSerializable in primKeyProps) { if (i > 0)  { #>, <# } 
-                                    #><#= GetPrimKeyVarName(primKpModelViewPropertyOfVwSerializable) #><#
-                                    i++;
-                                }} #> )
-                .subscribe({
-                    next: (data: <#= GetInterfaceNameEx(Context, viewName) #> ) => { // success path
-                        if (!(typeof data === 'undefined')) {
-                            if (!(data === null)) {
-<#
-                            if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-#>
-                                this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.patchValue(data, {emitEvent: false});
-                                
-<#
-                            }  else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-#>
-                                this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.patchValue(data, {emitEvent: false});
-<#
-                            }  else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-                                this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #> = data;
-<#
-                            }
-#>
-                            }
-                        }
-<#
-                            if(directMasters.Count < 1) {
-                                if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-#>
-                        this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.value, false);
-                        this.<#= GetExpressionForOnUpdateComboControlListMethod(modelViewUIFormPropertySerializable, Model, ComboSufix) #>();
-<#
-                                }  else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-#>
-                        this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.value, false);
-<#
-                                }  else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-                        this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #>, false);
-<#
-                                }
-                            } else {
-                                foreach(ModelViewUIFormPropertySerializable directMaster in directMasters) {
-#>
-                        this.<#= GetExpressionForOnInitMethod(directMaster, Model) #>();
-<#
-                                }
-                            }
-#>
-                    },
-                    error: (error) => { // error path
-<#
-                            if(directMasters.Count < 1) {
-                                if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-#>
-                        this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
-                        this.<#= GetExpressionForOnUpdateComboControlListMethod(modelViewUIFormPropertySerializable, Model, ComboSufix) #>();
-<#
-                                }  else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-#>
-                        this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
-<#
-                                }  else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-                        this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
-<#
-                                }
-                            } else {
-                                foreach(ModelViewUIFormPropertySerializable directMaster in directMasters) {
-#>
-                        this.<#= GetExpressionForOnInitMethod(directMaster, Model) #>();
-<#
-                                }
-                            }
-#>
-                        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error)
-                    } 
-                }); // end of .subscribe
-            }
-<#  
-                        } // if ( MustHaveDirectDetails(modelViewUIFormPropertySerializable, Model, Context) ) {...} else {
-#>
-        }
-<#  
-                        } // if(HasInitMethodForInputMode(modelViewUIFormPropertySerializable, Model, 1)) {
-                    } // for(int inptTp = 1; inptTp < 4; inptTp++) {
-#>
-    }
-<#    
-                } // if(HasInitMethod(modelViewUIFormPropertySerializable, Model))
-            } // if (modelViewUIFormPropertySerializable.IsShownInView) { 
-        } // foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-#>
-<# //////////////////////////// end OnInit...()-generator
-#>
-
-<#  //////////////////////////// start OnUpdate...ComboList()-generator
-        foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-            if (modelViewUIFormPropertySerializable.IsShownInView) { 
-                if(HasCombo(modelViewUIFormPropertySerializable, Model)) {
-#>
-    <#= GetExpressionForOnUpdateComboControlListMethod(modelViewUIFormPropertySerializable, Model, ComboSufix) #>(): void {
-<#  
-                    bool genElse = false;
-                    for(int inptTp = 1; inptTp < 4; inptTp++) {
-
-                        if ((inptTp ==2) && (ModeAddEqualUpdate)) continue;
-                        if ((inptTp ==3) && (ModeAddEqualDelete || ModeUpdateEqualDelete)) continue;
-
-
-                        if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-                            ModelViewSerializable locView = 
-                                GetViewForControlList(modelViewUIFormPropertySerializable, Model, Context, inptTp);
-            
-                            string viewName = ""; 
-                            if (locView != null) {
-                                viewName = locView.ViewName;
-                            }
-                            string servisPropNm  = formServicePrefix + viewName;
-                            List<ModelViewUIFormPropertySerializable> directMasters = 
-                                GetDirectMasters(modelViewUIFormPropertySerializable, Model, Context, inptTp);
-
-
-        if (inptTp ==1) {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
-<#
-        } else if (inptTp == 2) {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
-<#
-        } else {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
-<#
-        }
-                            if (directMasters.Count < 1) {
-#>
-            let flt: any = {};
-            <#= GetOrderBy(modelViewUIFormPropertySerializable, Model, Context, inptTp,"flt") #>
-            this.<#= servisPropNm #>.<#= GetWithFilterMethodName #>(flt)
-                .subscribe({
-                    next: (data: <#= GetInterfacePageNameEx(Context, viewName) #> ) => { // success path
-                        this.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = [];
-                        if (!(typeof data === 'undefined')) {
-                            if (!(data === null)) {
-                                if (!(typeof data.items === 'undefined')) {
-                                    if (Array.isArray(data.items)) {
-                                        this.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = data.items;
-                                        let lfc: any = this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.value;
-                                        if (!(typeof lfc === 'undefined')) {
-                                            if (!(lfc === null)) {
-                                                let ind: number = this.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.findIndex((e: any) => {
-                                                            return  <#= GetPrimKeyFilterForFindIndexMethod(Context, viewName, "e","lfc") #> ;
-                                                    });                            
-                                                if (ind > -1) {
-                                                    this.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.splice(ind,1,lfc);
-                                                } else {
-                                                    this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if(this.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.length < 1) {
-                            this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
-                        }
-                    }, 
-                    error: (error) => { // error path
-                        this.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = [];
-                        this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
-                        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error)
-                    } 
-                });
-<#
-                            } else {
-                                List<ModelViewPropertyOfVwSerializable> allForeignKeyProps = GetAllForeignKeyProps(locView);
-
-
-
-
-
-
-#>
-            let hasNoVal: boolean = typeof this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.value === 'undefined';
-            hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.value === null);
-            let flt: <#= GetInterfaceFilterName(locView) #> | any = null;
-            if (! hasNoVal) {
-                let lfc: <#= GetInterfaceNameEx(Context, viewName) #> = this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.value;
-<#
-                            foreach(ModelViewUIFormPropertySerializable directMasterProp in directMasters) {
-                                ModelViewSerializable masterView = GetViewForControlList(directMasterProp, Model, Context, inptTp);
-                                string masterViewName = "";
-                                if(masterView != null) {
-                                    masterViewName = masterView.ViewName;
-                                }
-                                List<ModelViewPropertyOfVwSerializable> masterPrimKeyProps      = GetModelPrimaryKeyProps(masterView);
-                                List<ModelViewPropertyOfVwSerializable> detailForeignKeyProps   = GetModelForeignKeyProps(locView, modelViewUIFormPropertySerializable.ForeignKeyNameChain, directMasterProp.ForeignKeyNameChain);
-                                if (masterPrimKeyProps.Count !=  detailForeignKeyProps.Count) {
-#>
-// error: Primary and Foreign keys have different number of properties for the given master view: <#= masterViewName #> which was detected by the property <#= directMasterProp.ViewPropertyName #> : <#= directMasterProp.ForeignKeyNameChain#>
-// error:                                                              for the given detail view: <#= viewName #> which was detected by the property <#= modelViewUIFormPropertySerializable.ViewPropertyName #> : <#= modelViewUIFormPropertySerializable.ForeignKeyNameChain#>
-<#  
-                                }
-#>
-                hasNoVal = hasNoVal ? hasNoVal : <#
-                                {
-                                    bool setOr = false;
-                                    for(int i = 0; i < detailForeignKeyProps.Count; i++) {
-                                        if(setOr) {
-#> || (typeof lfc.<#= GetTypeScriptPropertyName(detailForeignKeyProps[i], locView) #> === 'undefined')<# if((i+1) == detailForeignKeyProps.Count) {#>); <#} #>
-<#
-                                        } else {
-#> ((typeof lfc.<#= GetTypeScriptPropertyName(detailForeignKeyProps[i], locView) #> === 'undefined')<# if((i+1) == detailForeignKeyProps.Count) {#>); <#} #>
-<#
-                                            setOr = true;
-                                        }
-                                    }
-                                }
-#>
-
-                hasNoVal = hasNoVal ? hasNoVal : <#
-                                {
-                                    bool setOr = false;
-                                    for(int i = 0; i < detailForeignKeyProps.Count; i++) {
-                                        if(setOr) {
-#> || (lfc.<#= GetTypeScriptPropertyName(detailForeignKeyProps[i], locView) #> === null)<# if((i+1) == detailForeignKeyProps.Count) {#>); <#} #>
-<#
-                                        } else {
-#> ((lfc.<#= GetTypeScriptPropertyName(detailForeignKeyProps[i], locView) #> === null)<# if((i+1) == detailForeignKeyProps.Count) {#>); <#} #>
-<#
-                                            setOr = true;
-                                        }
-                                    }
-                                }
-                            }
-#>                              
-                if(!hasNoVal) {
-                    flt={};
-<#
-                            foreach(ModelViewUIFormPropertySerializable directMasterProp in directMasters) {
-                                ModelViewSerializable masterView = GetViewForControlList(directMasterProp, Model, Context, inptTp);
-                                string masterViewName = "";
-                                if(masterView != null) {
-                                    masterViewName = masterView.ViewName;
-                                }
-                                List<ModelViewPropertyOfVwSerializable> masterPrimKeyProps      = GetModelPrimaryKeyProps(masterView);
-                                List<ModelViewPropertyOfVwSerializable> detailForeignKeyProps   = GetModelForeignKeyProps(locView, modelViewUIFormPropertySerializable.ForeignKeyNameChain, directMasterProp.ForeignKeyNameChain);
-                                if (masterPrimKeyProps.Count !=  detailForeignKeyProps.Count) {
-#>
-// error: Primary and Foreign keys have different number of properties for the given master view: <#= masterViewName #> which was detected by the property <#= directMasterProp.ViewPropertyName #> : <#= directMasterProp.ForeignKeyNameChain#>
-// error:                                                              for the given detail view: <#= viewName #> which was detected by the property <#= modelViewUIFormPropertySerializable.ViewPropertyName #> : <#= modelViewUIFormPropertySerializable.ForeignKeyNameChain#>
-<#  
-                                }
-                                for(int i = 0; i < detailForeignKeyProps.Count; i++) {
-#>
-                    flt.<#= GetTypeScriptPropertyName(detailForeignKeyProps[i], locView) #> = [lfc.<#= GetTypeScriptPropertyName(detailForeignKeyProps[i], locView) #>];
-<#
-                                }
-                            }
-#>
-                }
-            }
-            if (hasNoVal) {
-                hasNoVal = false;
-
-<#
-                              foreach(ModelViewUIFormPropertySerializable directMasterProp in directMasters) {
-                                    ModelViewSerializable masterView = GetViewForControlList(directMasterProp, Model, Context, inptTp);
-                                    string masterViewName = "";
-                                    if(masterView != null) {
-                                        masterViewName = masterView.ViewName;
-                                    }
-                                    List<ModelViewPropertyOfVwSerializable> masterPrimKeyProps      = GetModelPrimaryKeyProps(masterView);
-                                    if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Combo) {
-#>
-                hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.value === 'undefined');
-                hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.value === null);
-<#
-                                    }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
-#>
-                hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.value === 'undefined');
-                hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.value === null);
-<#
-                                    }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-                hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> === 'undefined');
-                hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> === null);
-<#
-                                    }
-#>          
-                if (! hasNoVal) {
-<#
-                                    foreach(ModelViewPropertyOfVwSerializable masterProp in masterPrimKeyProps) {
-                                        if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Combo) {
-#>
-                    hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.value.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === 'undefined');
-                    hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.value.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === null);
-<#
-                                        }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
-#>
-                    hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.value.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === 'undefined');
-                    hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.value.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === null);
-<#
-                                        }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-                    hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #>.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === 'undefined');
-                    hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #>.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === null);
-<#
-                                        }
-                                    }
-#>
-                }
-<#
-                              }
-
-
-
-
-
-
-
-
-#>
-                if (!hasNoVal) {
-                    flt = {};
-<#
-                            foreach(ModelViewUIFormPropertySerializable directMasterProp in directMasters) {
-                                ModelViewSerializable masterView = GetViewForControlList(directMasterProp, Model, Context, inptTp);
-                                string masterViewName = "";
-                                if(masterView != null) {
-                                    masterViewName = masterView.ViewName;
-                                }
-                                List<ModelViewPropertyOfVwSerializable> masterPrimKeyProps      = GetModelPrimaryKeyProps(masterView);
-                                List<ModelViewPropertyOfVwSerializable> detailForeignKeyProps   = GetModelForeignKeyProps(locView, modelViewUIFormPropertySerializable.ForeignKeyNameChain, directMasterProp.ForeignKeyNameChain);
-                                if (masterPrimKeyProps.Count !=  detailForeignKeyProps.Count) {
-#>
-// error: Primary and Foreign keys have different number of properties for the given master view: <#= masterViewName #> which was detected by the property <#= directMasterProp.ViewPropertyName #> : <#= directMasterProp.ForeignKeyNameChain#>
-// error:                                                              for the given detail view: <#= viewName #> which was detected by the property <#= modelViewUIFormPropertySerializable.ViewPropertyName #> : <#= modelViewUIFormPropertySerializable.ForeignKeyNameChain#>
-<#  
-                                }
-                                for(int loci = 0; loci < detailForeignKeyProps.Count; loci++) {
-                                    if(loci < masterPrimKeyProps.Count) {
-                                        if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Combo) {
-#>
-                    flt['<#= GetTypeScriptPropertyName(detailForeignKeyProps[loci], locView) #>'] = [this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.value.<#= GetTypeScriptPropertyName(masterPrimKeyProps[loci], masterView) #>];
-<#
-                                        }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
-#>
-                    flt['<#= GetTypeScriptPropertyName(detailForeignKeyProps[loci], locView) #>'] = [this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.value.<#= GetTypeScriptPropertyName(masterPrimKeyProps[loci], masterView) #>];
-<#
-                                        }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-                    flt['<#= GetTypeScriptPropertyName(detailForeignKeyProps[loci], locView) #>'] = [this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #>.<#= GetTypeScriptPropertyName(masterPrimKeyProps[loci], masterView) #>];
-<#
-                                        }
-                                    }
-                                }
-                            }
-#>
-                }
-            }
-            if (!hasNoVal) {
-                    <#= GetOrderBy(modelViewUIFormPropertySerializable, Model, Context, inptTp,"flt") #>
-                    this.<#= servisPropNm #>.<#= GetWithFilterMethodName #>(flt)
-                        .subscribe({
-                            next: (data: <#= GetInterfacePageNameEx(Context, viewName) #> ) => { // success path
-                                this.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = [];
-                                if (!(typeof data === 'undefined')) {
-                                    if (!(data === null)) {
-                                        if (!(typeof data.items === 'undefined')) {
-                                            if (Array.isArray(data.items)) {
-                                                this.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = data.items;
-                                                let lfc: any = this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.value;
-                                                if (!(typeof lfc === 'undefined')) {
-                                                    if (!(lfc === null)) {
-                                                        let ind: number = this.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.findIndex((e: any) => {
-                                                                    return  <#= GetPrimKeyFilterForFindIndexMethod(Context, viewName, "e","lfc") #> ;
-                                                            });                            
-                                                        if (ind > -1) {
-                                                            this.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.splice(ind,1,lfc);
-                                                        } else {
-                                                            this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                if(this.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.length < 1) {
-                                    this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
-                                }
-                            }, 
-                            error: (error) => { // error path
-                                this.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = [];
-                                this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
-                                this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error)
-                            } 
-                    });
-            } else {
-                this.<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = [];
-                this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(null, true);
-            }
-<#
-                        } 
-#>
-        }
-<#  
-                        } // if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-                    } // for(int inptTp = 1; inptTp < 4; inptTp++) {
-#>
-    }
-<#  
-                } // if(HasCombo(modelViewUIFormPropertySerializable, Model)) {
-            } // if (modelViewUIFormPropertySerializable.IsShownInView) { 
-        } // foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-#>
-<# //////////////////////////// end  OnUpdate...ComboList()-generator
-#>
-
-<#  //////////////////////////// start OnFilter...Typeahead()-generator
-        foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-            if (modelViewUIFormPropertySerializable.IsShownInView) { 
-                if(HasTypeahead(modelViewUIFormPropertySerializable, Model)) {
-#>
-    <#= GetExpressionForOnFilterTypeaheadControlListMethod(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>(inFilter: string): <#= string.Join(" | ", CollectTypeaheadListInterfaces(Context, modelViewUIFormPropertySerializable, Model)) #> | any {
-<#  
-                    bool genElse = false;
-                    for(int inptTp = 1; inptTp < 4; inptTp++) {
-
-        if ((inptTp ==2) && (ModeAddEqualUpdate)) continue;
-        if ((inptTp ==3) && (ModeAddEqualDelete || ModeUpdateEqualDelete)) continue;
-
-
-                        if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-                            ModelViewSerializable locView = 
-                                GetViewForControlList(modelViewUIFormPropertySerializable, Model, Context, inptTp);
-                            if(locView == null) {
-#>
-//
-// error: Could not find model for for the property <#= modelViewUIFormPropertySerializable.ViewPropertyName #> with a method GetViewForControlList
-// 
-<#  
-                            }
-                            string viewName = ""; 
-                            if (locView != null) {
-                                viewName = locView.ViewName;
-                            }
-                            string servisPropNm  = formServicePrefix + viewName;
-                            List<ModelViewUIFormPropertySerializable> directMasters = 
-                                GetDirectMasters(modelViewUIFormPropertySerializable, Model, Context, inptTp);
-
-        if (inptTp ==1) {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
-<#
-        } else if (inptTp == 2) {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
-<#
-        } else {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
-<#
-        }
-#>
-            let hasNoVal: boolean = false;
-            let flt: <#= GetInterfaceFilterName(locView) #> | any = {};
-<#
-                            if (directMasters.Count > 0) {
-                                List<ModelViewPropertyOfVwSerializable> allForeignKeyProps = GetAllForeignKeyProps(locView);
-                              foreach(ModelViewUIFormPropertySerializable directMasterProp in directMasters) {
-                                    ModelViewSerializable masterView = GetViewForControlList(directMasterProp, Model, Context, inptTp);
-                                    string masterViewName = "";
-                                    if(masterView != null) {
-                                        masterViewName = masterView.ViewName;
-                                    }
-                                    List<ModelViewPropertyOfVwSerializable> masterPrimKeyProps      = GetModelPrimaryKeyProps(masterView);
-                                    if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Combo) {
-#>
-            hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.value === 'undefined');
-            hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.value === null);
-<#
-                                    }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
-#>
-            hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.value === 'undefined');
-            hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.value === null);
-<#
-                                    }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-            hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> === 'undefined');
-            hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> === null);
-<#
-                                    }
-#>                    
-            if (! hasNoVal) {
-<#
-                                    foreach(ModelViewPropertyOfVwSerializable masterProp in masterPrimKeyProps) {
-                                        if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Combo) {
-#>
-                hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.value.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === 'undefined');
-                hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.value.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === null);
-<#
-                                        }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
-#>
-                hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.value.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === 'undefined');
-                hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.value.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === null);
-<#
-                                        }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-                hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #>.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === 'undefined');
-                hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #>.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === null);
-<#
-                                        }
-                                    }
-#>
-            }
-<#
-                              } // foreach(ModelViewUIFormPropertySerializable directMasterProp in directMasters) {
-#>
-            if (hasNoVal) {
-                return of([]);
-            }
-<#
-                                foreach(ModelViewUIFormPropertySerializable directMasterProp in directMasters) {
-                                    ModelViewSerializable masterView = GetViewForControlList(directMasterProp, Model, Context, inptTp);
-                                    string masterViewName = "";
-                                    if(masterView != null) {
-                                        masterViewName = masterView.ViewName;
-                                    }
-                                    List<ModelViewPropertyOfVwSerializable> masterPrimKeyProps      = GetModelPrimaryKeyProps(masterView);
-                                    List<ModelViewPropertyOfVwSerializable> detailForeignKeyProps   = GetModelForeignKeyProps(locView, modelViewUIFormPropertySerializable.ForeignKeyNameChain, directMasterProp.ForeignKeyNameChain);
-                                    if (masterPrimKeyProps.Count !=  detailForeignKeyProps.Count) {
-#>
-// error: Primary and Foreign keys have different number of properties for the given master view: <#= masterViewName #> which was detected by the property <#= directMasterProp.ViewPropertyName #> : <#= directMasterProp.ForeignKeyNameChain#>
-// error:                                                              for the given detail view: <#= viewName #> which was detected by the property <#= modelViewUIFormPropertySerializable.ViewPropertyName #> : <#= modelViewUIFormPropertySerializable.ForeignKeyNameChain#>
-<#  
-                                    }
-                                    for(int loci = 0; loci < detailForeignKeyProps.Count; loci++) {
-                                        if(loci < masterPrimKeyProps.Count) {
-                                            if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Combo) {
-#>
-            flt['<#= GetTypeScriptPropertyName(detailForeignKeyProps[loci], locView) #>'] = [this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.value.<#= GetTypeScriptPropertyName(masterPrimKeyProps[loci], masterView) #>];
-<#
-                                            }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
-#>
-            flt['<#= GetTypeScriptPropertyName(detailForeignKeyProps[loci], locView) #>'] = [this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.value.<#= GetTypeScriptPropertyName(masterPrimKeyProps[loci], masterView) #>];
-<#
-                                            }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-            flt['<#= GetTypeScriptPropertyName(detailForeignKeyProps[loci], locView) #>'] = [this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #>.<#= GetTypeScriptPropertyName(masterPrimKeyProps[loci], masterView) #>];
-<#
-                                            }
-                                        }
-                                    }
-                                } // foreach(ModelViewUIFormPropertySerializable directMasterProp in directMasters) {
-                            } //  if (directMasters.Count > 0) {
-#>
-            if(!(typeof inFilter === 'undefined')) {
-                if(!(inFilter === null)) {
-                    if (!(inFilter === '')) {
-<#                          
-                            {
-                                // modelViewUIFormPropertySerializable, Model, locView
-                            ModelViewPropertyOfVwSerializable masterProp = GetTypeAheadMasterPropEx(Model, modelViewUIFormPropertySerializable, locView);
-                            if(masterProp == null) {
-#>
-//
-//error: could not find master property for the given detail property: <#= modelViewUIFormPropertySerializable.ViewPropertyName #> <# if(locView != null) { #> and the view: <#= locView.ViewName #>  <# } #> 
-
-//       with a method GetTypeAheadMasterPropEx
-//
-<#
-                            }
-                            if (directMasters.Count < 1) {
-                                
-#>
-                        flt['<#= GetTypeScriptPropertyName(masterProp, locView) #>'] = [inFilter];
-<#                          
-                            } else {
-#>
-                        if (typeof flt['<#= GetTypeScriptPropertyName(masterProp, locView) #>'] === 'undefined') {
-                            flt['<#= GetTypeScriptPropertyName(masterProp, locView) #>'] = [inFilter];
-                        } else if (Array.isArray(flt['<#= GetTypeScriptPropertyName(masterProp, locView) #>'])) {
-                            flt['<#= GetTypeScriptPropertyName(masterProp, locView) #>'].push(inFilter);
-                        } else {
-                            flt['<#= GetTypeScriptPropertyName(masterProp, locView) #>'] = [inFilter];
-                        }
-<#                          
-                            }
-                            }
-#>
-                    }
-                }
-            }
-            <#= GetOrderBy(modelViewUIFormPropertySerializable, Model, Context, inptTp,"flt") #>
-            return this.<#= servisPropNm #>.<#= GetWithFilterMethodName #>(flt)
-                .pipe(
-                    switchMap((rslt: <#= GetInterfacePageName(locView) #>) => {
-                        if (!(typeof rslt === 'undefined')) {
-                           if (!(rslt === null)) {
-                                if (!(typeof rslt.items === 'undefined')) {
-                                    if (Array.isArray( rslt.items )) {
-                                        return of(rslt.items);
-                                    }
-                                }
-                            }
-                        }
-                        return of([]);
-                     }),
-                     catchError(this.handleError<Array<<#= GetInterfaceName(locView) #>>>([]))
-                );
-        }
-<#  
-                        } // if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-                    } // for(int inptTp = 1; inptTp < 4; inptTp++) {
-#>
-    }
-<#  
-                } // if(HasTypeahead(modelViewUIFormPropertySerializable, Model)) {
-            } // if (modelViewUIFormPropertySerializable.IsShownInView) { 
-        } // foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-#>
-<# //////////////////////////// end OnFilter...Typeahead()-generator
-#>
-
-<#  //////////////////////////// start OnValChange...()-generator
-        foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-            if (modelViewUIFormPropertySerializable.IsShownInView) { 
-                if (HasInitMethod(modelViewUIFormPropertySerializable, Model) && 
-                    HasOnValChangedMethod(Context, Model, modelViewUIFormPropertySerializable)) {
-#>
-    <#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(inVal: any, dscrdChld: boolean): void {
-<#  
-                    bool genElse = false;
-                    for(int inptTp = 1; inptTp < 4; inptTp++) {
-
-        if ((inptTp ==2) && (ModeAddEqualUpdate)) continue;
-        if ((inptTp ==3) && (ModeAddEqualDelete || ModeUpdateEqualDelete)) continue;
-
-
-                        List<ModelViewUIFormPropertySerializable> directMasters = 
-                                GetDirectMasters(modelViewUIFormPropertySerializable, Model, Context, inptTp);
-                        ModelViewSerializable locView = 
-                            GetViewForControlList(modelViewUIFormPropertySerializable, Model, Context, inptTp);
-                        string viewName = ""; 
-                        if(locView == null) {
-#>
-//
-// error: Could not find model for for the property <#= modelViewUIFormPropertySerializable.ViewPropertyName #> with a method GetViewForControlList
-// 
-<#  
-                        }
-                        if (locView != null) {
-                            viewName = locView.ViewName;
-                        }
-                        List<ModelViewPropertyOfVwSerializable> locViewPrimKeys = GetPrimaryKeyProps(Context, viewName);
-                        string servisPropNm  = formServicePrefix + viewName;
-                        
-                        List<ModelViewUIFormPropertySerializable> details = 
-                                    GetDirectDetails(modelViewUIFormPropertySerializable, Model, Context, inptTp);
-                        List<ModelViewUIFormPropertySerializable> dependentScalarProps = 
-                                    GetDependentScalarProps(modelViewUIFormPropertySerializable, Model, Context, inptTp);
-                        if ((dependentScalarProps.Count > 0) || (details.Count > 0)) {
-
-        if (inptTp ==1) {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
-<#
-        } else if (inptTp == 2) {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
-<#
-        } else {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
-<#
-        }
-
-
-
-                        if(dependentScalarProps.Count > 0) {
-                            if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-
-#>
-
-            if (typeof inVal === 'undefined') {
-                inVal = null;
-            }
-            let hasNoVal: boolean = inVal === null;
-            if(!hasNoVal) {
-                hasNoVal = typeof inVal === 'string'; 
-            }
-            if (hasNoVal) { 
-                dscrdChld = true; 
-            }
-<#
-                            } else {
-#>
-            let hasNoVal: boolean = typeof inVal === 'undefined';
-            hasNoVal = hasNoVal ? hasNoVal : (inVal === null);
-            if (hasNoVal) { 
-                dscrdChld = true; 
-            }
-<#
-                            }
-                        if(directMasters.Count < 1) {
-                            if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-#>
-            this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.enable( {emitEvent: false} );
-<#
-                            } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-#>
-            this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.enable({emitEvent: false});
-<#
-                            } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-            this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonDisable) #> = false;
-<#
-                            }
-                            {
-                                List<string> fltFlds = new List<string>();
-                                fltFlds= GetHiddenFilterDisablingFields(Model, Context, modelViewUIFormPropertySerializable.ForeignKeyNameChain, fltFlds);
-                                if(fltFlds == null) {
-#>
-////////// nothing
-<#
-                                }
-                                if (fltFlds != null) {
-                                    if (fltFlds.Count > 0) {
-#>
-            let isDsbl: boolean = false;
-<#
-                                        foreach(string fltFld in fltFlds) {
-#>
-            isDsbl = isDsbl ? isDsbl : this.<#= HiddenFilterPropName #>.some(v => v.fltrName === '<#= fltFld #>');
-<#
-                                        }
-                                    }
-                                }
-                                if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-#>
-            if(isDsbl) {
-                this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.disable( {emitEvent: false} );
-            } else {
-                this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.enable( {emitEvent: false} );
-            }
-<#
-                                } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-#>
-            if(isDsbl) {
-                this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.disable({emitEvent: false});
-            } else {
-                this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.enable({emitEvent: false});
-            }
-<#
-                                } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-            this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonDisable) #> =  isDsbl;
-<#
-                                }
-                            }
-                        } else {
-#>
-            let isDsbl: boolean = false;
-<#
-                            foreach(ModelViewUIFormPropertySerializable masterProp in directMasters) {
-                                if (GetInputTypeWhenXXX(masterProp, inptTp) == InputTypeEnum.Combo) {
-#>
-            isDsbl = isDsbl ? isDsbl : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(masterProp, Model, ComboSufix) #>.value === 'undefined');
-            isDsbl = isDsbl ? isDsbl : (this.<#= GetTypeScriptPropertyNameWithSufix(masterProp, Model, ComboSufix) #>.value === null);
-<#
-                                } else if (GetInputTypeWhenXXX(masterProp, inptTp) == InputTypeEnum.Typeahead) {
-#>
-            isDsbl = isDsbl ? isDsbl : ((typeof this.<#= GetTypeScriptPropertyNameWithSufix(masterProp, Model, TypeaheadSufix) #>.value === 'undefined') || 
-                                        (typeof this.<#= GetTypeScriptPropertyNameWithSufix(masterProp, Model, TypeaheadSufix) #>.value === 'string'));
-            isDsbl = isDsbl ? isDsbl : (this.<#= GetTypeScriptPropertyNameWithSufix(masterProp, Model, TypeaheadSufix) #>.value === null);
-<#
-                                } else if (GetInputTypeWhenXXX(masterProp, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-            isDsbl = isDsbl ? isDsbl : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(masterProp, Model, ButtonSufix) #> === 'undefined') ;
-            isDsbl = isDsbl ? isDsbl : (this.<#= GetTypeScriptPropertyNameWithSufix(masterProp, Model, ButtonSufix) #> === null);
-<#
-                                }
-                            }
-                            {
-                                List<string> fltFlds = new List<string>();
-                                fltFlds= GetHiddenFilterDisablingFields(Model, Context, modelViewUIFormPropertySerializable.ForeignKeyNameChain, fltFlds);
-                                if(fltFlds == null) {
-#>
-////////// nothing
-<#
-                                }
-                                if (fltFlds != null) {
-                                    if (fltFlds.Count > 0) {
-#>
-            if(!isDsbl) {
-<#
-                                        foreach(string fltFld in fltFlds) {
-#>
-                isDsbl = isDsbl ? isDsbl : this.<#= HiddenFilterPropName #>.some(v => v.fltrName === '<#= fltFld #>');
-<#
-                                        }
-#>
-            }
-<#
-                                    }
-                                }
-                            }
-                            if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-#>
-            if(isDsbl) {
-                this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.disable( {emitEvent: false} );
-            } else {
-                this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.enable( {emitEvent: false} );
-            }
-<#
-                            } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-#>
-            if(isDsbl) {
-                this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.disable({emitEvent: false});
-            } else {
-                this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.enable({emitEvent: false});
-            }
-<#
-                            } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-            this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonDisable) #> =  isDsbl;
-<#
-                            }
-                        }
-#>
-            if (hasNoVal) { 
-<#
-                                foreach(ModelViewUIFormPropertySerializable dependentModelViewUIFormPropertySerializable in dependentScalarProps) {
-                                        ModelViewPropertyOfVwSerializable viewProp =
-                                            GetOnValChangeViewPropName(Context, Model, modelViewUIFormPropertySerializable, dependentModelViewUIFormPropertySerializable, inptTp);
-                                        if(viewProp != null) {
-#>
-                this.<#= MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(dependentModelViewUIFormPropertySerializable, Model) #>': null});
-<#
-                                        } else {
-#>
-// error: with method GetOnValChangeViewPropName() no mapping for view <#= viewName #> and props pair <#= modelViewUIFormPropertySerializable.ViewPropertyName  #> and <#= dependentModelViewUIFormPropertySerializable.ViewPropertyName  #>
-<#
-                                        }
-                                } // foreach(ModelViewUIFormPropertySerializable dependentModelViewUIFormPropertySerializable in dependentScalarProps) {
-                                foreach(ModelViewPropertyOfVwSerializable locViewPrimKey in locViewPrimKeys) {
-                                    List<ModelViewPropertyOfVwSerializable> dependentPkScalarProps = GetForeignKeyPropByIndirectPrimaryKeyPropEx(Model, modelViewUIFormPropertySerializable, locView, Context, locViewPrimKey);
-                                    if (dependentPkScalarProps != null) {
-                                        foreach(ModelViewPropertyOfVwSerializable dependentPkScalarProp in dependentPkScalarProps) {
-                                            if(!dependentScalarProps.Any(p => p.ViewPropertyName == dependentPkScalarProp.ViewPropertyName)) {
-#>
-                this.<#= MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyName(dependentPkScalarProp, Model) #>': null});
-<#
-                                            }
-                                        }
-                                    }
-                                }
-
-#>
-            } else {
-<#
-                                foreach(ModelViewUIFormPropertySerializable dependentModelViewUIFormPropertySerializable in dependentScalarProps) {
-
-                                        ModelViewPropertyOfVwSerializable viewProp =
-                                            GetOnValChangeViewPropName(Context, Model, modelViewUIFormPropertySerializable, dependentModelViewUIFormPropertySerializable, inptTp);
-                                        if(viewProp != null) {
-
-#>
-                if(typeof inVal.<#=  GetTypeScriptPropertyName(viewProp, locView) #> === 'undefined') {
-                    this.<#= MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(dependentModelViewUIFormPropertySerializable, Model) #>': null});
+        foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+            if(fk.Item4 == InputTypeEnum.Combo) {
+            // insert/update forms InputTypeEnum.Typeahead and InputTypeEnum.Typeahead and InputTypeEnum.SearchDialog should be implemented as well
+            // check to see if  IsSetFilterByCurrDirMstrsMethodName() returns true to make enable/disable controls
+#>
+    public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= GetCllctByCurrDirMstrsMethodName #>().subscribe({
+            next: (data: Array<<#= GetInterfaceNameEx(Context, fk.Item2.ViewName) #>> ) => {
+                this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #> = data;
+                let lfc: any = this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.Values2Interface();
+                let ind: number = data.findIndex((e: any) => { return  <#= GetPrimKeyFilterForFindIndexMethod(Context, fk.Item2.ViewName, "e","lfc") #> ; });
+                if (ind > -1) {
+                    this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.value = data[ind];
                 } else {
-                    this.<#= MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(dependentModelViewUIFormPropertySerializable, Model) #>': inVal.<#=  GetTypeScriptPropertyName(viewProp,locView) #>});
+                    this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.value = undefined;
                 }
-<#
-                                        } else {
-#>
-// error: with method GetOnValChangeViewPropName() no mapping for view <#= viewName #> and props pair <#= modelViewUIFormPropertySerializable.ViewPropertyName  #> and <#= dependentModelViewUIFormPropertySerializable.ViewPropertyName  #>
-<#
-                                        }
-                                }
-                                foreach(ModelViewPropertyOfVwSerializable locViewPrimKey in locViewPrimKeys) {
-                                    List<ModelViewPropertyOfVwSerializable> dependentPkScalarProps = GetForeignKeyPropByIndirectPrimaryKeyPropEx(Model, modelViewUIFormPropertySerializable, locView, Context, locViewPrimKey);
-                                    if (dependentPkScalarProps != null) {
-                                        foreach(ModelViewPropertyOfVwSerializable dependentPkScalarProp in dependentPkScalarProps) {
-                                            if(!dependentScalarProps.Any(p => p.ViewPropertyName == dependentPkScalarProp.ViewPropertyName)) {
-#>
-                if(typeof inVal.<#=  GetTypeScriptPropertyName(locViewPrimKey, locView) #> === 'undefined') {
-                    this.<#= MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyName(dependentPkScalarProp, Model) #>': null});
-                } else {
-                    this.<#= MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyName(dependentPkScalarProp, Model) #>': inVal.<#=  GetTypeScriptPropertyName(locViewPrimKey, locView) #>});
-                }
-<#
-                                            }
-                                        }
-                                    }
-                                }
-#>
+            },
+            error: (error: any) => {
+                this.<#=  GetExpressionForControlList(fk.Item3, Model, ComboSufix) #> = [];
+                this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.value = undefined;
+                this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= ClearNoCurrMasterPropsMethodName #>(true);
+                this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
             }
-<#
-                            }
-                        foreach(ModelViewUIFormPropertySerializable dtlModelViewUIFormPropertySerializable in details) {
-                            if (GetInputTypeWhenXXX(dtlModelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Combo) {
-#>
-            if(dscrdChld) {
-                this.<#= GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ComboSufix) #>.patchValue(null, {emitEvent: false});
-                this.<#=  GetExpressionForControlList(dtlModelViewUIFormPropertySerializable, Model, ComboSufix) #>=[];
-                this.<#= GetExpressionForOnValChangedMethod(dtlModelViewUIFormPropertySerializable, Model) #>(null, dscrdChld);
-            } else {
-                this.<#= GetExpressionForOnValChangedMethod(dtlModelViewUIFormPropertySerializable, Model) #>(this.<#= GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ComboSufix) #>.value, dscrdChld);                
-            }
-            this.<#= GetExpressionForOnUpdateComboControlListMethod(dtlModelViewUIFormPropertySerializable, Model, ComboSufix) #>();
-<#
-                            } else if (GetInputTypeWhenXXX(dtlModelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.Typeahead) {
-#>
-            if(dscrdChld) {
-                this.<#=  GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.patchValue(null, {emitEvent: false});
-                this.<#= GetExpressionForOnValChangedMethod(dtlModelViewUIFormPropertySerializable, Model) #>(null, dscrdChld);
-
-            } else {
-                this.<#= GetExpressionForOnValChangedMethod(dtlModelViewUIFormPropertySerializable, Model) #>(this.<#= GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.value, dscrdChld);
-            }
-<#
-                            } else if (GetInputTypeWhenXXX(dtlModelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-            if(dscrdChld) {
-                this.<#=  GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ButtonSufix) #> = null;
-                this.<#= GetExpressionForOnValChangedMethod(dtlModelViewUIFormPropertySerializable, Model) #>(null, dscrdChld);
-            } else {
-                this.<#= GetExpressionForOnValChangedMethod(dtlModelViewUIFormPropertySerializable, Model) #>(this.<#=  GetTypeScriptPropertyNameWithSufix(dtlModelViewUIFormPropertySerializable, Model, ButtonSufix) #>, dscrdChld); 
-            }
-<#
-                            }
-                        }
-#>
-        }
-<#  
-                        } // if ((dependentScalarProps.Count > 0) || (details.Count > 0)) {
-                    } // for(int inptTp = 1; inptTp < 4; inptTp++) {
-#>
+        });
     }
-<#  
-                } // if (HasInitMethod(modelViewUIFormPropertySerializable, Model)) {
-            } // if (modelViewUIFormPropertySerializable.IsShownInView) { 
-        } // foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-#>
-<# //////////////////////////// end  OnValChange...()-generator
-#>
-
 
 <#
-        foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-            if (HasButton(modelViewUIFormPropertySerializable, Model) &&  modelViewUIFormPropertySerializable.IsShownInView) {
-#>
-<# //////////////////////////// start SearchButtonClick()-generator
-#>
-
-    <#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>(): void {
-<#
-                {
-                bool genElse = false;
-                for(int inptTp = 1; inptTp < 4; inptTp++) {
-
-        if ((inptTp ==2) && (ModeAddEqualUpdate)) continue;
-        if ((inptTp ==3) && (ModeAddEqualDelete || ModeUpdateEqualDelete)) continue;
-
-
-                    if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp) == InputTypeEnum.SearchDialog) {
-                        ModelViewSerializable locView = 
-                            GetViewForControlList(modelViewUIFormPropertySerializable, Model, Context, inptTp);
-                        string viewName = ""; 
-                        if (locView != null) {
-                            viewName = locView.ViewName;
-                        }
-                        string dlgComponentPropNm   = GetComponentClassName(locView, sdlgComponentFolder);
-                        List<ModelViewUIFormPropertySerializable> directMasters = 
-                            GetDirectMasters(modelViewUIFormPropertySerializable, Model, Context, inptTp);
-
-        if (inptTp ==1) {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualUpdate) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+2)#>) <# } #>) {
-<#
-        } else if (inptTp == 2) {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if ((this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) <# 
-              if(ModeAddEqualDelete) {#> || (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp+1)#>) <# } #>) {
-<#
-        } else {
-#>
-        <# if (genElse) {#> else <# } else { genElse = true; } #>if (this.<#=  EformModePropName #> === <#=  eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) {
-<#
-        }
-#>
-            let hasNoVal: boolean = false;
-            let flt: <#= GetInterfaceDlgName(locView) #> = {
-                <#= TitlePropName #>: '<#= TitleCaptionVal #>',
-                <#= ShowFilterPropName #>: true,
-                <#= CanAddPropName #>: false,
-                <#= CanUpdPropName #>: false,
-                <#= CanDelPropName #>: false,
-                <#= HiddenFilterPropName #>: [],
-                <#= SelectedItemsPropName #>: null,
-                <#= MaxHeightPropName #>: 6,
-                <#= FilterMaxHeightPropName #>: 2
-
-            };
-<#
-                        if (directMasters.Count > 0) {
-                              List<ModelViewPropertyOfVwSerializable> allForeignKeyProps = GetAllForeignKeyProps(locView);
-                              foreach(ModelViewUIFormPropertySerializable directMasterProp in directMasters) {
-                                    ModelViewSerializable masterView = GetViewForControlList(directMasterProp, Model, Context, inptTp);
-                                    string masterViewName = "";
-                                    if(masterView != null) {
-                                        masterViewName = masterView.ViewName;
-                                    }
-                                    List<ModelViewPropertyOfVwSerializable> masterPrimKeyProps      = GetModelPrimaryKeyProps(masterView);
-                                    if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Combo) {
-#>
-            hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.value === 'undefined');
-            hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.value === null);
-<#
-                                    }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
-#>
-            hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.value === 'undefined');
-            hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.value === null);
-<#
-                                    }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-            hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> === 'undefined');
-            hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #> === null);
-<#
-                                    }
-#>                    
-            if (! hasNoVal) {
-<#
-                                    foreach(ModelViewPropertyOfVwSerializable masterProp in masterPrimKeyProps) {
-                                        if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Combo) {
-#>
-                hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.value.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === 'undefined');
-                hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.value.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === null);
-<#
-                                        }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
-#>
-                hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.value.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === 'undefined');
-                hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.value.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === null);
-<#
-                                        }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-                hasNoVal = hasNoVal ? hasNoVal : (typeof this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #>.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === 'undefined');
-                hasNoVal = hasNoVal ? hasNoVal : (this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #>.<#= GetTypeScriptPropertyName(masterProp, masterView) #> === null);
-<#
-                                        }
-                                    }
-#>
             }
-<#
-                            } // foreach(ModelViewUIFormPropertySerializable directMasterProp in directMasters) {
 #>
-            if (hasNoVal) {
-                let msg = {
-                    message:'Could not start dialog: not all master data is defined.'
-                };
-                this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('Form Error', msg)
-                return;                           
-            }
-<#
-                                foreach(ModelViewUIFormPropertySerializable directMasterProp in directMasters) {
-                                    ModelViewSerializable masterView = GetViewForControlList(directMasterProp, Model, Context, inptTp);
-                                    string masterViewName = "";
-                                    if(masterView != null) {
-                                        masterViewName = masterView.ViewName;
-                                    }
-                                    List<ModelViewPropertyOfVwSerializable> masterPrimKeyProps      = GetModelPrimaryKeyProps(masterView);
-                                    List<ModelViewPropertyOfVwSerializable> detailForeignKeyProps   = GetModelForeignKeyProps(locView, modelViewUIFormPropertySerializable.ForeignKeyNameChain, directMasterProp.ForeignKeyNameChain);
-                                    if (masterPrimKeyProps.Count !=  detailForeignKeyProps.Count) {
-#>
-// error: Primary and Foreign keys have different number of properties for the given master view: <#= masterViewName #> which was detected by the property <#= directMasterProp.ViewPropertyName #> : <#= directMasterProp.ForeignKeyNameChain#>
-// error:                                                              for the given detail view: <#= viewName #> which was detected by the property <#= modelViewUIFormPropertySerializable.ViewPropertyName #> : <#= modelViewUIFormPropertySerializable.ForeignKeyNameChain#>
-<#  
-                                    }
-                                    for(int loci = 0; loci < detailForeignKeyProps.Count; loci++) {
-                                        if(loci < masterPrimKeyProps.Count) {
-                                            if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Combo) {
-#>
-            flt.<#= HiddenFilterPropName #>.push({
-                fltrName: '<#= GetTypeScriptPropertyName(detailForeignKeyProps[loci], locView) #>',
-                fltrDataType: '<#= GetCCharpDatatype(detailForeignKeyProps[loci], Model) #>',
-                fltrOperator: 'eq',
-                fltrValue: this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ComboSufix) #>.value.<#= GetTypeScriptPropertyName(masterPrimKeyProps[loci], masterView) #>
-            });
-<#
-                                            }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.Typeahead) {
-#>
-            flt.<#= HiddenFilterPropName #>.push({
-                fltrName: '<#= GetTypeScriptPropertyName(detailForeignKeyProps[loci], locView) #>',
-                fltrDataType: '<#= GetCCharpDatatype(detailForeignKeyProps[loci], Model) #>',
-                fltrOperator: 'eq',
-                fltrValue: this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, TypeaheadSufix) #>.value.<#= GetTypeScriptPropertyName(masterPrimKeyProps[loci], masterView) #>
-            });
-<#
-                                            }  else if (GetInputTypeWhenXXX(directMasterProp, inptTp) == InputTypeEnum.SearchDialog) {
-#>
-            flt.<#= HiddenFilterPropName #>.push({
-                fltrName: '<#= GetTypeScriptPropertyName(detailForeignKeyProps[loci], locView) #>',
-                fltrDataType: '<#= GetCCharpDatatype(detailForeignKeyProps[loci], Model) #>',
-                fltrOperator: 'eq',
-                fltrValue: this.<#= GetTypeScriptPropertyNameWithSufix(directMasterProp, Model, ButtonSufix) #>.<#= GetTypeScriptPropertyName(masterPrimKeyProps[loci], masterView) #>
-            });
-<#
-                                            }
-                                        }
-                                    }
-                                } // foreach(ModelViewUIFormPropertySerializable directMasterProp in directMasters) {
-                        } // if (directMasters.Count > 0) {
-#>
-            let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
-            let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
-            let dialogRef = this.dialog.open(<#= GetComponentClassName(locView, sdlgComponentFolder) #>, {
-              data: flt,
-              maxWidth: mw,
-              width: w,
-            });
-            dialogRef.afterClosed()
-                .subscribe({
-                    next: (rslt) => {
-                        if (!(typeof rslt === 'undefined')) {
-                            if (!(rslt === null)) {
-                                if (!(rslt.<#= SelectedItemsPropName #> === 'undefined')) {
-                                    if(Array.isArray(rslt.<#= SelectedItemsPropName #>)) {
-                                        if(rslt.<#= SelectedItemsPropName #>.length > 0) {
-                                            this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonSufix) #> = rslt.<#= SelectedItemsPropName #>[0];
-                                            this.<#= GetExpressionForOnValChangedMethod(modelViewUIFormPropertySerializable, Model) #>(rslt.<#= SelectedItemsPropName #>[0], true);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-        }
-<#    
-                    }
-                }
-                }
-#>
+    public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, OnIsDefinedChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
+        // this method is not required.
+        // all form chages must be done in the <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #> method
     }
-<# //////////////////////////// end SearchButtonClick()-generator
-#>
 
-<#    
-            }
-            if ((modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Typeahead) &&  modelViewUIFormPropertySerializable.IsShownInView) {
-                string addPropName = GetControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, 1);
-#>
-<# //////////////////////////// start DisplayFn() for Typeahead control in Add-mode -generator
-#>
-    <#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadAddDisplaySufix) #>(val: any): string {
-        if(typeof val === 'undefined') {
-            return '';
-        }
-        return val && val.<#= addPropName #> ? val.<#= addPropName #> : '';
-    }
-<# //////////////////////////// end DisplayFn() for Typeahead control in Add-mode -generator
-#>
-
-<#    
-            }
-            if ((modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead) &&  modelViewUIFormPropertySerializable.IsShownInView) {
-                string updPropName = GetControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, 2);
-#>
-<# //////////////////////////// start DisplayFn() for Typeahead control in Update-mode -generator
-#>
-
-    <#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadUpdDisplaySufix) #>(val: any): string {
-        if(typeof val === 'undefined') {
-            return '';
-        }
-        return val && val.<#= updPropName #> ? val.<#= updPropName #> : '';
-    }
-<# //////////////////////////// end DisplayFn() for Typeahead control in Update-mode -generator
-#>
-
-<#    
-            }
-            if ((modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Typeahead) &&  modelViewUIFormPropertySerializable.IsShownInView) {
-                string delPropName = GetControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, 3);
-#>
-<# //////////////////////////// start DisplayFn() for Typeahead control in delete-mode -generator
-#>
-
-    <#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadDelDisplaySufix) #>(val: any): string {
-        if(typeof val === 'undefined') {
-            return '';
-        }
-        return val && val.<#= delPropName #> ? val.<#= delPropName #> : '';
-    }
-<# //////////////////////////// end DisplayFn() for Typeahead control in delete-mode -generator
-#>
-
-<#    
-            }
-        } // foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-#>
-
-
-
-<#  //////////////////////////// start onSubmit()-generator
-#>
-    @Output('<#= BeforeSubmitSelector #>') <#= BeforeSubmitPropName #> = new EventEmitter();
-    @Output('<#= AfterSubmitSelector #>') <#= AfterSubmitPropName #> = new EventEmitter<<#= GetInterfaceName(Model) #>>();
-
-    doSubmit() {
-        if(typeof this.<#= MainFormGroupName #> === 'undefined') return;
-        if(this.<#= MainFormGroupName #> === null) return;
-        if (this.<#= MainFormGroupName #>.invalid) {
-            this.<#= MainFormGroupName #>.markAllAsTouched();
 <#
-        for(int inptTp = 1; inptTp < 4; inptTp++) {
-#>
-            if (this.<#= EformModePropName #> === <#= eformModeEnumName #>.<#=GetInputTypeToEnumName(inptTp) #>) { 
-<#
-            foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-                InputTypeEnum controlInputType = GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, inptTp);
-                if (controlInputType == InputTypeEnum.Combo) {
-#>
-                this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.markAllAsTouched();
-<#
-                } else if (controlInputType == InputTypeEnum.Typeahead) {
-#>
-                this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.markAllAsTouched();
-<#
-                }
-            }
-#>
-            }
-<#
-        }
-#>
-            return;
-        }
-        this.<#= BeforeSubmitPropName #>.emit(this.<#= MainFormGroupName #>.value);
-
-        if (this.<#= EformModePropName #> === <#= eformModeEnumName #>.<#=GetInputTypeToEnumName(1) #>) { 
-            this.<#= formServicePrefix + Model.ViewName #>.<#= AddOneMethodName #>(this.<#= MainFormGroupName #>.getRawValue())
-            .subscribe({
-                next: (respdata: <#= GetInterfaceName(Model) #> ) => { // success path
-                    this.<#= AfterSubmitPropName #>.emit(respdata);
-                },
-                error: (error) => { // error path
-                    this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error)
-                }
-            });
-        } else if (this.<#= EformModePropName #> === <#= eformModeEnumName #>.<#=GetInputTypeToEnumName(2) #>) { 
-            this.<#= formServicePrefix + Model.ViewName #>.<#= UpdateOneMethodName #>(this.<#= MainFormGroupName #>.getRawValue())
-            .subscribe({
-                next: (respdata: <#= GetInterfaceName(Model) #> ) => { // success path
-                    this.<#= AfterSubmitPropName #>.emit(respdata);
-                },
-                error: (error) => { // error path
-                    this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error)
-                }
-            });
-
-        } else if (this.<#= EformModePropName #> === <#= eformModeEnumName #>.<#=GetInputTypeToEnumName(3) #>) { 
-            this.<#= formServicePrefix + Model.ViewName #>.<#= DeleteOneMethodName #>(<# 
-            {
-                int counter = 0;
-                List<ModelViewPropertyOfVwSerializable> primKeys =  GetModelPrimaryKeyProps(Model);
-                foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
-                    if(counter > 0) { #>, <#} #>  this.<#= MainFormGroupName #>.controls['<#= GetTypeScriptPropertyName(prop, Model) #>'].value <#
-                    counter++;
-                }
-            }
-            #>)
-            .subscribe({
-                next: (respdata: <#= GetInterfaceName(Model) #> ) => { // success path
-                    this.<#= AfterSubmitPropName #>.emit(respdata);
-                },
-                error: (error) => { // error path
-                    this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error)
-                }
-            });
         }
     }
-<# //////////////////////////// end  onSubmit()-generator
 #>
 
 } // the end of the <#= componentClassName #> class body
@@ -2924,6 +1231,62 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     }
 
 
+    List<string> CollectComboListInterfacesEx(DbContextSerializable context, 
+                                            ModelViewUIFormPropertySerializable prop, 
+                                            ModelViewSerializable model, 
+                                            int currentInputTypeId) {
+        List<string> result = new List<string>();
+        ModelViewSerializable mv = null;
+        string intrfsNm = null;
+        string viewNameForSel = null;
+        if (currentInputTypeId == 1) {
+            if (prop.InputTypeWhenAdd == InputTypeEnum.Combo)   {
+                viewNameForSel = prop.ForeifKeyViewNameForAdd;
+                if (string.IsNullOrEmpty(viewNameForSel)) {
+                    viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                }
+                if (!string.IsNullOrEmpty(viewNameForSel)) {
+                    mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
+                    if (mv != null) {
+                        result.Add("Array<" + GetInterfaceName(mv) + ">");
+                    }
+                }
+            }
+        } else if (currentInputTypeId == 2) {
+            if (prop.InputTypeWhenUpdate == InputTypeEnum.Combo) {
+                viewNameForSel = prop.ForeifKeyViewNameForUpd;
+                if (string.IsNullOrEmpty(viewNameForSel)) {
+                    viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                }
+                if (!string.IsNullOrEmpty(viewNameForSel)) {
+                    mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
+                    if (mv != null) {
+                        intrfsNm = "Array<" + GetInterfaceName(mv) + ">";
+                        if(!result.Contains(intrfsNm)) {
+                            result.Add(intrfsNm);
+                        }
+                    }
+                }
+            }
+        } else {
+            if (prop.InputTypeWhenDelete == InputTypeEnum.Combo) {
+                viewNameForSel = prop.ForeifKeyViewNameForDel;
+                if (string.IsNullOrEmpty(viewNameForSel)) {
+                    viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                }
+                if (!string.IsNullOrEmpty(viewNameForSel)) {
+                    mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
+                    if (mv != null) {
+                        intrfsNm = "Array<" + GetInterfaceName(mv) + ">";
+                        if(!result.Contains(intrfsNm)) {
+                            result.Add(intrfsNm);
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
     List<string> CollectComboListInterfaces(DbContextSerializable context, 
                                             ModelViewUIFormPropertySerializable prop, 
                                             ModelViewSerializable model) {
@@ -2935,7 +1298,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         if (prop.InputTypeWhenAdd == InputTypeEnum.Combo)   {
             viewNameForSel = prop.ForeifKeyViewNameForAdd;
             if (string.IsNullOrEmpty(viewNameForSel)) {
-                viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
             }
             if (!string.IsNullOrEmpty(viewNameForSel)) {
                 mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
@@ -2947,7 +1310,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         if (prop.InputTypeWhenUpdate == InputTypeEnum.Combo) {
             viewNameForSel = prop.ForeifKeyViewNameForUpd;
             if (string.IsNullOrEmpty(viewNameForSel)) {
-                viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
             }
             if (!string.IsNullOrEmpty(viewNameForSel)) {
                 mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
@@ -2962,7 +1325,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         if (prop.InputTypeWhenDelete == InputTypeEnum.Combo) {
             viewNameForSel = prop.ForeifKeyViewNameForDel;
             if (string.IsNullOrEmpty(viewNameForSel)) {
-                viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
             }
             if (!string.IsNullOrEmpty(viewNameForSel)) {
                 mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
@@ -2970,6 +1333,62 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                     intrfsNm = "Array<" + GetInterfaceName(mv) + ">";
                     if(!result.Contains(intrfsNm)) {
                         result.Add(intrfsNm);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    
+    List<string> CollectButtonItemInterfacesEx(DbContextSerializable context, 
+                                            ModelViewUIFormPropertySerializable prop, 
+                                            ModelViewSerializable model, int currentInputTypeId) {
+        List<string> result = new List<string>();
+        ModelViewSerializable mv = null;
+        string intrfsNm = null;
+        string viewNameForSel = null;
+        if (currentInputTypeId == 1) {
+            if (prop.InputTypeWhenAdd == InputTypeEnum.SearchDialog) {
+                viewNameForSel = prop.ForeifKeyViewNameForAdd;
+                if (string.IsNullOrEmpty(viewNameForSel)) {
+                    viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                }
+                if (!string.IsNullOrEmpty(viewNameForSel)) {
+                    mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
+                    if (mv != null) {
+                        result.Add( GetInterfaceName(mv) );
+                    }
+                }
+            }
+        } else if (currentInputTypeId == 2) {
+            if (prop.InputTypeWhenUpdate == InputTypeEnum.SearchDialog)  {
+                viewNameForSel = prop.ForeifKeyViewNameForUpd;
+                if (string.IsNullOrEmpty(viewNameForSel)) {
+                    viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                }
+                if (!string.IsNullOrEmpty(viewNameForSel)) {
+                    mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
+                    if (mv != null) {
+                        intrfsNm =  GetInterfaceName(mv) ;
+                        if(!result.Contains(intrfsNm)) {
+                            result.Add(intrfsNm);
+                        }
+                    }
+                }
+            }
+        } else {
+            if (prop.InputTypeWhenDelete == InputTypeEnum.SearchDialog) {
+                viewNameForSel = prop.ForeifKeyViewNameForDel;
+                if (string.IsNullOrEmpty(viewNameForSel)) {
+                    viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                }
+                if (!string.IsNullOrEmpty(viewNameForSel)) {
+                    mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
+                    if (mv != null) {
+                        intrfsNm =  GetInterfaceName(mv) ;
+                        if(!result.Contains(intrfsNm)) {
+                            result.Add(intrfsNm);
+                       }
                     }
                 }
             }
@@ -2987,7 +1406,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         if (prop.InputTypeWhenAdd == InputTypeEnum.SearchDialog) {
             viewNameForSel = prop.ForeifKeyViewNameForAdd;
             if (string.IsNullOrEmpty(viewNameForSel)) {
-                viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
             }
             if (!string.IsNullOrEmpty(viewNameForSel)) {
                 mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
@@ -2999,7 +1418,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         if (prop.InputTypeWhenUpdate == InputTypeEnum.SearchDialog)  {
             viewNameForSel = prop.ForeifKeyViewNameForUpd;
             if (string.IsNullOrEmpty(viewNameForSel)) {
-                viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
             }
             if (!string.IsNullOrEmpty(viewNameForSel)) {
                 mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
@@ -3014,7 +1433,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         if (prop.InputTypeWhenDelete == InputTypeEnum.SearchDialog) {
             viewNameForSel = prop.ForeifKeyViewNameForDel;
             if (string.IsNullOrEmpty(viewNameForSel)) {
-                viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
             }
             if (!string.IsNullOrEmpty(viewNameForSel)) {
                 mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
@@ -3022,6 +1441,62 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                     intrfsNm =  GetInterfaceName(mv) ;
                     if(!result.Contains(intrfsNm)) {
                         result.Add(intrfsNm);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    List<string> CollectTypeaheadListInterfacesEx(DbContextSerializable context, 
+                                            ModelViewUIFormPropertySerializable prop, 
+                                            ModelViewSerializable model, 
+                                            int currentInputTypeId) {
+        List<string> result = new List<string>();
+        ModelViewSerializable mv = null;
+        string intrfsNm = null;
+        string viewNameForSel = null;
+        if(currentInputTypeId == 1) {
+            if (prop.InputTypeWhenAdd == InputTypeEnum.Typeahead)   {
+                viewNameForSel = prop.ForeifKeyViewNameForAdd;
+                if (string.IsNullOrEmpty(viewNameForSel)) {
+                    viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                }
+                if (!string.IsNullOrEmpty(viewNameForSel)) {
+                    mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
+                    if (mv != null) {
+                        result.Add("Observable<Array<" + GetInterfaceName(mv) + ">>");
+                    }
+                }
+            }
+        } else if(currentInputTypeId == 2) {
+            if (prop.InputTypeWhenUpdate == InputTypeEnum.Typeahead) {
+                viewNameForSel = prop.ForeifKeyViewNameForUpd;
+                if (string.IsNullOrEmpty(viewNameForSel)) {
+                    viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                }
+                if (!string.IsNullOrEmpty(viewNameForSel)) {
+                    mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
+                    if (mv != null) {
+                        intrfsNm = "Observable<Array<" + GetInterfaceName(mv) + ">>";
+                        if(!result.Contains(intrfsNm)) {
+                            result.Add(intrfsNm);
+                        }
+                    }
+                }
+            }
+        } else {
+            if (prop.InputTypeWhenDelete == InputTypeEnum.Typeahead) {
+                viewNameForSel = prop.ForeifKeyViewNameForDel;
+                if (string.IsNullOrEmpty(viewNameForSel)) {
+                    viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                }
+                if (!string.IsNullOrEmpty(viewNameForSel)) {
+                    mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
+                    if (mv != null) {
+                        intrfsNm = "Observable<Array<" + GetInterfaceName(mv) + ">>";
+                        if(!result.Contains(intrfsNm)) {
+                            result.Add(intrfsNm);
+                        }
                     }
                 }
             }
@@ -3039,7 +1514,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         if (prop.InputTypeWhenAdd == InputTypeEnum.Typeahead)   {
             viewNameForSel = prop.ForeifKeyViewNameForAdd;
             if (string.IsNullOrEmpty(viewNameForSel)) {
-                viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
             }
             if (!string.IsNullOrEmpty(viewNameForSel)) {
                 mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
@@ -3051,7 +1526,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         if (prop.InputTypeWhenUpdate == InputTypeEnum.Typeahead) {
             viewNameForSel = prop.ForeifKeyViewNameForUpd;
             if (string.IsNullOrEmpty(viewNameForSel)) {
-                viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
             }
             if (!string.IsNullOrEmpty(viewNameForSel)) {
                 mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
@@ -3066,7 +1541,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         if (prop.InputTypeWhenDelete == InputTypeEnum.Typeahead) {
             viewNameForSel = prop.ForeifKeyViewNameForDel;
             if (string.IsNullOrEmpty(viewNameForSel)) {
-                viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+                viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
             }
             if (!string.IsNullOrEmpty(viewNameForSel)) {
                 mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
@@ -3079,33 +1554,6 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             }
         }
         return result;
-    }
-    string GetFormControlHiddenCondition(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string eformModePropName) {
-        if ((prop.InputTypeWhenAdd == InputTypeEnum.Hidden) &&
-            (prop.InputTypeWhenUpdate == InputTypeEnum.Hidden) &&
-            (prop.InputTypeWhenDelete == InputTypeEnum.Hidden)) {
-            return "";
-        }
-        string result= "*ngIf = \"";
-        bool setOr = false;
-        if (prop.InputTypeWhenAdd == InputTypeEnum.Hidden) {
-            result = result + "(" + eformModePropName + "==1)";
-            setOr = true;
-        }
-        if (prop.InputTypeWhenUpdate == InputTypeEnum.Hidden) {
-            if (setOr) {
-                result = result + "||";
-            }
-            result = result + "(" + eformModePropName + "==2)";
-            setOr = true;
-        }
-        if (prop.InputTypeWhenDelete == InputTypeEnum.Hidden) {
-            if (setOr) {
-                result = result + "||";
-            }
-            result = result + "(" + eformModePropName + "==3)";
-        }
-        return result + "\"";
     }
     int GetGreaterThanPercent(int currCnt, int maxCnt, int[] wdths) {
         if (currCnt < maxCnt) {
@@ -3444,7 +1892,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         return GetServiceClassName(model, fileType);
     }
 
-    string GetViewByForeignNameChain(DbContextSerializable context, string ViewName, string foreignKeyNameChain) {
+    string GetViewNameByForeignNameChain(DbContextSerializable context, string ViewName, string foreignKeyNameChain) {
         if ( (context == null) || (string.IsNullOrEmpty(ViewName)) ) {
             return "";
         }
@@ -3470,9 +1918,9 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         }
         if (foreignKeys.Length == 1)
         {
-            return GetViewByForeignNameChain(context, fk.ViewName, "");
+            return GetViewNameByForeignNameChain(context, fk.ViewName, "");
         }
-        return GetViewByForeignNameChain(context, fk.ViewName, string.Join(".", foreignKeys, 1, foreignKeys.Length - 1));
+        return GetViewNameByForeignNameChain(context, fk.ViewName, string.Join(".", foreignKeys, 1, foreignKeys.Length - 1));
     }
 
     string GetPrimKeyFilterForFindIndexMethod(DbContextSerializable context, string ViewName, string srcPrefix, string destPrefix) {
@@ -3520,7 +1968,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 break;
         }
         if (string.IsNullOrEmpty(viewNameForSel)) {
-            viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+            viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
         }
         if (string.IsNullOrEmpty(viewNameForSel)) {
             return "NoName";
@@ -3556,7 +2004,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 break;
         }
         if (string.IsNullOrEmpty(viewNameForSel)) {
-            viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
+            viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, prop.ForeignKeyNameChain);
         }
         if (string.IsNullOrEmpty(viewNameForSel)) {
             return null;
@@ -4175,7 +2623,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             {
                 return result;
             }
-            string masterNm = GetViewByForeignNameChain(context, model.ViewName, foreignKeyNameChain);
+            string masterNm = GetViewNameByForeignNameChain(context, model.ViewName, foreignKeyNameChain);
             if (string.IsNullOrEmpty(masterNm))
             {
                 return result;
@@ -4232,7 +2680,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
 
 
 
-    List<string> GetFKViewsList(ModelViewSerializable model, 
+    List<string> GetForeignKeyViewsList(ModelViewSerializable model, 
                                 DbContextSerializable context,
                                 int currentInputTypeId,
                                 List<string> fkViewsDict)
@@ -4252,7 +2700,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                     (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Typeahead)) {
                     viewNameForSel = modelViewUIFormPropertySerializable.ForeifKeyViewNameForAdd;
                     if (string.IsNullOrEmpty(viewNameForSel)) {
-                        viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
+                        viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
                     }
                     if (!string.IsNullOrEmpty(viewNameForSel)) {
                         mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
@@ -4269,7 +2717,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                     (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead)) {
                     viewNameForSel = modelViewUIFormPropertySerializable.ForeifKeyViewNameForUpd;
                     if (string.IsNullOrEmpty(viewNameForSel)) {
-                        viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
+                        viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
                     }
                     if (!string.IsNullOrEmpty(viewNameForSel)) {
                         mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
@@ -4286,7 +2734,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                     (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Typeahead)) {
                     viewNameForSel = modelViewUIFormPropertySerializable.ForeifKeyViewNameForDel;
                     if (string.IsNullOrEmpty(viewNameForSel)) {
-                        viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
+                        viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
                     }
                     if (!string.IsNullOrEmpty(viewNameForSel)) {
                         mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
@@ -4320,7 +2768,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 if (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.SearchDialog) {
                     viewNameForSel = modelViewUIFormPropertySerializable.ForeifKeyViewNameForAdd;
                     if (string.IsNullOrEmpty(viewNameForSel)) {
-                        viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
+                        viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
                     }
                     if (!string.IsNullOrEmpty(viewNameForSel)) {
                         mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
@@ -4335,7 +2783,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.SearchDialog) {
                     viewNameForSel = modelViewUIFormPropertySerializable.ForeifKeyViewNameForUpd;
                     if (string.IsNullOrEmpty(viewNameForSel)) {
-                        viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
+                        viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
                     }
                     if (!string.IsNullOrEmpty(viewNameForSel)) {
                         mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
@@ -4350,7 +2798,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.SearchDialog) {
                     viewNameForSel = modelViewUIFormPropertySerializable.ForeifKeyViewNameForDel;
                     if (string.IsNullOrEmpty(viewNameForSel)) {
-                        viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
+                        viewNameForSel = GetViewNameByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
                     }
                     if (!string.IsNullOrEmpty(viewNameForSel)) {
                         mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
@@ -4366,74 +2814,200 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         return sdViewsDict;
     }
 
-    List<string> GetNavChainsList(ModelViewSerializable model, 
-                                DbContextSerializable context,
-                                int currentInputTypeId,
-                                List<string> navChains)
+
+    ModelViewSerializable GetViewByForeignNameChain(DbContextSerializable context, string ViewName, string foreignKeyNameChain) {
+        if ( (context == null) || (string.IsNullOrEmpty(ViewName)) ) {
+            return null;
+        }
+        ModelViewSerializable mv = context.ModelViews.Where(v => v.ViewName == ViewName).FirstOrDefault();
+        if (mv == null)
+        {
+            return mv;
+        }
+        if (string.IsNullOrEmpty(foreignKeyNameChain))
+        {
+            return mv;
+        }
+        string[] foreignKeys = foreignKeyNameChain.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+        if (foreignKeys.Length < 1)
+        {
+            return mv;
+        }
+        ModelViewForeignKeySerializable fk = mv.ForeignKeys.Where(f => f.NavigationName == foreignKeys[0]).FirstOrDefault();
+        if (fk == null)
+        {
+            return mv;
+        }
+        if (foreignKeys.Length == 1)
+        {
+            return GetViewByForeignNameChain(context, fk.ViewName, "");
+        }
+        return GetViewByForeignNameChain(context, fk.ViewName, string.Join(".", foreignKeys, 1, foreignKeys.Length - 1));
+    }
+
+
+    List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> GetForeignKeyNameChainStructList(ModelViewSerializable model, 
+                                                                                        DbContextSerializable context,
+                                                                                        int currentInputTypeId,
+                                                                                        List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> foreignKeyNameChainList)
     {
-        if ((model == null) || (context == null) || (fkViewsDict == null)) {
-            return navChains;
+        if ((model == null) || (context == null) || (foreignKeyNameChainList == null)) {
+            return foreignKeyNameChainList;
         }
         if (model.ScalarProperties == null || model.UIFormProperties == null) {
-            return navChains;
+            return foreignKeyNameChainList;
         }
-        string viewNameForSel = null;
         ModelViewSerializable mv = null;
         foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in model.UIFormProperties) {
+            if(!modelViewUIFormPropertySerializable.IsShownInView) continue;
             if (currentInputTypeId == 1) {
                 if ((modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Combo) ||
                     (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.SearchDialog) ||
                     (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Typeahead)) {
-                    viewNameForSel = modelViewUIFormPropertySerializable.ForeifKeyViewNameForAdd;
-                    if (string.IsNullOrEmpty(viewNameForSel)) {
-                        viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
-                    }
-                    if (!string.IsNullOrEmpty(viewNameForSel)) {
-                        mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
-                        if (mv != null) {
-                            if( ! fkViewsDict.Contains(viewNameForSel) ) {
-                                fkViewsDict.Add(viewNameForSel);
-                            }
-                        }
-                    }
+                    mv = GetViewByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
+                    foreignKeyNameChainList.Add(new Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>(
+                            modelViewUIFormPropertySerializable.ForeignKeyNameChain, 
+                            mv, 
+                            modelViewUIFormPropertySerializable,
+                            modelViewUIFormPropertySerializable.InputTypeWhenAdd));
                 }
             } else if (currentInputTypeId == 2) {
                 if ((modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Combo) ||
                     (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.SearchDialog) ||
                     (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead)) {
-                    viewNameForSel = modelViewUIFormPropertySerializable.ForeifKeyViewNameForUpd;
-                    if (string.IsNullOrEmpty(viewNameForSel)) {
-                        viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
-                    }
-                    if (!string.IsNullOrEmpty(viewNameForSel)) {
-                        mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
-                        if (mv != null) {
-                            if( ! fkViewsDict.Contains(viewNameForSel) ) {
-                                fkViewsDict.Add(viewNameForSel);
-                            }
-                        }
-                    }
+                    mv = GetViewByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
+                    foreignKeyNameChainList.Add(new Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>(
+                            modelViewUIFormPropertySerializable.ForeignKeyNameChain, 
+                            mv, 
+                            modelViewUIFormPropertySerializable,
+                            modelViewUIFormPropertySerializable.InputTypeWhenUpdate));
                 }
             } else {
                 if ((modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Combo) ||
                     (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.SearchDialog) ||
                     (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Typeahead)) {
-                    viewNameForSel = modelViewUIFormPropertySerializable.ForeifKeyViewNameForDel;
-                    if (string.IsNullOrEmpty(viewNameForSel)) {
-                        viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
-                    }
-                    if (!string.IsNullOrEmpty(viewNameForSel)) {
-                        mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
-                        if (mv != null) {
-                            if( ! fkViewsDict.Contains(viewNameForSel) ) {
-                                fkViewsDict.Add(viewNameForSel);
-                            }
-                        }
-                    }
+                    mv = GetViewByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
+                    foreignKeyNameChainList.Add(new Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>(
+                            modelViewUIFormPropertySerializable.ForeignKeyNameChain, 
+                            mv, 
+                            modelViewUIFormPropertySerializable,
+                            modelViewUIFormPropertySerializable.InputTypeWhenDelete));
                 }
             }
         }
-        return fkViewsDict;
+        return foreignKeyNameChainList;
+    }
+    List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> GetCurrentDirectNavList(List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> foreignKeyNameChainList, string chain) {
+        List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> rslt = new List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>>();
+        if (foreignKeyNameChainList == null) return rslt;
+        int len = 1;
+        string[] fks = null;
+        if(!string.IsNullOrEmpty(chain)) {
+            fks = chain.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+            len = fks.Length + 1;
+        }
+        foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in foreignKeyNameChainList) {
+            fks = fk.Item1.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+            if (fks.Length != len) continue;
+            if(len == 1) {
+                rslt.Add(fk);
+            } else {
+                if(fk.Item1.StartsWith(chain+".")) {
+                    rslt.Add(fk);
+                }
+            }
+        }
+        return rslt;
+    }
+
+    string GetCurrentDirectNavs(List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> foreignKeyNameChainList, string chain) {
+        List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> lst = GetCurrentDirectNavList(foreignKeyNameChainList, chain);
+        int len = 0;
+        if(!string.IsNullOrEmpty(chain)) {
+            len = chain.Length + 1;
+        }
+        string rslt = "";
+        if(len == 0) {
+            foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in lst) {
+                if(rslt != "") rslt += ", ";
+                rslt += "'" + fk.Item1 + "'";
+            }
+        } else {
+            foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in lst) {
+                if(rslt != "") rslt += ", ";
+                rslt += "'" + fk.Item1.Substring(len, fk.Item1.Length) + "'";
+            }
+        }
+        return rslt;
+    }
+    Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> GetDirectDetail(List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> foreignKeyNameChainList, string chain) {
+        if (foreignKeyNameChainList == null) return null;
+        if(string.IsNullOrEmpty(chain)) return null; // this is RootDataSource
+        string[] fks = chain.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+        int len = fks.Length;
+        if (len == 1) return null; // direct detail is RootDataSource
+        foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in foreignKeyNameChainList) {
+            if(chain.StartsWith(fk.Item1+".")) {
+                fks = fk.Item1.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                if(fks.Length == len -1) return fk;
+            }
+        }
+        return null;
+    }
+    string GetDirectNavName(string chain) {
+        if(string.IsNullOrEmpty(chain)) return "";
+        string[] fks = chain.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+        return fks[ fks.Length - 1];
+    }
+
+    string GetJavaScriptClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".class","");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetJavaScriptClassNameEx(DbContextSerializable context, string ViewName, string fileType) {
+        if ((context == null) || string.IsNullOrEmpty(ViewName) || string.IsNullOrEmpty(fileType)) {
+            return "";
+        }
+        ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == ViewName).FirstOrDefault();
+        if (model == null) {
+            return "";
+        }
+        return GetJavaScriptClassName(model, fileType);
     }
 
 

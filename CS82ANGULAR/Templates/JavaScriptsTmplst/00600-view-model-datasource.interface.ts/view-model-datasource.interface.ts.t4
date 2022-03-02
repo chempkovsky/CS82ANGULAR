@@ -14,33 +14,62 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
 
+
+    string filterResultModelFolder                  = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName               = GetModelClassName(Model, filterResultModelFolder);
+
     string viewModelDatasourceInterfaceFolder       = "00600-view-model-datasource.interface.ts";
     string viewModelDatasourceInterfaceClassName    = GetModelClassName(Model, viewModelDatasourceInterfaceFolder);
 
-    string CurrentViewNameFieldName         = "CurrentViewName";
-    string ClientViewNameFieldName          = "ClientViewName";
-    string DirectNavigationFieldName        = "DirectNavigation";
-    string IsTopDetailFieldName             = "IsTopDetail";
-    string IsDefinedFieldName               = "IsDefined";
-    string ValuesFieldName                  = "Values";
-    string ClientToMasterFieldsMapFieldName = "ClientToMasterFieldsMap";
-    string MasterToClientFieldsMapFieldName = "MasterToClientFieldsMap";
-    string OnDetailChangedPropName          = "OnDetailChanged";
-    string OnMasterChangedPropName          = "OnMasterChanged";
-    string OnIsDefinedChangedPropName       = "OnIsDefinedChanged";
-    string submitOnDetailChangedMethodName  = "submitOnDetailChanged";
-    string submitOnMasterChangedMethodName  = "submitOnMasterChanged";
-    string LengthFieldName                  = "Length";
-    string KeysFieldName                    = "Keys";
-    string ValueFieldName                   = "Value";
-    string ClearMethodName                  = "clear";
+
+    string GetAllMethodName                 = "getall";
+    string GetWithFilterMethodName          = "getwithfilter";
+    string GetOneMethodName                 = "getone";
+    string UpdateOneMethodName              = "updateone";
+    string AddOneMethodName                 = "addone";
+    string DeleteOneMethodName              = "deleteone";
+
+    string CurrentViewNameFieldName             = "CurrentViewName";
+    string ClientViewNameFieldName              = "ClientViewName";
+    string DirectNavigationFieldName            = "DirectNavigation";
+    string IsTopDetailFieldName                 = "IsTopDetail";
+    string IsDefinedFieldName                   = "IsDefined";
+    string ValuesFieldName                      = "Values";
+    string ClientToMasterFieldsMapFieldName     = "ClientToMasterFieldsMap";
+    string MasterToClientFieldsMapFieldName     = "MasterToClientFieldsMap";
+    string OnDetailChangedPropName              = "OnDetailChanged";
+    string OnMasterChangedPropName              = "OnMasterChanged";
+    string OnIsDefinedChangedPropName           = "OnIsDefinedChanged";
+    string submitOnDetailChangedMethodName      = "submitOnDetailChanged";
+    string submitOnMasterChangedMethodName      = "submitOnMasterChanged";
+    string LengthFieldName                      = "Length";
+    string KeysFieldName                        = "Keys";
+    string ValueFieldName                       = "Value";
+    string ClearMethodName                      = "clear";
+    string HiddenFilterByFltRsltMethodName      = "HiddenFilterByFltRslt";
+    string UnderHiddenFilterFieldsFieldName     = "UnderHiddenFilterFields";
+    string UpdateByHiddenFilterFieldsMethodName = "UpdateByHiddenFilterFields";
+    string IsNewFieldName                       = "IsNew";
+    string UIFormChainFieldName                 = "UIFormChain";
+    string IsSetFilterByCurrDirMstrsMethodName  = "IsSetFilterByCurrDirMstrs";
+    string HiddenFilterFieldName                = "HiddenFilter";
+    string OnUpdatePropName                     = "OnUpdate";
+    string OnAddPropName                        = "OnAdd";
+    string OnDeletePropName                     = "OnDelete";
+    string ClearNoCurrMasterPropsMethodName     = "clearNoCurrMasterProps";
+    string AfterMasterChangedPropName           = "AfterMasterChanged";
 
 
 #>
 
 import { EventEmitter } from "@angular/core";
+import { <#= filterResultModelClassName #> } from '<#= GetFolderName(Model, filterResultModelFolder, viewModelDatasourceInterfaceFolder)#>';
 
 export interface <#= viewModelDatasourceInterfaceClassName #> {
+    get<#= HiddenFilterByFltRsltMethodName #>(fr:  Array<<#= filterResultModelClassName #>> | any): {[key: string]: {[key: string]: {[key: string]: any}}};
+    get<#= UIFormChainFieldName #>(): string;
+    get<#= HiddenFilterFieldName #>(): {[key: string]: {[key: string]: {[key: string]: any}}}
+    set<#= HiddenFilterFieldName #>(fltr: {[key: string]: {[key: string]: {[key: string]: any}}}): void;
     get<#= CurrentViewNameFieldName #>(): string;
     get<#= ClientViewNameFieldName #>(): string | any;
     get<#= DirectNavigationFieldName #>(): string | any;
@@ -49,13 +78,39 @@ export interface <#= viewModelDatasourceInterfaceClassName #> {
     get<#= LengthFieldName #>(): number;
     get<#= KeysFieldName #>(): string[];
     get<#= ValueFieldName #>(key: string): any;
-//    set<#= ValueFieldName #>(key: string, value: any): void;
-//    <#= ClearMethodName #>(): void;
+    set<#= ValueFieldName #>(key: string, value: any): void;
+    required<#= ValueFieldName #>(key: string): boolean;
+    dbgenerated<#= ValueFieldName #>(key: string): boolean;
+    isInPrimkey<#= ValueFieldName #>(key: string): boolean;
+    isSet<#= ValueFieldName #>(key: string): boolean; 
+    clear<#= ValueFieldName #>(key: string): void;
+    <#= ClearMethodName #>(): void;
+    isEqual(src: any, dest: any): boolean;
+
     <#= OnDetailChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
     <#= OnMasterChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
+    <#= AfterMasterChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
+
     <#= OnIsDefinedChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
+    <#= OnUpdatePropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
+    <#= OnAddPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
+    <#= OnDeletePropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
+    <#= ClearNoCurrMasterPropsMethodName #>(doNotify: boolean): void;
     <#= submitOnDetailChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void;
     <#= submitOnMasterChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void
+
+
+    <#= IsSetFilterByCurrDirMstrsMethodName #>(): boolean;
+    <#= UpdateOneMethodName #>(): void;
+    <#= AddOneMethodName #>(): void;
+    <#= DeleteOneMethodName #>(): void;
+//    set<#= UnderHiddenFilterFieldsFieldName #>(): void;
+    is<#= UnderHiddenFilterFieldsFieldName #>(fld: string|any): boolean;
+    <#= UpdateByHiddenFilterFieldsMethodName #>(): void;
+    get<#= IsNewFieldName #>(): boolean;
+    set<#= IsNewFieldName #>(v: boolean): void;
+    readonly<#= ValueFieldName #>(key: string): boolean;
+
 }
 
 <#+
@@ -99,4 +154,45 @@ export interface <#= viewModelDatasourceInterfaceClassName #> {
         }
         return "I"+sb.ToString();
     }
+    string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+
 #>

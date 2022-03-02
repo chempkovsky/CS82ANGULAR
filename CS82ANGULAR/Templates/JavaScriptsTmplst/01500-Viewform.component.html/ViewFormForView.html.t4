@@ -109,16 +109,6 @@
             }
             XXXCnt = 0;
         }
-        if (! modelViewUIFormPropertySerializable.IsShownInView ) {
-#>
-                <input type="hidden" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
-<#
-        } // if ((! modelViewUIFormPropertySerializable.IsShownInView ) || (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Hidden)) {
-        else if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Hidden)  {
-#>
-                <input type="hidden" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
-<#
-        } // else if (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Hidden) {
 
         if (modelViewUIFormPropertySerializable.IsShownInView) {
                 if (XXX1Wdth == 100) {
@@ -133,7 +123,6 @@
                     <mat-select [formControl]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">
                         <mat-option *ngFor="let aVal of <#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>;" [value]="aVal">{{ aVal.<#= GetComboControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #> }}</mat-option>
                     </mat-select>
-                    <!-- <mat-error *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">{{getErrorMessage(<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>)}}</mat-error> -->
                     <mat-error *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</mat-error>
                     <mat-hint align="end"><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#></mat-hint>
                 </mat-form-field>
@@ -141,7 +130,6 @@
                     } /// if(modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Combo) {}
                     else if(modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Typeahead) {
 #>
-
                 <input type="hidden"  formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
                 <mat-form-field  [appearance]="<#= AppearancePropName #>" fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#= GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#= GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#= percentEq100.ToString() #>">
                     <mat-label><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#></mat-label>
@@ -150,7 +138,6 @@
                         <mat-autocomplete autoActiveFirstOption #typeAhead<#= typeAheadNo #>="matAutocomplete" [displayWith]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadDisplaySufix)#>">
                         <mat-option *ngFor="let aVal of (<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> | async);" [value]="aVal">{{ aVal.<#= GetTypeaheadControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #> }}</mat-option>
                     </mat-autocomplete>
-                    <!-- <mat-error *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>">{{getErrorMessage(<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>)}}</mat-error> -->
                     <mat-error *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</mat-error>
                     <mat-hint align="end"><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#></mat-hint>
                 </mat-form-field>
@@ -160,60 +147,53 @@
                     else  
                     {
                             bool hasButton = HasButton(modelViewUIFormPropertySerializable.InputTypeWhenDelete);
-                            if (hasButton && false) {
 #>
-                <div   fxLayout="row" fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#= GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#= GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#= percentEq100.ToString() #>">
-                    <mat-form-field [appearance]="<#= AppearancePropName #>" fxFlex="94">
+                <mat-form-field  [appearance]="<#= AppearancePropName #>" fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#=  GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#=  GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#=  percentEq100.ToString() #>">
 <#
-                            } else {
-#>
-                    <mat-form-field  [appearance]="<#= AppearancePropName #>" fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#=  GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#=  GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#=  percentEq100.ToString() #>">
-<#
-                            }
                             if(!IsBooleanInput(modelViewUIFormPropertySerializable, Model)) {
 #>
-                        <mat-label><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#></mat-label>
+                    <mat-label><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#></mat-label>
 <#
                             }
                             if (IsDateInput(modelViewUIFormPropertySerializable, Model)) {
                                 if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.ReadOnly) {
 #>
-                        <input matInput [matDatepicker]="apicker<#= dateTmPickNo #>" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true">
-                        <mat-datepicker-toggle matSuffix [for]="apicker<#= dateTmPickNo #>" disabled></mat-datepicker-toggle>
+                    <input matInput [matDatepicker]="apicker<#= dateTmPickNo #>" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true">
+                    <mat-datepicker-toggle matSuffix [for]="apicker<#= dateTmPickNo #>" disabled></mat-datepicker-toggle>
 <#
                                 } else {
 #>
-                        <input matInput [matDatepicker]="apicker<#= dateTmPickNo #>" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
-                        <mat-datepicker-toggle matSuffix [for]="apicker<#= dateTmPickNo #>"></mat-datepicker-toggle>
+                    <input matInput [matDatepicker]="apicker<#= dateTmPickNo #>" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+                    <mat-datepicker-toggle matSuffix [for]="apicker<#= dateTmPickNo #>"></mat-datepicker-toggle>
 <#
                                 }
 #>
-                        <mat-datepicker #apicker<#= dateTmPickNo #>></mat-datepicker>
+                    <mat-datepicker #apicker<#= dateTmPickNo #>></mat-datepicker>
 <#
                                 dateTmPickNo++;
                             } else {
                                 if(IsMemoInput(modelViewUIFormPropertySerializable, Model)) {
                                     if (hasButton || (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.ReadOnly)) {
 #>
-                        <textarea  matInput placeholder="Placeholder..." formControlName="<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true"></textarea>
+                    <textarea  matInput placeholder="Placeholder..." formControlName="<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true"></textarea>
 <#
                                     } else {
 #>
-                        <textarea  matInput placeholder="Placeholder..." formControlName="<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"></textarea>
+                    <textarea  matInput placeholder="Placeholder..." formControlName="<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"></textarea>
 <#
                                     }
                                 } else {
                                     if( IsBooleanInput(modelViewUIFormPropertySerializable, Model) ) {
 #>
-                        <input matInput style="display: none" >
+                    <input matInput style="display: none" >
 <#
                                         if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.ReadOnly) { 
 #>
-                        <mat-checkbox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"  [disabled]="true"> <#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty) #> </mat-checkbox>
+                    <mat-checkbox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"  [disabled]="true"> <#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty) #> </mat-checkbox>
 <#
                                         } else {
 #>
-                        <mat-checkbox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"> <#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty) #> </mat-checkbox>
+                    <mat-checkbox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"> <#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty) #> </mat-checkbox>
 <#
                                         }
                                     }
@@ -221,18 +201,18 @@
 				                    {
                                         if (hasButton || (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.ReadOnly)) { 
 #>
-                        <input <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #> matInput placeholder="Placeholder..." formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true">
+                    <input <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #> matInput placeholder="Placeholder..." formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true">
 <#
                                             if (hasButton) {                           
 #>
-                        <button color="primary" mat-icon-button matSuffix (click)="<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>()" [disabled]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonDisable) #>"  >
-                          <mat-icon>search</mat-icon>
-                        </button>
+                    <button color="primary" mat-icon-button matSuffix (click)="<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>()" [disabled]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonDisable) #>"  >
+                      <mat-icon>search</mat-icon>
+                    </button>
 <#
                                             }
                                         } else {
 #>
-                        <input <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #> matInput placeholder="Placeholder..." formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+                    <input <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #> matInput placeholder="Placeholder..." formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
 <#
                                         }
                                     }
@@ -240,20 +220,10 @@
                                 }
                             }
 #>
-                        <mat-error *ngIf="<#=  GetExpressionForInvalid(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</mat-error>
-                        <mat-hint align="end"><#=  GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#></mat-hint>
-                    </mat-form-field>
+                    <mat-error *ngIf="<#=  GetExpressionForInvalid(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</mat-error>
+                    <mat-hint align="end"><#=  GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#></mat-hint>
+                </mat-form-field>
 <#
-                            if (hasButton && false) {
-#>
-                    <button mat-icon-button fxFlex="5" aria-label="Search"
-                        matTooltip="Select Item"
-                        color="primary" (click)="<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>()">
-                        <mat-icon>search</mat-icon>
-                    </button>
-                </div>
-<#
-                            }
                     } // if (!((modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Combo) || (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Typeahead))) {}
                     XXXCnt++;
 
