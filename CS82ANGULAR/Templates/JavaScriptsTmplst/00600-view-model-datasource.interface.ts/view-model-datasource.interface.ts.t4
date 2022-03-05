@@ -58,6 +58,8 @@
     string OnDeletePropName                     = "OnDelete";
     string ClearNoCurrMasterPropsMethodName     = "clearNoCurrMasterProps";
     string AfterMasterChangedPropName           = "AfterMasterChanged";
+    string AfterPropsChangedPropName            = "AfterPropsChanged";
+    string CalcIsDefinedMethodName              = "CalcIsDefined";
 
 
 #>
@@ -84,12 +86,13 @@ export interface <#= viewModelDatasourceInterfaceClassName #> {
     isInPrimkey<#= ValueFieldName #>(key: string): boolean;
     isSet<#= ValueFieldName #>(key: string): boolean; 
     clear<#= ValueFieldName #>(key: string): void;
-    <#= ClearMethodName #>(): void;
+    <#= ClearMethodName #>(doNotify: boolean = true): void;
     isEqual(src: any, dest: any): boolean;
 
     <#= OnDetailChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
     <#= OnMasterChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
     <#= AfterMasterChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
+    <#= AfterPropsChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
 
     <#= OnIsDefinedChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
     <#= OnUpdatePropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
@@ -97,8 +100,8 @@ export interface <#= viewModelDatasourceInterfaceClassName #> {
     <#= OnDeletePropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
     <#= ClearNoCurrMasterPropsMethodName #>(doNotify: boolean): void;
     <#= submitOnDetailChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void;
-    <#= submitOnMasterChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void
-
+    <#= submitOnMasterChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void;
+    <#= CalcIsDefinedMethodName #>(): boolean;
 
     <#= IsSetFilterByCurrDirMstrsMethodName #>(): boolean;
     <#= UpdateOneMethodName #>(): void;
@@ -106,7 +109,7 @@ export interface <#= viewModelDatasourceInterfaceClassName #> {
     <#= DeleteOneMethodName #>(): void;
 //    set<#= UnderHiddenFilterFieldsFieldName #>(): void;
     is<#= UnderHiddenFilterFieldsFieldName #>(fld: string|any): boolean;
-    <#= UpdateByHiddenFilterFieldsMethodName #>(): void;
+    <#= UpdateByHiddenFilterFieldsMethodName #>(doNotify: boolean = true): void;
     get<#= IsNewFieldName #>(): boolean;
     set<#= IsNewFieldName #>(v: boolean): void;
     readonly<#= ValueFieldName #>(key: string): boolean;
