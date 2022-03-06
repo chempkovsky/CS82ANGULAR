@@ -82,13 +82,20 @@
     string OnUpdatePropName                     = "OnUpdate";
     string OnAddPropName                        = "OnAdd";
     string OnDeletePropName                     = "OnDelete";
-    string ClearNoCurrMasterPropsMethodName     = "clearNoCurrMasterProps";
-    string GetCllctByFldFilterMethodName        = "GetCllctionByFldFilter";
-    string Interface2ValuesMethodName           = "Interface2Values";
-    string GetCllctByCurrDirMstrsMethodName     = "GetCllctionByCurrDirMstrs";
-    string ValueFieldName                       = "Value";
-    string IsSetFilterByCurrDirMstrsMethodName  = "IsSetFilterByCurrDirMstrs";
-    string GetWSFltrRsltByCurrDirMstrsMethodName= "GetWSFltrRsltByCurrDirMstrs";
+    string ClearPartiallyMethodName             = "clearPartially";
+    string GetCllctByFldFilterMethodName        = "getCllctionByFldFilter";
+    string Interface2ValuesMethodName           = "interface2Values";
+    string GetCllctByCurrDirMstrsMethodName     = "getCllctionByCurrDirMstrs";
+    string ValueSuffix                          = "Value";
+    string IsSetFilterByCurrDirMstrsMethodName  = "isSetFilterByCurrDirMstrs";
+    string GetWSFltrRsltByCurrDirMstrsMethodName= "getWSFltrRsltByCurrDirMstrs";
+    string Values2InterfaceMethodName           = "values2Interface";
+    string UpdateByHiddenFilterFieldsMethodName = "updateByHiddenFilterFields";
+    string ClearMethodName                      = "clear";
+    string HiddenFilterFieldName                = "HiddenFilter";
+    string HiddenFilterByFltRsltSuffix          = "HiddenFilterByFltRslt";
+    string HiddenFilterAsFltRsltSuffix          = "HiddenFilterAsFltRslt";
+    string RefreshMethodName                    = "refresh";
 
 
     string TitlePropName                        = "title";
@@ -364,44 +371,27 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 #>
     @Input('<#= FormControlModelSelector #>') 
         set <#= FormControlModelPropName #> (inFormControlModel : <#= GetInterfaceName(Model) #> | any) {
-            let isInputNull: boolean = true;
-            if (typeof inFormControlModel !== 'undefined') {
-                isInputNull = (inFormControlModel === null);
-            }
-            if(! isInputNull) {
-                this._<#= FormControlModelPropName #> = inFormControlModel;
-            } else {
-                this._<#= FormControlModelPropName #> = null;
-            }
-            if (this.ngOnInitCalled) {
-//                this.InputToControls();
-//                this.DoClearControls();
-//                this.DoInit();
+            let hasChanged: boolean = this.<#= RootDataSource #>.<#= Interface2ValuesMethodName #>(inFormControlModel, false);
+            hasChanged = this.<#= RootDataSource #>.<#= UpdateByHiddenFilterFieldsMethodName #>(false) || hasChanged;
+            if(this.ngOnInitCalled && hasChanged) {
+                this.<#= RootDataSource #>.<#= RefreshMethodName #>();
             }
         }
         get <#=  FormControlModelPropName #>(): <#= GetInterfaceName(Model) #> | any {
-            return this._<#= FormControlModelPropName #>;
+            return this.<#= RootDataSource #>.<#= Values2InterfaceMethodName #>();
         } // end of get <#= FormControlModelPropName #>
 <#    //////////////////////////// end Input Model -generator 
 #>
-    protected _<#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
     @Input('<#= HiddenFilterSelector #>') 
         get <#= HiddenFilterPropName #>(): Array<<#= filterResultModelClassName #>> {
-          return this._<#= HiddenFilterPropName #>;
+          return this.<#= RootDataSource #>.get<#= HiddenFilterAsFltRsltSuffix #>();
         }
         set <#= HiddenFilterPropName #>(inDef: Array<<#= filterResultModelClassName #>>) {
-          if (typeof inDef === 'undefined') {
-            this._<#= HiddenFilterPropName #> = [];
-          } else if(!Array.isArray(inDef)) {
-            this._<#= HiddenFilterPropName #> = [];
-          } else {
-            this._<#= HiddenFilterPropName #> =  inDef;
-          }
-          if(this.ngOnInitCalled) {
-//            this.InputToControls();
-//            this.DoClearControls();
-//            this.DoInit();
-          }
+            this.<#= RootDataSource #>.set<#= HiddenFilterFieldName #>(this.<#= RootDataSource #>.get<#= HiddenFilterByFltRsltSuffix #>(inDef));
+            let hasChanged: boolean = this.<#= RootDataSource #>.<#= UpdateByHiddenFilterFieldsMethodName #>(false);
+            if(this.ngOnInitCalled && hasChanged) {
+                this.<#= RootDataSource #>.<#= DoEmitEventMethodName #>();
+            }
         } 
 
     // end: input variable declaration section
@@ -460,7 +450,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                     if(val) {
                         this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= Interface2ValuesMethodName #>(val, true); 
                     } else {
-                        this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= ClearNoCurrMasterPropsMethodName #>(true);
+                        this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= ClearPartiallyMethodName #>(true);
                     }
                 }
             });
@@ -480,7 +470,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 debounceTime(100),
                 switchMap((value: any) => {
                     if(typeof value === 'string') {  
-                        this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= ClearNoCurrMasterPropsMethodName #>(true);
+                        this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= ClearPartiallyMethodName #>(true);
                         return this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= GetCllctByFldFilterMethodName #>('<#= GetControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, CurrentInputTypeId) #>', value);
                     } else {
                         this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= Interface2ValuesMethodName #>(value, true);
@@ -610,7 +600,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             if ((!mvUIFormProp.IsShownInView) || (mvUIFormProp.InputTypeWhenDelete == InputTypeEnum.Hidden)) continue;
             if (ForeignKeyNameChainList.Any(f => ((f.Item1 == mvUIFormProp.ForeignKeyName) || (f.Item3 == mvUIFormProp)))) continue;
 #>
-        this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(mvUIFormProp, Model) #>': this.<#=  RootDataSource #>.get<#= ValueFieldName #>('<#= GetTypeScriptPropertyNameEx(mvUIFormProp, Model) #>')}, {emitEvent: false});
+        this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(mvUIFormProp, Model) #>': this.<#=  RootDataSource #>.get<#= ValueSuffix #>('<#= GetTypeScriptPropertyNameEx(mvUIFormProp, Model) #>')}, {emitEvent: false});
 <#
         } 
     }
@@ -628,7 +618,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= GetCllctByCurrDirMstrsMethodName #>().subscribe({
             next: (data: Array<<#= GetInterfaceNameEx(Context, fk.Item2.ViewName) #>> ) => {
                 this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #> = data;
-                let lfc: any = this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.Values2Interface();
+                let lfc: any = this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Values2InterfaceMethodName #>();
                 let ind: number = data.findIndex((e: any) => { return  <#= GetPrimKeyFilterForFindIndexMethod(Context, fk.Item2.ViewName, "e","lfc") #> ; });
                 if (ind > -1) {
                     this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(data[ind], {emitEvent: true});
@@ -639,7 +629,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             error: (error: any) => {
                 this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #> = [];
                 this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(undefined, {emitEvent: true});
-                this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= ClearNoCurrMasterPropsMethodName #>(true);
+                this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= ClearPartiallyMethodName #>(true);
                 this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
             }
         });
@@ -707,17 +697,17 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             }
             
 #>
-        this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(mvUIFormProp, Model) #>': this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.getByOrg<#= ValueFieldName #>('<#= mvUIFormProp.OriginalPropertyName #>', '<#= navChain #>')}, {emitEvent: false});
+        this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(mvUIFormProp, Model) #>': this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.getByOrg<#= ValueSuffix #>('<#= mvUIFormProp.OriginalPropertyName #>', '<#= navChain #>')}, {emitEvent: false});
 <#
         }
         if(fk.Item4 == InputTypeEnum.Typeahead) {
 #>
-        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.patchValue(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.getByOrg<#= ValueFieldName #>('<#= fk.Item3.OriginalPropertyName #>', ''), {emitEvent: false});
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.patchValue(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.getByOrg<#= ValueSuffix #>('<#= fk.Item3.OriginalPropertyName #>', ''), {emitEvent: false});
 <#
         } else if(fk.Item4 == InputTypeEnum.Combo) {
 #>
         if(this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>) {
-            let lfc: any = this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.Values2Interface();
+            let lfc: any = this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Values2InterfaceMethodName #>();
             let ind: number = this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>.findIndex((e: any) => { return  <#= GetPrimKeyFilterForFindIndexMethod(Context, fk.Item2.ViewName, "e","lfc") #> ; });
             if (ind > -1) {
                 this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>[ind], {emitEvent: false});
@@ -730,7 +720,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#
         } else if(fk.Item4 == InputTypeEnum.SearchDialog) {
 #>
-        this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.getByOrg<#= ValueFieldName #>('<#= fk.Item3.OriginalPropertyName #>', '')}, {emitEvent: false});
+        this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.getByOrg<#= ValueSuffix #>('<#= fk.Item3.OriginalPropertyName #>', '')}, {emitEvent: false});
 <#
         }
     }

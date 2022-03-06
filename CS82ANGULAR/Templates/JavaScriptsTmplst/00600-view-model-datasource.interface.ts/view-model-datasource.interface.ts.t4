@@ -34,32 +34,39 @@
     string DirectNavigationFieldName            = "DirectNavigation";
     string IsTopDetailFieldName                 = "IsTopDetail";
     string IsDefinedFieldName                   = "IsDefined";
-    string ValuesFieldName                      = "Values";
-    string ClientToMasterFieldsMapFieldName     = "ClientToMasterFieldsMap";
-    string MasterToClientFieldsMapFieldName     = "MasterToClientFieldsMap";
+    string ValueSuffix                          = "Value";
+    string IsNewSuffix                          = "IsNew";
+
+    string ClientToMasterFieldsMapFieldName     = "clientToMasterFieldsMap";
+    string MasterToClientFieldsMapFieldName     = "masterToClientFieldsMap";
+
     string OnDetailChangedPropName              = "OnDetailChanged";
     string OnMasterChangedPropName              = "OnMasterChanged";
     string OnIsDefinedChangedPropName           = "OnIsDefinedChanged";
-    string submitOnDetailChangedMethodName      = "submitOnDetailChanged";
-    string submitOnMasterChangedMethodName      = "submitOnMasterChanged";
-    string LengthFieldName                      = "Length";
-    string KeysFieldName                        = "Keys";
-    string ValueFieldName                       = "Value";
-    string ClearMethodName                      = "clear";
-    string HiddenFilterByFltRsltMethodName      = "HiddenFilterByFltRslt";
-    string UnderHiddenFilterFieldsFieldName     = "UnderHiddenFilterFields";
-    string UpdateByHiddenFilterFieldsMethodName = "UpdateByHiddenFilterFields";
-    string IsNewFieldName                       = "IsNew";
-    string UIFormChainFieldName                 = "UIFormChain";
-    string IsSetFilterByCurrDirMstrsMethodName  = "IsSetFilterByCurrDirMstrs";
-    string HiddenFilterFieldName                = "HiddenFilter";
     string OnUpdatePropName                     = "OnUpdate";
     string OnAddPropName                        = "OnAdd";
     string OnDeletePropName                     = "OnDelete";
-    string ClearNoCurrMasterPropsMethodName     = "clearNoCurrMasterProps";
     string AfterMasterChangedPropName           = "AfterMasterChanged";
     string AfterPropsChangedPropName            = "AfterPropsChanged";
-    string CalcIsDefinedMethodName              = "CalcIsDefined";
+    string submitOnDetailChangedMethodName      = "submitOnDetailChanged";
+    string submitOnMasterChangedMethodName      = "submitOnMasterChanged";
+    string DoEmitEventMethodName                = "doEmitEvent";
+
+    string LengthSuffix                         = "Length";
+    string KeysSuffix                           = "Keys";
+    string CalcIsDefinedMethodName              = "calcIsDefined";
+    string ClearMethodName                      = "clear";
+    string ClearPartiallyMethodName             = "clearPartially";
+
+
+    string HiddenFilterByFltRsltSuffix          = "HiddenFilterByFltRslt";
+    string UnderHiddenFilterFieldsFieldName     = "UnderHiddenFilterFields";
+    string UpdateByHiddenFilterFieldsMethodName = "updateByHiddenFilterFields";
+
+    string UIFormChainFieldName                 = "UIFormChain";
+    string HiddenFilterFieldName                = "HiddenFilter";
+
+    string IsSetFilterByCurrDirMstrsMethodName  = "isSetFilterByCurrDirMstrs";
 
 
 #>
@@ -68,7 +75,7 @@ import { EventEmitter } from "@angular/core";
 import { <#= filterResultModelClassName #> } from '<#= GetFolderName(Model, filterResultModelFolder, viewModelDatasourceInterfaceFolder)#>';
 
 export interface <#= viewModelDatasourceInterfaceClassName #> {
-    get<#= HiddenFilterByFltRsltMethodName #>(fr:  Array<<#= filterResultModelClassName #>> | any): {[key: string]: {[key: string]: {[key: string]: any}}};
+    get<#= HiddenFilterByFltRsltSuffix #>(fr:  Array<<#= filterResultModelClassName #>> | any): {[key: string]: {[key: string]: {[key: string]: any}}};
     get<#= UIFormChainFieldName #>(): string;
     get<#= HiddenFilterFieldName #>(): {[key: string]: {[key: string]: {[key: string]: any}}}
     set<#= HiddenFilterFieldName #>(fltr: {[key: string]: {[key: string]: {[key: string]: any}}}): void;
@@ -77,16 +84,16 @@ export interface <#= viewModelDatasourceInterfaceClassName #> {
     get<#= DirectNavigationFieldName #>(): string | any;
     get<#= IsTopDetailFieldName #>(): boolean;
     get<#= IsDefinedFieldName #>(): boolean;
-    get<#= LengthFieldName #>(): number;
-    get<#= KeysFieldName #>(): string[];
-    get<#= ValueFieldName #>(key: string): any;
-    set<#= ValueFieldName #>(key: string, value: any): void;
-    required<#= ValueFieldName #>(key: string): boolean;
-    dbgenerated<#= ValueFieldName #>(key: string): boolean;
-    isInPrimkey<#= ValueFieldName #>(key: string): boolean;
-    isSet<#= ValueFieldName #>(key: string): boolean; 
-    clear<#= ValueFieldName #>(key: string): void;
-    <#= ClearMethodName #>(doNotify: boolean = true): void;
+    get<#= LengthSuffix #>(): number;
+    get<#= KeysSuffix #>(): string[];
+    get<#= ValueSuffix #>(key: string): any;
+    set<#= ValueSuffix #>(key: string, value: any): void;
+    required<#= ValueSuffix #>(key: string): boolean;
+    dbgenerated<#= ValueSuffix #>(key: string): boolean;
+    isInPrimkey<#= ValueSuffix #>(key: string): boolean;
+    isSet<#= ValueSuffix #>(key: string): boolean; 
+    clear<#= ValueSuffix #>(key: string): void;
+    <#= ClearMethodName #>(doNotify: boolean = true): boolean;
     isEqual(src: any, dest: any): boolean;
 
     <#= OnDetailChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
@@ -98,10 +105,11 @@ export interface <#= viewModelDatasourceInterfaceClassName #> {
     <#= OnUpdatePropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
     <#= OnAddPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
     <#= OnDeletePropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
-    <#= ClearNoCurrMasterPropsMethodName #>(doNotify: boolean): void;
+    <#= ClearPartiallyMethodName #>(doNotify: boolean): boolean;
     <#= submitOnDetailChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void;
     <#= submitOnMasterChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void;
     <#= CalcIsDefinedMethodName #>(): boolean;
+    <#= DoEmitEventMethodName #>(): void;
 
     <#= IsSetFilterByCurrDirMstrsMethodName #>(): boolean;
     <#= UpdateOneMethodName #>(): void;
@@ -109,10 +117,10 @@ export interface <#= viewModelDatasourceInterfaceClassName #> {
     <#= DeleteOneMethodName #>(): void;
 //    set<#= UnderHiddenFilterFieldsFieldName #>(): void;
     is<#= UnderHiddenFilterFieldsFieldName #>(fld: string|any): boolean;
-    <#= UpdateByHiddenFilterFieldsMethodName #>(doNotify: boolean = true): void;
-    get<#= IsNewFieldName #>(): boolean;
-    set<#= IsNewFieldName #>(v: boolean): void;
-    readonly<#= ValueFieldName #>(key: string): boolean;
+    <#= UpdateByHiddenFilterFieldsMethodName #>(doNotify: boolean = true): boolean;
+    get<#= IsNewSuffix #>(): boolean;
+    set<#= IsNewSuffix #>(v: boolean): void;
+    isReadonly<#= ValueSuffix #>(key: string): boolean;
 
 }
 
