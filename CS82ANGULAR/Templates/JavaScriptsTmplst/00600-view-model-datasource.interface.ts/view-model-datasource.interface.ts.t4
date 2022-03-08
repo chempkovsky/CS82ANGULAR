@@ -109,7 +109,7 @@ export interface <#= viewModelDatasourceInterfaceClassName #> {
     <#= submitOnDetailChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void;
     <#= submitOnMasterChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void;
     <#= CalcIsDefinedMethodName #>(): boolean;
-    <#= DoEmitEventMethodName #>(): void;
+    <#= DoEmitEventMethodName #>(aftrMstrChngd: boolean = false): void;
 
     <#= IsSetFilterByCurrDirMstrsMethodName #>(): boolean;
     <#= UpdateOneMethodName #>(): void;

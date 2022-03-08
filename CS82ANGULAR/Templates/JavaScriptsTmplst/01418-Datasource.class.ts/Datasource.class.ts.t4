@@ -363,7 +363,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
     public <#= OnAddPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
     public <#= OnDeletePropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
 
-    public <#= DoEmitEventMethodName #>(): void {
+    public <#= DoEmitEventMethodName #>(aftrMstrChngd: boolean = false): void {
         let isDef: boolean = this.<#= CalcIsDefinedMethodName #>();
         if(this._<#= IsDefinedFieldName #> !== isDef) {
             this._<#= IsDefinedFieldName #> = isDef;
@@ -371,6 +371,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         }
         this.<#= OnDetailChangedPropName #>.emit(this);
         this.<#= OnMasterChangedPropName #>.emit(this);
+        if(aftrMstrChngd) this.<#= AfterMasterChangedPropName #>.emit(this);
         this.<#= AfterPropsChangedPropName #>.emit(this);
     }
 
@@ -397,7 +398,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
     public <#= CalcIsDefinedMethodName #>(): boolean {
         for(let i in this._Values) {
             if((!this._Values[i].dbgenerated) && this._Values[i].required) {
-                if(!this.isSetValue(i)) return false;        
+                if(!this.isSet<#= ValueSuffix #>(i)) return false;        
             }
         }
         return true;
@@ -517,7 +518,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
             this._<#= ValuesSuffix #>[i].value = undefined;
         }
         if(!hasChanged) return hasChanged;
-        if(doNotify) this.<#= DoEmitEventMethodName #>();
+        if(doNotify) this.<#= DoEmitEventMethodName #>(true);
         return hasChanged;
     }
 
@@ -538,28 +539,57 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
     }
     public <#= Interface2ValuesMethodName #>(data: <#= GetInterfaceName(Model) #> | null, doNotify: boolean = true): boolean {
         if(typeof data === 'undefined') {
-            this.<#= ClearMethodName #>(doNotify);
-            return;
+            return this.<#= ClearMethodName #>(doNotify);
         }
         if(data === null) {
-            this.<#= ClearMethodName #>(doNotify);
-            return;
+            return this.<#= ClearMethodName #>(doNotify);
         }
         let hasChanged: boolean = false;
+        let aftrMstrChngd: boolean = false;
 <#
         if (Model.ScalarProperties != null) {
             foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+                string nvName = "";
+                if(string.IsNullOrEmpty(prop.ForeignKeyName)) {
+                    if (Model.ForeignKeys != null) {
+                        foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+                            if (fk.ForeignKeyProps.Any(p => p.OriginalPropertyName == prop.OriginalPropertyName)) {
+                                nvName = fk.NavigationName;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    if ((Model.ForeignKeys != null) && (prop.ForeignKeyName == prop.ForeignKeyNameChain)) {
+                        foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+                            if (fk.PrincipalKeyProps.Any(p => p.OriginalPropertyName == prop.OriginalPropertyName)) {
+                                nvName = fk.NavigationName;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if(string.IsNullOrEmpty(nvName)) {
 #>
         if(!this.isEqual(this.get<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>'), data.<#= GetTypeScriptPropertyName(prop, Model) #>)) {
             this.set<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>', data.<#= GetTypeScriptPropertyName(prop, Model) #>);
             hasChanged = true;
         }
 <#
+                } else {
+#>
+        if(!this.isEqual(this.get<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>'), data.<#= GetTypeScriptPropertyName(prop, Model) #>)) {
+            this.set<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>', data.<#= GetTypeScriptPropertyName(prop, Model) #>);
+            aftrMstrChngd = (this._<#= CurrDirectMasterNavsFieldName #>.indexOf('<#= nvName #>') >= 0) || aftrMstrChngd;
+            hasChanged = true;
+        }
+<#
+                }
             }
         }
 #>
         if(!hasChanged) return hasChanged;
-        if(doNotify) this.<#= DoEmitEventMethodName #>();
+        if(doNotify) this.<#= DoEmitEventMethodName #>(aftrMstrChngd);
         return hasChanged;
     }
     public <#= Values2InterfaceMethodName #>(): <#= GetInterfaceName(Model) #> | any {
@@ -618,11 +648,11 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
                             if (isFirstClnt) {
                                 isFirstClnt = false;
 #>
-            if (this._<#= ClientViewNameFieldName #> === '<#= clVm.ViewName #>') {
+        if (this._<#= ClientViewNameFieldName #> === '<#= clVm.ViewName #>') {
 <#
                             } else {
 #>
-            else if (this._<#= ClientViewNameFieldName #> === '<#= clVm.ViewName #>') {
+        else if (this._<#= ClientViewNameFieldName #> === '<#= clVm.ViewName #>') {
 <#
                             }
                             bool ismlFk = true;
@@ -630,11 +660,11 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
                                 if (ismlFk) {
                                     ismlFk = false;
 #>
-                if (this._<#= DirectNavigationFieldName #> === '<#= mlFk.NavigationName #>') {
+            if (this._<#= DirectNavigationFieldName #> === '<#= mlFk.NavigationName #>') {
 <#
                                 } else {
 #>
-                else if (this._<#= DirectNavigationFieldName #> === '<#= mlFk.NavigationName #>') {
+            else if (this._<#= DirectNavigationFieldName #> === '<#= mlFk.NavigationName #>') {
 <#
                                 }
                                 ModelViewUniqueKeyOfVwSerializable mvuk = GetIndexByEntityProps(uniqueKeys, mlFk.PrincipalKeyProps, Model);
@@ -647,20 +677,20 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 <#
                                 } else {
 #>
-                    let isKeyCrrct = true;
-                    let dtFrTst: any;
+                let isKeyCrrct = true;
+                let dtFrTst: any;
 <# 
                                     foreach(ModelViewPropertyOfVwSerializable prop in mvuk.UniqueKeyProperties) {
                                         if(prop.IsRequiredInView) {
 #>
-                    if(isKeyCrrct) {
-                        dtFrTst = this.get<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>');
-                        if(typeof dtFrTst === 'undefined') { 
-                            isKeyCrrct = false;
-                        } else if (dtFrTst === null) {
-                            isKeyCrrct = false;
-                        }
+                if(isKeyCrrct) {
+                    dtFrTst = this.get<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>');
+                    if(typeof dtFrTst === 'undefined') { 
+                        isKeyCrrct = false;
+                    } else if (dtFrTst === null) {
+                        isKeyCrrct = false;
                     }
+                }
 <#
                                         }
                                     }
@@ -672,45 +702,45 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
                                         localRouteName = GetOneByMethodNamePrefix + mvuk.UniqueKeyName;
                                     }
 #>
-                    if(isKeyCrrct) {
-                        this.<#= formRootService #>.<#= localRouteName #>(
+                if(isKeyCrrct) {
+                    this.<#= formRootService #>.<#= localRouteName #>(
 <#
                                     {
                                         int counter = 0;
                                         foreach(ModelViewPropertyOfVwSerializable prop in mvuk.UniqueKeyProperties) {
                                             if(counter > 0) { 
 #>
-                            ,this.get<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>')
+                    ,this.get<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>')
 <#
                                             } else {
 #>
-                             this.get<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>')
+                    this.get<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>')
 <#
                                                 counter++;
                                             }
                                         }
                                     }
 #>
-                        ).subscribe({
-                            next: (data: <#= GetInterfaceName(Model) #> ) => {
-                                this.<#= Interface2ValuesMethodName #>(data, true);
-                            },
-                            error: (error) => { // error path
-                                this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
-                                this.<#= ClearMethodName #>(true);
-                            }
-                        });
-                    } else {
-                        this.<#= ClearMethodName #>(true);
-                    }
+                    ).subscribe({
+                        next: (data: <#= GetInterfaceName(Model) #> ) => {
+                            this.<#= Interface2ValuesMethodName #>(data, true);
+                        },
+                        error: (error) => { // error path
+                            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
+                            this.<#= ClearMethodName #>(true);
+                        }
+                    });
+                } else {
+                    this.<#= ClearMethodName #>(true);
+                }
 <#
                                 }
 #>
-                }
+            }
 <#
                             }
 #>
-            }
+        }
 <#
                         }
                     }
@@ -771,7 +801,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 
 #>
         if(!hasChanged) return hasChanged;
-        if(doNotify) this.<#= DoEmitEventMethodName #>();
+        if(doNotify) this.<#= DoEmitEventMethodName #>(false);
         return hasChanged;
     }
 
@@ -808,15 +838,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         if(!this.get<#= IsTopDetailFieldName #>()) {
             this.<#= ClearPartiallyMethodName #>(false);
         }
-        let isDef: boolean = this.<#= CalcIsDefinedMethodName #>();
-        if(this._<#= IsDefinedFieldName #> !== isDef) {
-            this._<#= IsDefinedFieldName #> = isDef;
-            this.<#= OnIsDefinedChangedPropName #>.emit(this);
-        }
-        this.<#= OnDetailChangedPropName #>.emit(this);
-        this.<#= OnMasterChangedPropName #>.emit(this);
-        this.<#= AfterMasterChangedPropName #>.emit(this);
-        this.<#= AfterPropsChangedPropName #>.emit(this);
+        this.<#= DoEmitEventMethodName #>(true);
     }
     
     public <#= IsSetFilterByCurrDirMstrsMethodName #>(): boolean {
@@ -1028,12 +1050,96 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
     public <#= RefreshMethodName #>(): void {
 <#
     if (Model.IsWebApiSelectOneByPrimarykey) {
-    // check if prim ke fileds have been set
-    // make a call
-    }
+        ModelViewUniqueKeyOfVwSerializable prk = GetModelPrimaryKey(Model);
+        if(prk != null) {
+            List<ModelViewPropertyOfVwSerializable> prmKeys = prk.UniqueKeyProperties;
 #>
-    }
+            if (
+<#
+            int cntr = 0;
+            foreach(ModelViewPropertyOfVwSerializable prop in prmKeys) {
+                if(cntr > 0) { 
+#>
+                && this.isSet<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>')
+<#
+                } else {
+                    cntr++;
+#>
+                    this.isSet<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>')
+<#
+                }
+            } // foreach(ModelViewPropertyOfVwSerializable prop in prmKeys) {...}else{...}
+#>
+            ) {
+                this.<#= GetOneMethodName #>(
+<#
+            cntr = 0;
+            foreach(ModelViewPropertyOfVwSerializable prop in prmKeys) {
+                if(cntr > 0) { 
+#>
+                    , this.get<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>')
+<#
+                } else {
+                    cntr++;
+#>
+                      this.get<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>')
+<#
+                }
+            }
+#>
+                );
+                return;
+            }
+<#
+        } // if(prk != null) {...}
+        foreach(ModelViewUniqueKeyOfVwSerializable pk in uniqueKeys) {
+            if (pk.IsPrimary) continue;
+            string localRouteName = GetOneByMethodNamePrefix + pk.UniqueKeyName;
 
+            List<ModelViewPropertyOfVwSerializable> prmKeys = pk.UniqueKeyProperties;
+#>
+            if (
+<#
+            int cntr = 0;
+            foreach(ModelViewPropertyOfVwSerializable prop in prmKeys) {
+                if(cntr > 0) { 
+#>
+                && this.isSet<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>')
+<#
+                } else {
+                    cntr++;
+#>
+                    this.isSet<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>')
+<#
+                }
+            } // foreach(ModelViewPropertyOfVwSerializable prop in prmKeys) {...}else{...}
+#>
+            ) {
+                this.<#= localRouteName #>(
+<#
+            cntr = 0;
+            foreach(ModelViewPropertyOfVwSerializable prop in prmKeys) {
+                if(cntr > 0) { 
+#>
+                    , this.get<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>')
+<#
+                } else {
+                    cntr++;
+#>
+                      this.get<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(prop, Model) #>')
+<#
+                }
+            }
+#>
+                );
+                return;
+            }
+<#
+        } // foreach(ModelViewUniqueKeyOfVwSerializable pk in uniqueKeys) {...}
+    } // if (Model.IsWebApiSelectOneByPrimarykey) {...}
+#>
+        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', 'Not all Unique or Primary key properties are defined to call Refresh-method');
+    }
     public <#= UpdateOneMethodName #>(): void {
 <#
     if (Model.IsWebApiUpdate) { 
@@ -1174,18 +1280,19 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
     }
     public <#= UpdateByHiddenFilterFieldsMethodName #>(doNotify: boolean = true): boolean {
         let hasChanged: boolean = false;
-        if(typeof this._<#= HiddenFilterFieldName #> === 'undefined') return;
-        if(this._<#= HiddenFilterFieldName #> === null) return;
+        let aftrMstrChngd: boolean = false;
+        if(typeof this._<#= HiddenFilterFieldName #> === 'undefined') return hasChanged;
+        if(this._<#= HiddenFilterFieldName #> === null) return hasChanged;
         for(let i in this._<#= HiddenFilterFieldName #>) {
             if( Object.keys(this._<#= MasterToClientKeyFieldsMapFieldName #>).indexOf(i) > -1 ) {
                 for(let j in this._<#= HiddenFilterFieldName #>[i]) {
                     if( Object.keys(this._<#= MasterToClientKeyFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
                         for(let k in this._<#= HiddenFilterFieldName #>[i][j]) {
                             if( Object.keys(this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j]).indexOf(k) > -1 ) {
-
                                 let src: any = this._<#= HiddenFilterFieldName #>[i][j][k];
                                 if (!this.isEqual(this.get<#= ValueSuffix #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm), this._<#= HiddenFilterFieldName #>[i][j][k])) {
                                     this.set<#= ValueSuffix #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm, this._<#= HiddenFilterFieldName #>[i][j][k]);
+                                    aftrMstrChngd = (this._<#= CurrDirectMasterNavsFieldName #>.indexOf(j) >= 0) || aftrMstrChngd;
                                     hasChanged = true;
                                 }
                             }
@@ -1195,7 +1302,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
             }
         }
         if(!hasChanged) return hasChanged;
-        if(doNotify) this.<#= DoEmitEventMethodName #>();
+        if(doNotify) this.<#= DoEmitEventMethodName #>(aftrMstrChngd);
         return hasChanged;
     }
     public get<#= IsNewSuffix #>(): boolean {
