@@ -121,7 +121,7 @@
     string captionSelector                      = "caption";
 
 
-    int CurrentInputTypeId = 3;
+    int CurrentInputTypeId = 2;
 
 
     List<string> SearchDialogViewsList = new List<string>();
@@ -144,7 +144,7 @@
             throw new Exception("[Foreign Key Name Chain]=" +  fk + " occurs more than once");
         }
 
-        if (fk.Item3.InputTypeWhenDelete == InputTypeEnum.SearchDialog) {
+        if (fk.Item3.InputTypeWhenUpdate == InputTypeEnum.SearchDialog) {
             if(!SearchDialogViewsList.Contains(fk.Item2.ViewName)) {
                 SearchDialogViewsList.Add(fk.Item2.ViewName);
             }
@@ -172,7 +172,7 @@
         if(!entityProp.IsRequired) continue;
         ModelViewPropertyOfVwSerializable scalarProp = Model.ScalarProperties.Where(s => ((s.OriginalPropertyName == entityProp.OriginalPropertyName) && string.IsNullOrEmpty(s.ForeignKeyNameChain))).FirstOrDefault();
         if (scalarProp != null) {
-            if(Model.UIFormProperties.Any(u => (u.IsShownInView &&  (u.InputTypeWhenDelete != InputTypeEnum.Hidden) && (u.ViewPropertyName == scalarProp.ViewPropertyName)))) continue;
+            if(Model.UIFormProperties.Any(u => (u.IsShownInView &&  (u.InputTypeWhenUpdate != InputTypeEnum.Hidden) && (u.ViewPropertyName == scalarProp.ViewPropertyName)))) continue;
             if(Model.ForeignKeys != null) {
                 foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
                     if(ForeignKeyNameChainList.Any(f => f.Item1 == fk.NavigationName)) {
@@ -244,9 +244,9 @@
     string viewDatasourceClassFolder    = "01418-Datasource.class.ts";
 
 
-    string delformCssFolder             = "01506-Delform.component.css";
-    string delformHtmlFolder            = "01506-Delform.component.html";
-    string delformComponentFolder       = "01506-Delform.component.ts";
+    string updformCssFolder             = "01504-Updform.component.css";
+    string updformHtmlFolder            = "01504-Updform.component.html";
+    string updformComponentFolder       = "01504-Updform.component.ts";
 
     string sformComponentFolder         = "01420-Sform.component.ts";
     string viewInterfaceDlgFolder       = "01430-Dlg.interface.ts";
@@ -261,10 +261,10 @@
 
 
     string eformModeEnumName = GetCommonEnumClassName(Context, eformModeEnumlFolder);
-    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, delformComponentFolder);
+    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, updformComponentFolder);
 
     string serviceClassName = GetServiceClassName(Model, viewServiceFolder);
-    string componentClassName = GetComponentClassName(Model, delformComponentFolder);
+    string componentClassName = GetComponentClassName(Model, updformComponentFolder);
     string filterResultModelClassName = GetModelClassName(Context, filterResultModelFolder);
     string appSettingServiceClassName = GetCommonServiceClassName(Context, appSettingServiceFolder);
 
@@ -281,37 +281,37 @@ import { of } from 'rxjs/internal/observable/of';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
 import { Subscription } from 'rxjs';
 
-import { <#= eformModeEnumName #> } from '<#=  GetCommonFolderName(Model, Context,  eformModeEnumlFolder, delformComponentFolder)#>';
-import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, delformComponentFolder)#>';
-import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, delformComponentFolder)#>';
-import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, delformComponentFolder)#>';
-import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  menuItemDataModelFolder, delformComponentFolder)#>';
-import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Model, Context,  eventEmitterPubModelFolder, delformComponentFolder)#>';
-import { <#= viewModelDatasourceInterfaceClassName #> } from '<#= GetCommonFolderName(Model, Context,  viewModelDatasourceInterfaceFolder, delformComponentFolder)#>';
+import { <#= eformModeEnumName #> } from '<#=  GetCommonFolderName(Model, Context,  eformModeEnumlFolder, updformComponentFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, updformComponentFolder)#>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, updformComponentFolder)#>';
+import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, updformComponentFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  menuItemDataModelFolder, updformComponentFolder)#>';
+import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Model, Context,  eventEmitterPubModelFolder, updformComponentFolder)#>';
+import { <#= viewModelDatasourceInterfaceClassName #> } from '<#= GetCommonFolderName(Model, Context,  viewModelDatasourceInterfaceFolder, updformComponentFolder)#>';
 
 <#
     foreach(string viewNm in ViewsList) {
 #>
-import { <#=  GetInterfaceNameEx(Context, viewNm) #> } from '<#=  GetCrossComponentFolderName(Model, delformComponentFolder, Context, viewNm, viewInterfaceFolder) #>';
-import { <#=  GetInterfacePageNameEx(Context, viewNm) #> } from '<#=  GetCrossComponentFolderName(Model, delformComponentFolder, Context, viewNm, viewInterfacePageFolder) #>';
-import { <#=  GetInterfaceFilterNameEx(Context, viewNm) #> } from '<#= GetCrossComponentFolderName(Model, delformComponentFolder, Context, viewNm, viewInterfaceFltFolder) #>';
-import { <#=  GetServiceClassNameEx(Context, viewNm, viewServiceFolder) #> } from '<#= GetCrossComponentFolderName(Model, delformComponentFolder, Context, viewNm, viewServiceFolder) #>';
-import { <#=  GetJavaScriptClassNameEx(Context, viewNm, viewDatasourceClassFolder) #> } from '<#= GetCrossComponentFolderName(Model, delformComponentFolder, Context, viewNm, viewDatasourceClassFolder) #>';
+import { <#=  GetInterfaceNameEx(Context, viewNm) #> } from '<#=  GetCrossComponentFolderName(Model, updformComponentFolder, Context, viewNm, viewInterfaceFolder) #>';
+import { <#=  GetInterfacePageNameEx(Context, viewNm) #> } from '<#=  GetCrossComponentFolderName(Model, updformComponentFolder, Context, viewNm, viewInterfacePageFolder) #>';
+import { <#=  GetInterfaceFilterNameEx(Context, viewNm) #> } from '<#= GetCrossComponentFolderName(Model, updformComponentFolder, Context, viewNm, viewInterfaceFltFolder) #>';
+import { <#=  GetServiceClassNameEx(Context, viewNm, viewServiceFolder) #> } from '<#= GetCrossComponentFolderName(Model, updformComponentFolder, Context, viewNm, viewServiceFolder) #>';
+import { <#=  GetJavaScriptClassNameEx(Context, viewNm, viewDatasourceClassFolder) #> } from '<#= GetCrossComponentFolderName(Model, updformComponentFolder, Context, viewNm, viewDatasourceClassFolder) #>';
 
 <#
     }
     foreach(string viewNm in SearchDialogViewsList) {
 #>
-import { <#=  GetComponentClassNameEx(Context, viewNm, sdlgComponentFolder) #> } from '<#= GetCrossComponentFolderName(Model, delformComponentFolder, Context, viewNm, sdlgComponentFolder) #>';
-import { <#=  GetInterfaceDlgNameEx(Context, viewNm) #> } from '<#= GetCrossComponentFolderName(Model, delformComponentFolder, Context, viewNm, viewInterfaceDlgFolder) #>';
+import { <#=  GetComponentClassNameEx(Context, viewNm, sdlgComponentFolder) #> } from '<#= GetCrossComponentFolderName(Model, updformComponentFolder, Context, viewNm, sdlgComponentFolder) #>';
+import { <#=  GetInterfaceDlgNameEx(Context, viewNm) #> } from '<#= GetCrossComponentFolderName(Model, updformComponentFolder, Context, viewNm, viewInterfaceDlgFolder) #>';
 <#
     }
 #>
 
 @Component({
   selector: 'app-<#= componentSelectorCommonPart#>',
-  templateUrl: '<#= GetFolderName(Model, delformHtmlFolder, delformComponentFolder)#>.html',
-  styleUrls: ['<#= GetFolderName(Model, delformCssFolder, delformComponentFolder)#>.css']
+  templateUrl: '<#= GetFolderName(Model, updformHtmlFolder, updformComponentFolder)#>.html',
+  styleUrls: ['<#= GetFolderName(Model, updformCssFolder, updformComponentFolder)#>.css']
 })
 export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEmitterPubModelClassName #> {
     @Output('<#= BeforeSubmitSelector #>') <#= BeforeSubmitPropName #> = new EventEmitter();
@@ -337,12 +337,11 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             return;
         }
         this.<#= BeforeSubmitPropName #>.emit(this.<#= RootDataSource #>.<#= Values2InterfaceMethodName #>());
-        this.<#= RootDataSource #>.<#= DeleteOneMethodName #>();
+        this.<#= RootDataSource #>.<#= UpdateOneMethodName #>();
     }
-    public <#= RootDataSource + OnDeletePropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void { 
+    public <#= RootDataSource + OnUpdatePropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void { 
         this.<#= AfterSubmitPropName #>.emit(this.<#= RootDataSource #>.<#= Values2InterfaceMethodName #>());
     }
-
     ngOnDestroy(): void {
         this._<#= SubscriptionsPropName #>.forEach((s: Subscription) => { s.unsubscribe(); });
     }
@@ -354,14 +353,13 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
             if( !ForeignKeyNameChainList.Any(f => f.Item1.StartsWith(fk.Item1+".")) ) {
 #>
-         // this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= AfterMasterChangedPropName #>.emit(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>);
+        // this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= AfterMasterChangedPropName #>.emit(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>);
 <#
             }
         }
     }
 #>
     }
-
     // start: variable declaration section
     @Input('<#= captionSelector #>') <#= captionPropName #>: string|any = 'Review Item';
     @Output('<#= onContainerMenuItemClickSelector #>') <#= onContainerMenuItemClickEmitter #> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
@@ -382,27 +380,27 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     //////////////////////////// start helper variable and FormControl -generator 
     foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
         ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable = fk.Item3;
-        if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Combo) { 
+        if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Combo) { 
 #>
     public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>: FormControl | any = null;
     public <#=  GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> : <#= string.Join(" | ", CollectComboListInterfacesEx(Context, modelViewUIFormPropertySerializable, Model, CurrentInputTypeId)) #> | any = null;
     public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>: <#=  GetJavaScriptClassNameEx(Context, fk.Item2.ViewName, viewDatasourceClassFolder) #> | any = null;
 <#
-        } // if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Combo) { ... }
-        else if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.SearchDialog) {  
+        } // if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Combo) { ... }
+        else if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.SearchDialog) {  
 #>
     public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonDisable) #>: boolean = true;
     public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>: <#=  GetJavaScriptClassNameEx(Context, fk.Item2.ViewName, viewDatasourceClassFolder) #> | any = null;
 <#
-        } // if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.SearchDialog) { ... }
-        else if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Typeahead) {  
+        } // if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.SearchDialog) { ... }
+        else if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead) {  
 #>
     public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>: FormControl | any = null;
     public <#=  GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> : <#= 
                 string.Join(" | ", CollectTypeaheadListInterfacesEx(Context, modelViewUIFormPropertySerializable, Model, CurrentInputTypeId)) #> | any = null;
     public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>: <#=  GetJavaScriptClassNameEx(Context, fk.Item2.ViewName, viewDatasourceClassFolder) #> | any = null;
 <#
-        } // if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Typeahead) { ... } 
+        } // if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead) { ... } 
     } // end of foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
     //////////////////////////// end helper variable and FormControl -generator 
 #>
@@ -456,9 +454,10 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         this.<#=        MainFormGroupName #> =  new FormGroup({});
         let locValidators: ValidatorFn[]; 
         let v: any;
+        let frmcntrl: FormControl|any;
 <#
         foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-            if ((!modelViewUIFormPropertySerializable.IsShownInView) || (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Hidden)) continue;
+            if ((!modelViewUIFormPropertySerializable.IsShownInView) || (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Hidden)) continue;
             if (IsBooleanInput(modelViewUIFormPropertySerializable, Model)) {
 #>
         v = false;
@@ -525,9 +524,39 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: v, disabled: true}, locValidators));
 <#
             } else {
+                string isDisabled = "false";
+                bool isNtRoot = false;
+                string fknc = modelViewUIFormPropertySerializable.ForeignKeyNameChain;
+                if (string.IsNullOrEmpty(fknc)) {
+                    if(Model.ForeignKeys != null) {
+                        foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+                            if(ForeignKeyNameChainList.Any(f => f.Item1 == fk.NavigationName) && fk.ForeignKeyProps != null) {
+                                isNtRoot = fk.ForeignKeyProps.Any(f => f.OriginalPropertyName == modelViewUIFormPropertySerializable.OriginalPropertyName);
+                                if(isNtRoot) break;
+                            }
+                        }
+                    }
+                    if(!isNtRoot) {
+                        if(Model.PrimaryKeyProperties != null) {
+                            if(Model.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == modelViewUIFormPropertySerializable.OriginalPropertyName)) isDisabled = "true";
+                        }
+                    }
+                } else {
+                    isNtRoot = ForeignKeyNameChainList.Any(f => (f.Item1 == fknc) && (fknc.Contains(f.Item1 + ".")));
+                }
+                if(isNtRoot) {
 #>
         this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: v, disabled: true}, locValidators));
 <#
+                } else {
+#>
+        frmcntrl = new FormControl({ value: v, disabled: <#= isDisabled #>}, locValidators);
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', frmcntrl);
+        frmcntrl.valueChanges.subscribe({next: (val: any) => { 
+            this.<#= RootDataSource #>.set<#= ValueSuffix #>('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', val);
+        }});
+<#
+                }
             }
         } // foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) { ... }
 #>
@@ -539,9 +568,9 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 .<#= AfterPropsChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + AfterPropsChangedPropName #>(v) } })
         );
 //        this._<#= SubscriptionsPropName #>.push(this.<#= RootDataSource #>.<#= OnIsDefinedChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnIsDefinedChangedPropName #>(v) } }));
-//        this._<#= SubscriptionsPropName #>.push(this.<#= RootDataSource #>.<#= OnUpdatePropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnUpdatePropName #>(v) } }));
+        this._<#= SubscriptionsPropName #>.push(this.<#= RootDataSource #>.<#= OnUpdatePropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnUpdatePropName #>(v) } }));
 //        this._<#= SubscriptionsPropName #>.push(this.<#= RootDataSource #>.<#= OnAddPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnAddPropName #>(v) } }));
-        this._<#= SubscriptionsPropName #>.push(this.<#= RootDataSource #>.<#= OnDeletePropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnDeletePropName #>(v) } }));
+//        this._<#= SubscriptionsPropName #>.push(this.<#= RootDataSource #>.<#= OnDeletePropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnDeletePropName #>(v) } }));
 <#
         foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
             Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> detailFk = GetDirectDetail(ForeignKeyNameChainList, fk.Item1);
@@ -575,15 +604,11 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>
                 .<#= AfterPropsChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterPropsChangedPropName) #>(v) } })
         );
-<#
-            if(fk.Item4 == InputTypeEnum.Combo) {
-#>
         this._<#= SubscriptionsPropName #>.push(
             this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>
                 .<#= AfterMasterChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(v) } })
         );
 <#
-            }
             if(detailFk == null) {
 #>
         this._<#= SubscriptionsPropName #>.push(
@@ -622,7 +647,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#
     {
         foreach(ModelViewUIFormPropertySerializable mvUIFormProp in Model.UIFormProperties) {
-            if ((!mvUIFormProp.IsShownInView) || (mvUIFormProp.InputTypeWhenDelete == InputTypeEnum.Hidden)) continue;
+            if ((!mvUIFormProp.IsShownInView) || (mvUIFormProp.InputTypeWhenUpdate == InputTypeEnum.Hidden)) continue;
             if (ForeignKeyNameChainList.Any(f => ((f.Item1 == mvUIFormProp.ForeignKeyName) || (f.Item3 == mvUIFormProp)))) continue;
 #>
         this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(mvUIFormProp, Model) #>': this.<#=  RootDataSource #>.get<#= ValueSuffix #>('<#= GetTypeScriptPropertyNameEx(mvUIFormProp, Model) #>')}, {emitEvent: false});
@@ -635,9 +660,17 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#
     {
         foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
-            if(fk.Item4 == InputTypeEnum.Combo) {
-            // insert/update forms InputTypeEnum.Typeahead and InputTypeEnum.Typeahead and InputTypeEnum.SearchDialog should be implemented as well
-            // check to see if  IsSetFilterByCurrDirMstrsMethodName() returns true to make enable/disable controls
+            if(fk.Item4 == InputTypeEnum.Typeahead) {
+#>
+    public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
+        if(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>()) {
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.enable({emitEvent: false});
+        } else {
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.disable({emitEvent: false});
+        }
+    }
+<#
+            } else if(fk.Item4 == InputTypeEnum.Combo) {
 #>
     public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
         this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= GetCllctByCurrDirMstrsMethodName #>().subscribe({
@@ -658,11 +691,19 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
             }
         });
+        if(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>()) {
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.enable({emitEvent: false});
+        } else {
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.disable({emitEvent: false});
+        }
     }
 
 <#
             } else if(fk.Item4 == InputTypeEnum.SearchDialog) {
 #>
+    public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ButtonDisable) #> = !this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>();
+    }
     public <#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, SearchClickSufix) #>(): void {
         if(!this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#=  IsSetFilterByCurrDirMstrsMethodName #>()) {
             this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', 'Not all masters have been set');
@@ -712,7 +753,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#
     {
         foreach(ModelViewUIFormPropertySerializable mvUIFormProp in Model.UIFormProperties) {
-            if ((!mvUIFormProp.IsShownInView) || (mvUIFormProp.InputTypeWhenDelete == InputTypeEnum.Hidden) || string.IsNullOrEmpty(mvUIFormProp.ForeignKeyNameChain)) continue;
+            if ((!mvUIFormProp.IsShownInView) || (mvUIFormProp.InputTypeWhenUpdate == InputTypeEnum.Hidden) || string.IsNullOrEmpty(mvUIFormProp.ForeignKeyNameChain)) continue;
             if ((!mvUIFormProp.ForeignKeyNameChain.StartsWith(fk.Item1)) || ForeignKeyNameChainList.Any(f => (f.Item3 == mvUIFormProp))) continue;
             if ((mvUIFormProp.ForeignKeyNameChain != fk.Item1) && (ForeignKeyNameChainList.Any(f => f.Item1.StartsWith(fk.Item1 + ".")))) continue;
             string navChain = "";

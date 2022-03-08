@@ -150,7 +150,7 @@
                     <mat-label><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#></mat-label>
                     <input type="text" placeholder="Placeholder..." matInput [formControl]="<#= 
                                 GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>" [matAutocomplete]="typeAhead<#= typeAheadNo #>">
-                        <mat-autocomplete autoActiveFirstOption #typeAhead<#= typeAheadNo #>="matAutocomplete" [displayWith]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadAddDisplaySufix)#>">
+                        <mat-autocomplete autoActiveFirstOption #typeAhead<#= typeAheadNo #>="matAutocomplete" [displayWith]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadDisplaySufix)#>">
                         <mat-option *ngFor="let aVal of (<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> | async);" [value]="aVal">{{ aVal.<#= GetTypeaheadControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #> }}</mat-option>
                     </mat-autocomplete>
                     <!-- <mat-error *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>">{{getErrorMessage(<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>)}}</mat-error> -->

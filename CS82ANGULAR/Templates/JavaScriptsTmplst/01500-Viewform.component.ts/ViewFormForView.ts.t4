@@ -99,6 +99,7 @@
     string DoEmitEventMethodName                = "doEmitEvent";
     string DoSubmitMethodName                   = "doSubmit";
     string IsDefinedFieldName                   = "IsDefined";
+    string IsNewSuffix                          = "IsNew";
 
 
     string TitlePropName                        = "title";
@@ -474,9 +475,6 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#    
                 }
             }
-#>
-        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: v, disabled: true}, locValidators));
-<#
             if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.Combo) {
 #>
         this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = new FormControl({ value: null, disabled: true }, [ 
@@ -523,11 +521,16 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 #>
         this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: v, disabled: true}, locValidators));
 <#
+            } else {
+#>
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: v, disabled: true}, locValidators));
+<#
             }
         } // foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) { ... }
 #>
         this.<#= RootDataSource #> = new <#= GetJavaScriptClassNameEx(Context, Model.ViewName, viewDatasourceClassFolder) #> (this.<#= formServicePrefix + Model.ViewName #>,
             this.<#= AppSettingServicePropName #>, null, null, [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, "") #>],'');
+        this.<#= RootDataSource #>.set<#= IsNewSuffix #>(false);
         this._<#= SubscriptionsPropName #>.push(
             this.<#= RootDataSource #>
                 .<#= AfterPropsChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + AfterPropsChangedPropName #>(v) } })
@@ -551,6 +554,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 #>
         this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #> = new <#= GetJavaScriptClassNameEx(Context, fk.Item2.ViewName, viewDatasourceClassFolder) #> (this.<#= formServicePrefix + fk.Item2.ViewName #>,
             this.<#= AppSettingServicePropName #>, '<#= detailViewName #>', '<#= directNavigation #>', [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, fk.Item1) #>],'<#= fk.Item1 #>');
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.set<#= IsNewSuffix #>(false);
 <#
         }
         foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {

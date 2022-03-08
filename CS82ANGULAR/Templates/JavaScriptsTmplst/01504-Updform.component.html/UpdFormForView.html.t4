@@ -44,7 +44,7 @@
     int[] XXX2Wdth = new int[] {0, 0};
     int[] XXX3Wdth = new int[] {0, 0};
 
-    int InputTypeId = 1;
+    int InputTypeId = 2;
 
 #>
      <div fxLayout="row" fxLayoutAlign="flex-end space-around" style="margin-bottom: 12px;"> 
@@ -156,23 +156,7 @@
                     <mat-label><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#></mat-label>
                     <input type="text" placeholder="Placeholder..." matInput [formControl]="<#= 
                                 GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>" [matAutocomplete]="typeAhead<#= typeAheadNo #>">
-<#
-                            if(InputTypeId == 1) {
-#>
-                    <mat-autocomplete autoActiveFirstOption #typeAhead<#= typeAheadNo #>="matAutocomplete" [displayWith]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadAddDisplaySufix)#>">
-<#
-                            } else { 
-                                if(InputTypeId == 2) {              
-#>
-                    <mat-autocomplete autoActiveFirstOption #typeAhead<#= typeAheadNo #>="matAutocomplete" [displayWith]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadUpdDisplaySufix)#>">
-<#
-                                } else {
-#>
-                    <mat-autocomplete autoActiveFirstOption #typeAhead<#= typeAheadNo #>="matAutocomplete" [displayWith]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadDelDisplaySufix)#>">
-<#
-                                }
-                            }
-#>
+                    <mat-autocomplete autoActiveFirstOption #typeAhead<#= typeAheadNo #>="matAutocomplete" [displayWith]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadDisplaySufix)#>">
                         <mat-option *ngFor="let aVal of (<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> | async);" [value]="aVal">{{ aVal.<#= GetTypeaheadControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #> }}</mat-option>
                     </mat-autocomplete>
                     <!-- <mat-error *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>">{{getErrorMessage(<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>)}}</mat-error> -->
