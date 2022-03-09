@@ -1540,6 +1540,17 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         }
         return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "identity") || HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "computed");
     }
+    bool IsDatabaseGeneratedPropertyEx(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
+        if ((model == null) || (prop == null)) {
+            return false;
+        }
+        ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();
+        if(sclrProp == null) {
+            return false;
+        }
+        return IsDatabaseGeneratedProperty(sclrProp, model);
+    }
+
     List<ModelViewPropertyOfVwSerializable> GetDatabaseGeneratedProp(ModelViewSerializable model) {
         List<ModelViewPropertyOfVwSerializable> rslt = new List<ModelViewPropertyOfVwSerializable>();
         if(model == null) return null;
