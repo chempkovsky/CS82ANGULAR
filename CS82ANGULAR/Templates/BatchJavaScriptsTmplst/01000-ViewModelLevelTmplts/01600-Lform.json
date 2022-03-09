@@ -1,0 +1,72 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "1.",
+    "Please make sure that you have already run the following scripts for the current ViewModel",
+    "                                01100-.interface.ts",
+    "                                01200-Page.interface.ts",
+    "                                01300-Filter.interface.ts",
+    "                                01400-.service.ts",
+    "                                01420-Sform.component.ts",
+    "                                01440-Sdlg.component.ts",
+    "                                01500-Eform.component.ts",
+    "                                01520-Edlg.component.ts",
+    "",
+    "                                AND",
+    "",
+    "Please make sure that you have already run the following scripts for all MASTER ViewModels",
+    "                                01100-.interface.ts",
+    "                                01200-Page.interface.ts",
+    "                                01300-Filter.interface.ts",
+    "                                01400-.service.ts",
+    "                                01420-Sform.component.ts",
+    "                                01440-Sdlg.component.ts",
+    "",
+    "2.",
+    "Please make sure that you selected src\\app\\components\\your-view-model-name folder",
+    "  where [your-view-model-name] is a name of currently selected ViewModel",
+    "",
+    "",
+    "                                After you have finished the current batch generation",
+    "Please include 'L.module.ts' in the import:[]-section of AppModule",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "lform",
+      "GeneratorType": "01600-Lform.component.css",
+      "GeneratorSript": "ListFormForView.css.t4"
+    },
+    {
+      "DestinationFolder": "lform",
+      "GeneratorType": "01600-Lform.component.html",
+      "GeneratorSript": "ListFormForView.html.t4"
+    },
+    {
+      "DestinationFolder": "lform",
+      "GeneratorType": "01600-Lform.component.ts",
+      "GeneratorSript": "ListFormForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "ldlg",
+      "GeneratorType": "01620-Ldlg.component.css",
+      "GeneratorSript": "ListDlgFormForView.css.t4"
+    },
+    {
+      "DestinationFolder": "ldlg",
+      "GeneratorType": "01620-Ldlg.component.html",
+      "GeneratorSript": "ListDlgFormForView.html.t4"
+    },
+    {
+      "DestinationFolder": "ldlg",
+      "GeneratorType": "01620-Ldlg.component.ts",
+      "GeneratorSript": "ListDlgFormForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01650-L.module.ts",
+      "GeneratorSript": "lformModuleForView.ts.t4"
+    }
+  ]
+}

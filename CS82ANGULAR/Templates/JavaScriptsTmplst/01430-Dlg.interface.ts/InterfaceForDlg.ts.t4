@@ -24,6 +24,8 @@
     string CanUpdPropName               = "canUpdate";
     string CanDelSelector               = "can-delete";
     string CanDelPropName               = "canDelete";
+    string CanViewSelector              = "can-view";
+    string CanViewPropName              = "canView";
     string SelectedItemsPropName        = "selectedItems";
     string MaxHeightPropSelector        = "max-height";
     string MaxHeightPropName            = "maxHeight";
@@ -48,6 +50,7 @@ export interface <#= GetInterfaceDlgName(Model) #> {
         <#= CanAddPropName #> ? : boolean;
         <#= CanUpdPropName #> ? : boolean;
         <#= CanDelPropName #> ? : boolean;
+        <#= CanViewPropName #> ? : boolean;
         <#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>> | null;
         <#= SelectedItemsPropName #>: Array<<#= GetInterfaceName(Model) #>> | null;
         <#= MaxHeightPropName #>: number | null;

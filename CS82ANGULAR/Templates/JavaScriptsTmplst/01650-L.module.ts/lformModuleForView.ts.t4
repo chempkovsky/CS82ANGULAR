@@ -1,0 +1,434 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS2ANGULAR" #>
+<#@ import namespace="CS2ANGULAR.Model" #>
+<#@ import namespace="CS2ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS2ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS2ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+    string materialModuleFolder         = "00010-app-material.module.ts";
+    string flexModuleFolder             = "00011-app-flex-layout.module.ts";
+    string filterModuleFolder           = "00050-web-service-filter.module.ts";
+
+
+    string searchModuleFolder           = "01450-S.module.ts";
+    string vformModuleFolder            = "01550-V.module.ts";
+    string aformModuleFolder            = "01552-A.module.ts";
+    string uformModuleFolder            = "01554-U.module.ts";
+    string dformModuleFolder            = "01556-D.module.ts";
+
+    string lformComponentFolder         = "01600-Lform.component.ts";
+    string ldlgComponentFolder          = "01620-Ldlg.component.ts";
+
+    string lformModuleFolder            = "01650-L.module.ts";
+
+    string flexModuleClassName          = GetContextModuleClassName(Context, flexModuleFolder);
+    string materialModuleClassName      = GetContextModuleClassName(Context, materialModuleFolder);
+    string filterModuleClassName        = GetContextModuleClassName(Context, filterModuleFolder);
+
+
+    string searchModuleClassName = GetModuleClassName(Model, searchModuleFolder);
+    string vformModuleClassName = GetModuleClassName(Model, vformModuleFolder);
+    string aformModuleClassName = GetModuleClassName(Model, aformModuleFolder);
+    string uformModuleClassName = GetModuleClassName(Model, uformModuleFolder);
+    string dformModuleClassName = GetModuleClassName(Model, dformModuleFolder);
+
+    string lformComponentClassName = GetComponentClassName(Model, lformComponentFolder);
+    string lformDlgComponentClassName = GetComponentClassName(Model, ldlgComponentFolder);
+    string lformModuleClassName = GetModuleClassName(Model, lformModuleFolder);
+
+#>
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+// import { BrowserModule } from '@angular/platform-browser';
+import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  flexModuleFolder, lformModuleFolder)#>';
+import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  materialModuleFolder, lformModuleFolder)#>';
+// import { <#=  filterModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterModuleFolder, lformModuleFolder)#>';
+import { <#=  searchModuleClassName #> } from '<#= GetFolderName(Model, searchModuleFolder, lformModuleFolder) #>';
+
+import { <#=  vformModuleClassName #> } from '<#= GetFolderName(Model, vformModuleFolder, lformModuleFolder) #>';
+import { <#=  aformModuleClassName #> } from '<#= GetFolderName(Model, aformModuleFolder, lformModuleFolder) #>';
+import { <#=  uformModuleClassName #> } from '<#= GetFolderName(Model, uformModuleFolder, lformModuleFolder) #>';
+import { <#=  dformModuleClassName #> } from '<#= GetFolderName(Model, dformModuleFolder, lformModuleFolder) #>';
+
+import { <#=  lformComponentClassName #> } from '<#= GetFolderName(Model, lformComponentFolder, lformModuleFolder) #>';
+import { <#=  lformDlgComponentClassName #> } from '<#= GetFolderName(Model, ldlgComponentFolder, lformModuleFolder) #>';
+
+@NgModule({
+    declarations: [
+        <#=  lformComponentClassName #>,
+        <#=  lformDlgComponentClassName #>
+    ],
+    imports: [
+        CommonModule,
+        // BrowserModule,
+        <#= materialModuleClassName #>,
+        <#= flexModuleClassName #>,
+        // <#= filterModuleClassName #>,
+        <#=  searchModuleClassName #>,
+
+        <#=  vformModuleClassName #>,
+        <#=  aformModuleClassName #>,
+        <#=  uformModuleClassName #>,
+        <#=  dformModuleClassName #>,
+    ],
+    exports: [
+        <#=  lformComponentClassName #>,
+        <#=  lformDlgComponentClassName #>
+    ],
+    entryComponents: [
+        <#=  lformDlgComponentClassName #>
+    ]
+})
+export class <#= lformModuleClassName #> { }
+
+
+<#+
+    ModelViewSerializable GetViewByName(CS2ANGULAR.Model.Serializable.DbContextSerializable context, string ViewName) {
+        if ( (context == null) || (string.IsNullOrEmpty(ViewName)) ) {
+            return null;
+        }
+        return context.ModelViews.Where(v => v.ViewName == ViewName).FirstOrDefault();
+    }
+    string GetCrossComponentFolderName(CS2ANGULAR.Model.Serializable.ModelViewSerializable model, string currFolder, CS2ANGULAR.Model.Serializable.DbContextSerializable context, string refViewName, string refFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(currFolder) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(refViewName)) {
+            return result;
+        }
+        if ((model.CommonStaffs == null) || (context.ModelViews == null)) {
+            return result;
+        }
+        ModelViewSerializable refModel = context.ModelViews.Where(v => v.ViewName == refViewName).FirstOrDefault();
+        if (refModel == null) {
+            return result;
+        }
+        if (refModel.CommonStaffs == null)  {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            refModel.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+
+    string GetCommonFolderName(CS2ANGULAR.Model.Serializable.ModelViewSerializable model, CS2ANGULAR.Model.Serializable.DbContextSerializable context,  string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if ((model.CommonStaffs == null) || (context.CommonStaffs == null)) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetComponentClassName(CS2ANGULAR.Model.Serializable.ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetContextModuleClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".module","Module").Replace(".routing","Routing");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetModuleClassName(CS2ANGULAR.Model.Serializable.ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".module","Module").Replace(".routing","Routing");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetFolderName(CS2ANGULAR.Model.Serializable.ModelViewSerializable model, string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetViewByForeignNameChain(CS2ANGULAR.Model.Serializable.DbContextSerializable context, string ViewName, string foreignKeyNameChain) {
+        if ( (context == null) || (string.IsNullOrEmpty(ViewName)) ) {
+            return "";
+        }
+        ModelViewSerializable mv = context.ModelViews.Where(v => v.ViewName == ViewName).FirstOrDefault();
+        if (mv == null)
+        {
+            return "";
+        }
+        if (string.IsNullOrEmpty(foreignKeyNameChain))
+        {
+            return ViewName;
+        }
+        string[] foreignKeys = foreignKeyNameChain.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+        if (foreignKeys.Length < 1)
+        {
+            return "";
+        }
+        ModelViewForeignKeySerializable fk = 
+            mv.ForeignKeys.Where(f => f.NavigationName == foreignKeys[0]).FirstOrDefault();
+        if (fk == null)
+        {
+            return "";
+        }
+        if (foreignKeys.Length == 1)
+        {
+            return GetViewByForeignNameChain(context, fk.ViewName, "");
+        }
+        return GetViewByForeignNameChain(context, fk.ViewName, string.Join(".", foreignKeys, 1, foreignKeys.Length - 1));
+    }
+    List<string> GetSearchDialogViewsList(ModelViewSerializable model, DbContextSerializable context, List<string> sdViewsDict)
+    {
+        if ((model == null) || (context == null) || (sdViewsDict == null)) {
+            return sdViewsDict;
+        }
+        if (model.ScalarProperties == null || model.UIFormProperties == null) {
+            return sdViewsDict;
+        }
+        string viewNameForSel = null;
+        ModelViewSerializable mv = null;
+        foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in model.UIFormProperties) {
+            if (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.SearchDialog) {
+                viewNameForSel = modelViewUIFormPropertySerializable.ForeifKeyViewNameForAdd;
+                if (string.IsNullOrEmpty(viewNameForSel)) {
+                    viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
+                }
+                if (!string.IsNullOrEmpty(viewNameForSel)) {
+                    mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
+                    if (mv != null) {
+                        if( ! sdViewsDict.Contains(viewNameForSel) ) {
+                            sdViewsDict.Add(viewNameForSel);
+                        }
+                    }
+                }
+            }
+            if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.SearchDialog) {
+                viewNameForSel = modelViewUIFormPropertySerializable.ForeifKeyViewNameForUpd;
+                if (string.IsNullOrEmpty(viewNameForSel)) {
+                    viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
+                }
+                if (!string.IsNullOrEmpty(viewNameForSel)) {
+                    mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
+                    if (mv != null) {
+                        if( ! sdViewsDict.Contains(viewNameForSel) ) {
+                            sdViewsDict.Add(viewNameForSel);
+                        }
+                    }
+                }
+            }
+            if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.SearchDialog) {
+                viewNameForSel = modelViewUIFormPropertySerializable.ForeifKeyViewNameForDel;
+                if (string.IsNullOrEmpty(viewNameForSel)) {
+                    viewNameForSel = GetViewByForeignNameChain(context, model.ViewName, modelViewUIFormPropertySerializable.ForeignKeyNameChain);
+                }
+                if (!string.IsNullOrEmpty(viewNameForSel)) {
+                    mv = context.ModelViews.Where(v => v.ViewName == viewNameForSel).FirstOrDefault();
+                    if (mv != null) {
+                        if( ! sdViewsDict.Contains(viewNameForSel) ) {
+                            sdViewsDict.Add(viewNameForSel);
+                        }
+                    }
+                }
+            }
+        }
+        return sdViewsDict;
+    }
+
+
+#>
