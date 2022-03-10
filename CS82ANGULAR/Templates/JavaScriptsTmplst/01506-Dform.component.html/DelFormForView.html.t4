@@ -109,17 +109,6 @@
             }
             XXXCnt = 0;
         }
-        if (! modelViewUIFormPropertySerializable.IsShownInView ) {
-#>
-                <input type="hidden" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
-<#
-        } // if ((! modelViewUIFormPropertySerializable.IsShownInView ) || (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Hidden)) {
-        else if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Hidden)  {
-#>
-                <input type="hidden" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
-<#
-        } // else if (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Hidden) {
-
 
         if (modelViewUIFormPropertySerializable.IsShownInView) {
                 if (XXX1Wdth == 100) {

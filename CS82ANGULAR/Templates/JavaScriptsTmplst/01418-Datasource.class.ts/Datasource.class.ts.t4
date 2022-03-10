@@ -36,6 +36,7 @@
     string IsTopDetailFieldName                 = "IsTopDetail";
     string IsDefinedFieldName                   = "IsDefined";
     string CalcIsDefinedMethodName              = "calcIsDefined";
+    string RefreshIsDefinedMethodName           = "refreshIsDefined";
     string ClientToMasterFieldsMapFieldName     = "clientToMasterFieldsMap";
     string MasterToClientKeyFieldsMapFieldName  = "masterToClientKeyFieldsMap";
     string MasterToClientFieldsMapFieldName     = "masterToClientFieldsMap";
@@ -394,6 +395,10 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
             }
         }
         return rslt;
+    }
+    public <#= RefreshIsDefinedMethodName #>(): boolean {
+        this._<#= IsDefinedFieldName #> = this.<#= CalcIsDefinedMethodName #>();
+        return this._<#= IsDefinedFieldName #>;
     }
     public <#= CalcIsDefinedMethodName #>(): boolean {
         for(let i in this._Values) {
@@ -812,24 +817,25 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         if ((masterDirNav === null) || (masterClnt === null)) return;
         if (masterClnt !== this.get<#= CurrentViewNameFieldName #>()) return;
         let clntNtChngd = true;
-        if( Object.keys(this._<#= MasterToClientKeyFieldsMapFieldName #>).indexOf(masterClnt) > -1) {
-            if( Object.keys(this._<#= MasterToClientKeyFieldsMapFieldName #>[masterClnt]).indexOf(masterDirNav) > -1) {
-                for(let i in this._<#= MasterToClientKeyFieldsMapFieldName #>[masterClnt][masterDirNav]) {
+        let masterVw: string | any = v.getCurrentViewName();
+        if( Object.keys(this._<#= MasterToClientKeyFieldsMapFieldName #>).indexOf(masterVw) > -1) {
+            if( Object.keys(this._<#= MasterToClientKeyFieldsMapFieldName #>[masterVw]).indexOf(masterDirNav) > -1) {
+                for(let i in this._<#= MasterToClientKeyFieldsMapFieldName #>[masterVw][masterDirNav]) {
                     let src: any = v.get<#= ValueSuffix #>(i);
-                    let dst: any = this.get<#= ValueSuffix #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[masterClnt][masterDirNav][i].propNm);
+                    let dst: any = this.get<#= ValueSuffix #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[masterVw][masterDirNav][i].propNm);
                     if (this.isEqual(src, dst)) continue;
                     clntNtChngd = false;
-                    this.set<#= ValueSuffix #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[masterClnt][masterDirNav][i].propNm, src);
+                    this.set<#= ValueSuffix #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[masterVw][masterDirNav][i].propNm, src);
                 }
             }
         }
-        if( Object.keys(this._<#= MasterToClientFieldsMapFieldName #>).indexOf(masterClnt) > -1) {
-            if( Object.keys(this._<#= MasterToClientFieldsMapFieldName #>[masterClnt]).indexOf(masterDirNav) > -1) {
-                for(let i in this._<#= MasterToClientFieldsMapFieldName #>[masterClnt][masterDirNav]) {
+        if( Object.keys(this._<#= MasterToClientFieldsMapFieldName #>).indexOf(masterVw) > -1) {
+            if( Object.keys(this._<#= MasterToClientFieldsMapFieldName #>[masterVw]).indexOf(masterDirNav) > -1) {
+                for(let i in this._<#= MasterToClientFieldsMapFieldName #>[masterVw][masterDirNav]) {
                     let src: any = v.get<#= ValueSuffix #>(i);
-                    if (this.isEqual(src, this.get<#= ValueSuffix #>(this._<#= MasterToClientFieldsMapFieldName #>[masterClnt][masterDirNav][i]))) continue;
+                    if (this.isEqual(src, this.get<#= ValueSuffix #>(this._<#= MasterToClientFieldsMapFieldName #>[masterVw][masterDirNav][i]))) continue;
                     clntNtChngd = false;
-                    this.set<#= ValueSuffix #>(this._<#= MasterToClientFieldsMapFieldName #>[masterClnt][masterDirNav][i], src);
+                    this.set<#= ValueSuffix #>(this._<#= MasterToClientFieldsMapFieldName #>[masterVw][masterDirNav][i], src);
                 }
             }
         }
@@ -1035,7 +1041,9 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 #>
             ).subscribe({
                 next: (data: <#= GetInterfaceName(Model) #> ) => { 
-                    this.<#= Interface2ValuesMethodName #>(data, true);
+                    if(!this.<#= Interface2ValuesMethodName #>(data, true)) {
+                        this.<#= DoEmitEventMethodName #>(true);
+                    };
                 },
                 error: (error) => { 
                     this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error)
@@ -1138,14 +1146,14 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         } // foreach(ModelViewUniqueKeyOfVwSerializable pk in uniqueKeys) {...}
     } // if (Model.IsWebApiSelectOneByPrimarykey) {...}
 #>
-        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', 'Not all Unique or Primary key properties are defined to call Refresh-method');
+        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Not all Unique or Primary key properties are defined to call Refresh-method'});
     }
     public <#= UpdateOneMethodName #>(): void {
 <#
     if (Model.IsWebApiUpdate) { 
 #>
         if(!this.get<#= IsDefinedFieldName #>()) {
-            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', 'Not all propertes are correctly defined');
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Not all propertes are correctly defined'});
             return;
         }
         let itm: <#= GetInterfaceName(Model) #> | any = this.<#= Values2InterfaceMethodName #>();
@@ -1161,7 +1169,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 <#
     } else {
 #>
-        <#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', 'Update is not implemeted for the current ViewModel');
+        <#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http',{message: 'Update is not implemeted for the current ViewModel'});
 <#
     } // if (Model.IsWebApiUpdate) { ... } else { ... }
 #>
@@ -1171,7 +1179,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
     if (Model.IsWebApiAdd) { 
 #>
         if(!this.get<#= IsDefinedFieldName #>()) {
-            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', 'Not all propertes are correctly defined');
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Not all propertes are correctly defined'});
             return;
         }
         let itm: <#= GetInterfaceName(Model) #> | any = this.<#= Values2InterfaceMethodName #>();
@@ -1187,7 +1195,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 <#
     } else {
 #>
-        <#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', 'Insert is not implemeted for the current ViewModel');
+        <#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Insert is not implemeted for the current ViewModel'});
 <#
     } // if (Model.IsWebApiUpdate) { ... } else { ... }
 #>
@@ -1220,7 +1228,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 
 #>
         if(!this.get<#= IsDefinedFieldName #>()) {
-            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', 'Not all propertes are correctly defined');
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Not all propertes are correctly defined'});
             return;
         }
         this.<#= formRootService #>.<#= DeleteOneMethodName #>(<# 
@@ -1244,7 +1252,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         }
     } else {
 #>
-        <#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', 'Delete is not implemeted for the current ViewModel');
+        <#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Delete is not implemeted for the current ViewModel'});
 <#
     } // if (Model.IsWebApiUpdate) { ... } else { ... }
 #>

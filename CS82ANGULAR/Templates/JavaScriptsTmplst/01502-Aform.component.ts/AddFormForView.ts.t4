@@ -38,10 +38,7 @@
     string ButtonDisable                = "BttnDsnbl";
     string TypeaheadSufix               = "TphdCntrl";
     string DataSourceSufix              = "DtSrc";
-
-    string TypeaheadAddDisplaySufix     = "AddDsplFn";
-    string TypeaheadUpdDisplaySufix     = "UpdDsplFn";
-    string TypeaheadDelDisplaySufix     = "DelDsplFn";
+    string TypeaheadDisplaySufix        = "DsplFn";
 
     string SearchClickSufix             = "SrchClck";
 
@@ -79,6 +76,8 @@
     string AfterMasterChangedPropName           = "AfterMasterChanged";
     string AfterPropsChangedPropName            = "AfterPropsChanged";
     string OnIsDefinedChangedPropName           = "OnIsDefinedChanged";
+    string RefreshIsDefinedMethodName           = "refreshIsDefined";
+
     string OnUpdatePropName                     = "OnUpdate";
     string OnAddPropName                        = "OnAdd";
     string OnDeletePropName                     = "OnDelete";
@@ -317,7 +316,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     @Output('<#= BeforeSubmitSelector #>') <#= BeforeSubmitPropName #> = new EventEmitter();
     @Output('<#= AfterSubmitSelector #>') <#= AfterSubmitPropName #> = new EventEmitter<<#= GetInterfaceName(Model) #>>();
     public <#= DoSubmitMethodName #>(): void {
-        if (this.<#= MainFormGroupName #>.invalid || (!this.<#= RootDataSource #>.get<#= IsDefinedFieldName #>())) {
+        if (this.<#= MainFormGroupName #>.invalid || (!this.<#= RootDataSource #>.<#= RefreshIsDefinedMethodName #>())) {
             this.<#= MainFormGroupName #>.markAllAsTouched();
 <#
     {
@@ -334,6 +333,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         }
     }
 #>
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Not all properties are set'});
             return;
         }
         this.<#= BeforeSubmitPropName #>.emit(this.<#= RootDataSource #>.<#= Values2InterfaceMethodName #>());
@@ -371,6 +371,9 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     }
 #>
     }
+    public getErrorMessage(fc: AbstractControl): string {
+        return this.<#= AppSettingServicePropName #>.getValidationErrorMessage(fc);
+    } 
     // start: variable declaration section
     @Input('<#= captionSelector #>') <#= captionPropName #>: string|any = 'Review Item';
     @Output('<#= onContainerMenuItemClickSelector #>') <#= onContainerMenuItemClickEmitter #> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
@@ -464,21 +467,18 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         this.<#= AppearancePropName #> = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
         this.<#=        MainFormGroupName #> =  new FormGroup({});
         let locValidators: ValidatorFn[]; 
-        let v: any;
         let frmcntrl: FormControl|any;
 <#
         foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
             if ((!modelViewUIFormPropertySerializable.IsShownInView) || (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Hidden)) continue;
             bool isDbGenProp = IsDatabaseGeneratedPropertyEx(modelViewUIFormPropertySerializable, Model);
+            string defval = "null";
             if (IsBooleanInput(modelViewUIFormPropertySerializable, Model)) {
+                defval = "false";
 #>
-        v = false;
         locValidators = [ ];
 <#    
             } else {
-#>
-        v = null;
-<#    
                 if (isDbGenProp) {
 #>
         locValidators = [ ];
@@ -491,6 +491,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             }
             if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.Combo) {
 #>
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: true}, locValidators));
         this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = new FormControl({ value: null, disabled: true }, [ 
                 (fc)=>{  if ((typeof fc.value === 'string') || (typeof fc.value === 'undefined') || (fc.value === null)) { 
                             this.<#=  MainFormGroupName #>.patchValue({'<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>': null });
@@ -510,6 +511,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#    
             } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.Typeahead) {
 #>
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: true}, locValidators));
         this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> = new FormControl({ value: null, disabled: true }, [ 
             (fc)=>{  if ((typeof fc.value === 'string') || (typeof fc.value === 'undefined') || (fc.value === null)) { 
                     this.<#=  MainFormGroupName #>.patchValue({'<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>': null });
@@ -533,7 +535,11 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#
             } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.SearchDialog) {
 #>
-        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: v, disabled: true}, locValidators));
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: true}, locValidators));
+<#
+            } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.ReadOnly) {
+#>
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: true}, locValidators));
 <#
             } else {
                 string isDisabled = "false";
@@ -556,13 +562,14 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 } else {
                     isNtRoot = ForeignKeyNameChainList.Any(f => (f.Item1 == fknc) && (fknc.Contains(f.Item1 + ".")));
                 }
-                if(isNtRoot || isDbGenProp) {
+                if((isNtRoot || isDbGenProp) && false) {
 #>
-        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: v, disabled: true}, locValidators));
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: true}, locValidators));
 <#
                 } else {
+                    isDisabled = "false";
 #>
-        frmcntrl = new FormControl({ value: v, disabled: <#= isDisabled #>}, locValidators);
+        frmcntrl = new FormControl({ value: <#= defval #>, disabled: <#= isDisabled #>}, locValidators);
         this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', frmcntrl);
         frmcntrl.valueChanges.subscribe({next: (val: any) => { 
             this.<#= RootDataSource #>.set<#= ValueSuffix #>('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', val);
@@ -579,6 +586,13 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             this.<#= RootDataSource #>
                 .<#= AfterPropsChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + AfterPropsChangedPropName #>(v) } })
         );
+<#
+        if ((ForeignKeyNameChainList.Count > 0) && false) {
+#>
+        this._<#= SubscriptionsPropName #>.push(this.<#= RootDataSource #>.<#= AfterMasterChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + AfterMasterChangedPropName #>(v) } }));
+<#
+        }
+#>
 //        this._<#= SubscriptionsPropName #>.push(this.<#= RootDataSource #>.<#= OnIsDefinedChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnIsDefinedChangedPropName #>(v) } }));
 //        this._<#= SubscriptionsPropName #>.push(this.<#= RootDataSource #>.<#= OnUpdatePropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnUpdatePropName #>(v) } }));
         this._<#= SubscriptionsPropName #>.push(this.<#= RootDataSource #>.<#= OnAddPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnAddPropName #>(v) } }));
@@ -655,6 +669,15 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 //    public <#= RootDataSource + OnAddPropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void { }
 //    public <#= RootDataSource + OnDeletePropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void { }
 //    public <#= RootDataSource + OnIsDefinedChangedPropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void { }
+<#
+        if ((ForeignKeyNameChainList.Count > 0) && false) {
+#>
+    public <#= RootDataSource + AfterMasterChangedPropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
+        this.<#= RootDataSource + AfterPropsChangedPropName #>(v);
+    }
+<#
+        }
+#>
     public <#= RootDataSource + AfterPropsChangedPropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
 <#
     {
@@ -673,6 +696,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     {
         foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
             if(fk.Item4 == InputTypeEnum.Typeahead) {
+                string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
 #>
     public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
         if(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>()) {
@@ -680,6 +704,12 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         } else {
             this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.disable({emitEvent: false});
         }
+    }
+    public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadDisplaySufix) #>(val: any): string {
+        if(typeof val === 'undefined') {
+            return '';
+        }
+        return val && val.<#= dispPropName #> ? val.<#= dispPropName #> : '';
     }
 <#
             } else if(fk.Item4 == InputTypeEnum.Combo) {
@@ -718,7 +748,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     }
     public <#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, SearchClickSufix) #>(): void {
         if(!this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#=  IsSetFilterByCurrDirMstrsMethodName #>()) {
-            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', 'Not all masters have been set');
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message:'Not all masters have been set'});
             return;
         }
         let flt: <#= GetInterfaceDlgName(fk.Item2) #> = {
@@ -758,7 +788,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             });
     }
 <#
-            }
+            } 
 #>
 //    public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, OnIsDefinedChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void { }
     public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model,  AfterPropsChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
@@ -778,26 +808,33 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#
         }
         if(fk.Item4 == InputTypeEnum.Typeahead) {
+            string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
 #>
-        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.patchValue(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.getByOrg<#= ValueSuffix #>('<#= fk.Item3.OriginalPropertyName #>', ''), {emitEvent: false});
+        this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.get<#= ValueSuffix #>('<#= dispPropName #>')}, {emitEvent: false});
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.patchValue(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Values2InterfaceMethodName #>(), {emitEvent: false});
 <#
         } else if(fk.Item4 == InputTypeEnum.Combo) {
+            string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
 #>
         if(this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>) {
             let lfc: any = this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Values2InterfaceMethodName #>();
             let ind: number = this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>.findIndex((e: any) => { return  <#= GetPrimKeyFilterForFindIndexMethod(Context, fk.Item2.ViewName, "e","lfc") #> ; });
             if (ind > -1) {
                 this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>[ind], {emitEvent: false});
+                this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>[ind].<#= dispPropName #>}, {emitEvent: false});
             } else {
                 this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(undefined, {emitEvent: false});
+                this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': undefined}, {emitEvent: false});
             }
         } else {
             this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(undefined, {emitEvent: false});
+            this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': undefined}, {emitEvent: false});
         }
 <#
         } else if(fk.Item4 == InputTypeEnum.SearchDialog) {
+            string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
 #>
-        this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.getByOrg<#= ValueSuffix #>('<#= fk.Item3.OriginalPropertyName #>', '')}, {emitEvent: false});
+        this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.get<#= ValueSuffix #>('<#= dispPropName #>')}, {emitEvent: false});
 <#
         }
     }

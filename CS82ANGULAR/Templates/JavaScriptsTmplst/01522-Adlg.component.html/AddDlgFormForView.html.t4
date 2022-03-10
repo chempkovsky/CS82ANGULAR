@@ -38,7 +38,6 @@
         [<#= captionSelector #>]="data.title" 
         [<#= HiddenFilterSelector #>]="data.<#= HiddenFilterPropName #>"
         [<#= FormControlModelSelector #>]="data.<#= FormControlModelPropName #>"
-        <!-- [<#= EformModeSelector #>]="data.<#= EformModePropName #>" -->
         (<#= AfterSubmitSelector #>)="<#= OnAfterSubmitMethodName #>($event)"
     ></app-<#= componentSelectorCommonPart #>>
 </div>

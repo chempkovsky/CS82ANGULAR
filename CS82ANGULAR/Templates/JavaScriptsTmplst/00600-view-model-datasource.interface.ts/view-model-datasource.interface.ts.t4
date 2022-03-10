@@ -51,6 +51,7 @@
     string submitOnDetailChangedMethodName      = "submitOnDetailChanged";
     string submitOnMasterChangedMethodName      = "submitOnMasterChanged";
     string DoEmitEventMethodName                = "doEmitEvent";
+    string RefreshIsDefinedMethodName           = "refreshIsDefined";
 
     string LengthSuffix                         = "Length";
     string KeysSuffix                           = "Keys";
@@ -93,7 +94,7 @@ export interface <#= viewModelDatasourceInterfaceClassName #> {
     isInPrimkey<#= ValueSuffix #>(key: string): boolean;
     isSet<#= ValueSuffix #>(key: string): boolean; 
     clear<#= ValueSuffix #>(key: string): void;
-    <#= ClearMethodName #>(doNotify: boolean = true): boolean;
+    <#= ClearMethodName #>(doNotify: boolean): boolean;
     isEqual(src: any, dest: any): boolean;
 
     <#= OnDetailChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>;
@@ -109,15 +110,16 @@ export interface <#= viewModelDatasourceInterfaceClassName #> {
     <#= submitOnDetailChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void;
     <#= submitOnMasterChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void;
     <#= CalcIsDefinedMethodName #>(): boolean;
-    <#= DoEmitEventMethodName #>(aftrMstrChngd: boolean = false): void;
+    <#= DoEmitEventMethodName #>(aftrMstrChngd: boolean): void;
 
+    <#= RefreshIsDefinedMethodName #>(): boolean;
     <#= IsSetFilterByCurrDirMstrsMethodName #>(): boolean;
     <#= UpdateOneMethodName #>(): void;
     <#= AddOneMethodName #>(): void;
     <#= DeleteOneMethodName #>(): void;
 //    set<#= UnderHiddenFilterFieldsFieldName #>(): void;
     is<#= UnderHiddenFilterFieldsFieldName #>(fld: string|any): boolean;
-    <#= UpdateByHiddenFilterFieldsMethodName #>(doNotify: boolean = true): boolean;
+    <#= UpdateByHiddenFilterFieldsMethodName #>(doNotify: boolean): boolean;
     get<#= IsNewSuffix #>(): boolean;
     set<#= IsNewSuffix #>(v: boolean): void;
     isReadonly<#= ValueSuffix #>(key: string): boolean;

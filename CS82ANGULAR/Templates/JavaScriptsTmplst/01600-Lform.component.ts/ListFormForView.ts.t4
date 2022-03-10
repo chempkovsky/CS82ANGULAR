@@ -402,7 +402,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 
     rowMenuItemsData = [
           {id: '<#= ActionParamUpdateMode #>', caption: 'Modify Item', iconName: 'edit', iconColor: 'primary', enabled: true},
-          {id: '<#= ActionParamDeleteMode #>', caption: 'Delete Item', iconName: 'delete_forever', iconColor: 'warn', enabled: true}
+          {id: '<#= ActionParamDeleteMode #>', caption: 'Delete Item', iconName: 'delete_forever', iconColor: 'warn', enabled: true},
           {id: '<#= ActionParamViewMode #>', caption: 'View Item', iconName: 'preview', iconColor: 'primary', enabled: true},
         ];
     tableMenuItemsData = [
@@ -423,7 +423,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     onRowMenuItemsData() {
         let tmp: Array<<#= menuItemDataModelClassName #>> = [
           {id: '<#= ActionParamUpdateMode #>', caption: 'Modify Item', iconName: 'edit', iconColor: 'primary', enabled: true },
-          {id: '<#= ActionParamDeleteMode #>', caption: 'Delete Item', iconName: 'delete_forever', iconColor: 'warn', enabled: true}
+          {id: '<#= ActionParamDeleteMode #>', caption: 'Delete Item', iconName: 'delete_forever', iconColor: 'warn', enabled: true},
           {id: '<#= ActionParamViewMode #>', caption: 'View Item', iconName: 'preview', iconColor: 'primary', enabled: true },
         ];
         tmp = tmp.concat(this._<#= RowCommandsPropName #>);
@@ -450,15 +450,15 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     }
 
 
-    onView(sender: <#= searchComponentClassName #>) {
+    onView(e: <#= GetInterfaceName(Model) #>) {
 <#
     if(Model.IsWebApiSelectOneByPrimarykey) {
 #>
         let locdata: <#=  GetInterfaceVDlgName(Model) #> = {
-            title: 'Add item',
+            title: 'View item',
             <#= HiddenFilterPropName #>: this.<#= HiddenFilterPropName #>,
             <#= EformModePropName #>: <#= eformModeEnumName #>.<#= GetInputTypeToEnumName(1) #>,
-            <#= FormControlModelPropName #>: null,
+            <#= FormControlModelPropName #>: e,
             <#= FormControlNewModelPropName #>: null
         };
         let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
@@ -469,28 +469,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
               width: w,
             });
         dialogRef.afterClosed().subscribe(rslt => {
-            if (!(typeof rslt === 'undefined')) {
-                if (!(rslt === null)) {
-                    if (!( typeof rslt.<#= FormControlNewModelPropName #> === 'undefined') ) {
-                        if (!( rslt.<#= FormControlNewModelPropName #> === null) ) {
-                            if (!Array.isArray(sender.dataSource)) {
-                                sender.dataSource = [];
-                            }
-                            sender.dataSource.splice(0, 0, rslt.eformNewControlModel);
-                            sender.dataSource = sender.dataSource.slice(0);
-                            let isNDef = true;
-                            if (!(typeof sender.currentRow === 'undefined')) {
-                                if (!(sender.currentRow === null)) {
-                                    isNDef = false;
-                                }
-                            }
-                            if(isNDef) {
-                                sender.onSelectRow(rslt.eformNewControlModel);
-                            }
-                        }
-                    }
-                }
-            }
         });
 <#
     }
@@ -640,7 +618,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         } else if(v.id === '<#= ActionParamDeleteMode #>') {
             this.onDelete(v.value, v.sender);
         } else if(v.id === '<#= ActionParamViewMode #>') {
-            this.onView(v.value, v.sender);
+            this.onView(v.value);
         } else {
             this.onRowCommand.emit(v);
         }
