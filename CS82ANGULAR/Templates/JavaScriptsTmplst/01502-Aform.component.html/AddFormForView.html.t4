@@ -203,7 +203,7 @@
 <#
                                         if (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.ReadOnly) { 
 #>
-                        <mat-checkbox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"  [disabled]="true"> <#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty) #> </mat-checkbox>
+                        <mat-checkbox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"  [disableRipple]="true"> <#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty) #> </mat-checkbox>
 <#
                                         } else {
 #>

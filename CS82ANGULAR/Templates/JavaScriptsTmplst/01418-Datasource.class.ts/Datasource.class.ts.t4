@@ -314,15 +314,16 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 #>
                     '<#= mtcfk.NavigationName #>' : {
 <#
-                foreach(ModelViewPropertyOfFkSerializable clntPrp in mtcfk.ScalarProperties) {
-                    if(clntPrp.IsSelected) {
-                        ModelViewPropertyOfVwSerializable modelPrp = GetScalarPropertyByViewPropertyName(Model, clntPrp.ViewPropertyName);
-                        ModelViewPropertyOfVwSerializable masterProp = GetDirectMasterScalarPropertyByViewPropertyName(Model, clntPrp.ViewPropertyName, Context);
+                List<ModelViewPropertyOfVwSerializable> sclrProperties = Model.ScalarProperties.Where(p => p.ForeignKeyName == mtcfk.NavigationName).ToList();
+                foreach(ModelViewPropertyOfVwSerializable modelPrp in sclrProperties) {
+                    if(modelPrp.IsSelected) {
+                        // ModelViewPropertyOfVwSerializable modelPrp = GetScalarPropertyByViewPropertyName(Model, clntPrp.ViewPropertyName);
+                        ModelViewPropertyOfVwSerializable masterProp = GetDirectMasterScalarPropertyByViewPropertyName(Model, modelPrp.ViewPropertyName, Context);
                         if ((modelPrp != null) && (masterProp != null)) {
 #>
                         '<#= GetTypeScriptPropertyName(masterProp, masterModel) #>' : '<#= GetTypeScriptPropertyName(modelPrp, Model) #>',
 <#
-                        }
+                        } 
                     }
                 }
 #>
@@ -953,7 +954,16 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
             return of([]);
         }
         let flt: <#=  GetInterfaceFilterName(Model) #> | any =  this.<#= GetFilterByCurrDirMstrsMethodName #>();
-        flt[fldName] = fldVal;
+        if(typeof flt[fldName] === 'undefined') {
+            flt[fldName] = [fldVal];
+        } else {
+            flt[fldName].push(fldVal);
+        }
+        if(typeof flt[fldName + '<#= OperatorSufix #>'] === 'undefined') {
+            flt[fldName + '<#= OperatorSufix #>'] = ['lk'];
+        } else {
+            flt[fldName + '<#= OperatorSufix #>'].push('lk');
+        }
         return this.<#= formRootService #>.<#= GetWithFilterMethodName #>(flt)
                 .pipe(
                     switchMap((rslt: <#= GetInterfacePageName(Model) #>) => {
@@ -2293,7 +2303,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         } else {
             string flt = "";
             if(prop.ForeignKeyNameChain.StartsWith(prop.ForeignKeyName+".")) {
-                flt = prop.ForeignKeyNameChain.Substring(prop.ForeignKeyName.Length, prop.ForeignKeyNameChain.Length);
+                flt = prop.ForeignKeyNameChain.Substring(prop.ForeignKeyName.Length+1);
             }
             return masterVw.ScalarProperties.Where(p => ((p.OriginalPropertyName == prop.OriginalPropertyName) && (p.ForeignKeyNameChain == flt))).FirstOrDefault();
         }

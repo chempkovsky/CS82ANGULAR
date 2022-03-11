@@ -99,6 +99,7 @@
     string DoSubmitMethodName                   = "doSubmit";
     string IsDefinedFieldName                   = "IsDefined";
     string IsNewSuffix                          = "IsNew";
+    string CalcIsDefinedMethodName              = "calcIsDefined";
 
     string TitlePropName                        = "title";
     string TitleCaptionVal                      = "Select Item";
@@ -158,7 +159,7 @@
     foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
         string[] fks = fk.Item1.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
         if (fks.Length <= 1) continue;
-        string subfk = string.Join(".", fks, 1, fks.Length - 1);
+        string subfk = string.Join(".", fks, 0, fks.Length - 1);
         if( !ForeignKeyNameChainList.Any(f => f.Item1 == subfk) ) {
             throw new Exception("[Foreign Key Name Chain]=" +  fk.Item1 + " could not find direct detail with [Foreign Key Name Chain] = " + subfk);
         }
@@ -490,12 +491,15 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 }
             }
             if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.Combo) {
+        // disabled: false is correct
 #>
-        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: true}, locValidators));
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: false}, locValidators));
         this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = new FormControl({ value: null, disabled: true }, [ 
-                (fc)=>{  if ((typeof fc.value === 'string') || (typeof fc.value === 'undefined') || (fc.value === null)) { 
+                (fc)=>{  //if ((typeof fc.value === 'string') || (typeof fc.value === 'undefined') || (fc.value === null)) { 
+                        if (!this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= CalcIsDefinedMethodName #>()) {
                             this.<#=  MainFormGroupName #>.patchValue({'<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>': null });
-                            return  this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].errors; }  
+                            return  this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].errors; 
+                        }  
                         return null; }]);
         this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.valueChanges
             .subscribe({
@@ -510,12 +514,15 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 
 <#    
             } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.Typeahead) {
+        // disabled: false is correct
 #>
-        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: true}, locValidators));
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: false}, locValidators));
         this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> = new FormControl({ value: null, disabled: true }, [ 
-            (fc)=>{  if ((typeof fc.value === 'string') || (typeof fc.value === 'undefined') || (fc.value === null)) { 
-                    this.<#=  MainFormGroupName #>.patchValue({'<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>': null });
-                    return  this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].errors; }  
+            (fc)=>{ // if ((typeof fc.value === 'string') || (typeof fc.value === 'undefined') || (fc.value === null)) { 
+                    if (!this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= CalcIsDefinedMethodName #>()) {
+                        this.<#=  MainFormGroupName #>.patchValue({'<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>': null });
+                        return  this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].errors; 
+                    }  
                 return null; }]);
 
 
@@ -534,12 +541,14 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             );
 <#
             } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.SearchDialog) {
+        // disabled: false is correct
 #>
-        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: true}, locValidators));
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: false}, locValidators));
 <#
             } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.ReadOnly) {
+        // disabled: false is correct
 #>
-        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: true}, locValidators));
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: false}, locValidators));
 <#
             } else {
                 string isDisabled = "false";
@@ -651,7 +660,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 #>
         this._<#= SubscriptionsPropName #>.push(
             this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>
-                .<#= OnMasterChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= GetTypeScriptPropertyNameWithSufix(detailFk.Item3, Model, DataSourceSufix) #>.<#= submitOnMasterChangedMethodName #>(v) } });
+                .<#= OnMasterChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= GetTypeScriptPropertyNameWithSufix(detailFk.Item3, Model, DataSourceSufix) #>.<#= submitOnMasterChangedMethodName #>(v) } })
         );
         this._<#= SubscriptionsPropName #>.push(
             this.<#= GetTypeScriptPropertyNameWithSufix(detailFk.Item3, Model, DataSourceSufix) #>
@@ -704,6 +713,13 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         } else {
             this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.disable({emitEvent: false});
         }
+        if(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= CalcIsDefinedMethodName #>()) {
+            this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.get<#= ValueSuffix #>('<#= dispPropName #>')}, {emitEvent: false});
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.patchValue(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Values2InterfaceMethodName #>(), {emitEvent: false});
+        } else {
+            this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': undefined}, {emitEvent: false});
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.patchValue(undefined, {emitEvent: false});
+        }
     }
     public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadDisplaySufix) #>(val: any): string {
         if(typeof val === 'undefined') {
@@ -713,23 +729,29 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     }
 <#
             } else if(fk.Item4 == InputTypeEnum.Combo) {
+                string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
 #>
     public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
         this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= GetCllctByCurrDirMstrsMethodName #>().subscribe({
             next: (data: Array<<#= GetInterfaceNameEx(Context, fk.Item2.ViewName) #>> ) => {
                 this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #> = data;
                 let lfc: any = this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Values2InterfaceMethodName #>();
-                let ind: number = data.findIndex((e: any) => { return  <#= GetPrimKeyFilterForFindIndexMethod(Context, fk.Item2.ViewName, "e","lfc") #> ; });
+                let ind: number = -1;
+                if(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= CalcIsDefinedMethodName #>()) {
+                    ind = data.findIndex((e: any) => { return  <#= GetPrimKeyFilterForFindIndexMethod(Context, fk.Item2.ViewName, "e","lfc") #> ; });
+                }
                 if (ind > -1) {
                     this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(data[ind], {emitEvent: false});
+                    this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>[ind].<#= dispPropName #>}, {emitEvent: false});
                 } else {
                     this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(undefined, {emitEvent: false});
+                    this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': undefined}, {emitEvent: false});
                 }
             },
             error: (error: any) => {
                 this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #> = [];
                 this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(undefined, {emitEvent: false});
-//                this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= ClearPartiallyMethodName #>(true);
+                this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': undefined}, {emitEvent: false});
                 this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
             }
         });
@@ -742,6 +764,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 
 <#
             } else if(fk.Item4 == InputTypeEnum.SearchDialog) {
+                string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
 #>
     public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
         this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ButtonDisable) #> = !this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>();
@@ -788,7 +811,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             });
     }
 <#
-            } 
+            } // if(fk.Item4 == InputTypeEnum.Typeahead) {} else if(fk.Item4 == InputTypeEnum.Combo) {}else if(fk.Item4 == InputTypeEnum.SearchDialog) {}
 #>
 //    public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, OnIsDefinedChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void { }
     public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model,  AfterPropsChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
@@ -806,7 +829,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 #>
         this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(mvUIFormProp, Model) #>': this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.getByOrg<#= ValueSuffix #>('<#= mvUIFormProp.OriginalPropertyName #>', '<#= navChain #>')}, {emitEvent: false});
 <#
-        }
+        } // foreach(ModelViewUIFormPropertySerializable mvUIFormProp in Model.UIFormProperties) {...}
         if(fk.Item4 == InputTypeEnum.Typeahead) {
             string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
 #>
@@ -836,12 +859,12 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 #>
         this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.get<#= ValueSuffix #>('<#= dispPropName #>')}, {emitEvent: false});
 <#
-        }
+        } // if(fk.Item4 == InputTypeEnum.Typeahead) {...} else  if(fk.Item4 == InputTypeEnum.Combo) {...} else if(fk.Item4 == InputTypeEnum.SearchDialog) {...}
     }
 #>
     }
 <#
-        }
+        } // foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {}
     }
 #>
 
@@ -3171,7 +3194,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         } else {
             foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in lst) {
                 if(rslt != "") rslt += ", ";
-                rslt += "'" + fk.Item1.Substring(len, fk.Item1.Length) + "'";
+                rslt += "'" + fk.Item1.Substring(len) + "'";
             }
         }
         return rslt;
