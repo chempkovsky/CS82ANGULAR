@@ -13,8 +13,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 <# if(Model.GenerateJSonAttribute) { #>
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+//  using Newtonsoft.Json;
+//  using Newtonsoft.Json.Serialization;
+using System.Text.Json.Serialization;
 <# } #>
 
 
@@ -24,7 +25,8 @@ namespace <#= GetModelNameSpace(Model) #> {
         foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
             if(Model.GenerateJSonAttribute) { 
 #>
-        [JsonProperty(PropertyName = "<#= prop.JsonPropertyName #>")]
+        // [JsonProperty(PropertyName = "<#= prop.JsonPropertyName #>")]
+        [JsonPropertyName("<#= prop.JsonPropertyName #>")]
 <# 
             } 
             if (prop.IsRequiredInView) {
