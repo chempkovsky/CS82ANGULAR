@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Readme for 01700-O2m.component.html</title>
+</head>
+<body>
+    <h3>(Context level) Readme for 01700-O2m.component.html</h3>
+
+    <table cellspacing="5" border="1">
+        <tr>
+            <td>
+                Type
+            </td>
+            <td>
+                Angular component
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Status
+            </td>
+            <td>
+                <strong style="color:green">Active.</strong>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Recomended folder
+            </td>
+            <td>
+                /src/app/components/{this-is-my-view}/o2m
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Generator group
+            </td>
+            <td>
+                View-Model level
+            </td>
+        </tr>
+    </table>
+
+
+    <h3>Before continuing</h3>
+    <h4>
+        <strong>
+            <u>Remark</u>
+        </strong>
+    </h4>
+    <table cellspacing="5" border="1">
+        <tr>
+            <td>
+                Material UI
+            </td>
+            <td>
+                O2mFormForView.html.t4
+            </td>
+        </tr>
+        <tr>
+            <td>
+                bootstrap UI + Material Icons
+            </td>
+            <td>
+                O2mFormForView.ngb.html.t4
+            </td>
+        </tr>
+        <tr>
+            <td>
+                bootstrap UI + Awesome Icons
+            </td>
+            <td>
+                O2mFormForView.ngb.html.t4
+            </td>
+        </tr>
+    </table>
+    <p />
+    Generators are divided into two groups.
+    <ul>
+        <li>The first group has a <strong>Context level</strong>.</li>
+        <li>The second one is a <strong>View-Model level</strong>. </li>
+    </ul>
+    <p>
+        <strong>Context level</strong> code is generated once and shared by other parts of the application.<br>
+        The <strong>View-Model level</strong> code must be regenerated for each view you select.
+        That is, each view you select must have its own copy of the generated code.
+        The <strong>View-Model level</strong> code generated for one view cannot be used by another view.
+        For example, the product attributes input form is <strong>View-Model level</strong> code<br>
+    </p>
+    Each generator has a title which starts with 5 digits. <br>
+    If the first two digits are zeros it is <strong>Context level</strong> generator for Wizards <br>
+    If one the first two digits is non zero it is <strong>View-Model level</strong> generator for Wizards <p />
+
+
+    The currently selected generator is a <strong>View-Model level</strong> code generator.<p />
+
+    <strong>CLI-related information</strong><br>
+    Suppose your view has a name <strong>ThisIsMyView</strong><br>
+    <em>Inside your Angular project</em><br>
+    <em>1. Run the command</em><br>
+    <pre>
+    <code>
+        ng g component ThisIsMyViewO2m
+    </code>
+    </pre>
+    <kbd>It will create a file <b>ithis-is-my-view-o2m.component.*</b></kbd><br>
+    <em>2. In Visual Studio right-click the folder with a file and generate the component-body</em><br>
+    <p />
+    <strong>Project-related information</strong><br>
+    <kbd>Step 0: Do not run the command described under <b>CLI-related information</b>. It's for information purpose only and makes you hint about the type of component you are going to generate</kbd><br>
+    <kbd>Step 1: Inside folder <b>src/app</b> create the folder <b>'components'</b> (You can choose any folder name you like: 'mycomponents' or 'mycode' and so on) </kbd><br>
+    <kbd>Step 2: Inside folder of step 1 (recommended <b>'components'</b>) create the folder <b>'this-is-my-view'</b> (You can choose any folder name you like: 'myviewfolder' or 'fooooo' and so on) </kbd><br>
+    <kbd>Step 3: Inside folder of step 2 (recommended <b>'this-is-my-view'</b>) create the folder <b>'o2m'</b> (You can choose any folder name you like: 'myfolder' or 'fooooo' and so on) </kbd><br>
+    <kbd>Step 4: In Visual Studio right-click the <strong>'o2m'</strong>-folder that you created in step 3 and generate the following items</kbd><br>
+    <ul>
+        <li>01700-O2m.component.css</li>
+        <li>01700-O2m.component.html</li>
+        <li>01700-O2m.component.ts</li>
+    </ul>
+    <strong>Don't forget to click save-button.</strong> It saves the code into the file and adds some information into repository of the Wizards.
+    Repository information is actively used by all other generators that you will run later.
+    <p />
+    This component uses '01600-Lform.component.ts'-component to display tabular data for the currently selected View-Model
+    and all '01600-Lform.component.ts'-components for those View-Models that are direct details for the currently selected View-Model.<br>
+    View-Model inherits the concept of the relationship "master-detail" from the entity framework.<br>
+
+    Here is an example. Look at the fluent api code. 'DetailEntity' plays the role of 'direct detail' entity (the first line of code).
+    'MasterEntity' plays the role of 'direct master' entity (the second line of code).
+
+    <pre>
+    <code>
+            ...Entity&lt;DetailEntity&gt;().HasRequired(d => d.master).WithMany(m => m.details).HasForeignKey(d => d.masterIdRef);
+
+            ...Entity&lt;MasterEntity&gt;().HasMany(c => c.details).WithOne(e => e.master);
+        </code>
+    </pre>
+    If we say the word 'direct', we must discuss the following two terms, 'indirect master' and 'indirect details'.
+    Suppose Entity1 is a direct master for Entity2. Suppose Entity2 is a direct master for Entity3.
+    This is a case, we say that Entity1 is indirect master for the Entity3 or Entity3 is indirect detail for the Entity1.<p />
+
+
+
+
+    This component depends on (for the current View-Model and for all View-Models with the 'direct detail'-role)
+    <ul>
+        <li>01100-.interface.ts</li>
+        <li>01300-Filter.interface.ts</li>
+        <li>01420-Sform.component.ts</li>
+        <li>01600-Lform.component.ts</li>
+    </ul>
+    and
+    <ul>
+        <li>01400-.service.ts</li>
+    </ul>
+
+</body>
+</html>

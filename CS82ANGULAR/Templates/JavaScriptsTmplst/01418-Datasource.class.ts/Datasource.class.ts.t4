@@ -387,7 +387,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
             for(let j in this._<#= MasterToClientKeyFieldsMapFieldName #>[i]) {
                 for(let k in this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
                     let fld = this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k];
-                    let r: <#= filterResultModelClassName #> = fr.find((e:<#= filterResultModelClassName #> | any) => e.fltrName = fld);
+                    let r: <#= filterResultModelClassName #> = fr.find((e:<#= filterResultModelClassName #> | any) => e.fltrName === fld.propNm);
                     if (typeof r === 'undefined') continue;
                     if (currMstr !== i) { currMstr = i; rslt[currMstr] = {} }
                     if (currNav !== j) { currNav = j; rslt[currMstr][currNav] = {} }

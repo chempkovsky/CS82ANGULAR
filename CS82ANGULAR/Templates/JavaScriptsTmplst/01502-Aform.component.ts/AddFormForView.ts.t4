@@ -100,6 +100,7 @@
     string IsDefinedFieldName                   = "IsDefined";
     string IsNewSuffix                          = "IsNew";
     string CalcIsDefinedMethodName              = "calcIsDefined";
+    string UnderHiddenFilterFieldsFieldName     = "UnderHiddenFilterFields";
 
     string TitlePropName                        = "title";
     string TitleCaptionVal                      = "Select Item";
@@ -697,6 +698,29 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(mvUIFormProp, Model) #>': this.<#=  RootDataSource #>.get<#= ValueSuffix #>('<#= GetTypeScriptPropertyNameEx(mvUIFormProp, Model) #>')}, {emitEvent: false});
 <#
         } 
+        foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+            if(fk.Item4 == InputTypeEnum.Typeahead) {
+#>
+        if(this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>')) {
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.disable({emitEvent: false});
+        } else {
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.enable({emitEvent: false});
+        }
+<#
+            } else if(fk.Item4 == InputTypeEnum.Combo) {
+#>
+        if(this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>')) {
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.disable({emitEvent: false});
+        } else {
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.enable({emitEvent: false});
+        }
+<#
+            } else if(fk.Item4 == InputTypeEnum.SearchDialog) {
+#>
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ButtonDisable) #> = this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>');
+<#
+            }
+        }
     }
 #>
     }
@@ -708,7 +732,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
 #>
     public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
-        if(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>()) {
+        if(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>() &&
+          (!this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>'))) {
             this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.enable({emitEvent: false});
         } else {
             this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.disable({emitEvent: false});
@@ -755,7 +780,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
             }
         });
-        if(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>()) {
+        if(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>() &&
+          (!this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>'))) {
             this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.enable({emitEvent: false});
         } else {
             this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.disable({emitEvent: false});
@@ -767,7 +793,9 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
 #>
     public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
-        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ButtonDisable) #> = !this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>();
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ButtonDisable) #> = 
+            this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>') ||
+            (!this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>());
     }
     public <#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, SearchClickSufix) #>(): void {
         if(!this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#=  IsSetFilterByCurrDirMstrsMethodName #>()) {
