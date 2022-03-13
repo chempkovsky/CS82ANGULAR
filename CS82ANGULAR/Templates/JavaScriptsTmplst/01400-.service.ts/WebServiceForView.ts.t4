@@ -17,19 +17,36 @@
     string EqualOperator = "eq";
 
 
-    string GetAllMethodName             = "getall";
-    string GetWithFilterMethodName      = "getwithfilter";
-    string GetOneMethodName             = "getone";
-    string UpdateOneMethodName          = "updateone";
-    string AddOneMethodName             = "addone";
-    string DeleteOneMethodName          = "deleteone";
-    string AppSettingServicePropName    = "appGlblSettings";
-    string GetOneByMethodNamePrefix     = "getoneby";
+    string GetAllMethodName                     = "getall";
+    string GetWithFilterMethodName              = "getwithfilter";
+    string GetOneMethodName                     = "getone";
+    string UpdateOneMethodName                  = "updateone";
+    string AddOneMethodName                     = "addone";
+    string DeleteOneMethodName                  = "deleteone";
+    string AppSettingServicePropName            = "appGlblSettings";
+    string GetOneByMethodNamePrefix             = "getoneby";
+    string MasterToClientKeyFieldsMapFieldName  = "m2cKeyfm";
+    string MasterToClientFieldsMapFieldName     = "m2cfm";
+    string ClientToMasterFieldsMapFieldName     = "c2mfm";
+    string HiddenFilterByFltRsltSuffix          = "HiddenFilterByFltRslt";
+    string HiddenFilterAsFltRsltSuffix          = "HiddenFilterAsFltRslt";
+    string HiddenFilterByRowSuffix              = "HiddenFilterByRow";
+    string HiddenFilterFieldName                = "hf";
+
+    string LengthSuffix                         = "Length";
+    string KeysSuffix                           = "Keys";
+    string ValueSuffix                          = "Value";
+    string ValuesSuffix                         = "Values";
 
 
-    string src2destMethodName       = "src2dest";
 
-    string appSettingServiceFolder  = "00015-app-glbl-settings.service.ts";
+    string src2destMethodName                   = "src2dest";
+
+    string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
+
+    string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName   = GetModelClassName(Context, filterResultModelFolder);
+
     string viewInterfaceFolder      = "01100-.interface.ts";
     string viewInterfacePageFolder  = "01200-Page.interface.ts";
     string viewInterfaceFltFolder   = "01300-Filter.interface.ts";
@@ -52,6 +69,7 @@ import { <#= GetInterfaceName(Model) #> } from '<#= GetFolderName(Model, viewInt
 import { <#= GetInterfacePageName(Model) #> } from '<#= GetFolderName(Model, viewInterfacePageFolder, viewServiceFolder)#>';
 import { <#= GetInterfaceFilterName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceFltFolder, viewServiceFolder)#>';
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, viewServiceFolder)#>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, viewServiceFolder) #>';
 
 
 @Injectable({
@@ -62,6 +80,313 @@ export class <#= GetJavaScriptServiceName(Model) #> {
     constructor(private http: HttpClient, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {
        this.serviceUrl = this.<#= AppSettingServicePropName #>.getWebApiPrefix('<#= Model.ViewName #>') + '<#= GetWebApiServicePrefix(Model) #>';  
     }
+    protected _<#= ValuesSuffix #>: {[key: string]: {org: string, fk: string, fkchain: string, isinprimkey: boolean, required: boolean, dbgenerated: boolean, dttp: string}} = {
+<#
+    if (Model.ScalarProperties != null) {
+        List<ModelViewPropertyOfVwSerializable> primKeyProps = GetModelPrimaryKeyProps(Model);
+        foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+            string IsInPrimKey = "false";
+            if(primKeyProps != null) {
+                if (primKeyProps.Any(k => k == prop)) {
+                    IsInPrimKey = "true";
+                }
+            }
+            string IsDatabaseGenerated = IsDatabaseGeneratedProperty(prop, Model) ? "true" : "false";
+            string IsRequiredInView = prop.IsRequiredInView ? "true" : "false";
+            string fk = string.IsNullOrEmpty( prop.ForeignKeyName ) ? "" : prop.ForeignKeyName;
+            string fkchain = string.IsNullOrEmpty( prop.ForeignKeyNameChain ) ? "" : prop.ForeignKeyNameChain;
+#>
+      '<#= GetTypeScriptPropertyName(prop, Model) #>': {org: '<#= prop.OriginalPropertyName #>', fk: '<#= fk #>', fkchain: '<#= fkchain #>', isinprimkey: <#= IsInPrimKey #>, required: <#= IsRequiredInView #>, dbgenerated: <#= IsDatabaseGenerated #>, dttp: '<#= GetCCharpDatatype(prop, Model) #>'},  // <#= GetPropertyTypeScriptTypeName(prop) #>, <#= GetPropertyTypeName(prop) #>
+<#
+
+        }
+    }
+#>
+    };
+    // master name, navigation name, master filed, master filed value
+    public get<#= HiddenFilterByRowSuffix #>(rw: <#= GetInterfaceName(Model) #>|any, nvNm: string|any): {[key: string]: {[key: string]: {[key: string]: any}}} {
+        let rslt: {[key: string]: {[key: string]: {[key: string]: any}}} = {}
+        if((typeof rw === 'undefined') || (typeof nvNm === 'undefined')) return rslt;
+        if((rw === null) || (nvNm === null)) return rslt;
+        for(let i in this._<#= ValuesSuffix #>) {
+            if(this.isInPrimkey<#= ValueSuffix #>(i)) {
+                rslt['<#= Model.ViewName #>'][nvNm][i] = rw[i];
+            }
+        }
+        return rslt;
+    }
+    public get<#= LengthSuffix #>(): number {
+        return Object.keys(this._<#= ValuesSuffix #>).length;
+    }
+    public get<#= KeysSuffix #>(): string[] {
+        return Object.keys(this._<#= ValuesSuffix #>);
+    }
+    public getDtTp<#= ValueSuffix #>(key: string): string {
+        return this._<#= ValuesSuffix #>[key].dttp;
+    }
+    public getFk<#= ValueSuffix #>(key: string): string {
+        return this._<#= ValuesSuffix #>[key].fk;
+    }
+    public required<#= ValueSuffix #>(key: string): boolean {
+        return this._<#= ValuesSuffix #>[key].required;
+    }
+    public dbgenerated<#= ValueSuffix #>(key: string): boolean {
+        return this._<#= ValuesSuffix #>[key].dbgenerated;
+    }
+    public isInPrimkey<#= ValueSuffix #>(key: string): boolean {
+        return this._<#= ValuesSuffix #>[key].isinprimkey;
+    }
+    public getKeyByOrg<#= ValueSuffix #>(org: string, fkchain: string): string|any {
+        for(let i in this._<#= ValuesSuffix #>) {
+            if(this._<#= ValuesSuffix #>[i].org === org && this._<#= ValuesSuffix #>[i].fkchain ===fkchain) return i;
+        }
+        return undefined;
+    }
+    public get<#= HiddenFilterAsFltRsltSuffix #>(<#= HiddenFilterFieldName #>: {[key: string]: {[key: string]: {[key: string]: any}}} | any): Array<<#= filterResultModelClassName #>> {
+        let rslt: Array<<#= filterResultModelClassName #>> = [];
+        if(typeof <#= HiddenFilterFieldName #> === 'undefined') return rslt;
+        if(<#= HiddenFilterFieldName #> === null) return rslt;
+        let <#= MasterToClientKeyFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}}} = this.get<#= MasterToClientKeyFieldsMapFieldName #>();
+        let <#= MasterToClientFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = this.get<#= MasterToClientFieldsMapFieldName #>();
+        for(let i in <#= HiddenFilterFieldName #>) {
+            for(let j in <#= HiddenFilterFieldName #>[i]) {
+                if( Object.keys(<#= MasterToClientKeyFieldsMapFieldName #>).indexOf(i) > -1 ) {
+                    if( Object.keys(<#= MasterToClientKeyFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
+                        for(let k in <#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
+                            rslt.push({
+                                fltrName: <#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm,
+                                fltrDataType: this.getDtTp<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm),
+                                fltrOperator: 'eq',
+                                fltrValue: <#= HiddenFilterFieldName #>[i][j][k]
+                            });
+                        }
+                    }
+                }
+                if( Object.keys(<#= MasterToClientFieldsMapFieldName #>).indexOf(i) > -1 ) {
+                    if( Object.keys(<#= MasterToClientFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
+                        for(let k in <#= MasterToClientFieldsMapFieldName #>[i][j]) {
+                            rslt.push({
+                                fltrName: <#= MasterToClientFieldsMapFieldName #>[i][j][k],
+                                fltrDataType: this.getDtTp<#= ValueSuffix #>(<#= MasterToClientFieldsMapFieldName #>[i][j][k]),
+                                fltrOperator: 'eq',
+                                fltrValue: <#= HiddenFilterFieldName #>[i][j][k]
+                            });
+                        }
+                    }
+                }
+            }
+        }
+        return rslt;
+    }
+
+<#
+    {
+        List<string> errors = new List<string>();
+        List<ModelViewForeignKeySerializable> mtcfks = CollectMasterToClientFieldsMap(Model, errors);
+        foreach(string error in  errors) {
+#>
+<#= error #>
+<#
+        }
+#>
+
+    //
+    // first key is Master View Name, 
+    // second key is Direct Navigation Name, 
+    // third key is Master View Property Name, 
+    // value is a  Client View Property Name, i.e. Property Name of the Current View 
+    protected _<#= MasterToClientKeyFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}}} = {
+<#
+        if (mtcfks != null) {
+            string currentMasterView = "";
+            bool isOpened = false;
+            ModelViewSerializable masterModel = null;
+            foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) {
+                if (currentMasterView != mtcfk.ViewName) {
+                    masterModel = GetModelViewByViewName(Context, mtcfk.ViewName);
+                    if(currentMasterView == "") {
+#>
+                '<#= mtcfk.ViewName #>' : {
+<#
+                    } else {
+#>
+                },
+                '<#= mtcfk.ViewName #>' : {
+<#
+                    } // if(currentMasterView == "") {...} else {...}
+                } // if (currentMasterView != mtcfk.ViewName) {...}
+#>
+                    '<#= mtcfk.NavigationName #>' : {
+<#
+                for(int i = 0; i < mtcfk.PrincipalKeyProps.Count; i++) {
+                    ModelViewPropertyOfVwSerializable mstrProp = GetModelScalarPropByKeyProp(masterModel, mtcfk.PrincipalKeyProps[i]);
+                    if(mstrProp == null) {
+#>
+//
+// Errror: for the ModelView = <#= mtcfk.ViewName #> and PrincipalKey = <#= mtcfk.PrincipalKeyProps[i].OriginalPropertyName #>
+//         could not find scalar property
+//
+<#
+                    }
+                    string isReq = "true";
+                    if(mstrProp != null) {
+                        isReq = mstrProp.IsRequiredInView ? "true" : "false";
+                    }
+#>
+                        '<#= GetTypeScriptPropertyNameByKeyProperty(masterModel, mtcfk.PrincipalKeyProps[i]) #>' : {isMstrReq: <#= isReq #>, propNm:'<#= GetTypeScriptPropertyNameByKeyProperty(Model, mtcfk.ForeignKeyProps[i]) #>'},
+<#
+                }
+#>
+                    },
+<#
+                currentMasterView = mtcfk.ViewName;
+            } // foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) { ... }
+            if (currentMasterView != "") {
+#>
+                }
+<#
+            }
+        } // if (mtcfks != null) {...}
+#>
+    }; 
+    public get<#= MasterToClientKeyFieldsMapFieldName #>(): {[key: string]: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}}} {
+        return this._<#= MasterToClientKeyFieldsMapFieldName #>;
+    }
+    //
+    // first key is Master View Name, 
+    // second key is Direct Navigation Name, 
+    // third key is Master View Property Name, 
+    // value is a  Client View Property Name, i.e. Property Name of the Current View 
+    protected _<#= MasterToClientFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = {
+<#
+        if (mtcfks != null) {
+            string currentMasterView = "";
+            ModelViewSerializable masterModel = null;
+            foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) {
+                if (currentMasterView != mtcfk.ViewName) {
+                    masterModel = GetModelViewByViewName(Context, mtcfk.ViewName);
+                    if(currentMasterView == "") {
+#>
+                '<#= mtcfk.ViewName #>' : {
+<#
+                    } else {
+#>
+                },
+                '<#= mtcfk.ViewName #>' : {
+<#
+                    }
+                } // if (currentMasterView != mtcfk.ViewName) { ... }
+#>
+                    '<#= mtcfk.NavigationName #>' : {
+<#
+                List<ModelViewPropertyOfVwSerializable> sclrProperties = Model.ScalarProperties.Where(p => p.ForeignKeyName == mtcfk.NavigationName).ToList();
+                foreach(ModelViewPropertyOfVwSerializable modelPrp in sclrProperties) {
+                    if(modelPrp.IsSelected) {
+                        // ModelViewPropertyOfVwSerializable modelPrp = GetScalarPropertyByViewPropertyName(Model, clntPrp.ViewPropertyName);
+                        ModelViewPropertyOfVwSerializable masterProp = GetDirectMasterScalarPropertyByViewPropertyName(Model, modelPrp.ViewPropertyName, Context);
+                        if ((modelPrp != null) && (masterProp != null)) {
+#>
+                        '<#= GetTypeScriptPropertyName(masterProp, masterModel) #>' : '<#= GetTypeScriptPropertyName(modelPrp, Model) #>',
+<#
+                        } 
+                    }
+                }
+#>
+                    },
+<#
+                currentMasterView = mtcfk.ViewName;
+            } // foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) { ... }
+            if (currentMasterView != "") {
+#>
+                }
+<#
+            }
+        } // if (mtcfks != null) { ... }
+#>
+    };
+    public get<#= MasterToClientFieldsMapFieldName #>(): {[key: string]: {[key: string]: {[key: string]: string}}} {
+        return this._<#= MasterToClientFieldsMapFieldName #>;
+    }
+<#
+    }
+#>
+    public get<#= HiddenFilterByFltRsltSuffix #>(fr:  Array<<#= filterResultModelClassName #>> | any): {[key: string]: {[key: string]: {[key: string]: any}}} {
+        let rslt: {[key: string]: {[key: string]: {[key: string]: any}}} = {};
+        if ((typeof fr === 'undefined') || (typeof this._<#= MasterToClientKeyFieldsMapFieldName #> === 'undefined')) return rslt;
+        if ((fr === null) || (this._<#= MasterToClientKeyFieldsMapFieldName #> === null)) return rslt;
+        let currMstr: string = "";
+        let currNav: string = "";
+        for(let i in this._<#= MasterToClientKeyFieldsMapFieldName #>) {
+            for(let j in this._<#= MasterToClientKeyFieldsMapFieldName #>[i]) {
+                for(let k in this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
+                    let fld = this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k];
+                    let r: <#= filterResultModelClassName #> = fr.find((e:<#= filterResultModelClassName #> | any) => e.fltrName === fld.propNm);
+                    if (typeof r === 'undefined') continue;
+                    if (currMstr !== i) { currMstr = i; rslt[currMstr] = {} }
+                    if (currNav !== j) { currNav = j; rslt[currMstr][currNav] = {} }
+                    rslt[currMstr][currNav][k] = r.fltrValue;
+                }
+            }
+        }
+        return rslt;
+    }
+<#
+    {
+        List<string> errors = new List<string>();
+        List<ModelViewSerializable> clVms = CollectClientToMasterFieldsMapModelViews(Model, Context, errors);
+        foreach(string error in  errors) {
+#>
+<#= error #>
+<#
+        }
+#>
+
+    // first key is Client View Name, 
+    // second key is Direct Navigation Name, 
+    // third key is Client View Property Name, 
+    // value is a Master View Property Name, i.e. Property Name of the Current View 
+    protected _<#= ClientToMasterFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = {
+<#
+        if(clVms != null) {
+            foreach(ModelViewSerializable clVm in clVms) {
+                errors.Clear();
+                List<ModelViewForeignKeySerializable> mlFks = CollectMasterToClientFieldsMapForMasterView(clVm, Model.ViewName, errors);
+                foreach(string error in  errors) {
+#>
+<#= error #>
+<#
+                }
+                if (mlFks != null) {
+#>
+                '<#= clVm.ViewName #>' : {
+<#
+                    foreach(ModelViewForeignKeySerializable mlFk in mlFks) {
+#>
+                    '<#= mlFk.NavigationName #>' : {
+<#
+                        for(int i = 0; i < mlFk.ForeignKeyProps.Count; i++) {
+#>
+                        '<#= GetTypeScriptPropertyNameByKeyProperty(clVm, mlFk.ForeignKeyProps[i]) #>' : '<#= GetTypeScriptPropertyNameByKeyProperty(Model, mlFk.PrincipalKeyProps[i]) #>',
+<#
+                        }
+#>
+                    },
+<#
+                    }
+#>
+                },
+<#
+                }
+            } // end of: foreach(ModelViewSerializable clVm in clVms) {...}
+        } // end of: if(clVms != null) {...}
+#>
+    }
+    public get<#= ClientToMasterFieldsMapFieldName #>(): {[key: string]: {[key: string]: {[key: string]: string}}} {
+        return this._<#= ClientToMasterFieldsMapFieldName #>;
+    }
+<#
+    }
+#>
 
 <# 
     if (Model.IsWebApiSelectAll) { 
@@ -989,6 +1314,253 @@ export class <#= GetJavaScriptServiceName(Model) #> {
             }
         }
         return rsltKeys;
+    }
+    List<ModelViewForeignKeySerializable> CollectMasterToClientFieldsMap(ModelViewSerializable model, List<string> errors) {
+        List<ModelViewForeignKeySerializable> rslt = null;
+        if(model == null) {
+            if(errors != null) {
+                errors.Add("// CollectMasterToClientFieldsMap: Input param is not defined");
+            }
+            return rslt;
+        }
+        if (model.ForeignKeys == null) {
+            return rslt;
+        }
+        List<string> passedViews = new List<string>();
+        foreach(ModelViewForeignKeySerializable mlFk in model.ForeignKeys) {
+            if(string.IsNullOrEmpty(mlFk.ViewName)) {
+                if(errors != null) {
+                    errors.Add("//");
+                    errors.Add("// Error: CollectMasterToClientFieldsMap:");
+                    errors.Add("//        Foreigkey is not completely defined");
+                    errors.Add("//        ViewName = " + mlFk.ViewName);
+                    errors.Add("//        NavigationName = " + mlFk.NavigationName);
+                    errors.Add("//        NavigationEntityName = " + mlFk.NavigationEntityName);
+                    errors.Add("//");
+                }
+                continue;
+            }
+            if(passedViews.Any(e => mlFk.ViewName == e)) { 
+                continue;
+            }
+            passedViews.Add(mlFk.ViewName);
+            List<ModelViewForeignKeySerializable> intlpFks = model.ForeignKeys.Where(f => f.ViewName == mlFk.ViewName).ToList();
+            foreach(ModelViewForeignKeySerializable intlpFk in intlpFks) {
+                if (
+                    string.IsNullOrEmpty(intlpFk.NavigationName) ||
+                    string.IsNullOrEmpty(intlpFk.NavigationEntityName) ||
+                    string.IsNullOrEmpty(intlpFk.ViewName) ||
+                    intlpFk.PrincipalKeyProps == null ||
+                    intlpFk.ForeignKeyProps == null
+                   ) 
+                {
+                    if(errors != null) {
+                        errors.Add("//");
+                        errors.Add("// Error: CollectMasterToClientFieldsMap:");
+                        errors.Add("//        Foreigkey is not completely defined");
+                        errors.Add("//        ViewName = " + intlpFk.ViewName);
+                        errors.Add("//        NavigationName = " + intlpFk.NavigationName);
+                        errors.Add("//        NavigationEntityName = " + intlpFk.NavigationEntityName);
+                        errors.Add("//");
+                    }
+                    continue;
+                }
+                if (
+                    (intlpFk.PrincipalKeyProps.Count != intlpFk.ForeignKeyProps.Count) || 
+                    (intlpFk.PrincipalKeyProps.Count < 1) ||
+                    (intlpFk.ForeignKeyProps.Count < 1) 
+                    ) 
+                {
+                    if(errors != null) {
+                        errors.Add("//");
+                        errors.Add("// Error: CollectMasterToClientFieldsMap:");
+                        errors.Add("//        Foreigkey is not completely defined");
+                        errors.Add("//        ViewName = " + intlpFk.ViewName);
+                        errors.Add("//        NavigationName = " + intlpFk.NavigationName);
+                        errors.Add("//        NavigationEntityName = " + intlpFk.NavigationEntityName);
+                        errors.Add("//");
+                    }
+                    continue;
+                }
+                if(rslt == null) {
+                    rslt = new List<ModelViewForeignKeySerializable>();
+                }
+                rslt.Add(intlpFk);
+            }
+        }
+        return rslt;
+    }
+    List<ModelViewForeignKeySerializable> CollectMasterToClientFieldsMapForMasterView(ModelViewSerializable clentModel, string masterViewName, List<string> errors) {
+        List<ModelViewForeignKeySerializable> rslt = null; 
+        if(clentModel == null) {
+            if(errors != null) {
+                errors.Add("// CollectMasterToClientFieldsMapForMasterView: Input param is not defined");
+            }
+            return rslt;
+        }
+        if ((clentModel.ForeignKeys == null) || (string.IsNullOrEmpty(masterViewName))) {
+            return rslt;
+        }
+        List<ModelViewForeignKeySerializable> intlpFks = clentModel.ForeignKeys.Where(f => f.ViewName == masterViewName).ToList();
+        foreach(ModelViewForeignKeySerializable intlpFk in intlpFks) {
+            if (
+                string.IsNullOrEmpty(intlpFk.NavigationName) ||
+                string.IsNullOrEmpty(intlpFk.NavigationEntityName) ||
+                string.IsNullOrEmpty(intlpFk.ViewName) ||
+                intlpFk.PrincipalKeyProps == null ||
+                intlpFk.ForeignKeyProps == null
+                ) 
+            {
+                if(errors != null) {
+                    errors.Add("//");
+                    errors.Add("// Error: CollectMasterToClientFieldsMapForMasterView:");
+                    errors.Add("//        Foreigkey is not completely defined");
+                    errors.Add("//        ViewName = " + intlpFk.ViewName);
+                    errors.Add("//        NavigationName = " + intlpFk.NavigationName);
+                    errors.Add("//        NavigationEntityName = " + intlpFk.NavigationEntityName);
+                    errors.Add("//");
+                }
+                continue;
+            }
+            if (
+                (intlpFk.PrincipalKeyProps.Count != intlpFk.ForeignKeyProps.Count) || 
+                (intlpFk.PrincipalKeyProps.Count < 1) ||
+                (intlpFk.ForeignKeyProps.Count < 1) 
+                ) 
+            {
+                if(errors != null) {
+                    errors.Add("//");
+                    errors.Add("// Error: CollectMasterToClientFieldsMapForMasterView:");
+                    errors.Add("//        Foreigkey is not completely defined");
+                    errors.Add("//        ViewName = " + intlpFk.ViewName);
+                    errors.Add("//        NavigationName = " + intlpFk.NavigationName);
+                    errors.Add("//        NavigationEntityName = " + intlpFk.NavigationEntityName);
+                    errors.Add("//");
+                }
+                continue;
+            }
+            if(rslt == null) {
+                rslt = new List<ModelViewForeignKeySerializable>();
+            }
+            rslt.Add(intlpFk);
+        }
+        return rslt;
+    }
+    ModelViewSerializable GetModelViewByViewName(DbContextSerializable context, string ViewName) {
+        if(context == null) return null;
+        if(context.ModelViews == null) return null;
+        return context.ModelViews.Where(mv => mv.ViewName == ViewName).FirstOrDefault();
+    }
+    ModelViewPropertyOfVwSerializable GetDirectMasterScalarPropertyByViewPropertyName(ModelViewSerializable model, string viewPropertyName, DbContextSerializable context) {
+        if(context == null) return null;
+        ModelViewPropertyOfVwSerializable prop = GetScalarPropertyByViewPropertyName(model, viewPropertyName);
+        if ((prop == null) || (model.ForeignKeys == null) || (context.ModelViews ==null)) return null;
+        if(string.IsNullOrEmpty(prop.ForeignKeyName) || string.IsNullOrEmpty(prop.ForeignKeyNameChain)) return null;
+        ModelViewForeignKeySerializable fk = model.ForeignKeys.Where(f => f.NavigationName == prop.ForeignKeyName).FirstOrDefault();
+        if(fk == null) return null;
+        ModelViewSerializable masterVw = context.ModelViews.Where(m => m.ViewName == fk.ViewName).FirstOrDefault();
+        if(masterVw == null) return null;
+        ModelViewPropertyOfVwSerializable masterProp = null;
+        if(prop.ForeignKeyName == prop.ForeignKeyNameChain) {
+            return masterVw.ScalarProperties.Where(p => ((p.OriginalPropertyName == prop.OriginalPropertyName) && string.IsNullOrEmpty(p.ForeignKeyNameChain))).FirstOrDefault();
+        } else {
+            string flt = "";
+            if(prop.ForeignKeyNameChain.StartsWith(prop.ForeignKeyName+".")) {
+                flt = prop.ForeignKeyNameChain.Substring(prop.ForeignKeyName.Length+1);
+            }
+            return masterVw.ScalarProperties.Where(p => ((p.OriginalPropertyName == prop.OriginalPropertyName) && (p.ForeignKeyNameChain == flt))).FirstOrDefault();
+        }
+    }
+    string GetCCharpDatatype(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "";
+        return prop.UnderlyingTypeName.ToLower().Replace("system.", "");
+    }
+    string GetTypeScriptPropertyNameByKeyProperty(ModelViewSerializable model, ModelViewKeyPropertySerializable pk) {
+        ModelViewPropertyOfVwSerializable prop = GetModelScalarPropByKeyProp(model, pk);
+        return GetTypeScriptPropertyName(prop, model);
+    }
+    ModelViewPropertyOfVwSerializable GetScalarPropertyByViewPropertyName(ModelViewSerializable model, string viewPropertyName) {
+        if ((model == null) || (string.IsNullOrEmpty(viewPropertyName))) return null;
+        return model.ScalarProperties.Where(p => p.ViewPropertyName == viewPropertyName).FirstOrDefault();
+    }
+    string GetTypeScriptPropertyNameByViewPropertyName(ModelViewSerializable model, string viewPropertyName) {
+        ModelViewPropertyOfVwSerializable prop = GetScalarPropertyByViewPropertyName(model, viewPropertyName);
+        return GetTypeScriptPropertyName(prop, model);
+    }
+    List<ModelViewSerializable> CollectClientToMasterFieldsMapModelViews(ModelViewSerializable model, DbContextSerializable context, List<string> errors) {
+        List<ModelViewSerializable> rslt = null;
+        if ((model == null) || (context == null)) {
+            if(errors != null) {
+                errors.Add("// CollectClientToMasterFieldsMapModelViews: Input param is not defined");
+            }
+            return rslt;
+        }
+        if(context.ModelViews == null) {
+            if(errors != null) {
+                errors.Add("// CollectClientToMasterFieldsMapModelViews: Input param is not defined : Context.ModelViews is empty");
+            }
+            return rslt;
+        }
+        foreach(ModelViewSerializable modelView in context.ModelViews) {
+            if(modelView.ForeignKeys == null) continue;
+            if (modelView.ForeignKeys.Any(f => f.ViewName == model.ViewName)) {
+                if(rslt == null) rslt = new List<ModelViewSerializable>();
+                rslt.Add(modelView);
+            }
+        }
+        return rslt;
+    }
+    string GetModelClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".interface","");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return "I" + sb.ToString();
+    }
+    bool IsDatabaseGeneratedProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (HasAtribute(prop, "ConcurrencyCheck") || HasAtribute(prop, "Timestamp")) {
+            return true;
+        }
+        if (HasAtributeWithValue(prop, "DatabaseGenerated", "identity") || HasAtributeWithValue(prop, "DatabaseGenerated", "computed")) {
+            return true;
+        }
+        if(HasFluentAtribute(prop, new string[] {"UseSqlServerIdentityColumn", "ForSqlServerUseSequenceHiLo", "ValueGeneratedOnAdd", "ValueGeneratedOnAddOrUpdate", "IsConcurrencyToken", "IsRowVersion"} )) {
+            return true;
+        }
+        return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "identity") || HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "computed");
     }
 
 #>

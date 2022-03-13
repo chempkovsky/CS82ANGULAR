@@ -37,9 +37,11 @@
     string IsDefinedFieldName                   = "IsDefined";
     string CalcIsDefinedMethodName              = "calcIsDefined";
     string RefreshIsDefinedMethodName           = "refreshIsDefined";
-    string ClientToMasterFieldsMapFieldName     = "clientToMasterFieldsMap";
-    string MasterToClientKeyFieldsMapFieldName  = "masterToClientKeyFieldsMap";
-    string MasterToClientFieldsMapFieldName     = "masterToClientFieldsMap";
+    string ClientToMasterFieldsMapFieldName     = "c2mfm";
+
+    string MasterToClientKeyFieldsMapFieldName  = "m2cKeyfm";
+    string MasterToClientFieldsMapFieldName     = "m2cfm";
+
     string OnDetailChangedPropName              = "OnDetailChanged";
     string OnMasterChangedPropName              = "OnMasterChanged";
     string AfterMasterChangedPropName           = "AfterMasterChanged";
@@ -132,7 +134,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
     protected _<#= UnderHiddenFilterFieldsFieldName #>: string[] = [];
     protected _<#= IsNewSuffix #>: boolean = true;
     protected _<#= UIFormChainFieldName #>: string = '';
-    protected _<#= ValuesSuffix #>: {[key: string]: {org: string, fk: string, fkchain: string, isinprimkey: boolean, required: boolean, dbgenerated: boolean, dttp: string, value: any}} = {
+    protected _<#= ValuesSuffix #>: {[key: string]: any} = {
 <#
     if (Model.ScalarProperties != null) {
         List<ModelViewPropertyOfVwSerializable> primKeyProps = GetModelPrimaryKeyProps(Model);
@@ -148,201 +150,13 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
             string fk = string.IsNullOrEmpty( prop.ForeignKeyName ) ? "" : prop.ForeignKeyName;
             string fkchain = string.IsNullOrEmpty( prop.ForeignKeyNameChain ) ? "" : prop.ForeignKeyNameChain;
 #>
-      '<#= GetTypeScriptPropertyName(prop, Model) #>': {org: '<#= prop.OriginalPropertyName #>', fk: '<#= fk #>', fkchain: '<#= fkchain #>', isinprimkey: <#= IsInPrimKey #>, required: <#= IsRequiredInView #>, dbgenerated: <#= IsDatabaseGenerated #>, dttp: '<#= GetCCharpDatatype(prop, Model) #>', value: undefined},  // <#= GetPropertyTypeScriptTypeName(prop) #>, <#= GetPropertyTypeName(prop) #>
+      '<#= GetTypeScriptPropertyName(prop, Model) #>': undefined,  // <#= GetPropertyTypeScriptTypeName(prop) #>, <#= GetPropertyTypeName(prop) #>
 <#
 
         }
     }
 #>
     };
-<#
-    {
-        List<string> errors = new List<string>();
-        List<ModelViewSerializable> clVms = CollectClientToMasterFieldsMapModelViews(Model, Context, errors);
-        foreach(string error in  errors) {
-#>
-<#= error #>
-<#
-        }
-#>
-    // first key is Client View Name, 
-    // second key is Direct Navigation Name, 
-    // third key is Client View Property Name, 
-    // value is a Master View Property Name, i.e. Property Name of the Current View 
-    protected _<#= ClientToMasterFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = {
-<#
-        if(clVms != null) {
-            foreach(ModelViewSerializable clVm in clVms) {
-                errors.Clear();
-                List<ModelViewForeignKeySerializable> mlFks = CollectMasterToClientFieldsMapForMasterView(clVm, Model.ViewName, errors);
-                foreach(string error in  errors) {
-#>
-<#= error #>
-<#
-                }
-                if (mlFks != null) {
-#>
-                '<#= clVm.ViewName #>' : {
-<#
-                    foreach(ModelViewForeignKeySerializable mlFk in mlFks) {
-#>
-                    '<#= mlFk.NavigationName #>' : {
-<#
-                        for(int i = 0; i < mlFk.ForeignKeyProps.Count; i++) {
-#>
-                        '<#= GetTypeScriptPropertyNameByKeyProperty(clVm, mlFk.ForeignKeyProps[i]) #>' : '<#= GetTypeScriptPropertyNameByKeyProperty(Model, mlFk.PrincipalKeyProps[i]) #>',
-<#
-                        }
-#>
-                    },
-<#
-                    }
-#>
-                },
-<#
-                }
-            } // end of: foreach(ModelViewSerializable clVm in clVms) {...}
-        } // end of: if(clVms != null) {...}
-#>
-    };
-
-<#
-    }
-    {
-        List<string> errors = new List<string>();
-        List<ModelViewForeignKeySerializable> mtcfks = CollectMasterToClientFieldsMap(Model, errors);
-        foreach(string error in  errors) {
-#>
-<#= error #>
-<#
-        }
-#>
-    //
-    // first key is Master View Name, 
-    // second key is Direct Navigation Name, 
-    // third key is Master View Property Name, 
-    // value is a  Client View Property Name, i.e. Property Name of the Current View 
-    protected _<#= MasterToClientKeyFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}}} = {
-<#
-        if (mtcfks != null) {
-            string currentMasterView = "";
-            bool isOpened = false;
-            ModelViewSerializable masterModel = null;
-            foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) {
-                if (currentMasterView != mtcfk.ViewName) {
-                    masterModel = GetModelViewByViewName(Context, mtcfk.ViewName);
-                    if(currentMasterView == "") {
-#>
-                '<#= mtcfk.ViewName #>' : {
-<#
-                    } else {
-#>
-                },
-                '<#= mtcfk.ViewName #>' : {
-<#
-                    } // if(currentMasterView == "") {...} else {...}
-                } // if (currentMasterView != mtcfk.ViewName) {...}
-#>
-                    '<#= mtcfk.NavigationName #>' : {
-<#
-                for(int i = 0; i < mtcfk.PrincipalKeyProps.Count; i++) {
-                    ModelViewPropertyOfVwSerializable mstrProp = GetModelScalarPropByKeyProp(masterModel, mtcfk.PrincipalKeyProps[i]);
-                    if(mstrProp == null) {
-#>
-//
-// Errror: for the ModelView = <#= mtcfk.ViewName #> and PrincipalKey = <#= mtcfk.PrincipalKeyProps[i].OriginalPropertyName #>
-//         could not find scalar property
-//
-<#
-                    }
-                    string isReq = "true";
-                    if(mstrProp != null) {
-                        isReq = mstrProp.IsRequiredInView ? "true" : "false";
-                    }
-#>
-                        '<#= GetTypeScriptPropertyNameByKeyProperty(masterModel, mtcfk.PrincipalKeyProps[i]) #>' : {isMstrReq: <#= isReq #>, propNm:'<#= GetTypeScriptPropertyNameByKeyProperty(Model, mtcfk.ForeignKeyProps[i]) #>'},
-<#
-                }
-#>
-                    },
-<#
-                currentMasterView = mtcfk.ViewName;
-            } // foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) { ... }
-            if (currentMasterView != "") {
-#>
-                }
-<#
-            }
-        } // if (mtcfks != null) {...}
-#>
-    };
-<#
-    }
-    {
-        List<string> errors = new List<string>();
-        List<ModelViewForeignKeySerializable> mtcfks = CollectMasterToClientFieldsMap(Model, errors);
-        foreach(string error in  errors) {
-#>
-<#= error #>
-<#
-        }
-#>
-    //
-    // first key is Master View Name, 
-    // second key is Direct Navigation Name, 
-    // third key is Master View Property Name, 
-    // value is a  Client View Property Name, i.e. Property Name of the Current View 
-    protected _<#= MasterToClientFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = {
-<#
-        if (mtcfks != null) {
-            string currentMasterView = "";
-            ModelViewSerializable masterModel = null;
-            foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) {
-                if (currentMasterView != mtcfk.ViewName) {
-                    masterModel = GetModelViewByViewName(Context, mtcfk.ViewName);
-                    if(currentMasterView == "") {
-#>
-                '<#= mtcfk.ViewName #>' : {
-<#
-                    } else {
-#>
-                },
-                '<#= mtcfk.ViewName #>' : {
-<#
-                    }
-                } // if (currentMasterView != mtcfk.ViewName) { ... }
-#>
-                    '<#= mtcfk.NavigationName #>' : {
-<#
-                List<ModelViewPropertyOfVwSerializable> sclrProperties = Model.ScalarProperties.Where(p => p.ForeignKeyName == mtcfk.NavigationName).ToList();
-                foreach(ModelViewPropertyOfVwSerializable modelPrp in sclrProperties) {
-                    if(modelPrp.IsSelected) {
-                        // ModelViewPropertyOfVwSerializable modelPrp = GetScalarPropertyByViewPropertyName(Model, clntPrp.ViewPropertyName);
-                        ModelViewPropertyOfVwSerializable masterProp = GetDirectMasterScalarPropertyByViewPropertyName(Model, modelPrp.ViewPropertyName, Context);
-                        if ((modelPrp != null) && (masterProp != null)) {
-#>
-                        '<#= GetTypeScriptPropertyName(masterProp, masterModel) #>' : '<#= GetTypeScriptPropertyName(modelPrp, Model) #>',
-<#
-                        } 
-                    }
-                }
-#>
-                    },
-<#
-                currentMasterView = mtcfk.ViewName;
-            } // foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) { ... }
-            if (currentMasterView != "") {
-#>
-                }
-<#
-            }
-        } // if (mtcfks != null) { ... }
-#>
-    };
-<#
-    }
-#>
-
 
     constructor(private <#= formRootService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>,
                 <#= ClientViewNameFieldName #>: string | null | undefined, 
@@ -378,24 +192,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
     }
 
     public get<#= HiddenFilterByFltRsltSuffix #>(fr:  Array<<#= filterResultModelClassName #>> | any): {[key: string]: {[key: string]: {[key: string]: any}}} {
-        let rslt: {[key: string]: {[key: string]: {[key: string]: any}}} = {};
-        if ((typeof fr === 'undefined') || (typeof this._<#= MasterToClientKeyFieldsMapFieldName #> === 'undefined')) return rslt;
-        if ((fr === null) || (this._<#= MasterToClientKeyFieldsMapFieldName #> === null)) return rslt;
-        let currMstr: string = "";
-        let currNav: string = "";
-        for(let i in this._<#= MasterToClientKeyFieldsMapFieldName #>) {
-            for(let j in this._<#= MasterToClientKeyFieldsMapFieldName #>[i]) {
-                for(let k in this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
-                    let fld = this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k];
-                    let r: <#= filterResultModelClassName #> = fr.find((e:<#= filterResultModelClassName #> | any) => e.fltrName === fld.propNm);
-                    if (typeof r === 'undefined') continue;
-                    if (currMstr !== i) { currMstr = i; rslt[currMstr] = {} }
-                    if (currNav !== j) { currNav = j; rslt[currMstr][currNav] = {} }
-                    rslt[currMstr][currNav][k] = r.fltrValue;
-                }
-            }
-        }
-        return rslt;
+        return this.<#= formRootService #>.get<#= HiddenFilterByFltRsltSuffix #>(fr);
     }
     public <#= RefreshIsDefinedMethodName #>(): boolean {
         this._<#= IsDefinedFieldName #> = this.<#= CalcIsDefinedMethodName #>();
@@ -416,40 +213,8 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         return this._<#= HiddenFilterFieldName #>;
     }
     public get<#= HiddenFilterAsFltRsltSuffix #>(): Array<<#= filterResultModelClassName #>> {
-        let rslt: Array<<#= filterResultModelClassName #>> = [];
-        if(typeof this._<#= HiddenFilterFieldName #> === 'undefined') return rslt;
-        if(this._<#= HiddenFilterFieldName #> === null) return rslt;
-        for(let i in this._<#= HiddenFilterFieldName #>) {
-            for(let j in this._<#= HiddenFilterFieldName #>[i]) {
-                if( Object.keys(this._<#= MasterToClientKeyFieldsMapFieldName #>).indexOf(i) > -1 ) {
-                    if( Object.keys(this._<#= MasterToClientKeyFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
-                        for(let k in this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
-                            rslt.push({
-                                fltrName: this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm,
-                                fltrDataType: this.getDtTp<#= ValueSuffix #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm),
-                                fltrOperator: 'eq',
-                                fltrValue: this._<#= HiddenFilterFieldName #>[i][j][k]
-                            });
-                        }
-                    }
-                }
-                if( Object.keys(this._<#= MasterToClientFieldsMapFieldName #>).indexOf(i) > -1 ) {
-                    if( Object.keys(this._<#= MasterToClientFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
-                        for(let k in this._<#= MasterToClientFieldsMapFieldName #>[i][j]) {
-                            rslt.push({
-                                fltrName: this._<#= MasterToClientFieldsMapFieldName #>[i][j][k],
-                                fltrDataType: this.getDtTp<#= ValueSuffix #>(this._<#= MasterToClientFieldsMapFieldName #>[i][j][k]),
-                                fltrOperator: 'eq',
-                                fltrValue: this._<#= HiddenFilterFieldName #>[i][j][k]
-                            });
-                        }
-                    }
-                }
-            }
-        }
-        return rslt;
+        return this.<#= formRootService #>.get<#= HiddenFilterAsFltRsltSuffix #>(this._<#= HiddenFilterFieldName #>);
     }
-
     public set<#= HiddenFilterFieldName #>(fltr: {[key: string]: {[key: string]: {[key: string]: any}}}): void {
         this._<#= HiddenFilterFieldName #> = fltr;
         this.set<#= UnderHiddenFilterFieldsFieldName #>();
@@ -470,58 +235,52 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         return this._<#= DirectNavigationFieldName #>;
     }
     public get<#= LengthSuffix #>(): number {
-        return Object.keys(this._<#= ValuesSuffix #>).length;
+        return this.<#= formRootService #>.get<#= LengthSuffix #>();
     }
     public get<#= KeysSuffix #>(): string[] {
-        return Object.keys(this._<#= ValuesSuffix #>);
+        return this.<#= formRootService #>.get<#= KeysSuffix #>();
     }
     public getDtTp<#= ValueSuffix #>(key: string): string {
-        return this._<#= ValuesSuffix #>[key].dttp;
+        return this.<#= formRootService #>.getDtTp<#= ValueSuffix #>(key);
     }
     public get<#= ValueSuffix #>(key: string): any {
-        return this._<#= ValuesSuffix #>[key].value;
+        return this._<#= ValuesSuffix #>[key];
     }
     public set<#= ValueSuffix #>(key: string, value: any): void {
-        return this._<#= ValuesSuffix #>[key].value = value;
+        return this._<#= ValuesSuffix #>[key] = value;
     }
     public getByOrg<#= ValueSuffix #>(org: string, fkchain: string): any {
-        for(let i in this._Values) {
-            if(this._Values[i].org === org && this._Values[i].fkchain ===fkchain) return this._Values[i].value;
-        }
-        return undefined;
+        let i: string|any = this.<#= formRootService #>.getKeyByOrg<#= ValueSuffix #>(org, fkchain);
+        if(typeof i === 'undefined') return undefined;
+        return this._Values[i];
     }
     public setByOrg<#= ValueSuffix #>(org: string, fkchain: string, value: any): void {
-        for(let i in this._Values) {
-            if(this._Values[i].org === org && this._Values[i].fkchain === fkchain) { 
-                this._Values[i].value = value; 
-                return;
-            }
-        }
+        let i: string|any = this.<#= formRootService #>.getKeyByOrg<#= ValueSuffix #>(org, fkchain);
+        if(!(typeof i === 'undefined')) this._<#= ValuesSuffix #>[i] = value; 
     }
     public required<#= ValueSuffix #>(key: string): boolean {
-        return this._<#= ValuesSuffix #>[key].required;
+        return this.<#= formRootService #>.required<#= ValueSuffix #>(key);
     }
     public dbgenerated<#= ValueSuffix #>(key: string): boolean {
-        return this._<#= ValuesSuffix #>[key].dbgenerated;
+        return this.<#= formRootService #>.required<#= ValueSuffix #>(key);
     }
     public isInPrimkey<#= ValueSuffix #>(key: string): boolean {
-        return this._<#= ValuesSuffix #>[key].isinprimkey;
+        return this.<#= formRootService #>.isInPrimkey<#= ValueSuffix #>(key);
     }
     public isSet<#= ValueSuffix #>(key: string): boolean {
-        let v: {org: string, fk: string, fkchain: string, isinprimkey: boolean, required: boolean, dbgenerated: boolean, dttp: string, value: any} = this._<#= ValuesSuffix #>[key];
+        let v: any = this._<#= ValuesSuffix #>[key];
         if(typeof v === 'undefined') return false;
-        if(typeof v.value === 'undefined') return false;
-        if (v.required && (v.value === null)) return false;
+        if (this.required<#= ValueSuffix #>(key) && (v === null)) return false;
         return true;
     }
     public clear<#= ValueSuffix #>(key: string): void {
-        return this._<#= ValuesSuffix #>[key].value = undefined;
+        return this._<#= ValuesSuffix #>[key] = undefined;
     }
     public <#= ClearMethodName #>(doNotify: boolean = true): boolean {
         let hasChanged: boolean = false;
         for(let i in this._<#= ValuesSuffix #>) {
-            if (typeof this._<#= ValuesSuffix #>[i].value !== 'undefined') hasChanged = true;
-            this._<#= ValuesSuffix #>[i].value = undefined;
+            if (typeof this._<#= ValuesSuffix #>[i] !== 'undefined') hasChanged = true;
+            this._<#= ValuesSuffix #>[i] = undefined;
         }
         if(!hasChanged) return hasChanged;
         if(doNotify) this.<#= DoEmitEventMethodName #>(true);
@@ -617,14 +376,15 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         if ((this._<#= ClientViewNameFieldName #> === null) || (this._<#= DirectNavigationFieldName #> === null)) return;
         if(v.get<#= CurrentViewNameFieldName #>() !== this._<#= ClientViewNameFieldName #>) return;
         let clntNtChngd = true;
-        if( Object.keys(this._<#= ClientToMasterFieldsMapFieldName #>).indexOf(this._<#= ClientViewNameFieldName #>) > -1) {
-            if( Object.keys(this._<#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>]).indexOf(this._<#= DirectNavigationFieldName #>) > -1) {
-                for(let i in this._<#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>][this._<#= DirectNavigationFieldName #>]) {
+        let <#= ClientToMasterFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = this.<#= formRootService #>.get<#= ClientToMasterFieldsMapFieldName #>();
+        if( Object.keys(<#= ClientToMasterFieldsMapFieldName #>).indexOf(this._<#= ClientViewNameFieldName #>) > -1) {
+            if( Object.keys(<#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>]).indexOf(this._<#= DirectNavigationFieldName #>) > -1) {
+                for(let i in <#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>][this._<#= DirectNavigationFieldName #>]) {
                     let src: any = v.get<#= ValueSuffix #>(i);
-                    let dst: any = this.get<#= ValueSuffix #>(this._<#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>][this._<#= DirectNavigationFieldName #>][i]);
+                    let dst: any = this.get<#= ValueSuffix #>(<#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>][this._<#= DirectNavigationFieldName #>][i]);
                     if (this.isEqual(src, dst)) continue;
                     clntNtChngd = false;
-                    this.set<#= ValueSuffix #>(this._<#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>][this._<#= DirectNavigationFieldName #>][i], src);
+                    this.set<#= ValueSuffix #>(<#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>][this._<#= DirectNavigationFieldName #>][i], src);
                 }
             }
         }
@@ -793,7 +553,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
                 } else {
 #>
         if(!this.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>')) {
-            if(this._<#= CurrDirectMasterNavsFieldName #>.indexOf(this._<#= ValuesSuffix #>['<#= GetTypeScriptPropertyName(sclrProp, Model) #>'].fk) < 0) {
+            if(this._<#= CurrDirectMasterNavsFieldName #>.indexOf(this.<#= formRootService #>.getFk<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>')) < 0) {
                 if(this.isSet<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>')) {
                     this.clear<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>');
                     hasChanged = true;
@@ -819,24 +579,26 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         if (masterClnt !== this.get<#= CurrentViewNameFieldName #>()) return;
         let clntNtChngd = true;
         let masterVw: string | any = v.getCurrentViewName();
-        if( Object.keys(this._<#= MasterToClientKeyFieldsMapFieldName #>).indexOf(masterVw) > -1) {
-            if( Object.keys(this._<#= MasterToClientKeyFieldsMapFieldName #>[masterVw]).indexOf(masterDirNav) > -1) {
-                for(let i in this._<#= MasterToClientKeyFieldsMapFieldName #>[masterVw][masterDirNav]) {
+        let <#= MasterToClientKeyFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}}} = this.<#= formRootService #>.get<#= MasterToClientKeyFieldsMapFieldName #>();
+        let <#= MasterToClientFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = this.<#= formRootService #>.get<#= MasterToClientFieldsMapFieldName #>();
+        if( Object.keys(<#= MasterToClientKeyFieldsMapFieldName #>).indexOf(masterVw) > -1) {
+            if( Object.keys(<#= MasterToClientKeyFieldsMapFieldName #>[masterVw]).indexOf(masterDirNav) > -1) {
+                for(let i in <#= MasterToClientKeyFieldsMapFieldName #>[masterVw][masterDirNav]) {
                     let src: any = v.get<#= ValueSuffix #>(i);
-                    let dst: any = this.get<#= ValueSuffix #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[masterVw][masterDirNav][i].propNm);
+                    let dst: any = this.get<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[masterVw][masterDirNav][i].propNm);
                     if (this.isEqual(src, dst)) continue;
                     clntNtChngd = false;
-                    this.set<#= ValueSuffix #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[masterVw][masterDirNav][i].propNm, src);
+                    this.set<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[masterVw][masterDirNav][i].propNm, src);
                 }
             }
         }
-        if( Object.keys(this._<#= MasterToClientFieldsMapFieldName #>).indexOf(masterVw) > -1) {
-            if( Object.keys(this._<#= MasterToClientFieldsMapFieldName #>[masterVw]).indexOf(masterDirNav) > -1) {
-                for(let i in this._<#= MasterToClientFieldsMapFieldName #>[masterVw][masterDirNav]) {
+        if( Object.keys(<#= MasterToClientFieldsMapFieldName #>).indexOf(masterVw) > -1) {
+            if( Object.keys(<#= MasterToClientFieldsMapFieldName #>[masterVw]).indexOf(masterDirNav) > -1) {
+                for(let i in <#= MasterToClientFieldsMapFieldName #>[masterVw][masterDirNav]) {
                     let src: any = v.get<#= ValueSuffix #>(i);
-                    if (this.isEqual(src, this.get<#= ValueSuffix #>(this._<#= MasterToClientFieldsMapFieldName #>[masterVw][masterDirNav][i]))) continue;
+                    if (this.isEqual(src, this.get<#= ValueSuffix #>(<#= MasterToClientFieldsMapFieldName #>[masterVw][masterDirNav][i]))) continue;
                     clntNtChngd = false;
-                    this.set<#= ValueSuffix #>(this._<#= MasterToClientFieldsMapFieldName #>[masterVw][masterDirNav][i], src);
+                    this.set<#= ValueSuffix #>(<#= MasterToClientFieldsMapFieldName #>[masterVw][masterDirNav][i], src);
                 }
             }
         }
@@ -849,11 +611,12 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
     }
     
     public <#= IsSetFilterByCurrDirMstrsMethodName #>(): boolean {
-        for(let i in this._<#= MasterToClientKeyFieldsMapFieldName #>) {
-            for(let j in this._<#= MasterToClientKeyFieldsMapFieldName #>[i]) {
+        let <#= MasterToClientKeyFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}}} = this.<#= formRootService #>.get<#= MasterToClientKeyFieldsMapFieldName #>();
+        for(let i in <#= MasterToClientKeyFieldsMapFieldName #>) {
+            for(let j in <#= MasterToClientKeyFieldsMapFieldName #>[i]) {
                 if(this._<#= CurrDirectMasterNavsFieldName #>.indexOf(j) > -1) {
-                    for(let k in this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
-                        if (this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].isMstrReq && (!this.isSet<#= ValueSuffix #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm))) return false; 
+                    for(let k in <#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
+                        if (<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].isMstrReq && (!this.isSet<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm))) return false; 
                     }
                 }
             }
@@ -862,16 +625,17 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
     }
     public <#= GetWSFltrRsltByCurrDirMstrsMethodName #>(): Array<<#= filterResultModelClassName #>> {
         let rslt: Array<<#= filterResultModelClassName #>> = [];
-        for(let i in this._<#= MasterToClientKeyFieldsMapFieldName #>) {
-            for(let j in this._<#= MasterToClientKeyFieldsMapFieldName #>[i]) {
+        let <#= MasterToClientKeyFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}}} = this.<#= formRootService #>.get<#= MasterToClientKeyFieldsMapFieldName #>();
+        for(let i in <#= MasterToClientKeyFieldsMapFieldName #>) {
+            for(let j in <#= MasterToClientKeyFieldsMapFieldName #>[i]) {
                 if(this._<#= CurrDirectMasterNavsFieldName #>.indexOf(j) > -1) {
-                    for(let k in this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
-                        if (this.isSet<#= ValueSuffix #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm)) {
+                    for(let k in <#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
+                        if (this.isSet<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm)) {
                             rslt.push({
-                                fltrName: this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm,
-                                fltrDataType: this.getDtTp<#= ValueSuffix #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm),
+                                fltrName: <#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm,
+                                fltrDataType: this.getDtTp<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm),
                                 fltrOperator: 'eq',
-                                fltrValue: this.get<#= ValueSuffix #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm)
+                                fltrValue: this.get<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm)
                             });
                         }
                     }
@@ -882,12 +646,13 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
     }
     protected <#= GetFilterByCurrDirMstrsMethodName #>(): <#=  GetInterfaceFilterName(Model) #> {
         let flt: <#=  GetInterfaceFilterName(Model) #> | any = {}; // <#=  GetInterfaceFilterName(Model) #>
-        for(let i in this._<#= MasterToClientKeyFieldsMapFieldName #>) {
-            for(let j in this._<#= MasterToClientKeyFieldsMapFieldName #>[i]) {
+        let <#= MasterToClientKeyFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}}} = this.<#= formRootService #>.get<#= MasterToClientKeyFieldsMapFieldName #>();
+        for(let i in <#= MasterToClientKeyFieldsMapFieldName #>) {
+            for(let j in <#= MasterToClientKeyFieldsMapFieldName #>[i]) {
                 if(this._<#= CurrDirectMasterNavsFieldName #>.indexOf(j) > -1) {
-                    for(let k in this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
-                        if (this.isSet<#= ValueSuffix #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm)) {
-                            let nm: string = this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm;
+                    for(let k in <#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
+                        if (this.isSet<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm)) {
+                            let nm: string = <#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm;
                             let op: string = nm + '<#= OperatorSufix #>';
                             if (typeof flt[nm as keyof <#=  GetInterfaceFilterName(Model) #>] === 'undefined') { 
                                 flt[nm as keyof <#=  GetInterfaceFilterName(Model) #>] = [this.get<#= ValueSuffix #>(nm)]; 
@@ -909,6 +674,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
           return of(result as T);
         };
     }
+    // add input string to define flt.orderby prop
     public <#= GetCllctByCurrDirMstrsMethodName #>(): Observable<Array<<#= GetInterfaceName(Model) #>>> {
 <#
         if (Model.IsWebApiSelectManyWithPagination) {
@@ -964,6 +730,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         } else {
             flt[fldName + '<#= OperatorSufix #>'].push('lk');
         }
+        flt.orderby = fldName;
         return this.<#= formRootService #>.<#= GetWithFilterMethodName #>(flt)
                 .pipe(
                     switchMap((rslt: <#= GetInterfacePageName(Model) #>) => {
@@ -1270,21 +1037,23 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 
     protected set<#= UnderHiddenFilterFieldsFieldName #>(): void {
         this._<#= UnderHiddenFilterFieldsFieldName #> = [];
+        let <#= MasterToClientKeyFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}}} = this.<#= formRootService #>.get<#= MasterToClientKeyFieldsMapFieldName #>();
+        let <#= MasterToClientFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = this.<#= formRootService #>.get<#= MasterToClientFieldsMapFieldName #>();
         if(typeof this._<#= HiddenFilterFieldName #> === 'undefined') return;
         if(this._<#= HiddenFilterFieldName #> === null) return;
         for(let i in this._<#= HiddenFilterFieldName #>) {
             for(let j in this._<#= HiddenFilterFieldName #>[i]) {
-                if( Object.keys(this._<#= MasterToClientKeyFieldsMapFieldName #>).indexOf(i) > -1 ) {
-                    if( Object.keys(this._<#= MasterToClientKeyFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
-                        for(let k in this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
-                            this._<#= UnderHiddenFilterFieldsFieldName #>.push(this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm);
+                if( Object.keys(<#= MasterToClientKeyFieldsMapFieldName #>).indexOf(i) > -1 ) {
+                    if( Object.keys(<#= MasterToClientKeyFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
+                        for(let k in <#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
+                            this._<#= UnderHiddenFilterFieldsFieldName #>.push(<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm);
                         }
                     }
                 }
-                if( Object.keys(this._<#= MasterToClientFieldsMapFieldName #>).indexOf(i) > -1 ) {
-                    if( Object.keys(this._<#= MasterToClientFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
-                        for(let k in this._<#= MasterToClientFieldsMapFieldName #>[i][j]) {
-                            this._<#= UnderHiddenFilterFieldsFieldName #>.push(this._<#= MasterToClientFieldsMapFieldName #>[i][j][k]);
+                if( Object.keys(<#= MasterToClientFieldsMapFieldName #>).indexOf(i) > -1 ) {
+                    if( Object.keys(<#= MasterToClientFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
+                        for(let k in <#= MasterToClientFieldsMapFieldName #>[i][j]) {
+                            this._<#= UnderHiddenFilterFieldsFieldName #>.push(<#= MasterToClientFieldsMapFieldName #>[i][j][k]);
                         }
                     }
                 }
@@ -1301,15 +1070,16 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         let aftrMstrChngd: boolean = false;
         if(typeof this._<#= HiddenFilterFieldName #> === 'undefined') return hasChanged;
         if(this._<#= HiddenFilterFieldName #> === null) return hasChanged;
+        let <#= MasterToClientKeyFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}}} = this.<#= formRootService #>.get<#= MasterToClientKeyFieldsMapFieldName #>();
         for(let i in this._<#= HiddenFilterFieldName #>) {
-            if( Object.keys(this._<#= MasterToClientKeyFieldsMapFieldName #>).indexOf(i) > -1 ) {
+            if( Object.keys(<#= MasterToClientKeyFieldsMapFieldName #>).indexOf(i) > -1 ) {
                 for(let j in this._<#= HiddenFilterFieldName #>[i]) {
-                    if( Object.keys(this._<#= MasterToClientKeyFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
+                    if( Object.keys(<#= MasterToClientKeyFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
                         for(let k in this._<#= HiddenFilterFieldName #>[i][j]) {
-                            if( Object.keys(this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j]).indexOf(k) > -1 ) {
+                            if( Object.keys(<#= MasterToClientKeyFieldsMapFieldName #>[i][j]).indexOf(k) > -1 ) {
                                 let src: any = this._<#= HiddenFilterFieldName #>[i][j][k];
-                                if (!this.isEqual(this.get<#= ValueSuffix #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm), this._<#= HiddenFilterFieldName #>[i][j][k])) {
-                                    this.set<#= ValueSuffix #>(this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm, this._<#= HiddenFilterFieldName #>[i][j][k]);
+                                if (!this.isEqual(this.get<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm), this._<#= HiddenFilterFieldName #>[i][j][k])) {
+                                    this.set<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm, this._<#= HiddenFilterFieldName #>[i][j][k]);
                                     aftrMstrChngd = (this._<#= CurrDirectMasterNavsFieldName #>.indexOf(j) >= 0) || aftrMstrChngd;
                                     hasChanged = true;
                                 }
@@ -1333,7 +1103,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         let rslt: boolean = this.dbgenerated<#= ValueSuffix #>(key);
         if(!rslt) rslt = this.is<#= UnderHiddenFilterFieldsFieldName #>(key);
         if ((!rslt) && (!this.get<#= IsNewSuffix #>())) {
-            rslt = this.isInPrimkey<#= ValueSuffix #>(key);
+            rslt = this.<#= formRootService #>.isInPrimkey<#= ValueSuffix #>(key);
         }
         return rslt;
     }
