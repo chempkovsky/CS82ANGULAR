@@ -117,8 +117,8 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     ngOnInit() {
         if (!(typeof this.route.snapshot.data === 'undefined')) {
             if (!(this.route.snapshot.data === null)) {
-                if (!(typeof this.route.snapshot.data.<#= TitlePropName #> === 'undefined')) {
-                    this.<#= TitlePropName #> = this.route.snapshot.data.<#= TitlePropName #>;
+                if (!(typeof this.route.snapshot.data['<#= TitlePropName #>'] === 'undefined')) {
+                    this.<#= TitlePropName #> = this.route.snapshot.data['<#= TitlePropName #>'];
                 }
             }
         }

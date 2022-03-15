@@ -72,6 +72,10 @@
     string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
     string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
 
+    string externalFilterSelector               = "external-filter";
+    string externalFilterPropName               = "externalFilter";
+    string externalFilterRsltPropName           = "externalFilterRslt";
+
 
     string filterModelFolder            = "00021-web-service-filter.interface.ts";
     string filterDefModelFolder         = "00022-web-service-filter-def.interface.ts";
@@ -115,6 +119,7 @@
     (<#= OnBackBtnSelector #>)="<#= OnBackBtnMethodName #>($event)"
     [<#= showBackBtnSelector #>]="<#= showBackBtnPropName #>"
     (on-apply-filter)="onApplyFilter($event)" 
+    [<#= externalFilterSelector #>]="<#= externalFilterRsltPropName #>"
     [<#= showAddFltItemSelector #>]="<#= showAddFltItemPropName #>"  
     [<#= MaxHeightPropSelector #>]="<#= FilterMaxHeightPropName #>"  
     [filter-defs]="filterDefs" [hidden-filter]="hiddenFilter" [show-filter]="<#= ShowFilterPropName #>"

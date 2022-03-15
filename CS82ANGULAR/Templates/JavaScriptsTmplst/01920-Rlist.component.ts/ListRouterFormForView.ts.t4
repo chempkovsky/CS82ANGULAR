@@ -63,6 +63,12 @@
     string OnTableCommandSelector       = "on-table-command";
     string OnTableCommandPropName       = "onTableCommand";
 
+    string externalFilterSelector               = "external-filter";
+    string externalFilterPropName               = "externalFilter";
+    string beforeSquerySelector                 = "before-squery";
+    string beforeSqueryPropName                 = "beforeSquery";
+    string OnBeforeSqueryMethodName             = "onBeforeSquery";
+
     string containerMenuItemsPropName           = "contMenuItems";
     string containerMenuItemsSelector           = "cont-menu-items";
     string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
@@ -83,6 +89,7 @@
     string itemHeightDataModelFolder    = "00016-item-height-data.interface.ts";
 
     string viewInterfaceFolder          = "01100-.interface.ts";
+    string viewInterfaceFltFolder       = "01300-Filter.interface.ts";
     string viewServiceFolder            = "01400-.service.ts";
 
 
@@ -129,13 +136,14 @@ import { ActivatedRoute, Router, ParamMap, UrlSegment, ActivatedRouteSnapshot } 
 
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, rlistComponentFolder)#>';
 import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, rlistComponentFolder, Context, Model.ViewName, viewServiceFolder) #>';
-import { <#=  filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, rlistComponentFolder)#>';
-import { <#=  searchComponentClassName #> } from '<#=  GetFolderName(Model, sformComponentFolder, rlistComponentFolder) #>';
-import { <#=  eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, rlistComponentFolder)#>';
-import { <#=  menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  menuItemDataModelFolder, rlistComponentFolder)#>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, rlistComponentFolder)#>';
+import { <#= searchComponentClassName #> } from '<#=  GetFolderName(Model, sformComponentFolder, rlistComponentFolder) #>';
+import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, rlistComponentFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  menuItemDataModelFolder, rlistComponentFolder)#>';
 import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Model, Context, eventEmitterPubModelFolder, rlistComponentFolder)#>';
 import { <#= itemHeightDataModelClassName #> } from '<#= GetCommonFolderName(Model, Context, itemHeightDataModelFolder, rlistComponentFolder)#>';
-import { <#=  GetInterfaceName(Model) #> } from '<#=  GetFolderName(Model, viewInterfaceFolder, rlistComponentFolder) #>';
+import { <#= GetInterfaceName(Model) #> } from '<#=  GetFolderName(Model, viewInterfaceFolder, rlistComponentFolder) #>';
+import { <#= GetInterfaceFilterName(Model) #> } from '<#= GetCrossComponentFolderName(Model, rlistComponentFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
 
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
@@ -197,14 +205,14 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         this.isPostNavApplied = false;
         if (!(typeof this.route.snapshot.data === 'undefined')) {
             if (!(this.route.snapshot.data === null)) {
-                if (!(typeof this.route.snapshot.data.<#= ShowFilterPropName #> === 'undefined')) {
-                    this.<#= ShowFilterPropName #> = this.route.snapshot.data.<#= ShowFilterPropName #>;
+                if (!(typeof this.route.snapshot.data['<#= ShowFilterPropName #>'] === 'undefined')) {
+                    this.<#= ShowFilterPropName #> = this.route.snapshot.data['<#= ShowFilterPropName #>'];
                 }
-                if (!(typeof this.route.snapshot.data.<#= MaxHeightPropName #> === 'undefined')) {
-                    this.<#= MaxHeightPropName #> = this.route.snapshot.data.<#= MaxHeightPropName #>;
+                if (!(typeof this.route.snapshot.data['<#= MaxHeightPropName #>'] === 'undefined')) {
+                    this.<#= MaxHeightPropName #> = this.route.snapshot.data['<#= MaxHeightPropName #>'];
                 }
-                if (!(typeof this.route.snapshot.data.<#= FilterMaxHeightPropName #> === 'undefined')) {
-                    this.<#= FilterMaxHeightPropName #> = this.route.snapshot.data.<#= FilterMaxHeightPropName #>;
+                if (!(typeof this.route.snapshot.data['<#= FilterMaxHeightPropName #>'] === 'undefined')) {
+                    this.<#= FilterMaxHeightPropName #> = this.route.snapshot.data['<#= FilterMaxHeightPropName #>'];
                 }
             }
         }
@@ -720,6 +728,27 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             this.router.navigate(['../'.repeat(shft)], {relativeTo: this.route});
         }
     }
+
+    public <#= externalFilterPropName #>: <#= GetInterfaceFilterName(Model) #> | any = {}
+
+    <#= OnBeforeSqueryMethodName #>(bqp: {cf: <#= GetInterfaceFilterName(Model) #> | any, hf: Array<<#= filterResultModelClassName #>> | any } | any): void {
+        let cf: <#= GetInterfaceFilterName(Model) #> = {};
+        let hf: {[key: string]: {[key: string]: {[key: string]: any}}} = {};
+        if(!(typeof bqp === 'undefined')) {
+            if(!(bqp === null)) {
+                if (!(bqp.cf === 'undefined')) {
+                    if (!(bqp.cf === null)) {
+                        cf = bqp.cf;
+                    }
+                }
+                hf = this.<#= formRootService #>.getHiddenFilterByFltRslt(bqp.hf);
+            }
+        }
+        let cfstr: string|any = JSON.stringify(cf);
+        let hfstr: string|any = JSON.stringify(hf);
+        this.router.navigate( [], { relativeTo: this.route, queryParams: { cf: cfstr, hf: hfstr}, queryParamsHandling: 'merge' }); 
+    }
+
 }
 
 
@@ -1277,6 +1306,9 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 
         }
         return sb.ToString();
+    }
+    string GetInterfaceFilterName(ModelViewSerializable model) {
+        return "I"+model.ViewName + "Filter";
     }
 
 #>

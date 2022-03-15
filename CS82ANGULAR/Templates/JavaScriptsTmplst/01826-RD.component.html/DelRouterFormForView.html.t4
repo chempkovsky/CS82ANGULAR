@@ -15,8 +15,6 @@
 <#
     string HiddenFilterSelector         = "hidden-filter";
     string HiddenFilterPropName         = "hiddenFilter";
-    string EformModeSelector            = "eform-mode";
-    string EformModePropName            = "eformMode";
     string FormControlModelSelector     = "eform-control-model";
     string FormControlModelPropName     = "eformControlModel";
     string BeforeSubmitSelector         = "before-submit";
@@ -41,13 +39,12 @@
     string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, dformComponentFolder);
 #>
 <mat-card>
-        <mat-card-subtitle>{{<#= TitlePropName #>}}</mat-card-subtitle>
+    <mat-card-subtitle>{{<#= TitlePropName #>}}</mat-card-subtitle>
     <mat-card-content>
         <app-<#= componentSelectorCommonPart #> 
             [<#= captionSelector #>]="<#= TitlePropName #>" 
             [<#= HiddenFilterSelector #>]="<#= HiddenFilterPropName #>"
             [<#= FormControlModelSelector #>]="<#= FormControlModelPropName #>"
-            [<#= EformModeSelector #>]="<#= EformModePropName  #>"
             (<#= AfterSubmitSelector #>)="<#= OnAfterSubmitMethodName #>($event)"
             [<#= containerMenuItemsSelector #>]="<#= containerMenuItemsPropName #>"
             (<#= onContainerMenuItemClickSelector #>)="<#= onContainerMenuItemClickMethodName #>($event)"

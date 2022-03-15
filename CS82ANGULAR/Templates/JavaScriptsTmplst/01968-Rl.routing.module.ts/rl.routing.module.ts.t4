@@ -1,0 +1,288 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+    string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
+    string rlComponentFolder                        = "01920-Rlist.component.ts";
+    string rlComponentLazyRoutingModuleFolder       = "01968-Rl.routing.module.ts";
+
+    string rlComponentClassName                     = GetComponentClassName(Model, rlComponentFolder);
+    string rlComponentLazyRoutingModuleClassName    = GetModuleClassName(Model, rlComponentLazyRoutingModuleFolder);
+    string appSettingServiceClassName               = GetCommonServiceClassName(Context, appSettingServiceFolder);
+#>
+
+
+
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { <#= rlComponentClassName #> } from '<#= GetFolderName(Model, rlComponentFolder, rlComponentLazyRoutingModuleFolder) #>';
+import { <#= appSettingServiceClassName + "Activator" #> } from '<#= GetCommonFolderName(Model, Context,  appSettingServiceFolder, rlComponentLazyRoutingModuleFolder)#>';
+
+
+const routes: Routes = [
+ {
+    path: '',
+    component: <#= rlComponentClassName #>,
+    canActivate: [<#= appSettingServiceClassName + "Activator" #>]
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class <#= rlComponentLazyRoutingModuleClassName #> { }
+
+
+<#+
+
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetModuleClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".module","Module").Replace(".routing","Routing");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetServiceClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".service","Service");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetCommonFolderName(ModelViewSerializable model, DbContextSerializable context,  string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if ((model.CommonStaffs == null) || (context.CommonStaffs == null)) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetCommonServiceClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".service","Service");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString();
+    }
+
+#>

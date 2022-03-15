@@ -47,6 +47,12 @@
     string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
     string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
 
+    string externalFilterSelector               = "external-filter";
+    string externalFilterPropName               = "externalFilter";
+    string beforeSquerySelector                 = "before-squery";
+    string beforeSqueryPropName                 = "beforeSquery";
+    string OnBeforeSqueryMethodName             = "onBeforeSquery";
+
     string MaxHeightPropSelector        = "max-height";
     string MaxHeightPropName            = "maxHeight";
     string FilterMaxHeightPropSelector  = "filter-max-height";
@@ -78,6 +84,11 @@
     (<#= applyFilterSelector #>)="<#= applyFilterPropName #>($event)"
     [<#= containerMenuItemsSelector #>]="<#= containerMenuItemsPropName #>"
     (<#= onContainerMenuItemClickSelector #>)="<#= onContainerMenuItemClickMethodName #>($event)"
+
+    (<#= beforeSquerySelector #>)="<#= OnBeforeSqueryMethodName #>($event)"
+    [<#= externalFilterSelector #>]="<#= externalFilterPropName #>"
+    
+
     [<#= MaxHeightPropSelector #>]="<#= MaxHeightPropName #>"  
     [<#= FilterMaxHeightPropSelector #>]="<#= FilterMaxHeightPropName #>"  
  ></app-<#= componentSelectorCommonPart #>>

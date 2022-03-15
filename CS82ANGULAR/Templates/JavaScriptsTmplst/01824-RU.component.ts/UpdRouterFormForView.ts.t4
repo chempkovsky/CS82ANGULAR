@@ -106,7 +106,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     }
 
 
-    @ViewChild(<#= GetComponentClassName(Model, eformComponentFolder) #>) childForm: <#= GetComponentClassName(Model, eformComponentFolder) #> | any;
+    @ViewChild(<#= GetComponentClassName(Model, uformComponentFolder) #>) childForm: <#= GetComponentClassName(Model, uformComponentFolder) #> | any;
 
     <#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
     <#= EformModePropName #>: <#= eformModeEnumName #> = <#= eformModeEnumName #>.DeleteMode;
@@ -117,8 +117,8 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     ngOnInit() {
         if (!(typeof this.route.snapshot.data === 'undefined')) {
             if (!(this.route.snapshot.data === null)) {
-                if (!(typeof this.route.snapshot.data.<#= TitlePropName #> === 'undefined')) {
-                    this.<#= TitlePropName #> = this.route.snapshot.data.<#= TitlePropName #>;
+                if (!(typeof this.route.snapshot.data['<#= TitlePropName #>'] === 'undefined')) {
+                    this.<#= TitlePropName #> = this.route.snapshot.data['<#= TitlePropName #>'];
                 }
             }
         }

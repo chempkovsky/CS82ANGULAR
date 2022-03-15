@@ -855,6 +855,26 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01950-Rv.module.ts\Readme.html">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01952-Ra.module.ts\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01954-Ru.module.ts\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01956-Rd.module.ts\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01958-Rl.module.ts\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Templates\ViewModelTmplst\ViewModel.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -1801,6 +1821,88 @@
     <Content Include="Templates\JavaScriptsTmplst\01940-Routing.module.ts\RoutingModuleForView.ts.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\BatchJavaScriptsTmplst\01000-ViewModelLevelTmplts\01968-Rl.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01950-Rv.module.ts\rvformModuleForView.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01960-Rv.routing.module.ts\rv.routing.module.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01962-Ra.routing.module.ts\ra.routing.module.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01964-Ru.routing.module.ts\ru.routing.module.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01966-Rd.routing.module.ts\rd.routing.module.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01968-Rl.routing.module.ts\rl.routing.module.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01952-Ra.module.ts\raformModuleForView.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01954-Ru.module.ts\ruformModuleForView.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01956-Rd.module.ts\rdformModuleForView.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01958-Rl.module.ts\rlformModuleForView.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01980-R-lazy.routes.ts\r-lazy.routes.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\BatchJavaScriptsTmplst\01000-ViewModelLevelTmplts\01960-Rv.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\BatchJavaScriptsTmplst\01000-ViewModelLevelTmplts\01962-Ra.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\BatchJavaScriptsTmplst\01000-ViewModelLevelTmplts\01964-Ru.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\BatchJavaScriptsTmplst\01000-ViewModelLevelTmplts\01966-Rd.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01970-Rv-lazy.routing.module.ts\rv-lazy.routing.module.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01972-Ra-lazy.routing.module.ts\ra-lazy.routing.module.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01974-Ru-lazy.routing.module.ts\ru-lazy.routing.module.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01976-Rd-lazy.routing.module.ts\rd-lazy.routing.module.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01978-Rl-lazy.routing.module.ts\rl-lazy.routing.module.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
