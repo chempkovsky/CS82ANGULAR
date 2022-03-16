@@ -15,9 +15,16 @@
     
 
 
+    string HiddenFilterPrefix           = "hf";
+    string IdPrefix                     = "id";
+    string DepthParamName               = "depth"; 
+    string uidParamName                 = "uid"; 
 
-    string DepthParamName               = "depth"; // there exists one copy per url: if depth > 1 
-    string ActionParamName              = "mode";  // there exists one copy per url for Add/Update/Delete. it should be the last item
+    string VPrefix                      = "View";
+    string APrefix                      = "Add";
+    string UPrefix                      = "Upd";
+    string DPrefix                      = "Del";
+
     string MaxHeightPropSelector        = "max-height";
     string MaxHeightPropName            = "maxHeight";
     string FilterMaxHeightPropSelector  = "filter-max-height";
@@ -44,7 +51,9 @@
 
     List<Tuple<ModelViewSerializable, string, int>> nodes = new List<Tuple<ModelViewSerializable, string, int>>();
     List<string> allViewNames= new List<string>();
+    // Model, url, depth
     nodes.Add(new Tuple<ModelViewSerializable, string, int>( Model, Model.ViewName, 1));
+    List<string> detailViewNames = new List<string>();
     allViewNames.Add(Model.ViewName);
 
     {
@@ -55,9 +64,6 @@
             List<ModelViewPropertyOfVwSerializable> masterPrincipals = GetModelPrimaryKeyProps(masterView);
             string CurrPath = masterNode.Item2;
             int CurrDepth = masterNode.Item3 + 1;
-            if(CurrDepth == 2) {
-                CurrPath = CurrPath + "/:" + DepthParamName;
-            }
             List<string> viewNames = GetDetailViews(masterView, Context, null);
             foreach(string viewName in viewNames) {
                 ModelViewSerializable detail = GetModelViewByName(Context, viewName);
@@ -65,14 +71,15 @@
                     continue;
                 }
                 string newPath = CurrPath + "/" + viewName;
-                for(int i = 0; i < masterPrincipals.Count; i++) {
-                    newPath = newPath + "/:p"+CurrDepth + "x" + i;
+                if (CurrDepth > 2) {
+                    newPath = "/" +newPath + HiddenFilterPrefix + CurrDepth.ToString();
                 }
                 List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(masterView, detail, null);
+                detailViewNames.Clear();
                 foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
-                    nodes.Add(new Tuple<ModelViewSerializable, string, int>(  detail, newPath + "/"+foreignKey.NavigationName, CurrDepth));
-                    if (!allViewNames.Any(v => v == detail.ViewName)) {
-                        allViewNames.Add(detail.ViewName);
+                    if (!detailViewNames.Any(v => v == detail.ViewName)) {
+                        nodes.Add(new Tuple<ModelViewSerializable, string, int>(detail, newPath, CurrDepth));
+                        detailViewNames.Add(detail.ViewName);
                     }
                 }
             }
@@ -115,20 +122,17 @@
         string fileNm_ru = GeFileNameWithoutExt(aModel, ruLazyModuleFolder);
         string fileNm_rd = GeFileNameWithoutExt(aModel, rdLazyModuleFolder);
         
-        string aPath= "";
-        for(int i = 0; i <  aModelPrincipals.Count; i++) {
-            aPath= aPath + "/:p"+CurrDepth + "x" + i;
-        }
-        aPath= aPath + "/:" + ActionParamName;
-        bool incEdit= true;
         if(aModel.IsWebApiSelectManyWithPagination) {
             if(!string.IsNullOrEmpty(fileNm_rl)) {
+
+
+
                 if(aModel.IsWebApiSelectOneByPrimarykey) {
                     if(!string.IsNullOrEmpty(fileNm_rv)) {
 #>
-    { path: '<#= node.Item2 + aPath #>', 
-        loadChildren: () => import('<#= fileNm_rv #>').then(m => m.<#= GetModuleClassName(aModel, rvFormModuleFolder) #>),
-        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'View <#= aModel.ViewName #>' }  },
+    { path: '<#= node.Item2 + "/" + VPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
+        loadChildren: () => import('<#= fileNm_rv #>').then(m => m.<#= GetModuleClassName(aModel, rvLazyModuleFolder) #>),
+        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'View <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  IdPrefix: '<#= IdPrefix + CurrDepth.ToString() #>', <#= DepthParamName #>: <#= CurrDepth.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
                     } else {
@@ -152,9 +156,9 @@
                 if(aModel.IsWebApiAdd) {
                     if(!string.IsNullOrEmpty(fileNm_ra)) {
 #>
-    { path: '<#= node.Item2 + aPath #>', 
-        loadChildren: () => import('<#= fileNm_ra #>').then(m => m.<#= GetModuleClassName(aModel, raFormModuleFolder) #>),
-        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Add <#= aModel.ViewName #>' }  },
+    { path: '<#= node.Item2 + "/" + APrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() #>', 
+        loadChildren: () => import('<#= fileNm_ra #>').then(m => m.<#= GetModuleClassName(aModel, raLazyModuleFolder) #>),
+        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Add <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
                     } else {
@@ -164,21 +168,23 @@
 //
 <#
                     } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
-                } else { // if(aModel.IsWebApiSelectOneByPrimarykey) { ... } ...
+                } else { // if(aModel.IsWebApiAdd) { ... } ...
 #>
 //
 //warning: for the View   [<#= aModel.ViewName #>] WebApiAdd is set to false
 //
 <#
-                } // if(aModel.IsWebApiSelectOneByPrimarykey) { ... } else { ... }
+                } // if(aModel.IsWebApiAdd) { ... } else { ... }
+
+
 
 
                 if(aModel.IsWebApiUpdate) {
                     if(!string.IsNullOrEmpty(fileNm_ru)) {
 #>
-    { path: '<#= node.Item2 + aPath #>', 
-        loadChildren: () => import('<#= fileNm_ru #>').then(m => m.<#= GetModuleClassName(aModel, ruFormModuleFolder) #>),
-        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Modify <#= aModel.ViewName #>' }  },
+    { path: '<#= node.Item2 + "/" + UPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
+        loadChildren: () => import('<#= fileNm_ru #>').then(m => m.<#= GetModuleClassName(aModel, ruLazyModuleFolder) #>),
+        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Update <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  IdPrefix: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
                     } else {
@@ -188,21 +194,23 @@
 //
 <#
                     } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
-                } else { // if(aModel.IsWebApiSelectOneByPrimarykey) { ... } ...
+                } else { // if(aModel.IsWebApiUpdate) { ... } ...
 #>
 //
 //warning: for the View   [<#= aModel.ViewName #>] WebApiUpdate is set to false
 //
 <#
-                } // if(aModel.IsWebApiSelectOneByPrimarykey) { ... } else { ... }
+                } // if(aModel.IsWebApiUpdate) { ... } else { ... }
+
+
 
 
                 if(aModel.IsWebApiDelete) {
                     if(!string.IsNullOrEmpty(fileNm_rd)) {
 #>
-    { path: '<#= node.Item2 + aPath #>', 
-        loadChildren: () => import('<#= fileNm_rd #>').then(m => m.<#= GetModuleClassName(aModel, rdFormModuleFolder) #>),
-        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Delete <#= aModel.ViewName #>' }  },
+    { path: '<#= node.Item2 + "/" + DPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
+        loadChildren: () => import('<#= fileNm_rd #>').then(m => m.<#= GetModuleClassName(aModel, rdLazyModuleFolder) #>),
+        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Delete <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  IdPrefix: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
                     } else {
@@ -212,22 +220,32 @@
 //
 <#
                     } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
-                } else { // if(aModel.IsWebApiSelectOneByPrimarykey) { ... } ...
+                } else { // if(aModel.IsWebApiDelete) { ... } ...
 #>
 //
 //warning: for the View   [<#= aModel.ViewName #>] WebApiDelete is set to false
 //
 <#
-                } // if(aModel.IsWebApiSelectOneByPrimarykey) { ... } else { ... }
+                } // if(aModel.IsWebApiDelete) { ... } else { ... }
 
 
-
+                if(node.Item3 > 1) {
 #>
-    { path: '<#= node.Item2 + aPath #>', 
-        loadChildren: () => import('<#= fileNm_rl #>').then(m => m.<#= GetModuleClassName(aModel, rlFormModuleFolder) #>),
-        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List of <#= aModel.ViewName #>' }  },
+    { path: '<#= node.Item2 + "/:" + HiddenFilterPrefix + CurrDepth.ToString() #>', 
+        loadChildren: () => import('<#= fileNm_rl #>').then(m => m.<#= GetModuleClassName(aModel, rlLazyModuleFolder) #>),
+        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
+
+                } else {
+#>
+    { path: '<#= node.Item2 #>', 
+        loadChildren: () => import('<#= fileNm_rl #>').then(m => m.<#= GetModuleClassName(aModel, rlLazyModuleFolder) #>),
+        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+
+<#
+                } // if(node.Item3 > 1) { ... } else { ... }
+
 
 
             } else {
@@ -244,57 +262,8 @@
 //
 <#
         } // if(aModel.IsWebApiSelectManyWithPagination) { } else { ... }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        if ((aModelPrincipals.Count < 1)&&false) {
-#>
-//
-//warning: for the View   <#= aModel.ViewName #> the Primary Key properties not included in the list of View properties
-//
-<#
-            incEdit= false;
-        } if (aModelPrincipals.Count != aModel.PrimaryKeyProperties.Count) {
-#>
-//
-//warning: for the View   <#= aModel.ViewName #> not all Primary Key properties included in the list of View properties
-//
-<#
-            incEdit= false;
-        }
-        if ((incEdit)&&false) {
-#>
-    { path: '<#= node.Item2 + aPath #>', 
-        loadChildren: () => import('<#= GeFileNameWithoutExt(aModel, reLazyModuleFolder) #>').then(m => m.<#= GetModuleClassName(aModel, reLazyModuleFolder) #>),
-        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Modify(Delete) <#= aModel.ViewName #>' }  },
-
-    { path: '<#= node.Item2 + "/:" + ActionParamName #>', 
-        loadChildren: () => import('<#= GeFileNameWithoutExt(aModel, reLazyModuleFolder) #>').then(m => m.<#= GetModuleClassName(aModel, reLazyModuleFolder) #>),
-        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Add <#= aModel.ViewName #>'  }  },
-
-<#
-        }
-#>
-    { path: '<#= node.Item2 #>', 
-        loadChildren: () => import('<#= GeFileNameWithoutExt(aModel, rlLazyModuleFolder) #>').then(m => m.<#= GetModuleClassName(aModel, rlLazyModuleFolder) #>),
-        data: { <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>:  'List of <#= aModel.ViewName #>' }  },
-
-<#
     }
 #>
-
-
 */
 //
 //    ...

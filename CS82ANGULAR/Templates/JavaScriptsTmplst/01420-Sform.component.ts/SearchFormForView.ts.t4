@@ -262,7 +262,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         this.<#= OnBackBtnPropName #>.emit(v);
     }
 
-    @Output('<#= beforeSquerySelector #>') <#= beforeSqueryPropName #> = new EventEmitter<{cf:<#= GetInterfaceFilterName(Model) #> | any, hf:Array<<#= filterResultModelClassName #>> | any }>();
+    @Output('<#= beforeSquerySelector #>') <#= beforeSqueryPropName #> = new EventEmitter<<#= GetInterfaceFilterName(Model) #> | any>();
 
     @Output('<#= onContainerMenuItemClickSelector #>') <#= onContainerMenuItemClickEmitter #> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
     @Input('<#= containerMenuItemsSelector #>') <#= containerMenuItemsPropName #>: Array<<#= menuItemDataModelClassName #>> = [];
@@ -353,11 +353,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             this._<#= HiddenFilterPropName #> =  inDef;
           }
           this.onHiddenFilter();
-          this.currentPageIndex = 0;
-          this.resetCurFltr();
-          if(this.isOnInitCalled) {
-            this.onFilter();
-          }
+          this.reset<#= externalFilterPropName #>();
         } 
 
     public <#= externalFilterRsltPropName #>: Array<<#= filterResultModelClassName #>> = [];
@@ -371,45 +367,43 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         isNDf = isNDf ? isNDf : (ef === null);
         if(isNDf) {
           this._<#= externalFilterPropName #> = {};
-          if(this.<#= externalFilterRsltPropName #>.length > 0) {
-            this.<#= externalFilterRsltPropName #> = [];
-            this.currentPageIndex = 0;
-            this.currentPageSize = <#= MatPaginatorPageSize #>;
-            if(this.isOnInitCalled) {
-              this.resetCurFltr();
-              this.onFilter();
-            }
-          }
+          this.reset<#= externalFilterPropName #>();
         } else {
-          this.currentSortColumn = '';
-          if(Array.isArray(ef.orderby)) {
+            this._<#= externalFilterPropName #> = ef;
+            this.reset<#= externalFilterPropName #>();
+        }
+    }
+    reset<#= externalFilterPropName #>() {
+        let ef: <#= GetInterfaceFilterName(Model) #> | any = this._<#= externalFilterPropName #>;
+        this.currentSortColumn = '';
+        if(Array.isArray(ef.orderby)) {
             if(ef.orderby.length > 0) {
                 this.currentSortColumn = ef.orderby[0];
             }
-          }  
-          if(ef.page) { this.currentPageIndex = ef.page; } else { this.currentPageIndex = 0; }
-          if(ef.pagesize) { this.currentPageSize = ef.pagesize; } else { this.currentPageSize = <#= MatPaginatorPageSize #>; }
-          let rslt: Array<<#= filterResultModelClassName #>> = [];
-          this.filterDefs.forEach((fd: <#= filterDefModelClassName #>) => {
-            if( Array.isArray(ef[fd.fltrName]) ) {
-                let oprtrs: Array<string> = [];    
-                if( Array.isArray(ef[fd.fltrName+'<#= OperatorSufix #>']) ) {
-                    oprtrs = ef[fd.fltrName+'<#= OperatorSufix #>'];
+        }  
+        if(ef.page) { this.currentPageIndex = ef.page; } else { this.currentPageIndex = 0; }
+        if(ef.pagesize) { this.currentPageSize = ef.pagesize; } else { this.currentPageSize = <#= MatPaginatorPageSize #>; }
+        let rslt: Array<<#= filterResultModelClassName #>> = [];
+        this.filterDefs.forEach((fd: <#= filterDefModelClassName #>) => {
+            if(!this.<#= HiddenFilterPropName #>.some((v: { fltrName: string; }) => v.fltrName === fd.fltrName)) {
+                if( Array.isArray(ef[fd.fltrName]) ) {
+                    let oprtrs: Array<string> = [];    
+                    if( Array.isArray(ef[fd.fltrName+'<#= OperatorSufix #>']) ) {
+                        oprtrs = ef[fd.fltrName+'<#= OperatorSufix #>'];
+                    }
+                    ef[fd.fltrName].forEach((val: any, i: number) => {
+                        let op = 'eq';
+                        if(oprtrs.length > i) op = oprtrs[i];
+                        rslt.push({fltrName: fd.fltrName, fltrDataType: fd.fltrDataType, fltrOperator: op, fltrValue:val});
+                    });
                 }
-                ef[fd.fltrName].forEach((val: any, i: number) => {
-                    let op = 'eq';
-                    if(oprtrs.length > i) op = oprtrs[i];
-                    rslt.push({fltrName: fd.fltrName, fltrDataType: fd.fltrDataType, fltrOperator: op, fltrValue:val});
-                });
             }
-          });
-          this.<#= externalFilterRsltPropName #> = rslt;
-          this._<#= externalFilterPropName #> = ef;
-          this.resetCurFltr();
-          if(this.isOnInitCalled) {
+        });
+        this.resetCurFltr();
+        this.<#= externalFilterRsltPropName #> = rslt;
+        if(this.isOnInitCalled) {
             this.onFilter();
-          }
-      }
+        }
     }
 
     public <#= currentRowPropName #>: <#= GetInterfaceName(Model) #> | null = null;
@@ -553,7 +547,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 flt[opNm].push(e.fltrOperator);
             });
         }
-        this.<#= beforeSqueryPropName #>.emit({cf: flt, hf: this._<#= HiddenFilterPropName #>});
+        this.<#= beforeSqueryPropName #>.emit(flt);
         this.inQuery = true;
         this.<#= formRootService #>.<#= GetWithFilterMethodName #>(flt)
             .subscribe({

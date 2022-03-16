@@ -13,11 +13,31 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
 
+
+    string HiddenFilterPrefix           = "hf";
+    string IdPrefix                     = "id";
+    string VPrefix                      = "View";
+    string APrefix                      = "Add";
+    string UPrefix                      = "Upd";
+    string DPrefix                      = "Del";
     string DepthParamName               = "depth"; 
+    string HiddenFilterAsFltRsltSuffix  = "HiddenFilterAsFltRslt";
+    string HiddenFilterByRowSuffix      = "HiddenFilterByRow";
+    string uidParamName                 = "uid"; 
+
+    string getStorageItemMethodName     = "getStorageItem";
+    string setStorageItemMethodName     = "setStorageItem";
+    string getStorageLengthMethodName   = "getStorageLength";
+    string removeStorageItemMethodName  = "removeStorageItem";
+    string getStorageKeyMethodName      = "getStorageKey";
+    string clearStorageMethodName       = "getStorageKey";
+
+
     string ActionParamName              = "mode";  
     string ActionParamAddMode           = "add";
     string ActionParamUpdateMode        = "update";
     string ActionParamDeleteMode        = "delete";
+    string ActionParamViewMode          = "view";
     string ActionParamCancelMode        = "cancel";
     string ViewNameParamName            = "view";
     string NavigationParamName          = "nav";
@@ -155,6 +175,9 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
 
     isPostNavApplied: boolean = false;
     isOnInitCalled: boolean = false;
+    <#= DepthParamName #>: number = 1;
+    <#= HiddenFilterPrefix #>: string = '<#= HiddenFilterPrefix + "1" #>';
+    <#= uidParamName #>: string|null = null;
 
     <#= showBackBtnPropName #>: boolean = false;
 
@@ -186,6 +209,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             }
         }
     rowMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
+         {id: '<#= ActionParamViewMode #>', caption: 'View Item', iconName: 'preview', iconColor: 'primary', enabled: true},
          {id: '<#= ActionParamUpdateMode #>', caption: 'Modify Item', iconName: 'edit', iconColor: 'primary', enabled: true},
          {id: '<#= ActionParamDeleteMode #>', caption: 'Delete Item', iconName: 'delete_forever', iconColor: 'warn', enabled: true}
       ];
@@ -200,6 +224,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     }
     permMask: number = 0;
     ngOnInit() {
+        let luid = '';
         this.permMask = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= Model.ViewName #>');
         this.tableMenuItemsData[0].enabled = ((this.permMask & 8) === 8);
         this.isPostNavApplied = false;
@@ -214,173 +239,42 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 if (!(typeof this.route.snapshot.data['<#= FilterMaxHeightPropName #>'] === 'undefined')) {
                     this.<#= FilterMaxHeightPropName #> = this.route.snapshot.data['<#= FilterMaxHeightPropName #>'];
                 }
+                if (!(typeof this.route.snapshot.data['<#= HiddenFilterPrefix #>'] === 'undefined')) {
+                    this.<#= HiddenFilterPrefix #> = this.route.snapshot.data['<#= HiddenFilterPrefix #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= DepthParamName #>'] === 'undefined')) {
+                    this.<#= DepthParamName #> = this.route.snapshot.data['<#= DepthParamName #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= uidParamName #>'] === 'undefined')) {
+                    this.<#= uidParamName #> = this.route.snapshot.data['<#= uidParamName #>'];
+                }
             }
         }
-        if (this.route.snapshot.url.length < 1) {
-            this.currSnapshot = this.route.snapshot.pathFromRoot[this.route.snapshot.pathFromRoot.length-2];
+        luid = luid + ':' +this.<#= DepthParamName #>;
+        if(this.<#= DepthParamName #> > 1) {
+            let lhf: Array<<#= filterResultModelClassName #>> = [];
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                lhf = this.<#= formRootService #>.get<#= HiddenFilterAsFltRsltSuffix #>(JSON.parse(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]));
+            }
+            if(Array.isArray(lhf)) {
+                lhf.forEach((v:{fltrName: string, fltrValue: any}) => {
+                    luid = luid + ':' + v.fltrName + ':' + v.fltrValue
+                });
+            }
+            this.<#= HiddenFilterPropName #> = lhf;
+            this.<#= showBackBtnPropName #> = true;
         } else {
-            this.currSnapshot = this.route.snapshot;
+            this.<#= showBackBtnPropName #> = false;
         }
-
-<#
-    if (Model.ForeignKeys != null) {
-        if (Model.ForeignKeys.Count > 0) {
-#>
-        let url: UrlSegment[] = this.currSnapshot.url;
-        let len: number = url.length;
-        let paramMap: ParamMap = this.currSnapshot.paramMap;
-        if(paramMap.has('<#= DepthParamName #>')) {
-            let depth: number = parseInt(paramMap.get('<#= DepthParamName #>') as string);
-            if (depth > 1) {
-                if(len < 5) {
-                    this.onNavError();
-                    return;
-                }
-                let nvgNm: string = url[len-1].path;
-                if(typeof nvgNm === 'undefined') {
-                    this.onNavError();
-                    return;
-                }
-                if(nvgNm === null) {
-                    this.onNavError();
-                    return;
-                }
-                this.<#= showBackBtnPropName #> = true;
-                nvgNm = nvgNm.toLowerCase();
-                let hf: Array<<#= filterResultModelClassName #>> = [];
-<#
-            {
-                bool genEls = false;
-                foreach(ModelViewForeignKeySerializable modelViewForeignKeySerializable in Model.ForeignKeys) {
-                    if( string.IsNullOrEmpty( modelViewForeignKeySerializable.NavigationName ) || string.IsNullOrEmpty( modelViewForeignKeySerializable.ViewName )) {
-                        continue;
-                    }
-                    if ((modelViewForeignKeySerializable.PrincipalKeyProps == null) || (modelViewForeignKeySerializable.ForeignKeyProps == null) || (modelViewForeignKeySerializable.ScalarProperties == null)) {
-#>
-//
-//error: for the foreignkey <#= modelViewForeignKeySerializable.NavigationName #> can not find Foreign Keys and(or) Principal Keys and(or) Scalar Properties
-//
-<#
-                        continue;
-                    }
-                    if (modelViewForeignKeySerializable.PrincipalKeyProps.Count != modelViewForeignKeySerializable.ForeignKeyProps.Count) {
-#>
-//
-//error: for the foreignkey <#= modelViewForeignKeySerializable.NavigationName #> the number of properties of  ForeignKeys is not equal to the number of properties of PrincipalKeys
-//
-<#
-                        continue;
-                    }
-                    if (modelViewForeignKeySerializable.PrincipalKeyProps.Count < 1) {
-                        continue;
-                    }
-                    ModelViewSerializable masterView = GetViewByName(Context, modelViewForeignKeySerializable.ViewName);
-                    if(masterView == null) {
-#>
-//
-//error: for the foreignkey <#= modelViewForeignKeySerializable.NavigationName #> can not find View by name <#= modelViewForeignKeySerializable.ViewName #> in the context
-//         no code generated for the given foreign key
-//
-<#
-                        continue;
-                    }
-                    bool skipItem = false;
-                    for(int i = 0; i < modelViewForeignKeySerializable.PrincipalKeyProps.Count; i++) {
-                        ModelViewPropertyOfFkSerializable modelViewPropertyOfFkSerializable = 
-                            GetScalarPropByPrincipalKeyProp(modelViewForeignKeySerializable, modelViewForeignKeySerializable.PrincipalKeyProps[i]);
-                        if(modelViewPropertyOfFkSerializable == null) {
-#>
-//
-//error: for the foreignkey <#= modelViewForeignKeySerializable.NavigationName #> The primary key property <#= modelViewForeignKeySerializable.PrincipalKeyProps[i].OriginalPropertyName #> is not included in the View.
-//         no code generated for the given foreign key
-//
-<#
-                            skipItem = true;
-                            break;
-                        }
-                        ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable =
-                            GetScalarPropByOriginalPropertyNameAndForeignKeyNameChain(Model, modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName, null);
-                        if ((modelViewPropertyOfVwSerializable == null) && (!modelViewPropertyOfFkSerializable.IsSelected)) {
-#>
-//
-//warning: for the foreignkey <#= modelViewForeignKeySerializable.NavigationName #> The Foreign key property <#= modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName #> is not included in the View.
-//         no code generated for the given foreign key
-//
-<#
-                            skipItem = true;
-                            break;
-                        }
-                        ModelViewPropertyOfVwSerializable masterProp = 
-                            GetScalarPropByOriginalPropertyNameAndForeignKeyNameChain(masterView, modelViewForeignKeySerializable.PrincipalKeyProps[i].OriginalPropertyName, null);
-                        if (masterProp == null) {
-#>
-//
-//warning: for the foreignkey <#= modelViewForeignKeySerializable.NavigationName #> The Foreign key property <#= modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName #> is not included in the View.
-//         no code generated for the given foreign key
-//
-<#
-                            skipItem = true;
-                            break;
-                        }
-
-                    }
-                    if (skipItem) {
-                        continue;
-                    }
-                    if (genEls) {
-#>
-                    else if ('<#= modelViewForeignKeySerializable.NavigationName #>'.toLowerCase() === nvgNm) {
-<#
-                    } else {
-#>
-                    if ('<#= modelViewForeignKeySerializable.NavigationName #>'.toLowerCase() === nvgNm) {
-<#
-                        genEls = true;
-                    }
-#>
-                        if ( (4 + <#= modelViewForeignKeySerializable.PrincipalKeyProps.Count  #>) > len ) {
-                            this.onNavError();
-                            return;
-                        }
-<#
-                    for(int i = 0; i < modelViewForeignKeySerializable.PrincipalKeyProps.Count; i++) {
-                        ModelViewPropertyOfVwSerializable masterProp = 
-                            GetScalarPropByOriginalPropertyNameAndForeignKeyNameChain(masterView, modelViewForeignKeySerializable.PrincipalKeyProps[i].OriginalPropertyName, null);
-                        ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable =
-                            GetScalarPropByOriginalPropertyNameAndForeignKeyNameChain(Model, modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName, null);                        
-                        ModelViewPropertyOfFkSerializable modelViewPropertyOfFkSerializable = 
-                            GetScalarPropByPrincipalKeyProp(modelViewForeignKeySerializable, modelViewForeignKeySerializable.PrincipalKeyProps[i]);
-                        if(modelViewPropertyOfVwSerializable == null) {
-                            modelViewPropertyOfVwSerializable = Model.ScalarProperties.Where(p => p.ViewPropertyName == modelViewPropertyOfFkSerializable.ViewPropertyName).FirstOrDefault();
-                        }
-                        string masterName = GetTypeScriptPropertyName(masterProp, masterView);
-                        string detailName = GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model);
-#>
-                        hf.push({
-                            fltrName: '<#= detailName #>',
-                            fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', 
-                            fltrOperator: 'eq',
-                            fltrValue: url[len - <#= modelViewForeignKeySerializable.PrincipalKeyProps.Count-i+1 #>].path
-                        });
-<#
-                    }
-#>
-                    }
-<#
-                } // foreach(ModelViewForeignKeySerializable modelViewForeignKeySerializable in Model.ForeignKeys) {
+        this.<#= uidParamName #> = luid;
+        let si: string|any = this.<#= AppSettingServicePropName #>.<#= getStorageItemMethodName #>(this.<#= uidParamName #>);
+        if(!(typeof si === 'undefined')) {
+            if(!(si === null)) {
+                this.<#= externalFilterPropName #> = JSON.parse(si);
             }
-#>
-                if (hf.length < 1) {
-                    this.onNavError();
-                    return;
-                }
-                this.<#= HiddenFilterPropName #> = hf;
-            } // if (depth > 1)
-        } // if(paramMap.has(<#= DepthParamName #>))
-<#
-        } // if (Model.ForeignKeys.Count > 0) {
-    } // if (Model.ForeignKeys != null) {
-#>
+        }
+        
+
         this.rowMenuItemsData[0].enabled = this.rowMenuItemsData[0].enabled && ((this.permMask & 4) === 4); // modify
         this.rowMenuItemsData[1].enabled = this.rowMenuItemsData[1].enabled && ((this.permMask & 2) === 2); // delete
 <#
@@ -430,51 +324,51 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         let id = this.rowMenuItemsData.findIndex(e => { return e.id === v.id; })
         if(id < 0) return;
         let mnItm: <#=  menuItemDataModelClassName #> = this.rowMenuItemsData[id];
-        let qp = ['./'];
-        if  (!((v.id === '<#= ActionParamUpdateMode #>') || (v.id === '<#= ActionParamDeleteMode #>'))) {
-            //let depth: number = 1;
-            //let paramMap: ParamMap = this.currSnapshot.paramMap;
-            //if(paramMap.has('depth')) {
-                //depth = parseInt(paramMap.get('depth') as string)+1;
-            //} 
-            //if(depth < 2) depth = 2;
-            //qp.push(depth.toString());
-            let paramMap: ParamMap = this.currSnapshot.paramMap;
-            if(!paramMap.has('depth')) {
-                qp.push('2');
+        let qp = [];
+        if(v.id === '<#= ActionParamViewMode #>') {
+            qp.push( '<#= UPrefix #>' + '<#= Model.ViewName #>' );
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
+            } else {
+                qp.push(JSON.stringify({}));
             }
-        }
-        let sfx = mnItm.id;
-        if (!(typeof mnItm.data === 'undefined')) {
-            if (!(mnItm.data === null)) {
-                qp.push( mnItm.data.<#= ViewNameParamName #> );
-                sfx = mnItm.data.<#= NavigationParamName #>
+            qp.push(JSON.stringify(v.value));
+        } else if(v.id === '<#= ActionParamUpdateMode #>') {
+            qp.push( '<#= UPrefix #>' + '<#= Model.ViewName #>' );
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
+            } else {
+                qp.push(JSON.stringify({}));
             }
+            qp.push(JSON.stringify(v.value));
+        } else if(v.id === '<#= ActionParamDeleteMode #>') {
+            qp.push( '<#= DPrefix #>' + '<#= Model.ViewName #>' );
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
+            } else {
+                qp.push(JSON.stringify({}));
+            }
+            qp.push(JSON.stringify(v.value));
+        } else if (!(typeof mnItm.data === 'undefined')) {
+            qp.push( mnItm.data.<#= ViewNameParamName #> );
+            qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(v.value, mnItm.data.<#= NavigationParamName #>)));
         }
-<#
-    foreach(ModelViewPropertyOfVwSerializable primKey in primKeys) {
-#>
-        qp.push(v.value.<#= GetTypeScriptPropertyName(primKey, Model) #>);
-<#
-    }             
-#>      
-        qp.push(sfx);  
         this.router.navigate(qp, {relativeTo: this.route});
     }
     tableCommand(v: <#= eventEmitterDataModelClassName #>) {
         let id = this.tableMenuItemsData.findIndex(e => { return e.id === v.id; })
         if(id < 0) return;
         let mnItm: <#=  menuItemDataModelClassName #> = this.tableMenuItemsData[id];
-        let sfx = mnItm.id;
-        let qp = ['./'];
-        if (!(typeof mnItm.data === 'undefined')) {
-            if (!(mnItm.data === null)) {
-                qp.push( mnItm.data.<#= ViewNameParamName #> );
-                sfx = mnItm.data.<#= NavigationParamName #>
+        if(mnItm.id === '<#= ActionParamAddMode #>') {
+            let qp = [];
+            qp.push( '<#= APrefix #>' + '<#= Model.ViewName #>' );
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
+            } else {
+                qp.push(JSON.stringify({}));
             }
+            this.router.navigate(qp, {relativeTo: this.route});
         }
-        qp.push(sfx);  
-        this.router.navigate(qp, {relativeTo: this.route});
     }
     <#= applyFilterPropName #>(frm: <#= searchComponentClassName #> | any) {
         if(this.isPostNavApplied) {
@@ -551,202 +445,24 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         }
     }
     onBackBtn(e?: any) {
-<#
-    if (Model.ForeignKeys != null) {
-        if (Model.ForeignKeys.Count > 0) {
-#>
-        let paramMap: ParamMap = this.currSnapshot.paramMap;
-        let url: UrlSegment[] = this.currSnapshot.url;
-        let len: number = url.length;
-        if(paramMap.has('<#= DepthParamName #>')) {
-            let depth: number = parseInt(paramMap.get('<#= DepthParamName #>')  as string);
-            if (depth > 1) {
-                if(len < 5) {
-                    this.onNavError();
-                    return;
-                }
-                let nvgNm: string = url[len-1].path;
-                if (typeof nvgNm === 'undefined') {
-                    return;
-                }
-                if (nvgNm === null) {
-                    return;
-                }
-                nvgNm = nvgNm.toLowerCase();
-                let flt: any = {
-                    <#= ActionParamName #>: '<#= ActionParamCancelMode #>'
-                };
-<#
-            {
-                bool genEls = false;
-                foreach(ModelViewForeignKeySerializable modelViewForeignKeySerializable in Model.ForeignKeys) {
-                    if( string.IsNullOrEmpty( modelViewForeignKeySerializable.NavigationName ) || string.IsNullOrEmpty( modelViewForeignKeySerializable.ViewName )) {
-                        continue;
-                    }
-                    if ((modelViewForeignKeySerializable.PrincipalKeyProps == null) || (modelViewForeignKeySerializable.ForeignKeyProps == null) || (modelViewForeignKeySerializable.ScalarProperties == null)) {
-#>
-//
-//error: for the foreignkey <#= modelViewForeignKeySerializable.NavigationName #> can not find Foreign Keys and(or) Principal Keys and(or) Scalar Properties
-//
-<#
-                        continue;
-                    }
-                    if (modelViewForeignKeySerializable.PrincipalKeyProps.Count != modelViewForeignKeySerializable.ForeignKeyProps.Count) {
-#>
-//
-//error: for the foreignkey <#= modelViewForeignKeySerializable.NavigationName #> the number of properties of  ForeignKeys is not equal to the number of properties of PrincipalKeys
-//
-<#
-                        continue;
-                    }
-                    if (modelViewForeignKeySerializable.PrincipalKeyProps.Count < 1) {
-                        continue;
-                    }
-                    ModelViewSerializable masterView = GetViewByName(Context, modelViewForeignKeySerializable.ViewName);
-                    if(masterView == null) {
-#>
-//
-//error: for the foreignkey <#= modelViewForeignKeySerializable.NavigationName #> can not find View by name <#= modelViewForeignKeySerializable.ViewName #> in the context
-//         no code generated for the given foreign key
-//
-<#
-                        continue;
-                    }
-                    bool skipItem = false;
-                    for(int i = 0; i < modelViewForeignKeySerializable.PrincipalKeyProps.Count; i++) {
-                        ModelViewPropertyOfFkSerializable modelViewPropertyOfFkSerializable = 
-                            GetScalarPropByPrincipalKeyProp(modelViewForeignKeySerializable, modelViewForeignKeySerializable.PrincipalKeyProps[i]);
-                        if(modelViewPropertyOfFkSerializable == null) {
-#>
-//
-//error: for the foreignkey <#= modelViewForeignKeySerializable.NavigationName #> The primary key property <#= modelViewForeignKeySerializable.PrincipalKeyProps[i].OriginalPropertyName #> is not included in the View.
-//         no code generated for the given foreign key
-//
-<#
-                            skipItem = true;
-                            break;
-                        }
-                        ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable =
-                            GetScalarPropByOriginalPropertyNameAndForeignKeyNameChain(Model, modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName, null);
-                        if ((modelViewPropertyOfVwSerializable == null) && (!modelViewPropertyOfFkSerializable.IsSelected)) {
-#>
-//
-//warning: for the foreignkey <#= modelViewForeignKeySerializable.NavigationName #> The Foreign key property <#= modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName #> is not included in the View.
-//         no code generated for the given foreign key
-//
-<#
-                            skipItem = true;
-                            break;
-                        }
-                        ModelViewPropertyOfVwSerializable masterProp = 
-                            GetScalarPropByOriginalPropertyNameAndForeignKeyNameChain(masterView, modelViewForeignKeySerializable.PrincipalKeyProps[i].OriginalPropertyName, null);
-                        if (masterProp == null) {
-#>
-//
-//warning: for the foreignkey <#= modelViewForeignKeySerializable.NavigationName #> The Foreign key property <#= modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName #> is not included in the View.
-//         no code generated for the given foreign key
-//
-<#
-                            skipItem = true;
-                            break;
-                        }
-
-                    }
-                    if (skipItem) {
-                        continue;
-                    }
-                    if (genEls) {
-#>
-                    else if ('<#= modelViewForeignKeySerializable.NavigationName #>'.toLowerCase() === nvgNm) {
-<#
-                    } else {
-#>
-                    if ('<#= modelViewForeignKeySerializable.NavigationName #>'.toLowerCase() === nvgNm) {
-<#
-                        genEls = true;
-                    }
-#>
-                        if ( (4 + <#= modelViewForeignKeySerializable.PrincipalKeyProps.Count  #>) > len ) {
-                            this.onNavError();
-                            return;
-                        }
-<#
-                    for(int i = 0; i < modelViewForeignKeySerializable.PrincipalKeyProps.Count; i++) {
-                        ModelViewPropertyOfVwSerializable masterProp = 
-                            GetScalarPropByOriginalPropertyNameAndForeignKeyNameChain(masterView, modelViewForeignKeySerializable.PrincipalKeyProps[i].OriginalPropertyName, null);
-                        ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable =
-                            GetScalarPropByOriginalPropertyNameAndForeignKeyNameChain(Model, modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName, null);                        
-                        ModelViewPropertyOfFkSerializable modelViewPropertyOfFkSerializable = 
-                            GetScalarPropByPrincipalKeyProp(modelViewForeignKeySerializable, modelViewForeignKeySerializable.PrincipalKeyProps[i]);
-                        if(modelViewPropertyOfVwSerializable == null) {
-                            modelViewPropertyOfVwSerializable = Model.ScalarProperties.Where(p => p.ViewPropertyName == modelViewPropertyOfFkSerializable.ViewPropertyName).FirstOrDefault();
-                        }
-                        string masterName = GetTypeScriptPropertyName(masterProp, masterView);
-#>
-                        flt[ '<#= masterName #>'] = url[len - <#= modelViewForeignKeySerializable.PrincipalKeyProps.Count-i+1 #>].path;
-<#
-                    }
-#>
-                        let shft = <#= modelViewForeignKeySerializable.PrincipalKeyProps.Count + 2 #>;
-                        if(paramMap.keys.length === <#= modelViewForeignKeySerializable.PrincipalKeyProps.Count + 1 #>) {
-                            shft = shft + 1;
-                        }
-                        this.router.navigate(['../'.repeat(shft)], {queryParams: flt, relativeTo: this.route});
-                    }
-<#
-                } // foreach(ModelViewForeignKeySerializable modelViewForeignKeySerializable in Model.ForeignKeys) {
-            }
-#>
-            }
-        }
-<#
-        }
-    }
-#>
-    }
-    onNavError() {
-        let msg = {
-            message:'Incorrect Url.'
-        };
-        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('Navigation Error', msg)
-        let url: UrlSegment[] = this.currSnapshot.url;
-        let len: number = url.length;
-        let shft: number = 0;
-        for (var i = len-1; i > -1; i--) {
-            if (!(typeof url[i].path === 'undefined')) {
-                if (!(url[i].path === null)) {
-                    if ('<#= Model.ViewName #>'.toLowerCase() === url[i].path.toLowerCase()) {
-                        shft++;
-                        break;
-                    }
-                }
-            }
-        }
-        if (shft >= len) {
-            this.router.navigate(['/']);
-        } else {
-            this.router.navigate(['../'.repeat(shft)], {relativeTo: this.route});
+        if (this.<#= DepthParamName #> > 1) {
+            this.<#= AppSettingServicePropName #>.<#= removeStorageItemMethodName #>(this.<#= uidParamName #>);
+            this.router.navigate(['../../'], {relativeTo: this.route});
         }
     }
 
     public <#= externalFilterPropName #>: <#= GetInterfaceFilterName(Model) #> | any = {}
 
-    <#= OnBeforeSqueryMethodName #>(bqp: {cf: <#= GetInterfaceFilterName(Model) #> | any, hf: Array<<#= filterResultModelClassName #>> | any } | any): void {
-        let cf: <#= GetInterfaceFilterName(Model) #> = {};
-        let hf: {[key: string]: {[key: string]: {[key: string]: any}}} = {};
-        if(!(typeof bqp === 'undefined')) {
-            if(!(bqp === null)) {
-                if (!(bqp.cf === 'undefined')) {
-                    if (!(bqp.cf === null)) {
-                        cf = bqp.cf;
-                    }
-                }
-                hf = this.<#= formRootService #>.getHiddenFilterByFltRslt(bqp.hf);
+    <#= OnBeforeSqueryMethodName #>(cf: <#= GetInterfaceFilterName(Model) #> | any): void {
+        if (this.<#= uidParamName #> === null) return;
+        let cfs: <#= GetInterfaceFilterName(Model) #> = {};
+        if(!(typeof cf === 'undefined')) {
+            if(!(cf === null)) {
+                cfs = cf;
             }
         }
-        let cfstr: string|any = JSON.stringify(cf);
-        let hfstr: string|any = JSON.stringify(hf);
-        this.router.navigate( [], { relativeTo: this.route, queryParams: { cf: cfstr, hf: hfstr}, queryParamsHandling: 'merge' }); 
+        let cfstr: string|any = JSON.stringify(cfs);
+        this.<#= AppSettingServicePropName #>.<#= setStorageItemMethodName #>(this.<#= uidParamName #>, JSON.stringify(cfs));
     }
 
 }

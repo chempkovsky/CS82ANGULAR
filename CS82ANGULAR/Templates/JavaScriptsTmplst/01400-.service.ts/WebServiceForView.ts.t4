@@ -153,24 +153,28 @@ export class <#= GetJavaScriptServiceName(Model) #> {
                 if( Object.keys(<#= MasterToClientKeyFieldsMapFieldName #>).indexOf(i) > -1 ) {
                     if( Object.keys(<#= MasterToClientKeyFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
                         for(let k in <#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
+                          if(!(typeof hf[i][j][k] === 'undefined' )) {
                             rslt.push({
                                 fltrName: <#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm,
                                 fltrDataType: this.getDtTp<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm),
                                 fltrOperator: 'eq',
                                 fltrValue: <#= HiddenFilterFieldName #>[i][j][k]
                             });
+                          }
                         }
                     }
                 }
                 if( Object.keys(<#= MasterToClientFieldsMapFieldName #>).indexOf(i) > -1 ) {
                     if( Object.keys(<#= MasterToClientFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
                         for(let k in <#= MasterToClientFieldsMapFieldName #>[i][j]) {
+                          if(!(typeof hf[i][j][k] === 'undefined' )) {
                             rslt.push({
                                 fltrName: <#= MasterToClientFieldsMapFieldName #>[i][j][k],
                                 fltrDataType: this.getDtTp<#= ValueSuffix #>(<#= MasterToClientFieldsMapFieldName #>[i][j][k]),
                                 fltrOperator: 'eq',
                                 fltrValue: <#= HiddenFilterFieldName #>[i][j][k]
                             });
+                          }
                         }
                     }
                 }

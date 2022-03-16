@@ -13,6 +13,15 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
 
+    string HiddenFilterPrefix           = "hf";
+    string IdPrefix                     = "id";
+    string VPrefix                      = "View";
+    string APrefix                      = "Add";
+    string UPrefix                      = "Upd";
+    string DelPrefix                    = "Del";
+
+
+
     string DepthParamName               = "depth"; 
     string ActionParamName              = "mode";  
     string ActionParamAddMode           = "add";

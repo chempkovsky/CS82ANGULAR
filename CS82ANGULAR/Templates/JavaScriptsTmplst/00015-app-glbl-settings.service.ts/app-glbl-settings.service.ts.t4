@@ -20,6 +20,17 @@
     string ShowMessageMethodName        = "showMsg";
     string AppSettingServicePropName    = "appGlblSettings";
 
+    string getStorageItemMethodName     = "getStorageItem";
+    string setStorageItemMethodName     = "setStorageItem";
+    string getStorageLengthMethodName   = "getStorageLength";
+    string removeStorageItemMethodName  = "removeStorageItem";
+    string getStorageKeyMethodName      = "getStorageKey";
+    string clearStorageMethodName       = "getStorageKey";
+
+
+
+
+
 #>
 
 import { Injectable } from '@angular/core';
@@ -265,6 +276,64 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
     }
     
     public userName: string|null=null;
+
+    public useLocalStorage: boolean = false;
+    public useSessionStorage: boolean = false;
+    protected serviceStorage: {[key: string]: any} = {};
+
+    public <#= getStorageItemMethodName #>(key: string): any {
+        if(typeof key === 'undefined') return null;
+        if (this.useLocalStorage) {
+            return null;
+        } else if (this.useSessionStorage) {
+            return null;
+        } else {
+            return this.serviceStorage[key];
+        }
+    }
+    public <#= setStorageItemMethodName #>(key: string, val: any): void {
+        if(!(typeof key === 'undefined')) {
+            if (this.useLocalStorage) {
+                
+            } else if (this.useSessionStorage) {
+            
+            } else {
+                this.serviceStorage[key] = val;
+            }
+        }
+    }
+    public <#= getStorageLengthMethodName #>(): number {
+        if (this.useLocalStorage) {
+            return 0;
+        } else if (this.useSessionStorage) {
+            return 0;
+        } else {
+            return Object.keys(this.serviceStorage).length;
+        }
+    }
+    public <#= removeStorageItemMethodName #>(key: string): void {
+        delete this.serviceStorage[key];
+    }
+    public <#= getStorageKeyMethodName #>(index: number): string | null {
+        if (this.useLocalStorage) {
+            return null;
+        } else if (this.useSessionStorage) {
+            return null;
+        } else {
+            const ks = Object.keys(this.serviceStorage);
+            return index >= 0 && ks.length < index ? ks[index] : null;
+        }
+
+    }
+    public <#= clearStorageMethodName #>(): void {
+        if (this.useLocalStorage) {
+            
+        } else if (this.useSessionStorage) {
+            
+        } else {
+            this.serviceStorage = {};
+        }
+    }
 }
 
 @Injectable({
