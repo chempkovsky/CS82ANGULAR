@@ -213,7 +213,6 @@ import { ProgressBarMode } from '@angular/material/progress-bar';
 import { MatDialog } from '@angular/material/dialog';
 
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, lformComponentFolder)#>';
-import { <#= eformModeEnumName #> } from '<#=  GetCommonFolderName(Model, Context,  eformModeEnumlFolder, lformComponentFolder)#>';
 import { <#= filterModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterModelFolder, lformComponentFolder)#>';
 import { <#= filterDefModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterDefModelFolder, lformComponentFolder)#>';
 import { <#= filterOperatorModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterOperatorModelFolder, lformComponentFolder)#>';
@@ -457,7 +456,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         let locdata: <#=  GetInterfaceVDlgName(Model) #> = {
             title: 'View item',
             <#= HiddenFilterPropName #>: this.<#= HiddenFilterPropName #>,
-            <#= EformModePropName #>: <#= eformModeEnumName #>.<#= GetInputTypeToEnumName(1) #>,
             <#= FormControlModelPropName #>: e,
             <#= FormControlNewModelPropName #>: null
         };
@@ -483,7 +481,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         let locdata: <#=  GetInterfaceADlgName(Model) #> = {
             title: 'Add item',
             <#= HiddenFilterPropName #>: this.<#= HiddenFilterPropName #>,
-            <#= EformModePropName #>: <#= eformModeEnumName #>.<#= GetInputTypeToEnumName(1) #>,
             <#= FormControlModelPropName #>: null,
             <#= FormControlNewModelPropName #>: null
         };
@@ -530,7 +527,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         let locdata: <#=  GetInterfaceUDlgName(Model) #> = {
             title: 'Modify item',
             <#= HiddenFilterPropName #>: this.<#= HiddenFilterPropName #>,
-            <#= EformModePropName #>: <#= eformModeEnumName #>.<#= GetInputTypeToEnumName(2) #>,
             <#= FormControlModelPropName #>: e,
             <#= FormControlNewModelPropName #>: null
         };
@@ -564,7 +560,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         let locdata: <#=  GetInterfaceDDlgName(Model) #> = {
             title: 'Delete item',
             <#= HiddenFilterPropName #>: this.<#= HiddenFilterPropName #>,
-            <#= EformModePropName #>: <#= eformModeEnumName #>.<#= GetInputTypeToEnumName(3) #>,
             <#= FormControlModelPropName #>: e,
             <#= FormControlNewModelPropName #>: null
         };

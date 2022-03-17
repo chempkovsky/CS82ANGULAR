@@ -1,0 +1,116 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+    
+    string CanAddSelector           = "can-add";
+    string CanAddPropName           = "canAdd";
+    string CanUpdSelector           = "can-update";
+    string CanUpdPropName           = "canUpdate";
+    string CanDelSelector           = "can-delete";
+    string CanDelPropName           = "canDelete";
+    string HiddenFilterSelector     = "hidden-filter";
+    string HiddenFilterPropName     = "hiddenFilter";
+    string ShowFilterSelector       = "show-filter";
+    string ShowFilterPropName       = "showFilter";
+
+    string RowCommandsSelector      = "row-commands";
+    string RowCommandsPropName      = "rowCommands";
+    string TableCommandsSelector    = "table-commands";
+    string TableCommandsPropName    = "tableCommands";
+
+    string OnRowCommandSelector     = "on-row-command";
+    string OnRowCommandPropName     = "onRowCommand";
+    string OnTableCommandSelector   = "on-table-command";
+    string OnTableCommandPropName   = "onTableCommand";
+
+    string selectedRowSelector        = "selected-row";
+    string selectedRowPropName        = "selectedRow";
+
+    string applyFilterSelector        = "apply-filter";
+    string applyFilterPropName        = "applyFilter";
+
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+
+    string externalFilterSelector               = "external-filter";
+    string externalFilterPropName               = "externalFilter";
+    string beforeSquerySelector                 = "before-squery";
+    string beforeSqueryPropName                 = "beforeSquery";
+    string OnBeforeSqueryMethodName             = "onBeforeSquery";
+
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string FilterMaxHeightPropSelector  = "filter-max-height";
+    string FilterMaxHeightPropName      = "filterMaxHeight";
+
+    string OnBackBtnMethodName          = "onBackBtnMd";
+    string OnBackBtnPropName            = "onBackBtn";
+    string OnBackBtnSelector            = "on-back-btn";
+    string showBackBtnPropName          = "showBackBtn";
+    string showBackBtnSelector          = "show-back-btn";
+
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+    string sformComponentFolder         = "01420-Sform.component.ts";
+    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, sformComponentFolder);
+#>
+
+<app-<#= componentSelectorCommonPart #>
+    [<#= captionSelector #>]="<#= captionPropName #>" 
+    (<#= OnBackBtnSelector #>)="onBackBtn($event)"
+    [<#= showBackBtnSelector #>]="<#= showBackBtnPropName #>"
+    [<#= RowCommandsSelector #>]="rowMenuItemsData" 
+    [<#= TableCommandsSelector #>]="tableMenuItemsData"
+    [<#= ShowFilterSelector #>]="<#= ShowFilterPropName #>"
+    [<#= HiddenFilterSelector #>] ="<#= HiddenFilterPropName #>"
+    (<#= OnRowCommandSelector #>)="rowCommand($event)"
+    (<#= OnTableCommandSelector #>)="tableCommand($event)"
+    [<#= containerMenuItemsSelector #>]="<#= containerMenuItemsPropName #>"
+    (<#= onContainerMenuItemClickSelector #>)="<#= onContainerMenuItemClickMethodName #>($event)"
+
+    (<#= beforeSquerySelector #>)="<#= OnBeforeSqueryMethodName #>($event)"
+    [<#= externalFilterSelector #>]="<#= externalFilterPropName #>"
+    
+
+    [<#= MaxHeightPropSelector #>]="<#= MaxHeightPropName #>"  
+    [<#= FilterMaxHeightPropSelector #>]="<#= FilterMaxHeightPropName #>"  
+ ></app-<#= componentSelectorCommonPart #>>
+
+<#+
+
+    string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        return refItem.FileName.Replace(".component","");
+    }
+
+#>

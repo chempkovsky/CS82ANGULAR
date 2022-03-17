@@ -29,13 +29,11 @@
 #>
 
 import { <#= GetInterfaceName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceFolder, viewInterfaceADlgFolder)#>';
-import { <#= eformModeEnumName #> } from '<#= GetCommonFolderName(Model, Context,  eformModeEnumlFolder, viewInterfaceADlgFolder)#>';
 import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, viewInterfaceADlgFolder)#>';
 
 export interface <#= GetInterfaceADlgName(Model) #> {
         title : string | null; 
         <#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>>;
-        <#= EformModePropName #>: <#= eformModeEnumName #>;
         <#= FormControlModelPropName #>: <#= GetInterfaceName(Model) #> | null;
         <#= FormControlNewModelPropName #>: <#= GetInterfaceName(Model) #> | null;
 }

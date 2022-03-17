@@ -25,134 +25,90 @@
     string delformModuleFolder          = "01556-D.module.ts";
 
 
-    string rvComponentFolder            = "01820-RV.component.ts";
-    string raComponentFolder            = "01822-RA.component.ts";
-    string ruComponentFolder            = "01824-RU.component.ts";
-    string rdComponentFolder            = "01826-RD.component.ts";
-    string rlistComponentFolder         = "01920-Rlist.component.ts";
-
-
-    string rlFormModuleFolder           = "01958-Rl.module.ts";
-//    string rvFormModuleFolder           = "01950-Rv.module.ts";
-//    string raFormModuleFolder           = "01952-Ra.module.ts";
-//    string ruFormModuleFolder           = "01954-Ru.module.ts";
-//    string rdFormModuleFolder           = "01956-Rd.module.ts";
+    string rdlistComponentFolder        = "02020-Rdlist.component.ts";
+    string rdlFormModuleFolder          = "02030-Rdl.module.ts";
 
     string flexModuleClassName          = GetContextModuleClassName(Context, flexModuleFolder);
     string materialModuleClassName      = GetContextModuleClassName(Context, materialModuleFolder);
     string filterModuleClassName        = GetContextModuleClassName(Context, filterModuleFolder);
 
     string searchModuleClassName        = GetModuleClassName(Model, searchModuleFolder);
-
-    string viewformModuleClassName      = null;//GetModuleClassName(Model, viewformModuleFolder);
-    string addformModuleClassName       = null;//GetModuleClassName(Model, addformModuleFolder);
-    string updformModuleClassName       = null;//GetModuleClassName(Model, updformModuleFolder);
-    string delformModuleClassName       = null;//GetModuleClassName(Model, delformModuleFolder);
-
-
-    string rvFormModuleClassName        = null;//GetModuleClassName(Model, rvFormModuleFolder);
-    string raFormModuleClassName        = null;//GetModuleClassName(Model, raFormModuleFolder);
-    string ruFormModuleClassName        = null;//GetModuleClassName(Model, ruFormModuleFolder);
-    string rdFormModuleClassName        = null;//GetModuleClassName(Model, rdFormModuleFolder);
-    string rlFormModuleClassName        = GetModuleClassName(Model, rlFormModuleFolder);
+    string viewformModuleClassName      = GetModuleClassName(Model, viewformModuleFolder);
+    string addformModuleClassName       = GetModuleClassName(Model, addformModuleFolder);
+    string updformModuleClassName       = GetModuleClassName(Model, updformModuleFolder);
+    string delformModuleClassName       = GetModuleClassName(Model, delformModuleFolder);
 
 
-    string rvComponentClassName = null;//GetComponentClassName(Model, rvComponentFolder);
-    string raComponentClassName = null;//GetComponentClassName(Model, raComponentFolder);
-    string ruComponentClassName = null;//GetComponentClassName(Model, ruComponentFolder);
-    string rdComponentClassName = null;//GetComponentClassName(Model, rdComponentFolder);
-    string rlComponentClassName = GetComponentClassName(Model, rlistComponentFolder);
+    string rdlFormModuleClassName       = GetModuleClassName(Model, rdlFormModuleFolder);
+    string rdlComponentClassName        = GetComponentClassName(Model, rdlistComponentFolder);
 
-
+    List<string> masterViewNames = new List<string>();
+    masterViewNames = GetSearchDialogViewsList(Model, Context, masterViewNames);
 
 #>
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  flexModuleFolder, rlFormModuleFolder)#>';
-import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  materialModuleFolder, rlFormModuleFolder)#>';
-
-
-
-<#
-    if(!string.IsNullOrEmpty(rlComponentClassName)) {
-#>
-import { <#=  searchModuleClassName #> } from '<#= GetFolderName(Model, searchModuleFolder, rlFormModuleFolder) #>';
-import { <#=  rlComponentClassName #> } from '<#= GetFolderName(Model, rlistComponentFolder, rlFormModuleFolder) #>';
-<#
-    }
-    if(!string.IsNullOrEmpty(rvComponentClassName)) {
-#>
-import { <#=  rvComponentClassName #> } from '<#=  GetFolderName(Model, rvComponentFolder, rlFormModuleFolder) #>';
-<#
-    }
-    if(!string.IsNullOrEmpty(raComponentClassName)) {
-#>
-import { <#=  raComponentClassName #> } from '<#=  GetFolderName(Model, raComponentFolder, rlFormModuleFolder) #>';
-<#
-    }
-    if(!string.IsNullOrEmpty(ruComponentClassName)) {
-#>
-import { <#=  ruComponentClassName #> } from '<#=  GetFolderName(Model, ruComponentFolder, rlFormModuleFolder) #>';
-<#
-    }
-    if(!string.IsNullOrEmpty(rdComponentClassName)) {
-#>
-import { <#=  rdComponentClassName #> } from '<#=  GetFolderName(Model, rdComponentFolder, rlFormModuleFolder) #>';
-<#
-    }
-#>
+import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  flexModuleFolder, rdlFormModuleFolder)#>';
+import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  materialModuleFolder, rdlFormModuleFolder)#>';
 
 
 <#
+    if(!string.IsNullOrEmpty(rdlComponentClassName)) {
+#>
+import { <#=  searchModuleClassName #> } from '<#= GetFolderName(Model, searchModuleFolder, rdlFormModuleFolder) #>';
+import { <#=  rdlComponentClassName #> } from '<#= GetFolderName(Model, rdlistComponentFolder, rdlFormModuleFolder) #>';
+<#
+    }
     if(!string.IsNullOrEmpty(viewformModuleClassName)) {
 #>
-import { <#=  viewformModuleClassName #> } from '<#=  GetFolderName(Model, viewformModuleFolder, rlFormModuleFolder) #>';
+import { <#=  viewformModuleClassName #> } from '<#=  GetFolderName(Model, viewformModuleFolder, rdlFormModuleFolder) #>';
 <#
     }
     if(!string.IsNullOrEmpty(addformModuleClassName)) {
 #>
-import { <#=  addformModuleClassName #> } from '<#=  GetFolderName(Model, addformModuleFolder, rlFormModuleFolder) #>';
+import { <#=  addformModuleClassName #> } from '<#=  GetFolderName(Model, addformModuleFolder, rdlFormModuleFolder) #>';
+<#
+    }
+    if(!string.IsNullOrEmpty(updformModuleClassName)) {
+#>
+import { <#=  updformModuleClassName #> } from '<#=  GetFolderName(Model, updformModuleFolder, rdlFormModuleFolder) #>';
 <#
     }
     if(!string.IsNullOrEmpty(delformModuleClassName)) {
 #>
-import { <#=  delformModuleClassName #> } from '<#=  GetFolderName(Model, delformModuleFolder, rlFormModuleFolder) #>';
+import { <#=  delformModuleClassName #> } from '<#=  GetFolderName(Model, delformModuleFolder, rdlFormModuleFolder) #>';
 <#
     }
 #>
 
 
+<#
+    foreach(string viewName in masterViewNames) {
+        ModelViewSerializable masterView = GetViewByName(Context, viewName);
+        if (masterView == null) {
+#>
+//
+//Error: could not find view by its name <#= viewName #>
+//
+<#
+            continue;
+        }
+#>
+import { <#=  GetModuleClassName(masterView, searchModuleFolder) #> } from '<#=  GetCrossComponentFolderName(Model, rdlFormModuleFolder, Context, viewName, searchModuleFolder) #>';
+<#
+    }
+#>
 
 
 
 @NgModule({
     declarations: [
 <#
-    if(!string.IsNullOrEmpty(rvComponentClassName)) {
+    if(!string.IsNullOrEmpty(rdlComponentClassName)) {
 #>
-        <#=  rvComponentClassName #>,
-<#
-    }
-    if(!string.IsNullOrEmpty(raComponentClassName)) {
-#>
-        <#=  raComponentClassName #>,
-<#
-    }
-    if(!string.IsNullOrEmpty(ruComponentClassName)) {
-#>
-        <#=  ruComponentClassName #>,
-<#
-    }
-    if(!string.IsNullOrEmpty(rdComponentClassName)) {
-#>
-        <#=  rdComponentClassName #>,
-<#
-    }
-    if(!string.IsNullOrEmpty(rlComponentClassName)) {
-#>
-        <#=  rlComponentClassName #>,
+        <#=  rdlComponentClassName #>,
 <#
     }
 #>
@@ -165,7 +121,7 @@ import { <#=  delformModuleClassName #> } from '<#=  GetFolderName(Model, delfor
         <#= flexModuleClassName #>,
         // <#= filterModuleClassName #>,
 <#
-    if(!string.IsNullOrEmpty(rlComponentClassName)) {
+    if(!string.IsNullOrEmpty(rdlComponentClassName)) {
 #>
         <#=  searchModuleClassName #>,
 <#
@@ -198,32 +154,27 @@ import { <#=  delformModuleClassName #> } from '<#=  GetFolderName(Model, delfor
 #>
 
 
+<#
+    foreach(string viewName in masterViewNames) {
+        ModelViewSerializable masterView = GetViewByName(Context, viewName);
+        if (masterView == null) {
+            continue;
+        }
+#>
+        <#= GetModuleClassName(masterView, searchModuleFolder) #>,
+<#
+    }
+#>
+
+
+
+
     ],
     exports: [
 <#
-    if(!string.IsNullOrEmpty(rvComponentClassName)) {
+    if(!string.IsNullOrEmpty(rdlComponentClassName)) {
 #>
-        <#=  rvComponentClassName #>,
-<#
-    }
-    if(!string.IsNullOrEmpty(raComponentClassName)) {
-#>
-        <#=  raComponentClassName #>,
-<#
-    }
-    if(!string.IsNullOrEmpty(ruComponentClassName)) {
-#>
-        <#=  ruComponentClassName #>,
-<#
-    }
-    if(!string.IsNullOrEmpty(rdComponentClassName)) {
-#>
-        <#=  rdComponentClassName #>,
-<#
-    }
-    if(!string.IsNullOrEmpty(rlComponentClassName)) {
-#>
-        <#=  rlComponentClassName #>,
+        <#=  rdlComponentClassName #>,
 <#
     }
 #>
@@ -231,7 +182,7 @@ import { <#=  delformModuleClassName #> } from '<#=  GetFolderName(Model, delfor
     entryComponents: [
     ]
 })
-export class <#= rlFormModuleClassName #> { }
+export class <#= rdlFormModuleClassName #> { }
 
 
 <#+
