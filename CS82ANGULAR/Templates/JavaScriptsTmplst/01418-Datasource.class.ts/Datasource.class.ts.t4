@@ -200,7 +200,8 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
     }
     public <#= CalcIsDefinedMethodName #>(): boolean {
         for(let i in this._Values) {
-            if((!this._Values[i].dbgenerated) && this._Values[i].required) {
+            if((!this.<#= formRootService #>.dbgenerated<#= ValueSuffix #>(i)) && 
+                this.<#= formRootService #>.required<#= ValueSuffix #>(i)) {
                 if(!this.isSet<#= ValueSuffix #>(i)) return false;        
             }
         }

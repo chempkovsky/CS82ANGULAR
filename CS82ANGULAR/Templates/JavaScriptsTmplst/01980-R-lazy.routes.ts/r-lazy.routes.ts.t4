@@ -71,8 +71,8 @@
                     continue;
                 }
                 string newPath = CurrPath + "/" + viewName;
-                if (CurrDepth > 2) {
-                    newPath = "/" +newPath + HiddenFilterPrefix + CurrDepth.ToString();
+                if (CurrDepth > 1) {
+                    newPath = newPath +"/:" + HiddenFilterPrefix + CurrDepth.ToString();
                 }
                 List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(masterView, detail, null);
                 detailViewNames.Clear();
@@ -132,7 +132,7 @@
 #>
     { path: '<#= node.Item2 + "/" + VPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
         loadChildren: () => import('<#= fileNm_rv #>').then(m => m.<#= GetModuleClassName(aModel, rvLazyModuleFolder) #>),
-        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'View <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  IdPrefix: '<#= IdPrefix + CurrDepth.ToString() #>', <#= DepthParamName #>: <#= CurrDepth.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'View <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>', <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
                     } else {
@@ -158,7 +158,7 @@
 #>
     { path: '<#= node.Item2 + "/" + APrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() #>', 
         loadChildren: () => import('<#= fileNm_ra #>').then(m => m.<#= GetModuleClassName(aModel, raLazyModuleFolder) #>),
-        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Add <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Add <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
                     } else {
@@ -184,7 +184,7 @@
 #>
     { path: '<#= node.Item2 + "/" + UPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
         loadChildren: () => import('<#= fileNm_ru #>').then(m => m.<#= GetModuleClassName(aModel, ruLazyModuleFolder) #>),
-        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Update <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  IdPrefix: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Update <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
                     } else {
@@ -210,7 +210,7 @@
 #>
     { path: '<#= node.Item2 + "/" + DPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
         loadChildren: () => import('<#= fileNm_rd #>').then(m => m.<#= GetModuleClassName(aModel, rdLazyModuleFolder) #>),
-        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Delete <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  IdPrefix: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Delete <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
                     } else {
@@ -231,9 +231,9 @@
 
                 if(node.Item3 > 1) {
 #>
-    { path: '<#= node.Item2 + "/:" + HiddenFilterPrefix + CurrDepth.ToString() #>', 
+    { path: '<#= node.Item2 #>', 
         loadChildren: () => import('<#= fileNm_rl #>').then(m => m.<#= GetModuleClassName(aModel, rlLazyModuleFolder) #>),
-        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + node.Item3.ToString() #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
 

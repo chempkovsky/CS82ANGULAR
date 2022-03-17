@@ -14,24 +14,18 @@
 <#
 
     string HiddenFilterPrefix           = "hf";
-    string DepthParamName               = "depth"; 
-    string ActionParamName              = "mode";  
-    string ItemParamName                = "item";  
-    string ActionParamAddMode           = "add";
-    string ActionParamUpdateMode        = "update";
-    string ActionParamDeleteMode        = "delete";
-    string ActionParamCancelMode        = "cancel";
+    string IdPrefix                     = "id";
     string VPrefix                      = "View";
     string APrefix                      = "Add";
     string UPrefix                      = "Upd";
     string DPrefix                      = "Del";
 
-    string GetAllMethodName             = "getall";
-    string GetWithFilterMethodName      = "getwithfilter";
-    string GetOneMethodName             = "getone";
-    string UpdateOneMethodName          = "updateone";
-    string AddOneMethodName             = "addone";
-    string DeleteOneMethodName          = "deleteone";
+    string HiddenFilterAsFltRsltSuffix  = "HiddenFilterAsFltRslt";
+    string DepthParamName               = "depth"; 
+    string ItemParamName                = "item";  
+    string ActionParamName              = "mode";  
+    string formRootService              = "frmRootSrv";
+    string TitlePropName                = "title";
 
 
     string HiddenFilterSelector         = "hidden-filter";
@@ -41,12 +35,9 @@
     string OnAfterSubmitMethodName      = "onAfterSubmit";
     
 
-    string EformModePropName            = "eformMode";
     string FormControlModelPropName     = "eformControlModel";
     string FormControlNewModelPropName  = "eformNewControlModel";
     string AppSettingServicePropName    = "appGlblSettings";
-    string formRootService              = "frmRootSrv";
-    string TitlePropName                = "title";
 
     string containerMenuItemsPropName           = "contMenuItems";
     string containerMenuItemsSelector           = "cont-menu-items";
@@ -60,7 +51,6 @@
     string menuItemDataModelFolder      = "00017-menu-item-data.interface.ts";
     string eventEmitterPubModelFolder   = "00019-event-emitter-pub.interface.ts";
     string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
-    string eformModeEnumlFolder         = "00026-eform-mode.enum.ts";
     string viewInterfaceFolder          = "01100-.interface.ts";
     string viewServiceFolder            = "01400-.service.ts";
 
@@ -75,7 +65,6 @@
     string menuItemDataModelClassName   = GetModelClassName(Context, menuItemDataModelFolder);
     string eventEmitterPubModelClassName    = GetModelClassName(Context, eventEmitterPubModelFolder);
 
-    string eformModeEnumName = GetCommonEnumClassName(Context, eformModeEnumlFolder);
     string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, raComponentFolder);
     string componentClassName = GetComponentClassName(Model, raComponentFolder);
     string appSettingServiceClassName = GetCommonServiceClassName(Context, appSettingServiceFolder);
@@ -87,7 +76,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, Inject } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap, UrlSegment, ActivatedRouteSnapshot } from '@angular/router';
 
-import { <#= eformModeEnumName #> } from '<#=  GetCommonFolderName(Model, Context,  eformModeEnumlFolder, aformComponentFolder)#>';
 import { <#= GetComponentClassName(Model, aformComponentFolder) #> } from '<#=  GetFolderName(Model, aformComponentFolder, raComponentFolder) #>';
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, raComponentFolder)#>';
 import { <#= serviceClassName #> } from '<#= GetFolderName(Model, viewServiceFolder, raComponentFolder) #>';
@@ -112,15 +100,9 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     }
     <#= HiddenFilterPrefix #>: string = '<#= HiddenFilterPrefix + "1" #>';
     <#= DepthParamName #>: number = 1;
-
-
     @ViewChild(<#= GetComponentClassName(Model, aformComponentFolder) #>) childForm: <#= GetComponentClassName(Model, aformComponentFolder) #> | any;
-
     <#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
-    <#= EformModePropName #>: <#= eformModeEnumName #> = <#= eformModeEnumName #>.DeleteMode;
     <#= FormControlModelPropName #>: <#= GetInterfaceName(Model) #> | null = null;
-    currSnapshot: ActivatedRouteSnapshot | any = null;
-
     constructor(protected route: ActivatedRoute, protected router: Router, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, protected <#= formRootService #>: <#= serviceClassName #>) { }
     ngOnInit() {
         if (!(typeof this.route.snapshot.data === 'undefined')) {
@@ -136,31 +118,43 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 }
             }
         }
-        if(this.<#= DepthParamName #> > 1) {
-            let lhf: Array<<#= filterResultModelClassName #>> = [];
-            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
-                lhf = this.<#= formRootService #>.get<#= HiddenFilterAsFltRsltSuffix #>(JSON.parse(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]));
-            }
-            this.<#= HiddenFilterPropName #> = lhf;
+        let lhf: Array<<#= filterResultModelClassName #>> = [];
+        if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+            lhf = this.<#= formRootService #>.get<#= HiddenFilterAsFltRsltSuffix #>(JSON.parse(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]));
         }
+        this.<#= HiddenFilterPropName #> = lhf;
     }
     <#= OnAfterSubmitMethodName #>(newVal: <#= GetInterfaceName(Model) #>) {
+<#
+        if(primKeys != null) {
+#>      
+        let flt: any = {};
+<#
+            foreach(ModelViewPropertyOfVwSerializable primKey in primKeys) { 
+#>      
+        flt['<#= GetTypeScriptPropertyName(primKey, Model) #>'] = newVal.<#= GetTypeScriptPropertyName(primKey, Model) #>;
+<#
+            }
+#>      
+        let qp: any = {
+            <#= ActionParamName #>: '<#= APrefix #>',
+            <#= ItemParamName  #>:  JSON.stringify(flt)
+        };
+<#
+
+        } else {
+#>
         let qp: any = {
             <#= ActionParamName #>: '<#= APrefix #>',
             <#= ItemParamName  #>:  JSON.stringify(newVal)
         };
-        if (this.<#= DepthParamName #> > 2) {
-            this.router.navigate(['../../'], {queryParams: qp, relativeTo: this.route});
-        } else {
-            this.router.navigate(['../../../'], {queryParams: qp, relativeTo: this.route});
+<#
         }
+#>
+        this.router.navigate(['../../'], {queryParams: qp, relativeTo: this.route});
     }
     onCancel() {
-        if (this.<#= DepthParamName #> > 2) {
-            this.router.navigate(['../../'], {relativeTo: this.route});
-        } else {
-            this.router.navigate(['../../../'], {relativeTo: this.route});
-        }
+        this.router.navigate(['../../'], {relativeTo: this.route});
     }
     onOk() {
         if (typeof this.childForm === 'undefined') return;

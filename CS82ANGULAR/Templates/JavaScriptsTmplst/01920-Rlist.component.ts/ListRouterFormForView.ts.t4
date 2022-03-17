@@ -16,6 +16,7 @@
 
     string HiddenFilterPrefix           = "hf";
     string IdPrefix                     = "id";
+    string ItemParamName                = "item";  
     string VPrefix                      = "View";
     string APrefix                      = "Add";
     string UPrefix                      = "Upd";
@@ -32,27 +33,18 @@
     string getStorageKeyMethodName      = "getStorageKey";
     string clearStorageMethodName       = "getStorageKey";
 
+    string GetOneMethodName             = "getone";
+
 
     string ActionParamName              = "mode";  
     string ActionParamAddMode           = "add";
     string ActionParamUpdateMode        = "update";
     string ActionParamDeleteMode        = "delete";
     string ActionParamViewMode          = "view";
-    string ActionParamCancelMode        = "cancel";
     string ViewNameParamName            = "view";
     string NavigationParamName          = "nav";
 
     // WebApi service's method names
-
-    string GetAllMethodName         = "getall";
-    string GetWithFilterMethodName  = "getwithfilter";
-    string GetOneMethodName         = "getone";
-    string UpdateOneMethodName      = "updateone";
-    string AddOneMethodName         = "addone";
-    string DeleteOneMethodName      = "deleteone";
-    string src2destMethodName       = "src2dest";
-
-
 
     string CanAddSelector           = "can-add";
     string CanAddPropName           = "canAdd";
@@ -178,13 +170,9 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     <#= DepthParamName #>: number = 1;
     <#= HiddenFilterPrefix #>: string = '<#= HiddenFilterPrefix + "1" #>';
     <#= uidParamName #>: string|null = null;
-
     <#= showBackBtnPropName #>: boolean = false;
-
-
     @Input('<#= FilterMaxHeightPropSelector #>')  <#= FilterMaxHeightPropName #>: number | null = null;
     @Input('<#= MaxHeightPropSelector #>') <#= MaxHeightPropName #>: number | null = null;
-
     @Output('<#= onContainerMenuItemClickSelector #>') <#= onContainerMenuItemClickEmitter #> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
     @Input('<#= containerMenuItemsSelector #>') <#= containerMenuItemsPropName #>: Array<<#= menuItemDataModelClassName #>> = [];
     <#= onContainerMenuItemClickMethodName #>(e: <#= eventEmitterDataModelClassName #>)  {
@@ -216,8 +204,6 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     tableMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
          {id: '<#= ActionParamAddMode #>', caption: 'Add Item', iconName: 'create', iconColor: 'primary', enabled: true},
       ];
-    currSnapshot: ActivatedRouteSnapshot | any = null;
-
     constructor(protected route: ActivatedRoute, protected router: Router, protected  <#= formRootService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
         // public dialog: MatDialog, 
         protected cd: ChangeDetectorRef) {
@@ -325,14 +311,33 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         if(id < 0) return;
         let mnItm: <#=  menuItemDataModelClassName #> = this.rowMenuItemsData[id];
         let qp = [];
+<#
+        if(primKeys != null) {
+#>      
+        let flt: any = {
+<#
+            foreach(ModelViewPropertyOfVwSerializable primKey in primKeys) { 
+#>      
+          <#= GetTypeScriptPropertyName(primKey, Model) #>: v.value.<#= GetTypeScriptPropertyName(primKey, Model) #>,
+<#
+            }
+#>
+        };
+<#
+        } else {
+#>
+        let flt: any = v.value;
+<#
+        }
+#>
         if(v.id === '<#= ActionParamViewMode #>') {
-            qp.push( '<#= UPrefix #>' + '<#= Model.ViewName #>' );
+            qp.push( '<#= VPrefix #>' + '<#= Model.ViewName #>' );
             if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
                 qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
             } else {
                 qp.push(JSON.stringify({}));
             }
-            qp.push(JSON.stringify(v.value));
+            qp.push(JSON.stringify(flt));
         } else if(v.id === '<#= ActionParamUpdateMode #>') {
             qp.push( '<#= UPrefix #>' + '<#= Model.ViewName #>' );
             if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
@@ -340,7 +345,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             } else {
                 qp.push(JSON.stringify({}));
             }
-            qp.push(JSON.stringify(v.value));
+            qp.push(JSON.stringify(flt));
         } else if(v.id === '<#= ActionParamDeleteMode #>') {
             qp.push( '<#= DPrefix #>' + '<#= Model.ViewName #>' );
             if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
@@ -348,7 +353,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             } else {
                 qp.push(JSON.stringify({}));
             }
-            qp.push(JSON.stringify(v.value));
+            qp.push(JSON.stringify(flt));
         } else if (!(typeof mnItm.data === 'undefined')) {
             qp.push( mnItm.data.<#= ViewNameParamName #> );
             qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(v.value, mnItm.data.<#= NavigationParamName #>)));
@@ -375,40 +380,50 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             return;
         }
         this.isPostNavApplied = true;
-        let paramMap: ParamMap = this.currSnapshot.queryParamMap;
-        if(!paramMap.has('<#= ActionParamName #>')) {
-            return;
+
+        
+        let act: string | any = undefined;
+        if (!(typeof this.route.snapshot.queryParams['<#= ActionParamName #>'] === 'undefined')) {
+            act = this.route.snapshot.queryParams['<#= ActionParamName #>'];
         }
-        let act: string | any = paramMap.get('<#= ActionParamName #>');
-        if(typeof act === 'undefined') {
-            return;
-        }
-        if(act === null) {
-            return;
-        }
-        if (act === '<#= ActionParamDeleteMode #>') {
-            return;
-        }
-        if ((act === '<#= ActionParamAddMode #>') ||
-            (act === '<#= ActionParamUpdateMode #>') ||
-            (act === '<#= ActionParamCancelMode #>')) {
+        if(typeof act === 'undefined') return;
+        if(act === null) return;
+
+        let flt: <#= GetInterfaceName(Model) #> | any = JSON.parse(this.route.snapshot.queryParams['<#= ItemParamName #>']);
+        if(typeof flt === 'undefined') return;
+        if(flt === null) return;
+
+        if ((act === '<#= APrefix #>') ||
+            (act === '<#= UPrefix #>')) {
 <#
     for(int i = 0 ; i < primKeys.Count; i++) {
 #>
-            if(!paramMap.has('<#= GetTypeScriptPropertyName(primKeys[i], Model) #>')) {
+            if(typeof flt['<#= GetTypeScriptPropertyName(primKeys[i], Model) #>'] === 'undefined') {
                 return;
             }
-            let <#= GetPrimKeyVarName(primKeys[i]) #>: any = paramMap.get('<#= GetTypeScriptPropertyName(primKeys[i], Model) #>');
+            let <#= GetPrimKeyVarName(primKeys[i]) #>: any = flt['<#= GetTypeScriptPropertyName(primKeys[i], Model) #>'];
 <#
     }
 #>
-            this.<#= formRootService #>.<#= GetOneMethodName #>(<# {int k = 0;
-            foreach(ModelViewPropertyOfVwSerializable primKey in primKeys) { if (k > 0)  { #>, <# } 
-                                    #><#= GetPrimKeyVarName(primKey) #><#
-                                    k++;
-                                }} #> )
-                .subscribe(
-                   (data: <#= GetInterfaceName(Model) #> ) => { // success path
+            this.<#= formRootService #>.<#= GetOneMethodName #>(
+<# {
+            int k = 0;
+            foreach(ModelViewPropertyOfVwSerializable primKey in primKeys) { 
+                if (k > 0)  {
+#>
+                , <#= GetPrimKeyVarName(primKey) #>
+<#
+                } else {
+                    k++;
+#>
+                  <#= GetPrimKeyVarName(primKey) #>
+<#
+                }
+            }
+   }
+#> 
+            ).subscribe({
+                   next: (data: <#= GetInterfaceName(Model) #> ) => { // success path
                         if (typeof data === 'undefined') return;
                         if (data === null) return;
                         if(typeof frm.dataSource === 'undefined') return;
@@ -436,11 +451,11 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                             frm.onSelectRow(frm.dataSource[i]); 
                         }
                    },
-                   error => { // error path
+                   error: (error) => { // error path
                         this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
                         this.onBackBtn(); // navigation is correct: onBackBtn is correct method here
                    } 
-                ); // end of .subscribe
+                });
             return;
         }
     }

@@ -399,8 +399,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 }
             }
         });
-        this.resetCurFltr();
         this.<#= externalFilterRsltPropName #> = rslt;
+        this.resetCurFltr();
         if(this.isOnInitCalled) {
             this.onFilter();
         }

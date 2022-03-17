@@ -110,6 +110,8 @@ export class <#= GetJavaScriptServiceName(Model) #> {
         if((rw === null) || (nvNm === null)) return rslt;
         for(let i in this._<#= ValuesSuffix #>) {
             if(this.isInPrimkey<#= ValueSuffix #>(i)) {
+                if(typeof rslt['<#= Model.ViewName #>'] === 'undefined') rslt['<#= Model.ViewName #>'] = {};
+                if(typeof rslt['<#= Model.ViewName #>'][nvNm] === 'undefined') rslt['<#= Model.ViewName #>'][nvNm] = {};
                 rslt['<#= Model.ViewName #>'][nvNm][i] = rw[i];
             }
         }
