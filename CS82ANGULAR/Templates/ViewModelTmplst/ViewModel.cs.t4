@@ -67,10 +67,17 @@ namespace <#= GetModelNameSpace(Model) #> {
 <#
                 }
             }
+            if((!prop.IsNullable) && IsStringPropertyTypeName(prop)) {
+#>
+        public <#= GetPropertyTypeName(prop) #>  <#= GetTypeScriptPropertyName(prop, Model) #> { get; set; } = null!;
+
+<# 
+            } else {
 #>
         public <#= GetPropertyTypeName(prop) #>  <#= GetTypeScriptPropertyName(prop, Model) #> { get; set; }
 
 <# 
+            }
        } 
 #>
     }
@@ -79,13 +86,20 @@ namespace <#= GetModelNameSpace(Model) #> {
 <#+
         string GetPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
         {
-            if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
-                return prop.UnderlyingTypeName;
-            }
+            //if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
+            //    return prop.UnderlyingTypeName;
+            //}
             if(prop.IsNullable || (!prop.IsRequiredInView)) {
                 return prop.UnderlyingTypeName + " ?";
             }
             return prop.UnderlyingTypeName;
+        }
+        bool IsStringPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
+        {
+            if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase) || "String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
+                return true;
+            }
+            return false;
         }
         string GetModelNameSpace(ModelViewSerializable model) {
             string result = model.ViewFolder;

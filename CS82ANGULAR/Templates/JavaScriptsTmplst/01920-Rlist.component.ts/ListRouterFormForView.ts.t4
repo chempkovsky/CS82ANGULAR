@@ -359,10 +359,8 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             if(id < 0) return;
             let mnItm: IMenuItemData = this.rowMenuItemsData[id];
             if (!(typeof mnItm.data === 'undefined')) {
-                let qp = [];
                 qp.push( mnItm.data.view );
                 qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(v.value, mnItm.data.nav)));
-                this.router.navigate(qp, {relativeTo: this.route});
             } else {
                 this.onRowCommand.emit(v);
                 return;
@@ -469,7 +467,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     }
     onBackBtn(e?: any) {
         if (this.<#= DepthParamName #> > 1) {
-            this.<#= AppSettingServicePropName #>.<#= removeStorageItemMethodName #>(this.<#= uidParamName #>);
+            this.<#= AppSettingServicePropName #>.<#= removeStorageItemMethodName #>(this.<#= uidParamName #> as string);
             this.router.navigate(['../../'], {relativeTo: this.route});
         }
     }
@@ -484,7 +482,6 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 cfs = cf;
             }
         }
-        let cfstr: string|any = JSON.stringify(cfs);
         this.<#= AppSettingServicePropName #>.<#= setStorageItemMethodName #>(this.<#= uidParamName #>, JSON.stringify(cfs));
     }
 

@@ -114,6 +114,11 @@
                 if (XXX1Wdth == 100) {
                     XXX1Wdth = percentEq100;
                 }
+                if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Hidden) {
+#>
+                <input type="hidden"  formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+<#
+                }
                 if (modelViewUIFormPropertySerializable.InputTypeWhenDelete != InputTypeEnum.Hidden) {
                     if(modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Combo) {
 #>

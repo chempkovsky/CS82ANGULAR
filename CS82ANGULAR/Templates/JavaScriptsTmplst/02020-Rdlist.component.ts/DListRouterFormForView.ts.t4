@@ -363,7 +363,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     }
     onBackBtn(e?: any) {
         if (this.<#= DepthParamName #> > 1) {
-            this.<#= AppSettingServicePropName #>.<#= removeStorageItemMethodName #>(this.<#= uidParamName #>);
+            this.<#= AppSettingServicePropName #>.<#= removeStorageItemMethodName #>(this.<#= uidParamName #> as string);
             this.router.navigate(['../../'], {relativeTo: this.route});
         }
     }
@@ -378,8 +378,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 cfs = cf;
             }
         }
-        let cfstr: string|any = JSON.stringify(cfs);
-        this.<#= AppSettingServicePropName #>.<#= setStorageItemMethodName #>(this.<#= uidParamName #>, JSON.stringify(cfs));
+        this.<#= AppSettingServicePropName #>.<#= setStorageItemMethodName #>(this.<#= uidParamName #> as string, JSON.stringify(cfs));
     }
 
 

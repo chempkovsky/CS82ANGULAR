@@ -172,7 +172,8 @@
         if(!entityProp.IsRequired) continue;
         ModelViewPropertyOfVwSerializable scalarProp = Model.ScalarProperties.Where(s => ((s.OriginalPropertyName == entityProp.OriginalPropertyName) && string.IsNullOrEmpty(s.ForeignKeyNameChain))).FirstOrDefault();
         if (scalarProp != null) {
-            if(Model.UIFormProperties.Any(u => (u.IsShownInView &&  (u.InputTypeWhenDelete != InputTypeEnum.Hidden) && (u.ViewPropertyName == scalarProp.ViewPropertyName)))) continue;
+            //if(Model.UIFormProperties.Any(u => (u.IsShownInView &&  (u.InputTypeWhenDelete != InputTypeEnum.Hidden) && (u.ViewPropertyName == scalarProp.ViewPropertyName)))) continue;
+            if(Model.UIFormProperties.Any(u => (u.IsShownInView &&  (u.ViewPropertyName == scalarProp.ViewPropertyName)))) continue;
             if(Model.ForeignKeys != null) {
                 foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
                     if(ForeignKeyNameChainList.Any(f => f.Item1 == fk.NavigationName)) {
@@ -460,7 +461,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         let locValidators: ValidatorFn[]; 
 <#
         foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
-            if ((!modelViewUIFormPropertySerializable.IsShownInView) || (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Hidden)) continue;
+            // if ((!modelViewUIFormPropertySerializable.IsShownInView) || (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Hidden)) continue;
+            if ((!modelViewUIFormPropertySerializable.IsShownInView)) continue;
             string defval = "null";
             if (IsBooleanInput(modelViewUIFormPropertySerializable, Model)) {
                 defval = "false";
@@ -653,7 +655,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#
     {
         foreach(ModelViewUIFormPropertySerializable mvUIFormProp in Model.UIFormProperties) {
-            if ((!mvUIFormProp.IsShownInView) || (mvUIFormProp.InputTypeWhenDelete == InputTypeEnum.Hidden)) continue;
+            //if ((!mvUIFormProp.IsShownInView) || (mvUIFormProp.InputTypeWhenDelete == InputTypeEnum.Hidden)) continue;
+            if ((!mvUIFormProp.IsShownInView)) continue;
             if (ForeignKeyNameChainList.Any(f => ((f.Item1 == mvUIFormProp.ForeignKeyName) || (f.Item3 == mvUIFormProp)))) continue;
 #>
         this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(mvUIFormProp, Model) #>': this.<#=  RootDataSource #>.get<#= ValueSuffix #>('<#= GetTypeScriptPropertyNameEx(mvUIFormProp, Model) #>')}, {emitEvent: false});
@@ -770,7 +773,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#
     {
         foreach(ModelViewUIFormPropertySerializable mvUIFormProp in Model.UIFormProperties) {
-            if ((!mvUIFormProp.IsShownInView) || (mvUIFormProp.InputTypeWhenDelete == InputTypeEnum.Hidden) || string.IsNullOrEmpty(mvUIFormProp.ForeignKeyNameChain)) continue;
+            //if ((!mvUIFormProp.IsShownInView) || (mvUIFormProp.InputTypeWhenDelete == InputTypeEnum.Hidden) || string.IsNullOrEmpty(mvUIFormProp.ForeignKeyNameChain)) continue;
+            if ((!mvUIFormProp.IsShownInView) || string.IsNullOrEmpty(mvUIFormProp.ForeignKeyNameChain)) continue;
             if ((!mvUIFormProp.ForeignKeyNameChain.StartsWith(fk.Item1)) || ForeignKeyNameChainList.Any(f => (f.Item3 == mvUIFormProp))) continue;
             if ((mvUIFormProp.ForeignKeyNameChain != fk.Item1) && (ForeignKeyNameChainList.Any(f => f.Item1.StartsWith(fk.Item1 + ".")))) continue;
             string navChain = "";
