@@ -27,6 +27,7 @@
     string AddOneMethodName         = "addone";
     string DeleteOneMethodName      = "deleteone";
     string src2destMethodName       = "src2dest";
+    string multSelectionProperty    = "multSelection";
 
 
     string DisplayLabelProperty     = "Name";
@@ -129,7 +130,6 @@
     string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
     string filterDefModelFolder         = "00022-web-service-filter-def.interface.ts";
     string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
-    string eformModeEnumlFolder         = "00026-eform-mode.enum.ts";
     string menuItemDataModelFolder      = "00017-menu-item-data.interface.ts";
     string eventEmitterDataModelFolder  = "00018-event-emitter-data.interface.ts";
     string eventEmitterPubModelFolder   = "00019-event-emitter-pub.interface.ts";
@@ -143,22 +143,11 @@
     string viewInterfacePageFolder      = "01200-Page.interface.ts";
     string viewInterfaceFltFolder       = "01300-Filter.interface.ts";
     string viewServiceFolder            = "01400-.service.ts";
-    string eformCssFolder               = "01500-Eform.component.css";
-    string eformHtmlFolder              = "01500-Eform.component.html";
-    string eformComponentFolder         = "01500-Eform.component.ts";
-
-    string viewInterfaceEDlgFolder      = "01510-Edlg.interface.ts";
-    string edlgCssFolder                = "01520-Edlg.component.css";
-    string edlgHtmlFolder               = "01520-Edlg.component.html";
-    string edlgComponentFolder          = "01520-Edlg.component.ts";
 
 
-
-    string sformCssFolder               = "01420-Sform.component.css";
-    string sformHtmlFolder              = "01420-Sform.component.html";
-    string sformComponentFolder         = "01420-Sform.component.ts";
-
-
+    string sMltFormCssFolder            = "01460-Smform.component.css";
+    string sMltFormHtmlFolder           = "01460-Smform.component.html";
+    string sMltFormComponentFolder      = "01460-Smform.component.ts";
 
 
     string ActionColumnDefProperty      = "menuAction";
@@ -169,11 +158,10 @@
 
 
 
-    string eformModeEnumName = GetCommonEnumClassName(Context, eformModeEnumlFolder);
-    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, sformComponentFolder);
+    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, sMltFormComponentFolder);
 
     string serviceClassName = GetServiceClassName(Model, viewServiceFolder);
-    string componentClassName = GetComponentClassName(Model, sformComponentFolder);
+    string componentClassName = GetComponentClassName(Model, sMltFormComponentFolder);
 
 
     string filterDefModelClassName = GetModelClassName(Context, filterDefModelFolder);
@@ -187,7 +175,6 @@
     string componentSelectorDlgComponentClassName = GetContextComponentClassName(Context, columnSelectorDlgComponentFolder);
 
 
-    string dlgComponentClassName = GetComponentClassName(Model, edlgComponentFolder);
     string appSettingServiceClassName = GetCommonServiceClassName(Context, appSettingServiceFolder);
 
     string OnBackBtnMethodName          = "onBackBtnMd";
@@ -202,26 +189,28 @@ import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, ChangeDe
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
+import { SelectionChange, SelectionModel } from '@angular/cdk/collections';
 
-import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, sformComponentFolder)#>';
-import { <#= filterDefModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterDefModelFolder, sformComponentFolder)#>';
-import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, sformComponentFolder)#>';
-import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, sformComponentFolder)#>';
-import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  menuItemDataModelFolder, sformComponentFolder)#>';
-import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Model, Context, eventEmitterPubModelFolder, sformComponentFolder)#>';
-import { <#= itemHeightDataModelClassName #> } from '<#= GetCommonFolderName(Model, Context, itemHeightDataModelFolder, sformComponentFolder)#>';
-import { <#= columnSelectorItemModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  columnSelectorItemInterfaceFolder, sformComponentFolder)#>';
-import { <#= componentSelectorDlgComponentClassName #> } from '<#=  GetCommonFolderName(Model, Context,  columnSelectorDlgComponentFolder, sformComponentFolder)#>';
+
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, sMltFormComponentFolder)#>';
+import { <#= filterDefModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterDefModelFolder, sMltFormComponentFolder)#>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, sMltFormComponentFolder)#>';
+import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, sMltFormComponentFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  menuItemDataModelFolder, sMltFormComponentFolder)#>';
+import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Model, Context, eventEmitterPubModelFolder, sMltFormComponentFolder)#>';
+import { <#= itemHeightDataModelClassName #> } from '<#= GetCommonFolderName(Model, Context, itemHeightDataModelFolder, sMltFormComponentFolder)#>';
+import { <#= columnSelectorItemModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  columnSelectorItemInterfaceFolder, sMltFormComponentFolder)#>';
+import { <#= componentSelectorDlgComponentClassName #> } from '<#=  GetCommonFolderName(Model, Context,  columnSelectorDlgComponentFolder, sMltFormComponentFolder)#>';
 
 
 <# 
     {
         string viewNm = Model.ViewName;
 #>
-import { <#= GetInterfaceName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, viewNm, viewInterfaceFolder) #>';
-import { <#= GetInterfacePageName(Model) #> } from '<#= GetCrossComponentFolderName(Model, sformComponentFolder, Context, viewNm, viewInterfacePageFolder) #>';
-import { <#= GetInterfaceFilterName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, viewNm, viewInterfaceFltFolder) #>';
-import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, viewNm, viewServiceFolder) #>';
+import { <#= GetInterfaceName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, sMltFormComponentFolder, Context, viewNm, viewInterfaceFolder) #>';
+import { <#= GetInterfacePageName(Model) #> } from '<#= GetCrossComponentFolderName(Model, sMltFormComponentFolder, Context, viewNm, viewInterfacePageFolder) #>';
+import { <#= GetInterfaceFilterName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, sMltFormComponentFolder, Context, viewNm, viewInterfaceFltFolder) #>';
+import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, sMltFormComponentFolder, Context, viewNm, viewServiceFolder) #>';
 <# 
     }
 #>
@@ -230,10 +219,53 @@ import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCr
 
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
-  templateUrl: '<#= GetFolderName(Model, sformHtmlFolder, sformComponentFolder)#>.html',
-  styleUrls: ['<#=  GetFolderName(Model, sformCssFolder, sformComponentFolder)#>.css']
+  templateUrl: '<#= GetFolderName(Model, sMltFormHtmlFolder, sMltFormComponentFolder)#>.html',
+  styleUrls: ['<#=  GetFolderName(Model, sMltFormCssFolder, sMltFormComponentFolder)#>.css']
 })
 export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
+
+    public <#= currentRowPropName #>: Array<<#= GetInterfaceName(Model) #>> = [];
+    @Output('<#= selectedRowSelector #>') <#= selectedRowPropName #>: EventEmitter<Array<<#= GetInterfaceName(Model) #>>> = new EventEmitter<Array<<#= GetInterfaceName(Model) #>>>();
+    public <#= multSelectionProperty #>: SelectionModel<<#= GetInterfaceName(Model) #>> = new SelectionModel<<#= GetInterfaceName(Model) #>>(true, []);
+    onSelectRow(e: Array<<#= GetInterfaceName(Model) #>>) {
+        if (typeof e === 'undefined') {
+            this.<#= currentRowPropName #> = [];
+        } else {
+            this.<#= currentRowPropName #> = e;
+        }
+        this.cd.detectChanges();
+        this.<#= selectedRowPropName #>.emit(this.<#= currentRowPropName #>);
+    }
+    selectRows(e: Array<<#= GetInterfaceName(Model) #>>) {
+        if((typeof e === 'undefined') || (typeof this.dataSource  === 'undefined')) return;
+        if((e === null) || (this.dataSource  === null)) return;
+        if(!Array.isArray(e)) return;
+        let rslt: Array<<#= GetInterfaceName(Model) #>>=[];
+        e.forEach(row => { if(this.dataSource.indexOf(row) > -1) rslt.push(row) });
+        this.<#= multSelectionProperty #>.select(...rslt);
+    }
+    deselectRows(e: Array<<#= GetInterfaceName(Model) #>>) {
+        this.<#= multSelectionProperty #>.deselect(...e);
+    }
+    
+    isAllSelected() {
+      const numSelected = this.<#= multSelectionProperty #>.selected.length;
+      const numRows = this.dataSource.length;
+      return numSelected == numRows;
+    }
+    masterToggle() {
+      this.isAllSelected() ?
+          this.<#= multSelectionProperty #>.clear() :
+          this.dataSource.forEach(row => this.<#= multSelectionProperty #>.select(row));
+    }
+    ngOnInit() {
+        this.<#= multSelectionProperty #>.changed.subscribe({next: 
+            (e: SelectionChange<<#= GetInterfaceName(Model) #>>) => {
+                this.onSelectRow(this.<#= multSelectionProperty #>.selected);
+            }
+        });
+    }
+
 
     isOnInitCalled: boolean = false;
     protected currentFilter: Array<<#= filterResultModelClassName #>> = [];
@@ -402,16 +434,12 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         }
     }
 
-    public <#= currentRowPropName #>: <#= GetInterfaceName(Model) #> | null = null;
-    @Output('<#= selectedRowSelector #>') <#= selectedRowPropName #>: EventEmitter<<#= GetInterfaceName(Model) #>|null> = new EventEmitter<<#= GetInterfaceName(Model) #>|null>();
     @Output('<#= applyFilterSelector #>') <#= applyFilterPropName #>: EventEmitter<<#= componentClassName #>|null> = new EventEmitter<<#= componentClassName #>|null>();
 
 
     constructor(private  <#= formRootService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, protected dialog: MatDialog, private cd: ChangeDetectorRef) {
     }
 
-    ngOnInit() {
-    }
 
     onHiddenFilter() {
         let lcFltrDfs: Array<<#= filterDefModelClassName #>> = [
@@ -562,16 +590,14 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                             rslt = v.items;
                         }
                     }
+                    this.<#= multSelectionProperty #>.clear();
                     this.dataSource = rslt;
                     this.<#= applyFilterPropName #>.emit(this);
-                    let currow: <#= GetInterfaceName(Model) #> | null = null;
                     if(Array.isArray(this.dataSource)) {
                         if(this.dataSource.length > 0) {
-                            currow = this.dataSource[0];
+                            this.<#= multSelectionProperty #>.select(this.dataSource[0]);
                         }
                     }
-                    this.onSelectRow(currow);
-                    this.cd.detectChanges();
                 },
                 error: (error) => {
                     this.inQuery = false;
@@ -580,15 +606,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             });
     }
 
-    onSelectRow(e: <#= GetInterfaceName(Model) #>|any) {
-        if (typeof e === 'undefined') {
-            this.<#= currentRowPropName #> = null;
-        } else {
-            this.<#= currentRowPropName #> = e;
-        }
-        this.cd.detectChanges();
-        this.<#= selectedRowPropName #>.emit(this.<#= currentRowPropName #>);
-    }
     rowCommand(e: <#= GetInterfaceName(Model) #>, id: string) {
         let v: <#= eventEmitterDataModelClassName #> = {
             id: id,

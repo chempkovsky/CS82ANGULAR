@@ -27,6 +27,7 @@
     string MatPaginatorLen                 = "matPaginatorLen";
     string MatPaginatorPageSize            = "matPaginatorPageSize";
     string MatPaginatorPageSizeOptions     = "matPaginatorPageSizeOptions"; 
+    string multSelectionProperty           = "multSelection";
     
     string EformModePropName        = "eformMode";
 
@@ -122,15 +123,26 @@
 <mat-progress-bar *ngIf="inQuery" mode="query"></mat-progress-bar>
 <div [style.maxHeight.px]="<#= MaxHeightPropName #>X" [style.overflow-y]="<#= OverflowPropName #>" class="mat-tbl-container">
 
-<mat-radio-group>
+
 <table mat-table [dataSource]="dataSource" <#= matSortIfNeeded(Model) #>  >
 
   <ng-container matColumnDef="<#= SelectColumnDefProperty #>" sticky>
-    <th mat-header-cell *matHeaderCellDef> </th>
+    <th mat-header-cell *matHeaderCellDef>
+      <mat-checkbox (change)="$event ? masterToggle() : null"
+                    [checked]="<#= multSelectionProperty #>.hasValue() && isAllSelected()"
+                    [indeterminate]="<#= multSelectionProperty #>.hasValue() && !isAllSelected()">
+      </mat-checkbox>
+    </th>
     <td mat-cell *matCellDef="let e">
-      <mat-radio-button (change)="<#= OnSelectRowMethodName #>(e)" [value]="e" [checked]="e === currentRow" ></mat-radio-button>
+      <mat-checkbox (click)="$event.stopPropagation()"
+                    (change)="$event ? <#= multSelectionProperty #>.toggle(e) : null"
+                    [checked]="<#= multSelectionProperty #>.isSelected(e)">
+      </mat-checkbox>
     </td>
   </ng-container>
+
+
+  
 
 <#
     foreach(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable in Model.UIListProperties) {
@@ -202,7 +214,7 @@
 
     <tr mat-row *matRowDef="let row; columns: <#= DisplayedColumnsProperty #>;"></tr>
 </table>
-</mat-radio-group>
+
 </div>
 <mat-paginator (page)="onPage($event)"  [pageIndex]="currentPageIndex" [pageSize]="currentPageSize" [length]="matPaginatorLen" [pageSize]="matPaginatorPageSize" [pageSizeOptions]="matPaginatorPageSizeOptions"> </mat-paginator> 
 
