@@ -439,7 +439,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     onTableMenuItemsData() {
         let tmp: Array<<#= menuItemDataModelClassName #>> = [
             {id: '<#= ActionParamAddMode #>', caption: 'Add Item', iconName: 'create', iconColor: 'primary', enabled: true},
-            {id: '<#= ActionParamDeleteMode #>', caption: 'Delete Selected Items', iconName: 'delete_forever', iconColor: 'warn', enabled: true},
+            {id: '<#= ActionParamDeleteMode #>', caption: 'Delete Selected', iconName: 'delete_forever', iconColor: 'warn', enabled: true},
         ];
         tmp = tmp.concat(this._<#= TableCommandsPropName #>);
         tmp[0].enabled = this._<#= CanAddPropName #> && ((this.permMask & 8) === 8);
@@ -604,17 +604,17 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         let locdata: <#=  messageDialogInterfaceName #> = {
             title: 'Delete Items',
             message: 'Delete Selected Items ?',
-            iconname: 'delete_forever',
+            iconname: 'warning',
             iconcolor: 'warn'
         };
         let dialogRef = this.dialog.open(<#=  messageDialogComponentClassName #>, {
               data: locdata,
             });
-        dialogRef.afterClosed().subscribe(rslt => {
+        dialogRef.afterClosed().subscribe(async rslt => {
             if (typeof rslt === 'undefined') return;
             if (rslt === null) return;
             let currRowsCp: Array<<#= GetInterfaceName(Model) #>> = sender.currentRow.slice();
-            currRowsCp.forEach(async (row: <#= GetInterfaceName(Model) #>) => {
+            for(let row of currRowsCp) {
                 try {
                     // let data: <#= GetInterfaceName(Model) #>  =  
                     await firstValueFrom<<#= GetInterfaceName(Model) #>>(this.<#= formRootService #>.<#= DeleteOneMethodName #>(<# 
@@ -626,13 +626,13 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                             counter++;
                         }
                     }#>));
-                    let i: number = sender.dataSource.indexOf(rslt.<#= FormControlModelPropName #>); 
+                    let i: number = sender.dataSource.indexOf(row); 
                     sender.deselectRows([row]);
                     sender.dataSource = sender.dataSource.splice(i, 1);        
                 } catch (error) {
                     this.appGlblSettings.showError('http', error)
                 }
-            });
+            }
         });
 <#
     }
