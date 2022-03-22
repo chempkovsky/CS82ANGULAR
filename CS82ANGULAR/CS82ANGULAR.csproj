@@ -917,9 +917,11 @@
     </Content>
     <Content Include="Templates\JavaScriptsTmplst\01922-Rmlist.component.html\Readme.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\JavaScriptsTmplst\01922-Rmlist.component.ts\Readme.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\JavaScriptsTmplst\01940-Routing.module.ts\Readme.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -945,6 +947,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01958-Rlm.module.ts\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Templates\JavaScriptsTmplst\02020-Rdlist.component.css\Readme.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -957,7 +963,23 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Templates\JavaScriptsTmplst\02022-Rmdlist.component.css\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\02022-Rmdlist.component.html\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\02022-Rmdlist.component.ts\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Templates\JavaScriptsTmplst\02030-Rdl.module.ts\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\02032-Rdlm.module.ts\Readme.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -2030,9 +2052,11 @@
     </Content>
     <Content Include="Templates\JavaScriptsTmplst\01922-Rmlist.component.html\ListRouterMltFormForView.html.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\JavaScriptsTmplst\01922-Rmlist.component.ts\ListRouterMltFormForView.ts.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\JavaScriptsTmplst\01460-Smform.component.css\SearchMltFormForView.css.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -2088,6 +2112,7 @@
     </Content>
     <Content Include="Templates\BatchJavaScriptsTmplst\01000-ViewModelLevelTmplts\01630-Lmform.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\JavaScriptsTmplst\01640-Lmdlg.component.css\ListMltDlgFormForView.css.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -2098,6 +2123,58 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\JavaScriptsTmplst\01640-Lmdlg.component.ts\ListMltDlgFormForView.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01958-Rlm.module.ts\rlMltformModuleForView.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01968-Rlm.routing.module.ts\rlMlt.routing.module.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01978-Rlm-lazy.routing.module.ts\rl-lazy.routing.module.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01980-Rm-lazy.routes.ts\rm-lazy.routes.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\BatchJavaScriptsTmplst\01000-ViewModelLevelTmplts\01968-Rlm.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\02022-Rmdlist.component.css\MDListRouterFormForView.css.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\02022-Rmdlist.component.html\MDListRouterFormForView.html.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\02022-Rmdlist.component.ts\MDListRouterFormForView.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\02032-Rdlm.module.ts\rdlmformModuleForView.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\02042-Rdlm.routing.module.ts\rdlm.routing.module.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\02062-Rdlm-lazy.routes.ts\rdlm-lazy.routes.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\02052-Rdlm-lazy.routing.module.ts\rdlm-lazy.routing.module.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\BatchJavaScriptsTmplst\01000-ViewModelLevelTmplts\02022-Rdlm.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

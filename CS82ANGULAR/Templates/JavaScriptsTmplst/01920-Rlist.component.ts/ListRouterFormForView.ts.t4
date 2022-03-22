@@ -26,6 +26,9 @@
     string HiddenFilterByRowSuffix      = "HiddenFilterByRow";
     string uidParamName                 = "uid"; 
 
+    string NavPrefix                    = "NavPrefix";
+    string OutletNmPropName             = "outletNm";
+
     string getStorageItemMethodName     = "getStorageItem";
     string setStorageItemMethodName     = "setStorageItem";
     string getStorageLengthMethodName   = "getStorageLength";
@@ -164,6 +167,8 @@ import { <#= GetInterfaceFilterName(Model) #> } from '<#= GetCrossComponentFolde
 })
 export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
     @Input('<#= captionSelector #>') <#= captionPropName #>: string = '<#= Model.ViewName #>';
+    <#= NavPrefix #>: string|any = '';
+    <#= OutletNmPropName #> : string = 'primary';
 
     isPostNavApplied: boolean = false;
     isOnInitCalled: boolean = false;
@@ -233,6 +238,12 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 }
                 if (!(typeof this.route.snapshot.data['<#= uidParamName #>'] === 'undefined')) {
                     this.<#= uidParamName #> = this.route.snapshot.data['<#= uidParamName #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= NavPrefix #>'] === 'undefined')) {
+                    this.<#= NavPrefix #> = this.route.snapshot.data['<#= NavPrefix #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= OutletNmPropName #>'] === 'undefined')) {
+                    this.<#= OutletNmPropName #> = this.route.snapshot.data['<#= OutletNmPropName #>'];
                 }
             }
         }
@@ -310,7 +321,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     @Output('on-table-command') onTableCommand: EventEmitter<<#= eventEmitterDataModelClassName #>> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
 
     rowCommand(v: <#= eventEmitterDataModelClassName #>) {
-        let qp = [];
+        let qp: string[] = [];
 <#
         if(primKeys != null) {
 #>      
@@ -359,26 +370,48 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             if(id < 0) return;
             let mnItm: IMenuItemData = this.rowMenuItemsData[id];
             if (!(typeof mnItm.data === 'undefined')) {
-                qp.push( mnItm.data.view );
+                qp.push( this.<#= NavPrefix #> +  mnItm.data.view );
                 qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(v.value, mnItm.data.nav)));
             } else {
                 this.onRowCommand.emit(v);
                 return;
             }
         }
-        this.router.navigate(qp, {relativeTo: this.route});
+        // this.router.navigate(qp, {relativeTo: this.route});
+        if(this.<#= OutletNmPropName #> === 'primary') {
+            this.router.navigate(qp, {relativeTo: this.route});
+        } else {
+            qp[0] = this.<#= OutletNmPropName #> + '2' + qp[0];
+            this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route.parent!.parent}).then(
+                ()=> {
+                    this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: qp }}], {relativeTo: this.route.parent!.parent});
+                }
+            );
+        }
     }
     tableCommand(v: <#= eventEmitterDataModelClassName #>) {
         if(v.id === '<#= ActionParamAddMode #>') {
-            let qp = [];
+            let qp: string[] = [];
             qp.push( '<#= APrefix #>' + '<#= Model.ViewName #>' );
             if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
                 qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
             } else {
-                this.onTableCommand.emit(v);
-                return;
+                qp.push(JSON.stringify({}));
             }
-            this.router.navigate(qp, {relativeTo: this.route});
+            // this.router.navigate(qp, {relativeTo: this.route});
+            if(this.<#= OutletNmPropName #> === 'primary') {
+                this.router.navigate(qp, {relativeTo: this.route});
+            } else {
+                qp[0] = this.<#= OutletNmPropName #> + '2' + qp[0];
+                this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route.parent!.parent}).then(
+                    ()=> {
+                        this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: qp }}], {relativeTo: this.route.parent!.parent});
+                    }
+                );
+            }
+        } else {
+            this.onTableCommand.emit(v);
+            return;
         }
     }
     <#= applyFilterPropName #>(frm: <#= searchComponentClassName #> | any) {
@@ -468,7 +501,13 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     onBackBtn(e?: any) {
         if (this.<#= DepthParamName #> > 1) {
             this.<#= AppSettingServicePropName #>.<#= removeStorageItemMethodName #>(this.<#= uidParamName #> as string);
-            this.router.navigate(['../../'], {relativeTo: this.route});
+            // this.router.navigate(['../../'], {relativeTo: this.route});
+            if(this.<#= OutletNmPropName #> === 'primary') {
+                this.router.navigate(['../../'], {relativeTo: this.route});
+            } else {
+                // there is no parant, so do just hide detail component
+                this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: null }}], {relativeTo: this.route.parent!.parent});
+            }
         }
     }
 

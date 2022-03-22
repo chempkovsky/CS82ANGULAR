@@ -411,6 +411,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         ];
     tableMenuItemsData = [
         {id: '<#= ActionParamAddMode #>', caption: 'Add Item', iconName: 'create', iconColor: 'primary', enabled: true},
+        {id: '<#= ActionParamDeleteMode #>', caption: 'Delete Selected', iconName: 'delete_forever', iconColor: 'warn', enabled: true},
       ];
 
     constructor(private  <#= formRootService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, public dialog: MatDialog, private cd: ChangeDetectorRef) {
@@ -506,9 +507,9 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                             if (!Array.isArray(sender.dataSource)) {
                                 sender.dataSource = [];
                             }
-                            sender.dataSource.splice(0, 0, rslt.eformNewControlModel);
+                            sender.dataSource.splice(0, 0, rslt.<#= FormControlNewModelPropName #>);
                             sender.dataSource = sender.dataSource.slice(0);
-                            sender.selectRows([rslt.eformNewControlModel]);
+                            sender.selectRows([rslt.<#= FormControlNewModelPropName #>]);
                         }
                     }
                 }
@@ -628,7 +629,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                     }#>));
                     let i: number = sender.dataSource.indexOf(row); 
                     sender.deselectRows([row]);
-                    sender.dataSource = sender.dataSource.splice(i, 1);        
+                    sender.dataSource.splice(i, 1);
+                    sender.dataSource = sender.dataSource.slice(0);
                 } catch (error) {
                     this.appGlblSettings.showError('http', error)
                 }

@@ -31,19 +31,19 @@
     string FilterMaxHeightPropName      = "filterMaxHeight";
     string ShowFilterPropName           = "showFilter";
     string TitlePropName                = "title";
-    string RDLPrefix                    = "RDL";
+    string RDLMPrefix                   = "RDLM";
     string NavPrefix                    = "NavPrefix";
 
 
 
                                            
-    string rdLazyModuleFolder           = "01976-Rd-lazy.routing.module.ts";
-    string rdlLazyModuleFolder           = "02050-Rdl-lazy.routing.module.ts";
+
+    string rdlMltLazyModuleFolder       = "02052-Rdlm-lazy.routing.module.ts";
 
     List<Tuple<ModelViewSerializable, string, int>> nodes = new List<Tuple<ModelViewSerializable, string, int>>();
     List<string> allViewNames= new List<string>();
     // Model, url, depth
-    nodes.Add(new Tuple<ModelViewSerializable, string, int>( Model, RDLPrefix + Model.ViewName, 1));
+    nodes.Add(new Tuple<ModelViewSerializable, string, int>( Model, RDLMPrefix + Model.ViewName, 1));
     List<string> detailViewNames = new List<string>();
     allViewNames.Add(Model.ViewName);
 
@@ -61,7 +61,7 @@
                 if(nodes.Count(p => p.Item1 == detail) > 2) {
                     continue;
                 }
-                string newPath = CurrPath + "/" + RDLPrefix + viewName;
+                string newPath = CurrPath + "/" + RDLMPrefix + viewName;
                 if (CurrDepth > 1) {
                     newPath = newPath +"/:" + HiddenFilterPrefix + CurrDepth.ToString();
                 }
@@ -107,7 +107,7 @@
         ModelViewSerializable aModel = node.Item1;
         int CurrDepth = node.Item3 + 1;
         List<ModelViewPropertyOfVwSerializable> aModelPrincipals = GetModelPrimaryKeyProps(aModel);
-        string fileNm_rdl = GeFileNameWithoutExt(aModel, rdlLazyModuleFolder);
+        string fileNm_rdl = GeFileNameWithoutExt(aModel, rdlMltLazyModuleFolder);
         
         if(aModel.IsWebApiSelectManyWithPagination) {
             if(!string.IsNullOrEmpty(fileNm_rdl)) {
@@ -118,16 +118,16 @@
                 if(node.Item3 > 1) {
 #>
     { path: '<#= node.Item2 #>', 
-        loadChildren: () => import('<#= fileNm_rdl #>').then(m => m.<#= GetModuleClassName(aModel, rdlLazyModuleFolder) #>),
-        data: { <#= NavPrefix #>: '<#= RDLPrefix #>', <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + node.Item3.ToString() #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+        loadChildren: () => import('<#= fileNm_rdl #>').then(m => m.<#= GetModuleClassName(aModel, rdlMltLazyModuleFolder) #>),
+        data: { <#= NavPrefix #>: '<#= RDLMPrefix #>', <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + node.Item3.ToString() #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
 
                 } else {
 #>
     { path: '<#= node.Item2 #>', 
-        loadChildren: () => import('<#= fileNm_rdl #>').then(m => m.<#= GetModuleClassName(aModel, rdlLazyModuleFolder) #>),
-        data: { <#= NavPrefix #>: '<#= RDLPrefix #>', <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+        loadChildren: () => import('<#= fileNm_rdl #>').then(m => m.<#= GetModuleClassName(aModel, rdlMltLazyModuleFolder) #>),
+        data: { <#= NavPrefix #>: '<#= RDLMPrefix #>', <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
                 } // if(node.Item3 > 1) { ... } else { ... }
@@ -137,7 +137,7 @@
             } else {
 #>
 //
-//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= rdlLazyModuleFolder #>] has not been generated yet
+//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= rdlMltLazyModuleFolder #>] has not been generated yet
 //
 <#
             }

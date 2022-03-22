@@ -39,7 +39,7 @@
     string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, aformComponentFolder);
 #>
 <mat-card>
-        <mat-card-subtitle>{{<#= TitlePropName #>}}</mat-card-subtitle>
+        <!-- <mat-card-subtitle>{{<#= TitlePropName #>}}</mat-card-subtitle>  -->
     <mat-card-content>
         <app-<#= componentSelectorCommonPart #> 
             [<#= captionSelector #>]="<#= TitlePropName #>" 

@@ -31,19 +31,23 @@
     string FilterMaxHeightPropName      = "filterMaxHeight";
     string ShowFilterPropName           = "showFilter";
     string TitlePropName                = "title";
-    string RDLPrefix                    = "RDL";
+    string MLTPrefix                    = "MLT";
     string NavPrefix                    = "NavPrefix";
 
 
 
+
                                            
+    string rvLazyModuleFolder           = "01970-Rv-lazy.routing.module.ts";
+    string raLazyModuleFolder           = "01972-Ra-lazy.routing.module.ts";
+    string ruLazyModuleFolder           = "01974-Ru-lazy.routing.module.ts";
     string rdLazyModuleFolder           = "01976-Rd-lazy.routing.module.ts";
-    string rdlLazyModuleFolder           = "02050-Rdl-lazy.routing.module.ts";
+    string rlMltLazyModuleFolder        = "01978-Rlm-lazy.routing.module.ts";
 
     List<Tuple<ModelViewSerializable, string, int>> nodes = new List<Tuple<ModelViewSerializable, string, int>>();
     List<string> allViewNames= new List<string>();
     // Model, url, depth
-    nodes.Add(new Tuple<ModelViewSerializable, string, int>( Model, RDLPrefix + Model.ViewName, 1));
+    nodes.Add(new Tuple<ModelViewSerializable, string, int>( Model, MLTPrefix + Model.ViewName, 1));
     List<string> detailViewNames = new List<string>();
     allViewNames.Add(Model.ViewName);
 
@@ -61,7 +65,7 @@
                 if(nodes.Count(p => p.Item1 == detail) > 2) {
                     continue;
                 }
-                string newPath = CurrPath + "/" + RDLPrefix + viewName;
+                string newPath = CurrPath + "/" + MLTPrefix + viewName;
                 if (CurrDepth > 1) {
                     newPath = newPath +"/:" + HiddenFilterPrefix + CurrDepth.ToString();
                 }
@@ -107,27 +111,132 @@
         ModelViewSerializable aModel = node.Item1;
         int CurrDepth = node.Item3 + 1;
         List<ModelViewPropertyOfVwSerializable> aModelPrincipals = GetModelPrimaryKeyProps(aModel);
-        string fileNm_rdl = GeFileNameWithoutExt(aModel, rdlLazyModuleFolder);
+        string fileNm_rlm = GeFileNameWithoutExt(aModel, rlMltLazyModuleFolder);
+        string fileNm_rv  = GeFileNameWithoutExt(aModel, rvLazyModuleFolder);
+        string fileNm_ra  = GeFileNameWithoutExt(aModel, raLazyModuleFolder);
+        string fileNm_ru  = GeFileNameWithoutExt(aModel, ruLazyModuleFolder);
+        string fileNm_rd  = GeFileNameWithoutExt(aModel, rdLazyModuleFolder);
         
         if(aModel.IsWebApiSelectManyWithPagination) {
-            if(!string.IsNullOrEmpty(fileNm_rdl)) {
+            if(!string.IsNullOrEmpty(fileNm_rlm)) {
 
 
+
+                if(aModel.IsWebApiSelectOneByPrimarykey) {
+                    if(!string.IsNullOrEmpty(fileNm_rv)) {
+#>
+    { path: '<#= node.Item2 + "/" + VPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
+        loadChildren: () => import('<#= fileNm_rv #>').then(m => m.<#= GetModuleClassName(aModel, rvLazyModuleFolder) #>),
+        data: { <#= NavPrefix #>: '<#= MLTPrefix #>', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'View <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>', <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
+
+<#
+                    } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= rvLazyModuleFolder #>] has not been generated yet
+//
+<#
+                    } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
+                } else { // if(aModel.IsWebApiSelectOneByPrimarykey) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] SelectOneByPrimarykey is set to false
+//
+<#
+                } // if(aModel.IsWebApiSelectOneByPrimarykey) { ... } else { ... }
+
+
+
+
+                if(aModel.IsWebApiAdd) {
+                    if(!string.IsNullOrEmpty(fileNm_ra)) {
+#>
+    { path: '<#= node.Item2 + "/" + APrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() #>', 
+        loadChildren: () => import('<#= fileNm_ra #>').then(m => m.<#= GetModuleClassName(aModel, raLazyModuleFolder) #>),
+        data: { <#= NavPrefix #>: '<#= MLTPrefix #>', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Add <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
+
+<#
+                    } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= raLazyModuleFolder #>] has not been generated yet
+//
+<#
+                    } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
+                } else { // if(aModel.IsWebApiAdd) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] WebApiAdd is set to false
+//
+<#
+                } // if(aModel.IsWebApiAdd) { ... } else { ... }
+
+
+
+
+                if(aModel.IsWebApiUpdate) {
+                    if(!string.IsNullOrEmpty(fileNm_ru)) {
+#>
+    { path: '<#= node.Item2 + "/" + UPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
+        loadChildren: () => import('<#= fileNm_ru #>').then(m => m.<#= GetModuleClassName(aModel, ruLazyModuleFolder) #>),
+        data: { <#= NavPrefix #>: '<#= MLTPrefix #>', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Update <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
+
+<#
+                    } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= ruLazyModuleFolder #>] has not been generated yet
+//
+<#
+                    } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
+                } else { // if(aModel.IsWebApiUpdate) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] WebApiUpdate is set to false
+//
+<#
+                } // if(aModel.IsWebApiUpdate) { ... } else { ... }
+
+
+
+
+                if(aModel.IsWebApiDelete) {
+                    if(!string.IsNullOrEmpty(fileNm_rd)) {
+#>
+    { path: '<#= node.Item2 + "/" + DPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
+        loadChildren: () => import('<#= fileNm_rd #>').then(m => m.<#= GetModuleClassName(aModel, rdLazyModuleFolder) #>),
+        data: { <#= NavPrefix #>: '<#= MLTPrefix #>', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Delete <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
+
+<#
+                    } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= rdLazyModuleFolder #>] has not been generated yet
+//
+<#
+                    } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
+                } else { // if(aModel.IsWebApiDelete) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] WebApiDelete is set to false
+//
+<#
+                } // if(aModel.IsWebApiDelete) { ... } else { ... }
 
 
                 if(node.Item3 > 1) {
 #>
     { path: '<#= node.Item2 #>', 
-        loadChildren: () => import('<#= fileNm_rdl #>').then(m => m.<#= GetModuleClassName(aModel, rdlLazyModuleFolder) #>),
-        data: { <#= NavPrefix #>: '<#= RDLPrefix #>', <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + node.Item3.ToString() #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+        loadChildren: () => import('<#= fileNm_rlm #>').then(m => m.<#= GetModuleClassName(aModel, rlMltLazyModuleFolder) #>),
+        data: { <#= NavPrefix #>: '<#= MLTPrefix #>', <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + node.Item3.ToString() #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
 
                 } else {
 #>
     { path: '<#= node.Item2 #>', 
-        loadChildren: () => import('<#= fileNm_rdl #>').then(m => m.<#= GetModuleClassName(aModel, rdlLazyModuleFolder) #>),
-        data: { <#= NavPrefix #>: '<#= RDLPrefix #>', <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+        loadChildren: () => import('<#= fileNm_rlm #>').then(m => m.<#= GetModuleClassName(aModel, rlMltLazyModuleFolder) #>),
+        data: { <#= NavPrefix #>: '<#= MLTPrefix #>', <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
                 } // if(node.Item3 > 1) { ... } else { ... }
@@ -137,7 +246,7 @@
             } else {
 #>
 //
-//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= rdlLazyModuleFolder #>] has not been generated yet
+//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= rlMltLazyModuleFolder #>] has not been generated yet
 //
 <#
             }

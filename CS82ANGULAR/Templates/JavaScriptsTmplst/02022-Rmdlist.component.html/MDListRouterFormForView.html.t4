@@ -68,6 +68,7 @@
     string captionSelector              = "caption";
 
     string sMltFormComponentFolder      = "01460-Smform.component.ts";
+
     string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, sMltFormComponentFolder);
 #>
 
@@ -81,7 +82,6 @@
     [<#= HiddenFilterSelector #>] ="<#= HiddenFilterPropName #>"
     (<#= OnRowCommandSelector #>)="rowCommand($event)"
     (<#= OnTableCommandSelector #>)="tableCommand($event)"
-    (<#= applyFilterSelector #>)="<#= applyFilterPropName #>($event)"
     [<#= containerMenuItemsSelector #>]="<#= containerMenuItemsPropName #>"
     (<#= onContainerMenuItemClickSelector #>)="<#= onContainerMenuItemClickMethodName #>($event)"
 

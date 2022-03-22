@@ -315,6 +315,8 @@ import { <#=  GetInterfaceDlgNameEx(Context, viewNm) #> } from '<#= GetCrossComp
   styleUrls: ['<#= GetFolderName(Model, viewformCssFolder, viewformComponentFolder)#>.css']
 })
 export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEmitterPubModelClassName #> {
+
+    
     @Output('<#= BeforeSubmitSelector #>') <#= BeforeSubmitPropName #> = new EventEmitter();
     @Output('<#= AfterSubmitSelector #>') <#= AfterSubmitPropName #> = new EventEmitter<<#= GetInterfaceName(Model) #>>();
     public <#= DoSubmitMethodName #>(): void {

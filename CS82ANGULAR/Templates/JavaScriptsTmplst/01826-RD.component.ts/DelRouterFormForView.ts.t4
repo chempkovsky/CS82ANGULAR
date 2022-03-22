@@ -20,6 +20,10 @@
     string DelPrefix                    = "Del";
     string DPrefix                      = "Del";
 
+    string NavPrefix                    = "NavPrefix";
+    string OutletNmPropName             = "outletNm";
+    string OutletParent                 = "oltParent";
+
     string HiddenFilterAsFltRsltSuffix  = "HiddenFilterAsFltRslt";
     string DepthParamName               = "depth"; 
     string ActionParamName              = "mode";  
@@ -90,6 +94,9 @@ import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Mo
 
 export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #> {
     <#= TitlePropName #>: string|any = 'No title';
+    <#= NavPrefix #>: string|any = '';
+    <#= OutletNmPropName #> : string = 'primary';
+    <#= OutletParent #>: string = '';
     @Output('<#= onContainerMenuItemClickSelector #>') <#= onContainerMenuItemClickEmitter #> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
     @Input('<#= containerMenuItemsSelector #>') <#= containerMenuItemsPropName #>: Array<<#= menuItemDataModelClassName #>> = [];
     <#= onContainerMenuItemClickMethodName #>(v: <#= eventEmitterDataModelClassName #>)  {
@@ -98,7 +105,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     <#= HiddenFilterPrefix #>: string = '<#= HiddenFilterPrefix + "1" #>';
     <#= IdPrefix #>: string = '<#= IdPrefix + "1" #>';
     <#= DepthParamName #>: number = 1;
-    @ViewChild(<#= GetComponentClassName(Model, rdComponentFolder) #>) childForm: <#= GetComponentClassName(Model, rdComponentFolder) #> | any;
+    @ViewChild(<#= GetComponentClassName(Model, dformComponentFolder) #>) childForm: <#= GetComponentClassName(Model, dformComponentFolder) #> | any;
     <#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
     <#= FormControlModelPropName #>: <#= GetInterfaceName(Model) #> | null = null;
     constructor(protected route: ActivatedRoute, protected router: Router, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, protected <#= formRootService #>: <#= serviceClassName #>) { }
@@ -116,6 +123,15 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 }
                 if (!(typeof this.route.snapshot.data['<#= IdPrefix #>'] === 'undefined')) {
                     this.<#= IdPrefix #> = this.route.snapshot.data['<#= IdPrefix #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= NavPrefix #>'] === 'undefined')) {
+                    this.<#= NavPrefix #> = this.route.snapshot.data['<#= NavPrefix #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= OutletNmPropName #>'] === 'undefined')) {
+                    this.<#= OutletNmPropName #> = this.route.snapshot.data['<#= OutletNmPropName #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= OutletParent #>'] === 'undefined')) {
+                    this.<#= OutletParent #> = this.route.snapshot.data['<#= OutletParent #>'];
                 }
             }
         }
@@ -153,11 +169,44 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
 <#
         }
 #>
-        this.router.navigate(['../../../'], {queryParams: qp, relativeTo: this.route});
+        // this.router.navigate(['../../../'], {queryParams: qp, relativeTo: this.route});
+        if(this.<#= OutletNmPropName #> === 'primary') {
+            this.router.navigate(['../../../'], {queryParams: qp, relativeTo: this.route});
+        } else {
+            let qp0: string[] = [];
+            qp0.push(this.<#= OutletParent #>);
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                qp0.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>])
+            } else {
+                qp0.push(JSON.stringify({}));
+            }
+            this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route.parent!.parent}).then(
+                ()=> {
+                    this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: qp0 }}], {relativeTo: this.route.parent!.parent})
+                }
+            );
+        }
     }
 
     onCancel() {
-        this.router.navigate(['../../../'], {relativeTo: this.route});
+        // this.router.navigate(['../../../'], {relativeTo: this.route});
+        if(this.<#= OutletNmPropName #> === 'primary') {
+            this.router.navigate(['../../../'], {relativeTo: this.route});
+        } else {
+            let qp: string[] = [];
+            qp.push(this.<#= OutletParent #>);
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>])
+            } else {
+                qp.push(JSON.stringify({}));
+            }
+            this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route.parent!.parent}).then(
+                ()=> {
+                    this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: qp }}], {relativeTo: this.route.parent!.parent})
+                }
+            );
+        }
+
     }
     onOk() {
         if (typeof this.childForm === 'undefined') return;

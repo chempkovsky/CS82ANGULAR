@@ -75,6 +75,7 @@
     string UIFormChainFieldName                 = "UIFormChain";
     string DoEmitEventMethodName                = "doEmitEvent";
     string RefreshMethodName                    = "refresh";
+    string HiddenFilterByRowSuffix              = "HiddenFilterByRow";
     
 
 
@@ -189,6 +190,9 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         this.<#= OnMasterChangedPropName #>.emit(this);
         if(aftrMstrChngd) this.<#= AfterMasterChangedPropName #>.emit(this);
         this.<#= AfterPropsChangedPropName #>.emit(this);
+    }
+    public get<#= HiddenFilterByRowSuffix #>(rw: <#= GetInterfaceName(Model) #>|any, nvNm: string|any): {[key: string]: {[key: string]: {[key: string]: any}}} {
+        return this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(rw, nvNm);
     }
 
     public get<#= HiddenFilterByFltRsltSuffix #>(fr:  Array<<#= filterResultModelClassName #>> | any): {[key: string]: {[key: string]: {[key: string]: any}}} {
