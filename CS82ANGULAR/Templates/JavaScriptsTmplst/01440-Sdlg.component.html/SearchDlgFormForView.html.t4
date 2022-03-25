@@ -29,6 +29,8 @@
     string MaxHeightPropName            = "maxHeight";
     string FilterMaxHeightPropSelector  = "filter-max-height";
     string FilterMaxHeightPropName      = "filterMaxHeight";
+    string showMultiSelectedRowSelector   = "show-multi-selected-row";
+    string showMultiSelectedRowPropName   = "showMultiSelectedRow";
 
 
     string sformComponentFolder     = "01420-Sform.component.ts";
@@ -42,6 +44,7 @@
         [<#= ShowFilterSelector #>]="data.<#= ShowFilterPropName #>"
         [<#= MaxHeightPropSelector #>]="data.<#= MaxHeightPropName #>"
         [<#= FilterMaxHeightPropSelector #>]="data.<#= FilterMaxHeightPropName #>"
+        [<#= showMultiSelectedRowSelector #>]="<#= showMultiSelectedRowPropName #>"
     ></app-<#= componentSelectorCommonPart #>>
 </div>
 <div mat-dialog-actions>

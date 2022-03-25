@@ -23,6 +23,9 @@
     string DisplayedColumnsProperty        = "displayedColumns";
     string ActionColumnDefProperty         = "menuAction";
     string SelectColumnDefProperty         = "selectAction";
+    string SelectMultColumnDefProperty     = "selectMultAction";
+    string multSelectionProperty           = "multSelection";
+
     string OnSelectRowMethodName           = "onSelectRow";
     string MatPaginatorLen                 = "matPaginatorLen";
     string MatPaginatorPageSize            = "matPaginatorPageSize";
@@ -129,6 +132,21 @@
       <mat-radio-button (change)="<#= OnSelectRowMethodName #>(e)" [value]="e" [checked]="e === currentRow" ></mat-radio-button>
     </td>
   </ng-container>
+  <ng-container matColumnDef="<#= SelectMultColumnDefProperty #>" sticky>
+    <th mat-header-cell *matHeaderCellDef>
+      <mat-checkbox (change)="$event ? masterToggle() : null"
+                    [checked]="<#= multSelectionProperty #>.hasValue() && isAllSelected()"
+                    [indeterminate]="<#= multSelectionProperty #>.hasValue() && !isAllSelected()">
+      </mat-checkbox>
+    </th>
+    <td mat-cell *matCellDef="let e">
+      <mat-checkbox (click)="$event.stopPropagation()"
+                    (change)="$event ? <#= multSelectionProperty #>.toggle(e) : null"
+                    [checked]="<#= multSelectionProperty #>.isSelected(e)">
+      </mat-checkbox>
+    </td>
+  </ng-container>
+
 
 <#
     foreach(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable in Model.UIListProperties) {

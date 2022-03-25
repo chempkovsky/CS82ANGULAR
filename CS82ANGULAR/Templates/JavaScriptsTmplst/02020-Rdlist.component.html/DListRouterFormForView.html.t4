@@ -67,6 +67,13 @@
     string captionPropName              = "caption";
     string captionSelector              = "caption";
 
+    string showMultiSelectedRowSelector = "show-multi-selected-row";
+    string showMultiSelectedRowPropName = "showMultiSelectedRow";
+    string multiSelectedRowSelector     = "multi-selected-row";
+    string multiSelectedRowPropName     = "multiSelectedRow";
+    string onMultiSelectedRowPropName   = "onMultiSelectedRow";
+    string currentMultiRowPropName      = "currentMultiRow";
+
     string sformComponentFolder         = "01420-Sform.component.ts";
     string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, sformComponentFolder);
 #>
@@ -87,6 +94,8 @@
     (<#= beforeSquerySelector #>)="<#= OnBeforeSqueryMethodName #>($event)"
     [<#= externalFilterSelector #>]="<#= externalFilterPropName #>"
     
+    [<#= showMultiSelectedRowSelector #>]="<#= showMultiSelectedRowPropName #>"  
+    (<#= multiSelectedRowSelector #>)="<#= onMultiSelectedRowPropName #>($event)"  
 
     [<#= MaxHeightPropSelector #>]="<#= MaxHeightPropName #>"  
     [<#= FilterMaxHeightPropSelector #>]="<#= FilterMaxHeightPropName #>"  

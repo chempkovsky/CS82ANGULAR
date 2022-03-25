@@ -131,6 +131,10 @@
 
     string eformModeEnumlFolder         = "00026-eform-mode.enum.ts";
 
+    string messageDialogInterfaceFolder = "00037-message-dialog.interface.ts";
+    string messageDialogComponentFolder = "00038-message-dialog.component.ts";
+
+
     string viewInterfaceFolder          = "01100-.interface.ts";
     string viewInterfacePageFolder      = "01200-Page.interface.ts";
     string viewInterfaceFltFolder       = "01300-Filter.interface.ts";
@@ -164,6 +168,12 @@
     string captionPropName              = "caption";
     string captionSelector              = "caption";
 
+    string showMultiSelectedRowSelector = "show-multi-selected-row";
+    string showMultiSelectedRowPropName = "showMultiSelectedRow";
+    string multiSelectedRowSelector     = "multi-selected-row";
+    string multiSelectedRowPropName     = "multiSelectedRow";
+    string onMultiSelectedRowPropName   = "onMultiSelectedRow";
+    string currentMultiRowPropName      = "currentMultiRow";
 
     string ActionColumnDefProperty      = "menuAction";
     string SelectColumnDefProperty      = "selectAction";
@@ -182,6 +192,8 @@
     string componentClassName = GetComponentClassName(Model, lformComponentFolder);
     string searchComponentClassName = GetComponentClassName(Model, sformComponentFolder);
 
+    string messageDialogComponentClassName = GetContextComponentClassName(Context, messageDialogComponentFolder);
+    string messageDialogInterfaceName = GetModelClassName(Context, messageDialogInterfaceFolder);
 
     string filterModelClassName = GetModelClassName(Context, filterModelFolder);
     string filterDefModelClassName = GetModelClassName(Context, filterDefModelFolder);
@@ -205,12 +217,14 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { FormControl, Validators, ValidatorFn } from '@angular/forms';
 import { MatSelectChange } from '@angular/material/select';
+import { MatDialog } from '@angular/material/dialog';
+import { firstValueFrom } from 'rxjs';
 
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatRow } from '@angular/material/table';
 import { ProgressBarMode } from '@angular/material/progress-bar';
-import { MatDialog } from '@angular/material/dialog';
+
 
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, lformComponentFolder)#>';
 import { <#= filterModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterModelFolder, lformComponentFolder)#>';
@@ -223,6 +237,9 @@ import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(
 import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  menuItemDataModelFolder, lformComponentFolder)#>';
 import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Model, Context, eventEmitterPubModelFolder, lformComponentFolder)#>';
 import { <#= itemHeightDataModelClassName #> } from '<#= GetCommonFolderName(Model, Context, itemHeightDataModelFolder, lformComponentFolder)#>';
+import { <#= messageDialogInterfaceName #> } from '<#=  GetCommonFolderName(Model, Context,  messageDialogInterfaceFolder, lformComponentFolder)#>';
+import { <#= messageDialogComponentClassName #> } from '<#=  GetCommonFolderName(Model, Context,  messageDialogComponentFolder, lformComponentFolder)#>';
+
 
 <# 
     {
@@ -269,6 +286,14 @@ import { <#=  ddlgComponentClassName #> } from '<#= GetFolderName(Model, ddlgCom
   styleUrls: ['<#=  GetFolderName(Model, lformCssFolder, lformComponentFolder)#>.css']
 })
 export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
+
+    @Input('<#= showMultiSelectedRowSelector #>') <#= showMultiSelectedRowPropName #>: boolean = true;
+
+    @Output('<#= multiSelectedRowSelector #>') <#= multiSelectedRowPropName #>: EventEmitter<Array<<#= GetInterfaceName(Model) #>>> = new EventEmitter<Array<<#= GetInterfaceName(Model) #>>>();
+    <#= onMultiSelectedRowPropName #>(e: Array<<#= GetInterfaceName(Model) #>>): void {
+        this.<#= multiSelectedRowPropName #>.emit(e);
+    }
+
     @Input('<#= captionSelector #>') <#= captionPropName #>: string = '<#= Model.ViewName #>';
 
     @Input('<#= FilterMaxHeightPropSelector #>')  <#= FilterMaxHeightPropName #>: number | any = null;
@@ -431,6 +456,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         ];
     tableMenuItemsData = [
         {id: '<#= ActionParamAddMode #>', caption: 'Add Item', iconName: 'create', iconColor: 'primary', enabled: true},
+        {id: '<#= ActionParamDeleteMode #>', caption: 'Delete Selected', iconName: 'delete_forever', iconColor: 'warn', enabled: true},
       ];
 
     constructor(private  <#= formRootService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, public dialog: MatDialog, private cd: ChangeDetectorRef) {
@@ -459,9 +485,11 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     onTableMenuItemsData() {
         let tmp: Array<<#= menuItemDataModelClassName #>> = [
             {id: '<#= ActionParamAddMode #>', caption: 'Add Item', iconName: 'create', iconColor: 'primary', enabled: true},
+            {id: '<#= ActionParamDeleteMode #>', caption: 'Delete Item', iconName: 'delete_forever', iconColor: 'warn', enabled: true},
         ];
         tmp = tmp.concat(this._<#= TableCommandsPropName #>);
         tmp[0].enabled = this._<#= CanAddPropName #> && ((this.permMask & 8) === 8) <# if (!Model.IsWebApiAdd) { #> && false <# } #>;
+        tmp[1].enabled = this._<#= CanDelPropName #> && ((this.permMask & 2) === 2) <# if (!Model.IsWebApiDelete) { #> && false <# } #>;
         this.tableMenuItemsData = tmp;
     }
     
@@ -533,7 +561,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                                 }
                             }
                             if(isNDef) {
-                                sender.onSelectRow(rslt.eformNewControlModel);
+                                sender.<#= OnSelectRowMethodName #>(rslt.eformNewControlModel);
                             }
                         }
                     }
@@ -608,11 +636,11 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                                 if (!(sender.currentRow === null)) {
                                     if (sender.currentRow === rslt.eformControlModel) {
                                         if (i > 0) {
-                                            sender.onSelectRow(sender.dataSource[i-1]);
+                                            sender.<#= OnSelectRowMethodName #>(sender.dataSource[i-1]);
                                         } else if (i < sender.dataSource.length-1) {
-                                            sender.onSelectRow(sender.dataSource[i+1]);
+                                            sender.<#= OnSelectRowMethodName #>(sender.dataSource[i+1]);
                                         } else {
-                                            sender.onSelectRow(null);
+                                            sender.<#= OnSelectRowMethodName #>(null);
                                         }
                                     }
                                 }
@@ -632,6 +660,54 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     @Output('on-row-command') onRowCommand: EventEmitter<<#= eventEmitterDataModelClassName #>> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
     @Output('on-table-command') onTableCommand: EventEmitter<<#= eventEmitterDataModelClassName #>> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
 
+    onDeleteMultiple(sender: <#= searchComponentClassName #>) {
+<#
+    if(Model.IsWebApiDelete) {
+#>
+        let locdata: <#=  messageDialogInterfaceName #> = {
+            title: 'Delete Items',
+            message: 'Delete Selected Items ?',
+            iconname: 'warning',
+            iconcolor: 'warn'
+        };
+        let dialogRef = this.dialog.open(<#=  messageDialogComponentClassName #>, {
+              data: locdata,
+            });
+        dialogRef.afterClosed().subscribe(async rslt => {
+            if (typeof rslt === 'undefined') return;
+            if (rslt === null) return;
+            let currRowsCp: Array<<#= GetInterfaceName(Model) #>> = sender.<#= currentMultiRowPropName #>.slice();
+            let deletedRows: Array<<#= GetInterfaceName(Model) #>> = [];
+            for(let row of currRowsCp) {
+                try {
+                    // let data: <#= GetInterfaceName(Model) #>  =  
+                    await firstValueFrom<<#= GetInterfaceName(Model) #>>(this.<#= formRootService #>.<#= DeleteOneMethodName #>(<# 
+                    {
+                        int counter = 0;
+                        List<ModelViewPropertyOfVwSerializable> primKeys = GetPrimaryKeyProps(Context, Model.ViewName);
+                        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+                            if(counter > 0) { #>, <#} #>  row.<#= GetTypeScriptPropertyName(prop, Model) #> <#
+                            counter++;
+                        }
+                    }#>));
+                    deletedRows.push(row);
+                } catch (error) {
+                    this.appGlblSettings.showError('http', error)
+                }
+            }
+            sender.deselectRows(deletedRows);
+            deletedRows.forEach((r: <#= GetInterfaceName(Model) #>) => {
+                let i: number = sender.dataSource.indexOf(r); 
+                if(i > -1) sender.dataSource.splice(i, 1);
+            });
+            sender.dataSource = sender.dataSource.slice(0);
+            if ((deletedRows.indexOf( sender.<#= currentRowPropName #>  as <#= GetInterfaceName(Model) #>) > -1) && (sender.dataSource.length > 0)) sender.<#= OnSelectRowMethodName #>(sender.dataSource[0]);
+        });
+<#
+    }
+#>
+    }
+
     rowCommand(v: <#= eventEmitterDataModelClassName #>) {
         if(v.id === '<#= ActionParamUpdateMode #>') {
             this.onEdit(v.value);
@@ -646,6 +722,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     tableCommand(v: <#= eventEmitterDataModelClassName #>) {
         if(v.id === '<#= ActionParamAddMode #>') {
            this.onAdd( v.sender );
+        } else if (v.id === '<#= ActionParamDeleteMode #>') {
+            this.onDeleteMultiple( v.sender );
         } else {
             this.onTableCommand.emit(v);
         }

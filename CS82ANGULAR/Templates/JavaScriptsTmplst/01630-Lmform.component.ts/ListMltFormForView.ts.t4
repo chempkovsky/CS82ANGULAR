@@ -633,6 +633,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             if (typeof rslt === 'undefined') return;
             if (rslt === null) return;
             let currRowsCp: Array<<#= GetInterfaceName(Model) #>> = sender.currentRow.slice();
+            let deletedRows: Array<<#= GetInterfaceName(Model) #>> = [];
             for(let row of currRowsCp) {
                 try {
                     // let data: <#= GetInterfaceName(Model) #>  =  
@@ -645,14 +646,17 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                             counter++;
                         }
                     }#>));
-                    let i: number = sender.dataSource.indexOf(row); 
-                    sender.deselectRows([row]);
-                    sender.dataSource.splice(i, 1);
-                    sender.dataSource = sender.dataSource.slice(0);
+                    deletedRows.push(row);
                 } catch (error) {
                     this.appGlblSettings.showError('http', error)
                 }
             }
+            sender.deselectRows(deletedRows);
+            deletedRows.forEach((r: <#= GetInterfaceName(Model) #>) => {
+                let i: number = sender.dataSource.indexOf(r); 
+                if(i > -1) sender.dataSource.splice(i, 1);
+            });
+            sender.dataSource = sender.dataSource.slice(0);
         });
 <#
     }

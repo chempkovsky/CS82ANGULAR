@@ -56,6 +56,14 @@
     string captionPropName              = "caption";
     string captionSelector              = "caption";
 
+    string showMultiSelectedRowSelector = "show-multi-selected-row";
+    string showMultiSelectedRowPropName = "showMultiSelectedRow";
+    string multiSelectedRowSelector     = "multi-selected-row";
+    string multiSelectedRowPropName     = "multiSelectedRow";
+    string onMultiSelectedRowPropName   = "onMultiSelectedRow";
+    string currentMultiRowPropName      = "currentMultiRow";
+
+
     string sformComponentFolder         = "01420-Sform.component.ts";
     string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, sformComponentFolder);
 #>
@@ -74,7 +82,8 @@
     (<#= onContainerMenuItemClickSelector #>)="<#= onContainerMenuItemClickMethodName #>($event)"
     [<#= MaxHeightPropSelector #>]="<#= MaxHeightPropName #>"  
     [<#= FilterMaxHeightPropSelector #>]="<#= FilterMaxHeightPropName #>"  
-
+    [<#= showMultiSelectedRowSelector #>]="<#= showMultiSelectedRowPropName #>"  
+    (<#= multiSelectedRowSelector #>)="<#= onMultiSelectedRowPropName #>($event)"  
  ></app-<#= componentSelectorCommonPart #>>
 
 <#+

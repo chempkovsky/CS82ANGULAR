@@ -48,6 +48,7 @@
     string externalFilterRsltPropName   = "externalFilterRslt";
     string beforeSquerySelector         = "before-squery";
     string beforeSqueryPropName         = "beforeSquery";
+    string OnSelectRowMethodName        = "onSelectRow";
 
 
 
@@ -98,10 +99,17 @@
     string selectedRowSelector        = "selected-row";
     string selectedRowPropName        = "selectedRow";
 
+    string multiSelectedRowSelector   = "multi-selected-row";
+    string multiSelectedRowPropName   = "multiSelectedRow";
+
+    string showMultiSelectedRowSelector   = "show-multi-selected-row";
+    string showMultiSelectedRowPropName   = "showMultiSelectedRow";
+
     string applyFilterSelector        = "apply-filter";
     string applyFilterPropName        = "applyFilter";
 
     string currentRowPropName        = "currentRow";
+    string currentMultiRowPropName   = "currentMultiRow";
 
     string captionPropName              = "caption";
     string captionSelector              = "caption";
@@ -162,6 +170,9 @@
 
     string ActionColumnDefProperty      = "menuAction";
     string SelectColumnDefProperty      = "selectAction";
+    string SelectMultColumnDefProperty  = "selectMultAction";
+    string multSelectionProperty        = "multSelection";
+
     string DisplayedColumnsProperty     = "displayedColumns";
     string MatPaginatorPageSize         = "10";
     string MatPaginatorPageSizeOptions  = "[10, 25, 50, 100]";
@@ -200,6 +211,7 @@ import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, ChangeDe
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
+import { SelectionChange, SelectionModel } from '@angular/cdk/collections';
 
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, sformComponentFolder)#>';
 import { <#= filterDefModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterDefModelFolder, sformComponentFolder)#>';
@@ -232,7 +244,75 @@ import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCr
   styleUrls: ['<#=  GetFolderName(Model, sformCssFolder, sformComponentFolder)#>.css']
 })
 export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
+//===============
 
+    _<#= showMultiSelectedRowPropName #>: boolean = true;
+    @Input('<#= showMultiSelectedRowSelector #>')
+        get <#= showMultiSelectedRowPropName #>(): boolean {
+            return this._<#= showMultiSelectedRowPropName #>;
+        }
+      set <#= showMultiSelectedRowPropName #>(inp: boolean|null) {
+        if (!(typeof inp === 'undefined')) {
+            let nc: boolean = false;
+            if(inp) {
+                nc = this._<#= showMultiSelectedRowPropName #>;
+            } else {
+                nc = !this._<#= showMultiSelectedRowPropName #>;
+            }
+            if(nc) return;
+            this._<#= showMultiSelectedRowPropName #> = !this._<#= showMultiSelectedRowPropName #>;
+            let r: string[] = ['<#= SelectColumnDefProperty #>']
+            if(this._<#= showMultiSelectedRowPropName #>) r.push('<#= SelectMultColumnDefProperty #>');
+            this.<#= DisplayedColumnsProperty #>.forEach((s: string) => {if(s !== '<#= SelectColumnDefProperty #>' && s !== '<#= SelectMultColumnDefProperty #>') r.push(s)});
+            this.<#= DisplayedColumnsProperty #> = r;
+            this.cd.detectChanges();
+        }
+      }
+
+
+    public <#= currentMultiRowPropName #>: Array<<#= GetInterfaceName(Model) #>> = [];
+    @Output('<#= multiSelectedRowSelector #>') <#= multiSelectedRowPropName #>: EventEmitter<Array<<#= GetInterfaceName(Model) #>>> = new EventEmitter<Array<<#= GetInterfaceName(Model) #>>>();
+    public <#= multSelectionProperty #>: SelectionModel<<#= GetInterfaceName(Model) #>> = new SelectionModel<<#= GetInterfaceName(Model) #>>(true, []);
+    selectRows(e: Array<<#= GetInterfaceName(Model) #>>) {
+        if((typeof e === 'undefined') || (typeof this.dataSource  === 'undefined')) return;
+        if((e === null) || (this.dataSource  === null)) return;
+        if(!Array.isArray(e)) return;
+        let rslt: Array<<#= GetInterfaceName(Model) #>>=[];
+        e.forEach(row => { if(this.dataSource.indexOf(row) > -1) rslt.push(row) });
+        this.<#= multSelectionProperty #>.select(...rslt);
+    }
+    deselectRows(e: Array<<#= GetInterfaceName(Model) #>>) {
+        this.<#= multSelectionProperty #>.deselect(...e);
+    }
+    isAllSelected() {
+      const numSelected = this.<#= multSelectionProperty #>.selected.length;
+      const numRows = this.dataSource.length;
+      return numSelected == numRows;
+    }
+    masterToggle() {
+      this.isAllSelected() ?
+          this.<#= multSelectionProperty #>.clear() :
+          this.dataSource.forEach(row => this.<#= multSelectionProperty #>.select(row));
+    }
+    onMultiSelectRow(e: Array<<#= GetInterfaceName(Model) #>>) {
+        if (typeof e === 'undefined') {
+            this.<#= currentMultiRowPropName #> = [];
+        } else {
+            this.<#= currentMultiRowPropName #> = e;
+        }
+        this.cd.detectChanges();
+        this.<#= multiSelectedRowPropName #>.emit(this.<#= currentMultiRowPropName #>);
+    }
+
+    ngOnInit() {
+        this.<#= multSelectionProperty #>.changed.subscribe({next: 
+            (e: SelectionChange<<#= GetInterfaceName(Model) #>>) => {
+                this.onMultiSelectRow(this.<#= multSelectionProperty #>.selected);
+            }
+        });
+    }
+
+//===============
     isOnInitCalled: boolean = false;
     protected currentFilter: Array<<#= filterResultModelClassName #>> = [];
     protected currentSortColumn: string = '';
@@ -243,7 +323,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     matPaginatorLen: number = 0;
     matPaginatorPageSize: number = <#= MatPaginatorPageSize #>;
     matPaginatorPageSizeOptions: Array<number> = <#= MatPaginatorPageSizeOptions #>;
-    <#= DisplayedColumnsProperty #>:  Array<string> = ['<#= SelectColumnDefProperty #>', <#= GetDisplayedColumns(Model) #>, '<#= ActionColumnDefProperty #>'];
+    <#= DisplayedColumnsProperty #>:  Array<string> = ['<#= SelectColumnDefProperty #>', '<#= SelectMultColumnDefProperty #>', <#= GetDisplayedColumns(Model) #>, '<#= ActionColumnDefProperty #>'];
     @Input('<#= captionSelector #>') <#= captionPropName #>: string = '<#= Model.ViewName #>';
     @Input('<#= ShowFilterSelector #>') <#= ShowFilterPropName #>: boolean = true;
     @Input('<#= RowCommandsSelector #>')  <#= RowCommandsPropName #>:Array<<#= menuItemDataModelClassName #>>|any;
@@ -408,8 +488,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     constructor(private  <#= formRootService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, protected dialog: MatDialog, private cd: ChangeDetectorRef) {
     }
 
-    ngOnInit() {
-    }
 
     onHiddenFilter() {
         let lcFltrDfs: Array<<#= filterDefModelClassName #>> = [
@@ -568,7 +646,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                             currow = this.dataSource[0];
                         }
                     }
-                    this.onSelectRow(currow);
+                    this.<#= OnSelectRowMethodName #>(currow);
                     this.cd.detectChanges();
                 },
                 error: (error) => {
@@ -578,7 +656,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             });
     }
 
-    onSelectRow(e: <#= GetInterfaceName(Model) #>|any) {
+    <#= OnSelectRowMethodName #>(e: <#= GetInterfaceName(Model) #>|any) {
         if (typeof e === 'undefined') {
             this.<#= currentRowPropName #> = null;
         } else {
@@ -609,17 +687,14 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     foreach(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable in Model.UIListProperties) {
         if (modelViewUIListPropertySerializable.IsShownInView) {
 #>
-            {
-                name: '<#=GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model)#>',
-                caption:'<#=  GetDisplayAttributeValueString2(modelViewUIListPropertySerializable, Model, DisplayLabelProperty) #>',
-                checked: false
-            },
+            { name: '<#=GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model)#>', caption:'<#=  GetDisplayAttributeValueString2(modelViewUIListPropertySerializable, Model, DisplayLabelProperty) #>', checked: false },
 <#
         }
     }
 #>
         ];
         let len: number =  this.<#= DisplayedColumnsProperty #>.length;
+        // i = 1 is correct
         for(var i = 1; i < len-1; i++) {
             let ind=locdata.findIndex(e => { return e.name === this.<#= DisplayedColumnsProperty #>[i]; })
             if(ind > -1) {
@@ -635,7 +710,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             next: (rslt: any) => {
                 if (!(typeof rslt === 'undefined')) {
                     if (!(rslt === null)) {
-                        let r: string[] = ['<#= SelectColumnDefProperty #>'];
+                        let r: string[] = ['<#= SelectColumnDefProperty #>']
+                        if(this._<#= showMultiSelectedRowPropName #>) r.push('<#= SelectMultColumnDefProperty #>');
                         rslt.forEach((e: { checked: any; name: string; }) => { if (e.checked) { r.push(e.name) }});
                         r.push('<#= ActionColumnDefProperty #>');
                         this.<#= DisplayedColumnsProperty #> = r;

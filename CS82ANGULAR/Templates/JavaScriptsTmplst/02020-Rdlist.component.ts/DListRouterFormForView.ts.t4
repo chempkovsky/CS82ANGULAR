@@ -39,6 +39,7 @@
     string clearStorageMethodName       = "getStorageKey";
 
     string GetOneMethodName             = "getone";
+    string DeleteOneMethodName          = "deleteone";
 
 
     string ActionParamName              = "mode";  
@@ -103,6 +104,9 @@
     string FormControlNewModelPropName  = "eformNewControlModel";
     string src2destMethodName           = "src2dest";
 
+    string currentRowPropName        = "currentRow";
+    string OnSelectRowMethodName     = "onSelectRow";
+    string showMultiSelectPropName   = "showMultiSelect";
 
     string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
     string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
@@ -110,6 +114,9 @@
     string eventEmitterDataModelFolder  = "00018-event-emitter-data.interface.ts";
     string eventEmitterPubModelFolder   = "00019-event-emitter-pub.interface.ts";
     string itemHeightDataModelFolder    = "00016-item-height-data.interface.ts";
+
+    string messageDialogInterfaceFolder = "00037-message-dialog.interface.ts";
+    string messageDialogComponentFolder = "00038-message-dialog.component.ts";
 
     string viewInterfaceFolder          = "01100-.interface.ts";
     string viewInterfaceFltFolder       = "01300-Filter.interface.ts";
@@ -161,6 +168,9 @@
     string eventEmitterPubModelClassName    = GetModelClassName(Context, eventEmitterPubModelFolder);
     string itemHeightDataModelClassName   = GetModelClassName(Context, itemHeightDataModelFolder);
 
+    string messageDialogComponentClassName = GetContextComponentClassName(Context, messageDialogComponentFolder);
+    string messageDialogInterfaceName = GetModelClassName(Context, messageDialogInterfaceFolder);
+
     List<ModelViewPropertyOfVwSerializable> primKeys= GetModelPrimaryKeyProps(Model);
     List<string> detailViewNames =  GetDetailViews(Model, Context, null);
 
@@ -172,10 +182,20 @@
     string captionPropName              = "caption";
     string captionSelector              = "caption";
 
+    string showMultiSelectedRowSelector = "show-multi-selected-row";
+    string showMultiSelectedRowPropName = "showMultiSelectedRow";
+    string multiSelectedRowSelector     = "multi-selected-row";
+    string multiSelectedRowPropName     = "multiSelectedRow";
+    string onMultiSelectedRowPropName   = "onMultiSelectedRow";
+    string currentMultiRowPropName      = "currentMultiRow";
+
 #>
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap, UrlSegment, ActivatedRouteSnapshot } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSelectChange } from '@angular/material/select';
+import { firstValueFrom } from 'rxjs';
+
 
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, rdlistComponentFolder)#>';
 import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, rdlistComponentFolder, Context, Model.ViewName, viewServiceFolder) #>';
@@ -187,6 +207,9 @@ import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Mo
 import { <#= itemHeightDataModelClassName #> } from '<#= GetCommonFolderName(Model, Context, itemHeightDataModelFolder, rdlistComponentFolder)#>';
 import { <#= GetInterfaceName(Model) #> } from '<#=  GetFolderName(Model, viewInterfaceFolder, rdlistComponentFolder) #>';
 import { <#= GetInterfaceFilterName(Model) #> } from '<#= GetCrossComponentFolderName(Model, rdlistComponentFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
+import { <#= messageDialogInterfaceName #> } from '<#=  GetCommonFolderName(Model, Context,  messageDialogInterfaceFolder, rdlistComponentFolder)#>';
+import { <#= messageDialogComponentClassName #> } from '<#=  GetCommonFolderName(Model, Context,  messageDialogComponentFolder, rdlistComponentFolder)#>';
+
 
 <#
     if(Model.IsWebApiSelectOneByPrimarykey) {
@@ -222,6 +245,13 @@ import { <#=  ddlgComponentClassName #> } from '<#= GetFolderName(Model, ddlgCom
   styleUrls: ['<#=  GetFolderName(Model, rdlistCssFolder, rdlistComponentFolder)#>.css']
 })
 export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
+    @Input('<#= showMultiSelectedRowSelector #>') <#= showMultiSelectedRowPropName #>: boolean = true;
+
+    @Output('<#= multiSelectedRowSelector #>') <#= multiSelectedRowPropName #>: EventEmitter<Array<<#= GetInterfaceName(Model) #>>> = new EventEmitter<Array<<#= GetInterfaceName(Model) #>>>();
+    <#= onMultiSelectedRowPropName #>(e: Array<<#= GetInterfaceName(Model) #>>): void {
+        this.<#= multiSelectedRowPropName #>.emit(e);
+    }
+
     @Input('<#= captionSelector #>') <#= captionPropName #>: string = '<#= Model.ViewName #>';
     <#= NavPrefix #>: string|any = '';
     <#= OutletNmPropName #> : string = 'primary';
@@ -264,6 +294,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
       ];
     tableMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
          {id: '<#= ActionParamAddMode #>', caption: 'Add Item', iconName: 'create', iconColor: 'primary', enabled: true},
+         {id: '<#= ActionParamDeleteMode #>', caption: 'Delete Selected', iconName: 'delete_forever', iconColor: 'warn', enabled: true},
       ];
     constructor(protected route: ActivatedRoute, protected router: Router, protected  <#= formRootService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
         public dialog: MatDialog, 
@@ -271,9 +302,10 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     }
     permMask: number = 0;
     ngOnInit() {
-        let luid = '';
+        let luid = '<#= componentClassName #>';
         this.permMask = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= Model.ViewName #>');
         this.tableMenuItemsData[0].enabled = ((this.permMask & 8) === 8) <# if (!Model.IsWebApiAdd) { #> && false <# } #>;
+        this.tableMenuItemsData[1].enabled = ((this.permMask & 2) === 2) <# if (!Model.IsWebApiDelete) { #> && false <# } #>;
         this.isPostNavApplied = false;
         if (!(typeof this.route.snapshot.data === 'undefined')) {
             if (!(this.route.snapshot.data === null)) {
@@ -293,13 +325,16 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                     this.<#= DepthParamName #> = this.route.snapshot.data['<#= DepthParamName #>'];
                 }
                 if (!(typeof this.route.snapshot.data['<#= uidParamName #>'] === 'undefined')) {
-                    this.<#= uidParamName #> = this.route.snapshot.data['<#= uidParamName #>'];
+                    luid = this.route.snapshot.data['<#= uidParamName #>'];
                 }
                 if (!(typeof this.route.snapshot.data['<#= NavPrefix #>'] === 'undefined')) {
                     this.<#= NavPrefix #> = this.route.snapshot.data['<#= NavPrefix #>'];
                 }
                 if (!(typeof this.route.snapshot.data['<#= OutletNmPropName #>'] === 'undefined')) {
                     this.<#= OutletNmPropName #> = this.route.snapshot.data['<#= OutletNmPropName #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= showMultiSelectPropName #>'] === 'undefined')) {
+                    this.<#= showMultiSelectedRowPropName #> = this.route.snapshot.data['<#= showMultiSelectPropName #>'];
                 }
             }
         }
@@ -559,6 +594,54 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     @Output('on-row-command') onRowCommand: EventEmitter<<#= eventEmitterDataModelClassName #>> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
     @Output('on-table-command') onTableCommand: EventEmitter<<#= eventEmitterDataModelClassName #>> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
 
+    onDeleteMultiple(sender: <#= searchComponentClassName #>) {
+<#
+    if(Model.IsWebApiDelete) {
+#>
+        let locdata: <#=  messageDialogInterfaceName #> = {
+            title: 'Delete Items',
+            message: 'Delete Selected Items ?',
+            iconname: 'warning',
+            iconcolor: 'warn'
+        };
+        let dialogRef = this.dialog.open(<#=  messageDialogComponentClassName #>, {
+              data: locdata,
+            });
+        dialogRef.afterClosed().subscribe(async rslt => {
+            if (typeof rslt === 'undefined') return;
+            if (rslt === null) return;
+            let currRowsCp: Array<<#= GetInterfaceName(Model) #>> = sender.<#= currentMultiRowPropName #>.slice();
+            let deletedRows: Array<<#= GetInterfaceName(Model) #>> = [];
+            for(let row of currRowsCp) {
+                try {
+                    // let data: <#= GetInterfaceName(Model) #>  =  
+                    await firstValueFrom<<#= GetInterfaceName(Model) #>>(this.<#= formRootService #>.<#= DeleteOneMethodName #>(<# 
+                    {
+                        int counter = 0;
+                        //List<ModelViewPropertyOfVwSerializable> primKeys = GetPrimaryKeyProps(Context, Model.ViewName);
+                        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+                            if(counter > 0) { #>, <#} #>  row.<#= GetTypeScriptPropertyName(prop, Model) #> <#
+                            counter++;
+                        }
+                    }#>));
+                    deletedRows.push(row);
+                } catch (error) {
+                    this.appGlblSettings.showError('http', error)
+                }
+            }
+            sender.deselectRows(deletedRows);
+            deletedRows.forEach((r: <#= GetInterfaceName(Model) #>) => {
+                let i: number = sender.dataSource.indexOf(r); 
+                if(i > -1) sender.dataSource.splice(i, 1);
+            });
+            sender.dataSource = sender.dataSource.slice(0);
+            if ((deletedRows.indexOf( sender.<#= currentRowPropName #> as <#= GetInterfaceName(Model) #>) > -1) && (sender.dataSource.length > 0)) sender.<#= OnSelectRowMethodName #>(sender.dataSource[0]);
+        });
+<#
+    }
+#>
+    }
+
     rowCommand(v: <#= eventEmitterDataModelClassName #>) {
         
 <#
@@ -612,7 +695,9 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         }
     }
     tableCommand(v: <#= eventEmitterDataModelClassName #>) {
-        if(v.id === '<#= ActionParamAddMode #>') {
+        if(v.id === '<#= ActionParamDeleteMode #>') {
+            this.onDeleteMultiple( v.sender );
+        } else if(v.id === '<#= ActionParamAddMode #>') {
            this.onAdd( v.sender );
         } else {
             this.onTableCommand.emit(v);
@@ -1191,6 +1276,45 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     }
     string GetInterfaceUDlgName(ModelViewSerializable model) {
         return "I"+model.ViewName+"Udlg";
+    }
+    string GetContextComponentClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
     }
 
 #>

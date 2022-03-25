@@ -20,6 +20,8 @@
     string sdlgHtmlFolder               = "01440-Sdlg.component.html";
     string sdlgComponentFolder          = "01440-Sdlg.component.ts";
 
+    string showMultiSelectedRowSelector   = "show-multi-selected-row";
+    string showMultiSelectedRowPropName   = "showMultiSelectedRow";
 
     string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, sdlgComponentFolder);
 
@@ -41,6 +43,7 @@ import { <#= GetInterfaceName(Model) #> } from '<#=  GetFolderName(Model, viewIn
 export class <#= GetComponentClassName(Model, sdlgComponentFolder) #> { 
     constructor(public dialogRef: MatDialogRef<<#= GetComponentClassName(Model, sdlgComponentFolder) #>>, @Inject(MAT_DIALOG_DATA) public data: <#= GetInterfaceDlgName(Model) #> ) { }
     currentRow: <#= GetInterfaceName(Model) #> |null = null;
+    <#= showMultiSelectedRowPropName #>: boolean = false;
     onSelectedRow(row:  <#= GetInterfaceName(Model) #> | null) {
         this.currentRow = row;
     }
