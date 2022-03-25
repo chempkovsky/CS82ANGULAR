@@ -238,8 +238,8 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     ngOnInit() {
         let luid = '';
         this.permMask = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= Model.ViewName #>');
-        this.tableMenuItemsData[0].enabled = ((this.permMask & 8) === 8); // add
-        this.tableMenuItemsData[1].enabled = ((this.permMask & 2) === 2); // delete mult
+        this.tableMenuItemsData[0].enabled = ((this.permMask & 8) === 8) <# if (!Model.IsWebApiAdd) { #> && false <# } #>; // add
+        this.tableMenuItemsData[1].enabled = ((this.permMask & 2) === 2) <# if (!Model.IsWebApiDelete) { #> && false <# } #>; // delete mult
         this.isPostNavApplied = false;
         if (!(typeof this.route.snapshot.data === 'undefined')) {
             if (!(this.route.snapshot.data === null)) {
@@ -294,8 +294,9 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         }
         
 
-        this.rowMenuItemsData[0].enabled = this.rowMenuItemsData[0].enabled && ((this.permMask & 4) === 4); // modify
-        this.rowMenuItemsData[1].enabled = this.rowMenuItemsData[1].enabled && ((this.permMask & 2) === 2); // delete
+        this.rowMenuItemsData[0].enabled = this.rowMenuItemsData[0].enabled && ((this.permMask & 4) === 4) <# if (!Model.IsWebApiUpdate) { #> && false <# } #>; // modify
+        this.rowMenuItemsData[1].enabled = this.rowMenuItemsData[1].enabled && ((this.permMask & 2) === 2) <# if (!Model.IsWebApiDelete) { #> && false <# } #>; // delete
+        this.rowMenuItemsData[2].enabled = this.rowMenuItemsData[2].enabled <# if (!Model.IsWebApiSelectOneByPrimarykey) { #> && false <# } #>; // view
 <#
     {
         if (detailViewNames.Count > 0) {
@@ -500,6 +501,9 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         let flt: <#= GetInterfaceName(Model) #> | any = JSON.parse(this.route.snapshot.queryParams['<#= ItemParamName #>']);
         if(typeof flt === 'undefined') return;
         if(flt === null) return;
+<#
+    if (Model.IsWebApiSelectOneByPrimarykey) {
+#>
 
         if ((act === '<#= APrefix #>') ||
             (act === '<#= UPrefix #>')) {
@@ -556,6 +560,14 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 });
             return;
         }
+<#
+    } else {
+#>
+// IsSelectOne is not set for given view
+<#
+    }
+#>
+
     }
     onBackBtn(e?: any) {
         if (this.<#= DepthParamName #> > 1) {

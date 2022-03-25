@@ -80,15 +80,22 @@ export class <#= GetJavaScriptServiceName(Model) #> {
     constructor(private http: HttpClient, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {
        this.serviceUrl = this.<#= AppSettingServicePropName #>.getWebApiPrefix('<#= Model.ViewName #>') + '<#= GetWebApiServicePrefix(Model) #>';  
     }
-    protected _<#= ValuesSuffix #>: {[key: string]: {org: string, fk: string, fkchain: string, isinprimkey: boolean, required: boolean, dbgenerated: boolean, dttp: string}} = {
+    protected _<#= ValuesSuffix #>: {[key: string]: {org: string, fk: string, fkchain: string, isinprimkey: boolean, isinunqkey: boolean, required: boolean, dbgenerated: boolean, dttp: string}} = {
 <#
     if (Model.ScalarProperties != null) {
         List<ModelViewPropertyOfVwSerializable> primKeyProps = GetModelPrimaryKeyProps(Model);
+        List<ModelViewPropertyOfVwSerializable> allUnkKeyProps = GetModelAllUniqueKeysProps(Model);
         foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
             string IsInPrimKey = "false";
+            string IsInUnkKey = "false";
             if(primKeyProps != null) {
                 if (primKeyProps.Any(k => k == prop)) {
                     IsInPrimKey = "true";
+                }
+            }
+            if(allUnkKeyProps != null) {
+                if (allUnkKeyProps.Any(k => k == prop)) {
+                    IsInUnkKey = "true";
                 }
             }
             string IsDatabaseGenerated = IsDatabaseGeneratedProperty(prop, Model) ? "true" : "false";
@@ -96,7 +103,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
             string fk = string.IsNullOrEmpty( prop.ForeignKeyName ) ? "" : prop.ForeignKeyName;
             string fkchain = string.IsNullOrEmpty( prop.ForeignKeyNameChain ) ? "" : prop.ForeignKeyNameChain;
 #>
-      '<#= GetTypeScriptPropertyName(prop, Model) #>': {org: '<#= prop.OriginalPropertyName #>', fk: '<#= fk #>', fkchain: '<#= fkchain #>', isinprimkey: <#= IsInPrimKey #>, required: <#= IsRequiredInView #>, dbgenerated: <#= IsDatabaseGenerated #>, dttp: '<#= GetCCharpDatatype(prop, Model) #>'},  // <#= GetPropertyTypeScriptTypeName(prop) #>, <#= GetPropertyTypeName(prop) #>
+      '<#= GetTypeScriptPropertyName(prop, Model) #>': {org: '<#= prop.OriginalPropertyName #>', fk: '<#= fk #>', fkchain: '<#= fkchain #>', isinprimkey: <#= IsInPrimKey #>, isinunqkey: <#= IsInUnkKey #>, required: <#= IsRequiredInView #>, dbgenerated: <#= IsDatabaseGenerated #>, dttp: '<#= GetCCharpDatatype(prop, Model) #>'},  // <#= GetPropertyTypeScriptTypeName(prop) #>, <#= GetPropertyTypeName(prop) #>
 <#
 
         }
@@ -109,7 +116,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
         if((typeof rw === 'undefined') || (typeof nvNm === 'undefined')) return rslt;
         if((rw === null) || (nvNm === null)) return rslt;
         for(let i in this._<#= ValuesSuffix #>) {
-            if(this.isInPrimkey<#= ValueSuffix #>(i)) {
+            if(this.isInPrimkey<#= ValueSuffix #>(i) || this.IsInUnkKey<#= ValueSuffix #>(i)) {
                 if(typeof rslt['<#= Model.ViewName #>'] === 'undefined') rslt['<#= Model.ViewName #>'] = {};
                 if(typeof rslt['<#= Model.ViewName #>'][nvNm] === 'undefined') rslt['<#= Model.ViewName #>'][nvNm] = {};
                 rslt['<#= Model.ViewName #>'][nvNm][i] = rw[i];
@@ -137,6 +144,9 @@ export class <#= GetJavaScriptServiceName(Model) #> {
     }
     public isInPrimkey<#= ValueSuffix #>(key: string): boolean {
         return this._<#= ValuesSuffix #>[key].isinprimkey;
+    }
+    public IsInUnkKey<#= ValueSuffix #>(key: string): boolean {
+        return this._<#= ValuesSuffix #>[key].isinunqkey;
     }
     public getKeyByOrg<#= ValueSuffix #>(org: string, fkchain: string): string|any {
         for(let i in this._<#= ValuesSuffix #>) {
@@ -238,6 +248,15 @@ export class <#= GetJavaScriptServiceName(Model) #> {
                     if(mstrProp != null) {
                         isReq = mstrProp.IsRequiredInView ? "true" : "false";
                     }
+                    ModelViewPropertyOfVwSerializable cProp = GetModelScalarPropByKeyProp(Model, mtcfk.ForeignKeyProps[i]);
+                    ModelViewPropertyOfVwSerializable mProp = GetModelScalarPropByKeyProp(masterModel, mtcfk.PrincipalKeyProps[i]);
+                    if(mProp == null || cProp == null) {
+#>
+// for the foreign key <#= mtcfk.NavigationName #> not all props have included into ViewModel
+<#
+                        continue;
+                    }
+
 #>
                         '<#= GetTypeScriptPropertyNameByKeyProperty(masterModel, mtcfk.PrincipalKeyProps[i]) #>' : {isMstrReq: <#= isReq #>, propNm:'<#= GetTypeScriptPropertyNameByKeyProperty(Model, mtcfk.ForeignKeyProps[i]) #>'},
 <#
@@ -371,6 +390,14 @@ export class <#= GetJavaScriptServiceName(Model) #> {
                     '<#= mlFk.NavigationName #>' : {
 <#
                         for(int i = 0; i < mlFk.ForeignKeyProps.Count; i++) {
+                            ModelViewPropertyOfVwSerializable cProp = GetModelScalarPropByKeyProp(clVm, mlFk.ForeignKeyProps[i]);
+                            ModelViewPropertyOfVwSerializable mProp = GetModelScalarPropByKeyProp(Model, mlFk.PrincipalKeyProps[i]);
+                            if(mProp == null || cProp == null) {
+#>
+// for the foreign key <#= mlFk.NavigationName #> not all props have included into ViewModel
+<#
+                                continue;
+                            }
 #>
                         '<#= GetTypeScriptPropertyNameByKeyProperty(clVm, mlFk.ForeignKeyProps[i]) #>' : '<#= GetTypeScriptPropertyNameByKeyProperty(Model, mlFk.PrincipalKeyProps[i]) #>',
 <#
@@ -1247,6 +1274,8 @@ export class <#= GetJavaScriptServiceName(Model) #> {
         }
         return result;
     }
+
+
     ModelViewUniqueKeyOfVwSerializable GetModelPrimaryKey(ModelViewSerializable model) {
         if (model == null)  return null;
         if (model.PrimaryKeyProperties == null) return null;
@@ -1321,6 +1350,24 @@ export class <#= GetJavaScriptServiceName(Model) #> {
         }
         return rsltKeys;
     }
+    List<ModelViewPropertyOfVwSerializable> GetModelAllUniqueKeysProps(ModelViewSerializable model) {
+        List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
+        if (model == null)
+        {
+            return result;
+        }
+        if(model.UniqueKeys == null) return result;
+        foreach(ModelViewUniqueKeySerializable uk in model.UniqueKeys) {
+            List<ModelViewPropertyOfVwSerializable> ukprops = GetModelUniqueKeyProps(model, uk);
+            foreach(ModelViewPropertyOfVwSerializable ukp in ukprops) {
+                if (!result.Any(p => p == ukp)) result.Add(ukp);
+            }
+        }
+        return result;
+    }
+
+
+
     List<ModelViewForeignKeySerializable> CollectMasterToClientFieldsMap(ModelViewSerializable model, List<string> errors) {
         List<ModelViewForeignKeySerializable> rslt = null;
         if(model == null) {

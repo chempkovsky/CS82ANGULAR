@@ -11,22 +11,13 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
-using System.Web.Http.Description;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.AspNet.Identity;
-using System.Threading.Tasks;
+#nullable disable
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 
 <#
+
 
     string GetAllMethodName         = "getall";
     string GetWithFilterMethodName  = "getwithfilter";
@@ -102,30 +93,34 @@ using <#= rootEntityNameSpace #>;
 
 namespace <#= webApiServiceNameSpace #> {
 
-    [RoutePrefix("<#= webApiServicePrefix #>")]
-    public class <#= Model.WebApiServiceName #>: ApiController
+    // [RoutePrefix("<#= webApiServicePrefix #>")]
+    public class <#= Model.WebApiServiceName #>: ControllerBase
     {
         private int defaultPageSize = 50;
         private int minPageSize = 5;
         private int maxPageSize = 150;
-        private ApplicationUserManager _userManager;
-        public ApplicationUserManager UserManager
+        private readonly UserManager<IdentityUser> _userManager;
+        public UserManager<IdentityUser> UserManager
         {
             get
             {
-                return _userManager ?? Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
+                return _userManager;
             }
-            private set
-            {
-                _userManager = value;
-            }
+        }
+        public <#= Model.WebApiServiceName #>(
+                    IHttpContextAccessor httpContextAccessor,
+                    UserManager<IdentityUser> userManager,
+                    RoleManager<IdentityRole> roleManager,
+                    IConfiguration configuration)
+        {
+            _userManager = userManager;
         }
 
 <# 
     if (Model.IsWebApiSelectAll) { 
 #>
         [HttpGet]
-        [Route("<#= GetAllMethodName #>")]
+        [Route("[controller]/<#= GetAllMethodName #>")]
         public IQueryable<<#=Model.ViewName#>> <#= GetAllMethodName #>()
         {
             return UserManager.Users
@@ -151,20 +146,19 @@ namespace <#= webApiServiceNameSpace #> {
     if (Model.IsWebApiSelectManyWithPagination) { 
 #>
         [HttpGet]
-        [Route("<#= GetWithFilterMethodName #>")]
-        [ResponseType(typeof(<#= Model.PageViewName #>))]
-        public IHttpActionResult <#= GetWithFilterMethodName #>(<#
+        [Route("[controller]/<#= GetWithFilterMethodName #>")]
+        public async Task<ActionResult> <#= GetWithFilterMethodName #>(<#
         int counter = 0;
         foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
             if (prop.IsUsedByfilter) {
                 if(counter > 0) { 
-#>                , <# } #>[FromUri] <#= GetNullableType(prop)#>[] <#= GetFilterPropertyName(prop, Model) #> 
-                  , [FromUri] string[] <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #> 
+#>                , <# } #>[FromQuery] <#= GetNullableType(prop)#>[] <#= GetFilterPropertyName(prop, Model) #> 
+                  , [FromQuery] string[] <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #> 
 <#
                 counter++;
             }
         }
-#>                <# if(counter > 0) {#>,<# } #> [FromUri] string[] orderby = null, [FromUri] int? page =null, [FromUri] int? pagesize = null)
+#>                <# if(counter > 0) {#>,<# } #> [FromQuery] string[] orderby = null, [FromQuery] int? page =null, [FromQuery] int? pagesize = null)
         {
 
             string[] EqualOperators = { "eq", "lk" };
@@ -184,7 +178,7 @@ namespace <#= webApiServiceNameSpace #> {
                     currentPage = 1;
                 }
             }
-            IQueryable<ApplicationUser> query = 
+            IQueryable<IdentityUser> query = 
                 UserManager.Users;
             
 <#
@@ -499,7 +493,7 @@ namespace <#= webApiServiceNameSpace #> {
                     }
                 }   
                 bool isFirstTime = true; 
-                IOrderedQueryable<ApplicationUser> orderedQuery = null;
+                IOrderedQueryable<IdentityUser> orderedQuery = null;
                 if(currentOrderBy != null) {
                     List<string> wasInUseOrderBy = new List<string>();
                     foreach(string propName in currentOrderBy) {
@@ -570,42 +564,21 @@ namespace <#= webApiServiceNameSpace #> {
     if (Model.IsWebApiSelectOneByPrimarykey) { 
 #>
         [HttpGet]
-        [Route("<#= GetOneMethodName #>")]
-        [ResponseType(typeof(<#= Model.ViewName#>))]
-        public IHttpActionResult <#= GetOneMethodName #>(<#
+        [Route("[controller]/<#= GetOneMethodName #>")]
+        public async Task<ActionResult> <#= GetOneMethodName #>(<#
         int counter = 0;
         foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
-            if(counter > 0) { #>                , <#} #>[FromUri] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
+            if(counter > 0) { #>                , <#} #>[FromQuery] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
 <#
             counter++;
         } #>                )
         {
-            <#= Model.ViewName #> result = UserManager.Users
-<#
-        for(int pkId= 0; pkId < primKeys.Count; pkId++) {
-            ModelViewPropertyOfVwSerializable primKeyProp = primKeys[pkId];
-            
-#>
-                    .Where(p => p.<#= Model.PrimaryKeyProperties[pkId].OriginalPropertyName #> == <#= GetFilterPropertyName(primKeyProp, Model) #>)
-<#
-        }
-#>
-                    .Select(itm => new <#= Model.ViewName #>() {
-<#
-                int cnt = Model.ScalarProperties.Count-1;
-                for(int i = 0; i < cnt; i++) {
-#>
-                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[i].ForeignKeyNameChain) #><#= Model.ScalarProperties[i].OriginalPropertyName #>,
-<#
-        } 
-#>
-                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[cnt].ForeignKeyNameChain) #><#= Model.ScalarProperties[cnt].OriginalPropertyName #>
-                    }).FirstOrDefault();
-            if (result == null)
+            IdentityUser iu = await UserManager.FindByIdAsync(id);
+            if(iu == null)
             {
                 return NotFound();
             }
-            return Ok(result);
+            return Ok(iu);
         } // the end of public GetOne()-method
 <#
     } // the end of if (Model.IsWebApiSelectOneByPrimarykey)
@@ -615,28 +588,19 @@ namespace <#= webApiServiceNameSpace #> {
     if (Model.IsWebApiUpdate) { 
 #>
         [HttpPut]
-        [ResponseType(typeof(<#= Model.ViewName#>))]
-        [Route("<#= UpdateOneMethodName #>")]
-        public IHttpActionResult <#= UpdateOneMethodName #>([FromBody] <#= Model.ViewName#> viewToUpdate)
+        [Route("[controller]/<#= UpdateOneMethodName #>")]
+        public async Task<ActionResult> <#= UpdateOneMethodName #>([FromBody] <#= Model.ViewName#> viewToUpdate)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            ApplicationUser resultEntity = UserManager.Users
-<#
-        for(int pkId= 0; pkId < primKeys.Count; pkId++) {
-            ModelViewPropertyOfVwSerializable primKeyProp = primKeys[pkId];
-#>
-                    .Where(p => p.<#= Model.PrimaryKeyProperties[pkId].OriginalPropertyName #> == viewToUpdate.<#= GetTypeScriptPropertyName(primKeyProp, Model)#>)
-<#
-        }
-#>
-                    .FirstOrDefault();
-            if(resultEntity == null) {
+
+            IdentityUser iu = await UserManager.FindByIdAsync(viewToUpdate.Id);
+            if(iu == null)
+            {
                 return NotFound();
             }
-
 <#
         foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
             if(primKeys.Contains(prop)) {
@@ -646,35 +610,32 @@ namespace <#= webApiServiceNameSpace #> {
                 continue;
             }
 #>
-            resultEntity.<#=  GetChainedPropertyName(prop)#> =  viewToUpdate.<#=  GetTypeScriptPropertyName(prop, Model) #>;
+            iu.<#=  GetChainedPropertyName(prop)#> =  viewToUpdate.<#=  GetTypeScriptPropertyName(prop, Model) #>;
 <#
         }
 #>
-            UserManager.Update(resultEntity);
-            <#= Model.ViewName#> result = UserManager.Users
-<#
-        for(int pkId= 0; pkId < primKeys.Count; pkId++) {
-            ModelViewPropertyOfVwSerializable primKeyProp = primKeys[pkId];
-#>
-                    .Where(p => p.<#= Model.PrimaryKeyProperties[pkId].OriginalPropertyName #> == viewToUpdate.<#= GetTypeScriptPropertyName(primKeyProp, Model)#>)
-<#
-        }
-#>
-                    .Select(itm => new <#= Model.ViewName #>() {
+            IdentityResult rslt = await UserManager.UpdateAsync(iu);
+            if (!rslt.Succeeded)
+            {
+                return BadRequest(rslt);
+            }
+            iu = await UserManager.FindByIdAsync(viewToUpdate.Id);
+            if(iu == null)
+            {
+                return NotFound();
+            }
+            <#= Model.ViewName#> result = new <#= Model.ViewName#>() {
 <#
                 int cnt = Model.ScalarProperties.Count-1;
                 for(int i = 0; i < cnt; i++) {
 #>
-                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[i].ForeignKeyNameChain) #><#= Model.ScalarProperties[i].OriginalPropertyName #>,
+                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = iu.<#= GetForeignKeyNameChain(Model.ScalarProperties[i].ForeignKeyNameChain) #><#= Model.ScalarProperties[i].OriginalPropertyName #>,
 <#
         } 
 #>
-                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[cnt].ForeignKeyNameChain) #><#= Model.ScalarProperties[cnt].OriginalPropertyName #>
-                    }).FirstOrDefault();
-            if (result == null)
-            {
-                return NotFound();
-            }
+                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = iu.<#= GetForeignKeyNameChain(Model.ScalarProperties[cnt].ForeignKeyNameChain) #><#= Model.ScalarProperties[cnt].OriginalPropertyName #>
+                    };
+
             return Ok(result);
         }
 <#
@@ -685,15 +646,14 @@ namespace <#= webApiServiceNameSpace #> {
     if (Model.IsWebApiAdd) { 
 #>
         [HttpPost]
-        [ResponseType(typeof(<#=            Model.ViewName#>))]
-        [Route("<#= AddOneMethodName #>")]
-        public IHttpActionResult <#= AddOneMethodName #>([FromBody] <#= Model.ViewName#> viewToAdd)
+        [Route("[controller]/<#= AddOneMethodName #>")]
+        public async Task<ActionResult> <#= AddOneMethodName #>([FromBody] <#= Model.ViewName#> viewToAdd)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            ApplicationUser entityToAdd = new ApplicationUser()  { UserName = viewToAdd.Email, Email = viewToAdd.Email };
+            IdentityUser entityToAdd = new IdentityUser()  { UserName = viewToAdd.Email, Email = viewToAdd.Email, SecurityStamp = Guid.NewGuid().ToString() };
 /*
 <#
         foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
@@ -713,27 +673,28 @@ namespace <#= webApiServiceNameSpace #> {
         }
 #>
 */
-            IdentityResult rslt = UserManager.Create(entityToAdd, "Qqw?123");
+            IdentityResult rslt = await UserManager.CreateAsync(entityToAdd, "Qqw?123");
             if (!rslt.Succeeded)
             {
-                return GetErrorResult(rslt);
+                return BadRequest(rslt);
             }
-            <#= Model.ViewName#> result = UserManager.Users.Where(p => p.UserName == viewToAdd.Email)
-                    .Select(itm => new <#= Model.ViewName #>() {
+            IdentityUser iu = await UserManager.FindByNameAsync(viewToAdd.Email);
+            if(iu == null)
+            {
+                return NotFound();
+            }
+
+            <#= Model.ViewName#> result = new <#= Model.ViewName#>() {
 <#
                 int cnt = Model.ScalarProperties.Count-1;
                 for(int i = 0; i < cnt; i++) {
 #>
-                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[i].ForeignKeyNameChain) #><#= Model.ScalarProperties[i].OriginalPropertyName #>,
+                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = iu.<#= GetForeignKeyNameChain(Model.ScalarProperties[i].ForeignKeyNameChain) #><#= Model.ScalarProperties[i].OriginalPropertyName #>,
 <#
         } 
 #>
-                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[cnt].ForeignKeyNameChain) #><#= Model.ScalarProperties[cnt].OriginalPropertyName #>
-                    }).FirstOrDefault();
-            if (result == null)
-            {
-                return NotFound();
-            }
+                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = iu.<#= GetForeignKeyNameChain(Model.ScalarProperties[cnt].ForeignKeyNameChain) #><#= Model.ScalarProperties[cnt].OriginalPropertyName #>
+                    };
             return Ok(result);
         }
 <#
@@ -745,105 +706,43 @@ namespace <#= webApiServiceNameSpace #> {
     if (Model.IsWebApiDelete) { 
 #>
         [HttpDelete]
-        [ResponseType(typeof(<#=  Model.ViewName#>))]
-        [Route("<#= DeleteOneMethodName#>")]
-        public IHttpActionResult <#= DeleteOneMethodName#>(<#
+        [Route("[controller]/<#= DeleteOneMethodName#>")]
+        public async Task<ActionResult> <#= DeleteOneMethodName#>(<#
         int counter = 0;
         foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
-            if(counter > 0) { #>                , <#} #>[FromUri] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
+            if(counter > 0) { #>                , <#} #>[FromQuery] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
 <#
             counter++;
         } #>                )
         {
 
-                <#= Model.ViewName#> result = UserManager.Users
-<#
-        for(int pkId= 0; pkId < primKeys.Count; pkId++) {
-             ModelViewPropertyOfVwSerializable primKeyProp = primKeys[pkId];
-#>
-                    .Where(p => p.<#= Model.PrimaryKeyProperties[pkId].OriginalPropertyName #> == <#= GetFilterPropertyName(primKeyProp, Model)#>)
-<#
-        }
-#>
-                    .Select(itm => new <#= Model.ViewName #>() {
+            IdentityUser iu = await UserManager.FindByIdAsync(id);
+            if(iu == null)
+            {
+                return NotFound();
+            }
+            if(iu == null)
+            {
+                return NotFound();
+            }
+            <#= Model.ViewName#> result = new <#= Model.ViewName#>() {
 <#
                 int cnt = Model.ScalarProperties.Count-1;
                 for(int i = 0; i < cnt; i++) {
 #>
-                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[i].ForeignKeyNameChain) #><#= Model.ScalarProperties[i].OriginalPropertyName #>,
+                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = iu.<#= GetForeignKeyNameChain(Model.ScalarProperties[i].ForeignKeyNameChain) #><#= Model.ScalarProperties[i].OriginalPropertyName #>,
 <#
         } 
 #>
-                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[cnt].ForeignKeyNameChain) #><#= Model.ScalarProperties[cnt].OriginalPropertyName #>
-                    }).FirstOrDefault();
-                if (result == null)
-                {
-                    return NotFound();
-                }
-
-                ApplicationUser entityToDelete = UserManager.Users
-<#
-        for(int pkId= 0; pkId < primKeys.Count; pkId++) {
-             ModelViewPropertyOfVwSerializable primKeyProp = primKeys[pkId];
-#>
-                    .Where(p => p.<#= Model.PrimaryKeyProperties[pkId].OriginalPropertyName #> == result.<#= GetTypeScriptPropertyName(primKeyProp, Model)#>)
-<#
-        }
-#>
-                    .FirstOrDefault();
-                if (entityToDelete == null) {
-                    return Ok(result);
-                }
-                IdentityResult rslt = UserManager.Delete(entityToDelete);
-                if (!rslt.Succeeded)
-                {
-                    return GetErrorResult(rslt);
-                }
-                return Ok(result);
+                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = iu.<#= GetForeignKeyNameChain(Model.ScalarProperties[cnt].ForeignKeyNameChain) #><#= Model.ScalarProperties[cnt].OriginalPropertyName #>
+                    };
+            return Ok(result);
         }
 <#
     } // the end of if (Model.IsWebApiDelete)
 #>
 
-        private IHttpActionResult GetErrorResult(IdentityResult result)
-        {
-            if (result == null)
-            {
-                return InternalServerError();
-            }
 
-            if (!result.Succeeded)
-            {
-                if (result.Errors != null)
-                {
-                    foreach (string error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error);
-                    }
-                }
-
-                if (ModelState.IsValid)
-                {
-                    return BadRequest();
-                }
-
-                return BadRequest(ModelState);
-            }
-
-            return null;
-        }
-
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && _userManager != null)
-            {
-                _userManager.Dispose();
-                _userManager = null;
-            }
-
-            base.Dispose(disposing);
-        }
     }
 }
 

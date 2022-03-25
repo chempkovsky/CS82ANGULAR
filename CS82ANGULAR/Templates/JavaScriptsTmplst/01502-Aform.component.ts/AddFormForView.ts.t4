@@ -235,7 +235,6 @@
     string filterComponentCssFolder                 = "00025-web-service-filter.component.css";
     string filterComponentHtmlFolder                = "00025-web-service-filter.component.html";
     string filterComponentFolder                    = "00025-web-service-filter.component.ts";
-    string eformModeEnumlFolder                     = "00026-eform-mode.enum.ts";
     string viewModelDatasourceInterfaceFolder       = "00600-view-model-datasource.interface.ts";
 
 
@@ -262,7 +261,6 @@
     string eventEmitterPubModelClassName            = GetModelClassName(Context, eventEmitterPubModelFolder);
 
 
-    string eformModeEnumName = GetCommonEnumClassName(Context, eformModeEnumlFolder);
     string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, addformComponentFolder);
 
     string serviceClassName = GetServiceClassName(Model, viewServiceFolder);
@@ -283,7 +281,6 @@ import { of } from 'rxjs/internal/observable/of';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
 import { Subscription } from 'rxjs';
 
-import { <#= eformModeEnumName #> } from '<#=  GetCommonFolderName(Model, Context,  eformModeEnumlFolder, addformComponentFolder)#>';
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, addformComponentFolder)#>';
 import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, addformComponentFolder)#>';
 import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, addformComponentFolder)#>';
@@ -353,7 +350,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#
     {
         foreach(ModelViewPropertyOfVwSerializable sclrPrp in Model.ScalarProperties) {
-            if(IsDatabaseGeneratedProperty(sclrPrp, Model)) {
+            if(IsDatabaseGeneratedProperty(sclrPrp, Model) && (!IsMasterDefinedProperty(sclrPrp, Model))) {
 #>
         this.<#= RootDataSource #>.set<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrPrp, Model) #>', <#= GetDefaultVal(sclrPrp) #>);
 <#
@@ -3340,6 +3337,17 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 break;
         }
         return result;
+    }
+    bool IsMasterDefinedProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return false;
+        if (!string.IsNullOrEmpty(prop.ForeignKeyName)) return true;
+        if(model.ForeignKeys == null) return false;
+        foreach(ModelViewForeignKeySerializable fk in model.ForeignKeys) {
+            if(fk.ForeignKeyProps != null) {
+                if (fk.ForeignKeyProps.Any(p => p.OriginalPropertyName == prop.OriginalPropertyName)) return true; 
+            }
+        }
+        return false;
     }
 
 

@@ -336,6 +336,9 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             return this._<#= CanViewPropName #>;
         }
         set <#= CanViewPropName #>(v: boolean|any) {
+<# 
+    if (Model.IsWebApiSelectOneByPrimarykey) { 
+#>
             if(typeof v === 'undefined') return;
             if(v === null) return;
             if (v !== this._<#= CanViewPropName #>) {
@@ -345,6 +348,9 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                     this.cd.detectChanges();
                 }
             }
+<# 
+    }
+#>
         }
 
     protected _<#= CanAddPropName #>: boolean = true;
@@ -353,6 +359,9 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             return this._<#= CanAddPropName #>;
         }
         set <#= CanAddPropName #>(v: boolean|any) {
+<# 
+    if (Model.IsWebApiAdd) { 
+#>
             if(typeof v === 'undefined') return;
             if(v === null) return;
             if (v !== this._<#= CanAddPropName #>) {
@@ -362,6 +371,9 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                     this.cd.detectChanges();
                 }
             }
+<# 
+    }
+#>
         }
     
     protected _<#= CanUpdPropName #>: boolean = true;
@@ -370,6 +382,10 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             return this._<#= CanUpdPropName #>;
         }
         set <#= CanUpdPropName #>(v: boolean|any) {
+<# 
+    if (Model.IsWebApiUpdate) { 
+#>
+
             if(typeof v === 'undefined') return;
             if(v === null) return;
             if (v !== this._<#= CanUpdPropName #>) {
@@ -379,6 +395,9 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                     this.cd.detectChanges();
                 }
             }
+<# 
+    }
+#>
         }
 
     protected _<#= CanDelPropName #>: boolean = true;
@@ -387,6 +406,9 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             return this._<#= CanDelPropName #>;
         }
         set <#= CanDelPropName #>(v: boolean|any) {
+<# 
+    if (Model.IsWebApiDelete) { 
+#>
             if(typeof v === 'undefined') return;
             if(v === null) return;
             if (v !== this._<#= CanDelPropName #>) {
@@ -396,6 +418,9 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                     this.cd.detectChanges();
                 }
             }
+<# 
+    }
+#>
         }
 
 
@@ -426,9 +451,9 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
           {id: '<#= ActionParamViewMode #>', caption: 'View Item', iconName: 'preview', iconColor: 'primary', enabled: true },
         ];
         tmp = tmp.concat(this._<#= RowCommandsPropName #>);
-        tmp[0].enabled = this._<#= CanUpdPropName #> && ((this.permMask & 4) === 4);
-        tmp[1].enabled = this._<#= CanDelPropName #> && ((this.permMask & 2) === 2);
-        tmp[2].enabled = this._<#= CanViewPropName #> 
+        tmp[0].enabled = this._<#= CanUpdPropName #> && ((this.permMask & 4) === 4)  <# if (!Model.IsWebApiUpdate) { #> && false <# } #>;
+        tmp[1].enabled = this._<#= CanDelPropName #> && ((this.permMask & 2) === 2) <# if (!Model.IsWebApiDelete) { #> && false <# } #>;
+        tmp[2].enabled = this._<#= CanViewPropName #> <# if (!Model.IsWebApiSelectOneByPrimarykey) { #> && false <# } #>;
         this.rowMenuItemsData = tmp;
     }
     onTableMenuItemsData() {
@@ -436,7 +461,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             {id: '<#= ActionParamAddMode #>', caption: 'Add Item', iconName: 'create', iconColor: 'primary', enabled: true},
         ];
         tmp = tmp.concat(this._<#= TableCommandsPropName #>);
-        tmp[0].enabled = this._<#= CanAddPropName #> && ((this.permMask & 8) === 8);
+        tmp[0].enabled = this._<#= CanAddPropName #> && ((this.permMask & 8) === 8) <# if (!Model.IsWebApiAdd) { #> && false <# } #>;
         this.tableMenuItemsData = tmp;
     }
     

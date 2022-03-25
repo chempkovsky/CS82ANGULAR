@@ -95,15 +95,21 @@ const routes: Routes = [
         string fileNm_ra  = GetCrossComponentFolderName(Model, rvComponentLazyRoutingModuleFolder, Context, aModel.ViewName, raLazyModuleFolder);
         string fileNm_ru  = GetCrossComponentFolderName(Model, rvComponentLazyRoutingModuleFolder, Context, aModel.ViewName, ruLazyModuleFolder);
         string fileNm_rd  = GetCrossComponentFolderName(Model, rvComponentLazyRoutingModuleFolder, Context, aModel.ViewName, rdLazyModuleFolder);
+#>
 
+//
+// Info: Root Master View  [<#= Model.ViewName #>] 
+// Info: Detail View  [<#= aModel.ViewName #>] 
+//
+<#
 
         if(aModel.IsWebApiSelectManyWithPagination) {
-            if(!string.IsNullOrEmpty(fileNm_rlm)) {
+            if(!string.IsNullOrEmpty(fileNm_rlm) && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rlMltLazyModuleFolder)))) {
 
-
+            
 
                 if(aModel.IsWebApiSelectOneByPrimarykey) {
-                    if(!string.IsNullOrEmpty(fileNm_rv)) {
+                    if(!string.IsNullOrEmpty(fileNm_rv) && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rvLazyModuleFolder)))) {
 #>
     { 
         outlet: '<#=  OutletNameValue #>',
@@ -117,7 +123,7 @@ const routes: Routes = [
                     } else {
 #>
 //
-//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= rvLazyModuleFolder #>] has not been generated yet
+//warning: for the View   [<#= aModel.ViewName #>] the component [<#= rvLazyModuleFolder #>] has not been generated yet
 //
 <#
                     } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
@@ -133,7 +139,7 @@ const routes: Routes = [
 
 
                 if(aModel.IsWebApiAdd) {
-                    if(!string.IsNullOrEmpty(fileNm_ra)) {
+                    if(!string.IsNullOrEmpty(fileNm_ra) && (!string.IsNullOrEmpty(GetModuleClassName(aModel, raLazyModuleFolder)))) {
 #>
     { 
         outlet: '<#=  OutletNameValue #>',
@@ -147,7 +153,7 @@ const routes: Routes = [
                     } else {
 #>
 //
-//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= raLazyModuleFolder #>] has not been generated yet
+//warning: for the View   [<#= aModel.ViewName #>] the component [<#= raLazyModuleFolder #>] has not been generated yet
 //
 <#
                     } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
@@ -163,7 +169,7 @@ const routes: Routes = [
 
 
                 if(aModel.IsWebApiUpdate) {
-                    if(!string.IsNullOrEmpty(fileNm_ru)) {
+                    if(!string.IsNullOrEmpty(fileNm_ru) && (!string.IsNullOrEmpty(GetModuleClassName(aModel, ruLazyModuleFolder)))) {
 #>
     { 
         outlet: '<#=  OutletNameValue #>',
@@ -177,7 +183,7 @@ const routes: Routes = [
                     } else {
 #>
 //
-//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= ruLazyModuleFolder #>] has not been generated yet
+//warning: for the View   [<#= aModel.ViewName #>] the component [<#= ruLazyModuleFolder #>] has not been generated yet
 //
 <#
                     } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
@@ -193,7 +199,7 @@ const routes: Routes = [
 
 
                 if(aModel.IsWebApiDelete) {
-                    if(!string.IsNullOrEmpty(fileNm_rd)) {
+                    if(!string.IsNullOrEmpty(fileNm_rd) && (!string.IsNullOrEmpty(GetModuleClassName(aModel, rdLazyModuleFolder)))) {
 #>
     { 
         outlet: '<#=  OutletNameValue #>',
@@ -207,7 +213,7 @@ const routes: Routes = [
                     } else {
 #>
 //
-//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= rdLazyModuleFolder #>] has not been generated yet
+//warning: for the View   [<#= aModel.ViewName #>] the component [<#= rdLazyModuleFolder #>] has not been generated yet
 //
 <#
                     } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
@@ -233,7 +239,7 @@ const routes: Routes = [
             } else {
 #>
 //
-//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= rlMltLazyModuleFolder #>] has not been generated yet
+//warning: for the View   [<#= aModel.ViewName #>] the component [<#= rlMltLazyModuleFolder #>] has not been generated yet
 //
 <#
             }
@@ -707,6 +713,7 @@ export class <#= rvComponentLazyRoutingModuleClassName #> { }
     string GeFileNameWithoutExt(ModelViewSerializable model, string fileType) {
         string result= "";
         if ((model == null) || string.IsNullOrEmpty(fileType)) return result;
+        if(model.CommonStaffs == null) return result;
         CommonStaffSerializable refItem= 
             model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
         if (refItem == null) {

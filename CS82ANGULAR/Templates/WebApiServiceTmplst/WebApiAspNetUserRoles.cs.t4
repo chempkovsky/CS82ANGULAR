@@ -11,20 +11,9 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
-using System.Web.Http.Description;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.AspNet.Identity;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Identity.EntityFramework;
+#nullable disable
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 <#
 
@@ -105,43 +94,44 @@ using <#= rootEntityNameSpace #>;
 
 namespace <#= webApiServiceNameSpace #> {
 
-    [RoutePrefix("<#= webApiServicePrefix #>")]
-    public class <#= Model.WebApiServiceName #>: ApiController
+    // [RoutePrefix("<#= webApiServicePrefix #>")]
+    public class <#= Model.WebApiServiceName #>: ControllerBase
     {
         private int defaultPageSize = 50;
         private int minPageSize = 5;
         private int maxPageSize = 150;
-        private ApplicationUserManager _userManager;
-        private ApplicationRoleManager _roleManager = null;
-        public ApplicationUserManager UserManager
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public RoleManager<IdentityRole> RoleManager
         {
             get
             {
-                return _userManager ?? Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            }
-            private set
-            {
-                _userManager = value;
+                return _roleManager;
             }
         }
-	    protected ApplicationRoleManager RoleManager
-	    {
-		    get
-		    {
-			    return _roleManager ?? Request.GetOwinContext().GetUserManager<ApplicationRoleManager>();
-		    }
-            private set
+        private readonly UserManager<IdentityUser> _userManager;
+        public UserManager<IdentityUser> UserManager
+        {
+            get
             {
-                _roleManager = value;
+                return _userManager;
             }
-	    }
+        }
+        public <#= Model.WebApiServiceName #>(
+                    IHttpContextAccessor httpContextAccessor,
+                    UserManager<IdentityUser> userManager,
+                    RoleManager<IdentityRole> roleManager,
+                    IConfiguration configuration)
+        {
+            _roleManager = roleManager;
+            _userManager = userManager;
+        }
 
 
 <# 
     if (Model.IsWebApiSelectAll) { 
 #>
         [HttpGet]
-        [Route("<#= GetAllMethodName #>")]
+        [Route("[controller]/<#= GetAllMethodName #>")]
         public IQueryable<<#=Model.ViewName#>> <#= GetAllMethodName #>()
         {
             return new List<<#= Model.ViewName #>>().AsQueryable();
@@ -154,20 +144,19 @@ namespace <#= webApiServiceNameSpace #> {
     if (Model.IsWebApiSelectManyWithPagination) { 
 #>
         [HttpGet]
-        [Route("<#= GetWithFilterMethodName #>")]
-        [ResponseType(typeof(<#= Model.PageViewName #>))]
-        public IHttpActionResult <#= GetWithFilterMethodName #>(<#
+        [Route("[controller]/<#= GetWithFilterMethodName #>")]
+        public async Task<ActionResult> <#= GetWithFilterMethodName #>(<#
         int counter = 0;
         foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
             if (prop.IsUsedByfilter) {
                 if(counter > 0) { 
-#>                , <# } #>[FromUri] <#= GetNullableType(prop)#>[] <#= GetFilterPropertyName(prop, Model) #> 
-                  , [FromUri] string[] <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #> 
+#>                , <# } #>[FromQuery] <#= GetNullableType(prop)#>[] <#= GetFilterPropertyName(prop, Model) #> 
+                  , [FromQuery] string[] <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #> 
 <#
                 counter++;
             }
         }
-#>                <# if(counter > 0) {#>,<# } #> [FromUri] string[] orderby = null, [FromUri] int? page =null, [FromUri] int? pagesize = null)
+#>                <# if(counter > 0) {#>,<# } #> [FromQuery] string[] orderby = null, [FromQuery] int? page =null, [FromQuery] int? pagesize = null)
         {
 
             string[] EqualOperators = { "eq", "lk" };
@@ -242,17 +231,18 @@ namespace <#= webApiServiceNameSpace #> {
             if (hasNo) {
                 return Ok(resultObject);
             }
-            ApplicationUser usr = UserManager.Users.Where(u => u.Id == <#= UserIdPropName #>).FirstOrDefault();
+            IdentityUser usr = await UserManager.FindByIdAsync(<#= UserIdPropName #>);
             if(usr == null) {
                 return Ok(resultObject);
             }
-            List<string> rls = usr.Roles.Select(r => r.RoleId).ToList();
+            
+            IList<string> rls = await UserManager.GetRolesAsync(usr);
             hasNo = (rls == null);
             hasNo = hasNo ? hasNo : (rls.Count < 1);
             if (hasNo) {
                 return Ok(resultObject);
             }
-            List<IdentityRole> usrRls = RoleManager.Roles.Where(r => rls.Contains( r.Id )).OrderBy(r => r.Name).ToList();
+            List<IdentityRole> usrRls = RoleManager.Roles.Where(r => rls.Contains( r.Name )).OrderBy(r => r.Name).ToList();
             hasNo = (usrRls == null);
             hasNo = hasNo ? hasNo : (usrRls.Count < 1);
             if (hasNo) {
@@ -313,12 +303,11 @@ namespace <#= webApiServiceNameSpace #> {
     if (Model.IsWebApiSelectOneByPrimarykey) { 
 #>
         [HttpGet]
-        [Route("<#= GetOneMethodName #>")]
-        [ResponseType(typeof(<#= Model.ViewName#>))]
-        public IHttpActionResult <#= GetOneMethodName #>(<#
+        [Route("[controller]/<#= GetOneMethodName #>")]
+        public async Task<ActionResult> <#= GetOneMethodName #>(<#
         int counter = 0;
         foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
-            if(counter > 0) { #>                , <#} #>[FromUri] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
+            if(counter > 0) { #>                , <#} #>[FromQuery] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
 <#
             counter++;
         } #>                )
@@ -369,15 +358,16 @@ namespace <#= webApiServiceNameSpace #> {
             if (hasNoUserId || hasNoRoleId) {
                 return NotFound();
             }
-            ApplicationUser usr = UserManager.Users.Where(u => u.Id == <#= UserIdPropName #>).FirstOrDefault();
+            IdentityUser usr = await UserManager.FindByIdAsync(<#= UserIdPropName #>);
             if(usr == null) {
                 return NotFound();
             }
-            if(!usr.Roles.Any(r => r.RoleId == <#= RoleIdPropName #>)) {
+            IdentityRole usrRl = await RoleManager.FindByIdAsync(<#= RoleIdPropName #>);
+            if(usrRl == null) {
                 return NotFound();
             }
-            IdentityRole usrRl = RoleManager.Roles.Where(r => r.Id == <#= RoleIdPropName #>).FirstOrDefault();
-            if(usrRl == null) {
+            bool IsInRole = await UserManager.IsInRoleAsync(usr, usrRl.Name);
+            if(!IsInRole) {
                 return NotFound();
             }
             <#= Model.ViewName #> result = new <#= Model.ViewName #>() {
@@ -432,9 +422,8 @@ namespace <#= webApiServiceNameSpace #> {
     if (Model.IsWebApiUpdate) { 
 #>
         [HttpPut]
-        [ResponseType(typeof(<#= Model.ViewName#>))]
-        [Route("<#= UpdateOneMethodName #>")]
-        public IHttpActionResult <#= UpdateOneMethodName #>([FromBody] <#= Model.ViewName#> viewToUpdate)
+        [Route("[controller]/<#= UpdateOneMethodName #>")]
+        public async Task<ActionResult> <#= UpdateOneMethodName #>([FromBody] <#= Model.ViewName#> viewToUpdate)
         {
             if (!ModelState.IsValid)
             {
@@ -486,15 +475,16 @@ namespace <#= webApiServiceNameSpace #> {
             if (hasNoUserId || hasNoRoleId) {
                 return NotFound();
             }
-            ApplicationUser usr = UserManager.Users.Where(u => u.Id == <#= UserIdPropName #>).FirstOrDefault();
+            IdentityUser usr = await UserManager.FindByIdAsync(<#= UserIdPropName #>);
             if(usr == null) {
                 return NotFound();
             }
-            if(!usr.Roles.Any(r => r.RoleId == <#= RoleIdPropName #>)) {
+            IdentityRole usrRl = await RoleManager.FindByIdAsync(<#= RoleIdPropName #>);
+            if(usrRl == null) {
                 return NotFound();
             }
-            IdentityRole usrRl = RoleManager.Roles.Where(r => r.Id == <#= RoleIdPropName #>).FirstOrDefault();
-            if(usrRl == null) {
+            bool IsInRole = await UserManager.IsInRoleAsync(usr, usrRl.Name);
+            if(!IsInRole) {
                 return NotFound();
             }
             <#= Model.ViewName #> result = new <#= Model.ViewName #>() {
@@ -549,9 +539,8 @@ namespace <#= webApiServiceNameSpace #> {
     if (Model.IsWebApiAdd) { 
 #>
         [HttpPost]
-        [ResponseType(typeof(<#=            Model.ViewName#>))]
-        [Route("<#= AddOneMethodName #>")]
-        public IHttpActionResult <#= AddOneMethodName #>([FromBody] <#= Model.ViewName#> viewToAdd)
+        [Route("[controller]/<#= AddOneMethodName #>")]
+        public async Task<ActionResult> <#= AddOneMethodName #>([FromBody] <#= Model.ViewName#> viewToAdd)
         {
             if (!ModelState.IsValid)
             {
@@ -602,19 +591,20 @@ namespace <#= webApiServiceNameSpace #> {
             if (hasNoUserId || hasNoRoleId) {
                 return NotFound();
             }
-            ApplicationUser usr = UserManager.Users.Where(u => u.Id == <#= UserIdPropName #>).FirstOrDefault();
+            IdentityUser usr = await UserManager.FindByIdAsync(<#= UserIdPropName #>);
             if(usr == null) {
                 return NotFound();
             }
-            IdentityRole usrRl = RoleManager.Roles.Where(r => r.Id == <#= RoleIdPropName #>).FirstOrDefault();
+            IdentityRole usrRl = await RoleManager.FindByIdAsync(<#= RoleIdPropName #>);
             if(usrRl == null) {
                 return NotFound();
             }
-            if(!UserManager.IsInRole(usr.Id, usrRl.Name)) {
-                IdentityResult rslt = UserManager.AddToRole(usr.Id, usrRl.Name);
+            bool IsInRole = await UserManager.IsInRoleAsync(usr, usrRl.Name);
+            if(!IsInRole) {
+                IdentityResult rslt = await UserManager.AddToRoleAsync(usr, usrRl.Name);
                 if (!rslt.Succeeded)
                 {
-                    return GetErrorResult(rslt);
+                    return BadRequest(rslt);;
                 }
             }
             <#= Model.ViewName #> result = new <#= Model.ViewName #>() {
@@ -670,12 +660,11 @@ namespace <#= webApiServiceNameSpace #> {
     if (Model.IsWebApiDelete) { 
 #>
         [HttpDelete]
-        [ResponseType(typeof(<#=  Model.ViewName#>))]
-        [Route("<#= DeleteOneMethodName#>")]
-        public IHttpActionResult <#= DeleteOneMethodName#>(<#
+        [Route("[controller]/<#= DeleteOneMethodName#>")]
+        public async Task<ActionResult> <#= DeleteOneMethodName#>(<#
         int counter = 0;
         foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
-            if(counter > 0) { #>                , <#} #>[FromUri] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
+            if(counter > 0) { #>                , <#} #>[FromQuery] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
 <#
             counter++;
         } #>                )
@@ -728,19 +717,20 @@ namespace <#= webApiServiceNameSpace #> {
             if (hasNoUserId || hasNoRoleId) {
                 return NotFound();
             }
-            ApplicationUser usr = UserManager.Users.Where(u => u.Id == <#= UserIdPropName #>).FirstOrDefault();
+            IdentityUser usr = await UserManager.FindByIdAsync(<#= UserIdPropName #>);
             if(usr == null) {
                 return NotFound();
             }
-            IdentityRole usrRl = RoleManager.Roles.Where(r => r.Id == <#= RoleIdPropName #>).FirstOrDefault();
+            IdentityRole usrRl = await RoleManager.FindByIdAsync(<#= RoleIdPropName #>);
             if(usrRl == null) {
                 return NotFound();
             }
-            if(UserManager.IsInRole(usr.Id, usrRl.Name)) {
-                IdentityResult rslt = UserManager.RemoveFromRole(usr.Id, usrRl.Name);
+            bool IsInRole = await UserManager.IsInRoleAsync(usr, usrRl.Name);
+            if(IsInRole) {
+                IdentityResult rslt = await UserManager.RemoveFromRoleAsync(usr, usrRl.Name);
                 if (!rslt.Succeeded)
                 {
-                    return GetErrorResult(rslt);
+                    return BadRequest(rslt);
                 }
             }
             <#= Model.ViewName #> result = new <#= Model.ViewName #>() {
@@ -791,48 +781,6 @@ namespace <#= webApiServiceNameSpace #> {
     } // the end of if (Model.IsWebApiDelete)
 #>
 
-        private IHttpActionResult GetErrorResult(IdentityResult result)
-        {
-            if (result == null)
-            {
-                return InternalServerError();
-            }
-
-            if (!result.Succeeded)
-            {
-                if (result.Errors != null)
-                {
-                    foreach (string error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error);
-                    }
-                }
-
-                if (ModelState.IsValid)
-                {
-                    return BadRequest();
-                }
-
-                return BadRequest(ModelState);
-            }
-
-            return null;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && _userManager != null)
-            {
-                _userManager.Dispose();
-                _userManager = null;
-            }
-            if (disposing && _roleManager != null)
-            {
-                _roleManager.Dispose();
-                _roleManager = null;
-            }
-            base.Dispose(disposing);
-        }
     }
 }
 

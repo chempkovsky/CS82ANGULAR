@@ -89,12 +89,14 @@ namespace <#= webApiServiceNameSpace #> {
 <#
                 int cnt = Model.ScalarProperties.Count-1;
                 for(int i = 0; i < cnt; i++) {
+                
 #>
-                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[i], Model) #> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[i].ForeignKeyNameChain) #><#= Model.ScalarProperties[i].OriginalPropertyName #>,
+                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[i], Model) #> = itm.<#= GetForeignKeyNameChainAndProp(Model.ScalarProperties[i], Model) #>,
 <#
                 }
 #>
-                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model) #> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[cnt].ForeignKeyNameChain) #><#= Model.ScalarProperties[cnt].OriginalPropertyName #>
+                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model) #> = itm.<#= GetForeignKeyNameChainAndProp(Model.ScalarProperties[cnt], Model) #>
+
                             }).ToListAsync();;
 
         } // the end of Get()-method
@@ -211,12 +213,12 @@ namespace <#= webApiServiceNameSpace #> {
 #>
                     if ( (filter.Length + filterOprtLst.Count) != filterCnt) {
                         if (filter.Length > 0) {
-                            query = query.Where(p => (filter.Contains(p.<#=  GetChainedPropertyName(prop)#>)) || (p.<#=  GetChainedPropertyName(prop)#> == null));
+                            query = query.Where(p => (filter.Contains(p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#>)) || (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> == null));
                         } else {
-                            query = query.Where(p => (p.<#= GetChainedPropertyName(prop)#> == null) );
+                            query = query.Where(p => (p.<#= GetForeignKeyNameChainAndProp(prop, Model)#> == null) );
                         }
                     } else if (filter.Length > 0) {
-                        query = query.Where(p => filter.Contains(p.<#= GetChainedPropertyName(prop)#>));
+                        query = query.Where(p => filter.Contains(p.<#= GetForeignKeyNameChainAndProp(prop, Model)#>));
                     }
                     foreach(var fltItm in filterOprtLst) {
                         <#= prop.TypeFullName #> aflt = <#=  GetFilterPropertyName(prop, Model) #>[ fltItm.Value ];
@@ -225,16 +227,16 @@ namespace <#= webApiServiceNameSpace #> {
                         if(! IsEntityTypeBoolean(prop) ) {
 #>
                             case "gt":
-                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#> >= aflt );
+                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> >= aflt );
                                 break;
                             case "lt":
-                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#> <= aflt );
+                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> <= aflt );
                                 break;
 <#
                         }
 #>
                             case "ne":
-                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#> != aflt );
+                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> != aflt );
                                 break;
                         }
                     }
@@ -242,7 +244,7 @@ namespace <#= webApiServiceNameSpace #> {
                 } else {
 #>
                     if (filter.Length > 0) {
-                        query = query.Where(p => filter.Contains(p.<#= GetChainedPropertyName(prop)#>));
+                        query = query.Where(p => filter.Contains(p.<#= GetForeignKeyNameChainAndProp(prop, Model)#>));
                     }
                     foreach(var fltItm in filterOprtLst) {
                         <#= prop.TypeFullName #> aflt = <#=  GetFilterPropertyName(prop, Model) #>[ fltItm.Value ].Value;
@@ -251,16 +253,16 @@ namespace <#= webApiServiceNameSpace #> {
                         if(! IsEntityTypeBoolean(prop) ) {
 #>
                             case "gt":
-                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#> >= aflt );
+                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> >= aflt );
                                 break;
                             case "lt":
-                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#> <= aflt );
+                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> <= aflt );
                                 break;
 <#
                         }
 #>
                             case "ne":
-                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#> != aflt );
+                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> != aflt );
                                 break;
                         }
                     }
@@ -308,7 +310,7 @@ namespace <#= webApiServiceNameSpace #> {
                     {
                         case 0:
                             if (hasNUllFilter) {
-                                query = query.Where(p => p.<#=    GetChainedPropertyName(prop)#> == null);
+                                query = query.Where(p => p.<#=    GetForeignKeyNameChainAndProp(prop, Model)#> == null);
                             }
                             break;
                         case 1:
@@ -316,12 +318,12 @@ namespace <#= webApiServiceNameSpace #> {
                                 string aflt0 = filter[0].Trim();
                                 if (hasNUllFilter) {
                                     query = query.Where(p => (
-                                            (p.<#=                    GetChainedPropertyName(prop)#> == null) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0))
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#> == null) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0))
                                             ));
                                 } else {
                                     query = query.Where(p => (
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0))
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0))
                                             ));
                                 }
                             }
@@ -332,14 +334,14 @@ namespace <#= webApiServiceNameSpace #> {
                                 string aflt1 = filter[1].Trim();
                                 if (hasNUllFilter) {
                                     query = query.Where(p => (
-                                            (p.<#=                    GetChainedPropertyName(prop)#> == null) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt1))
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#> == null) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt1))
                                             ));
                                 } else {
                                     query = query.Where(p => (
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt1))
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt1))
                                             ));
                                 }
                             }
@@ -351,16 +353,16 @@ namespace <#= webApiServiceNameSpace #> {
                                 string aflt2 = filter[2].Trim();
                                 if (hasNUllFilter) {
                                     query = query.Where(p => (
-                                            (p.<#=                    GetChainedPropertyName(prop)#> == null) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt1)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt2))
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#> == null) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt1)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt2))
                                             ));
                                 } else {
                                     query = query.Where(p => (
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt1)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt2))
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt1)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt2))
                                             ));
                                 }
                             }
@@ -373,18 +375,18 @@ namespace <#= webApiServiceNameSpace #> {
                                 string aflt3 = filter[3].Trim();
                                 if (hasNUllFilter) {
                                     query = query.Where(p => (
-                                            (p.<#=                    GetChainedPropertyName(prop)#> == null) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt1)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt2)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt3))
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#> == null) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt1)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt2)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt3))
                                             ));
                                 } else {
                                     query = query.Where(p => (
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt1)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt2)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt3))
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt1)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt2)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt3))
                                             ));
                                 }
                             }
@@ -398,20 +400,20 @@ namespace <#= webApiServiceNameSpace #> {
                                 string aflt4 = filter[4].Trim();
                                 if (hasNUllFilter) {
                                     query = query.Where(p => (
-                                            (p.<#=                    GetChainedPropertyName(prop)#> == null) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt1)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt2)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt3)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt4))
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#> == null) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt1)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt2)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt3)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt4))
                                             ));
                                 } else {
                                     query = query.Where(p => (
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt0)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt1)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt2)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt3)) ||
-                                            (p.<#=                    GetChainedPropertyName(prop)#>.Contains(aflt4))
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt1)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt2)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt3)) ||
+                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt4))
                                             ));
                                 }
 
@@ -425,16 +427,16 @@ namespace <#= webApiServiceNameSpace #> {
                         if(! IsEntityTypeBoolean(prop) ) {
 #>
                             case "gt":
-                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#>.CompareTo(aflt) >= 0 );
+                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#>.CompareTo(aflt) >= 0 );
                                 break;
                             case "lt":
-                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#>.CompareTo(aflt) <= 0 );
+                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#>.CompareTo(aflt) <= 0 );
                                 break;
 <#
                         }
 #>
                             case "ne":
-                                query = query.Where(p => p.<#=  GetChainedPropertyName(prop)#>.CompareTo(aflt) != 0 );
+                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#>.CompareTo(aflt) != 0 );
                                 break;
                         }
                     }
@@ -467,21 +469,21 @@ namespace <#= webApiServiceNameSpace #> {
             if (!currProp.IsUsedBySorting) continue;
 #>
                             case "<#= GetLowerCasePropertyName(currProp, Model)#>" :
-                                if(isFirstTime) {
-                                    orderedQuery = query.OrderBy(p => p.<#= GetChainedPropertyName(currProp)#>);
+                                if(isFirstTime) { 
+                                    orderedQuery = query.OrderBy(p => p.<#= GetForeignKeyNameChainAndProp(currProp, Model)#>);
                                     isFirstTime = false;
                                 } else {
-                                    orderedQuery = orderedQuery.ThenBy(p => p.<#= GetChainedPropertyName(currProp)#>);
+                                    orderedQuery = orderedQuery.ThenBy(p => p.<#= GetForeignKeyNameChainAndProp(currProp, Model)#>);
                                 }
                                 wasInUseOrderBy.Add("<#= GetLowerCasePropertyName(currProp, Model)#>");
                                 wasInUseOrderBy.Add("-<#= GetLowerCasePropertyName(currProp, Model)#>");
                                 break;
                             case "-<#= GetLowerCasePropertyName(currProp, Model)#>" :
                                 if(isFirstTime) {
-                                    orderedQuery = query.OrderByDescending(p => p.<#= GetChainedPropertyName(currProp)#>);
+                                    orderedQuery = query.OrderByDescending(p => p.<#= GetForeignKeyNameChainAndProp(currProp, Model)#>);
                                     isFirstTime = false;
                                 } else {
-                                    orderedQuery = orderedQuery.ThenByDescending(p => p.<#= GetChainedPropertyName(currProp)#>);
+                                    orderedQuery = orderedQuery.ThenByDescending(p => p.<#= GetForeignKeyNameChainAndProp(currProp, Model)#>);
                                 }
                                 wasInUseOrderBy.Add("<#= GetLowerCasePropertyName(currProp, Model)#>");
                                 wasInUseOrderBy.Add("-<#= GetLowerCasePropertyName(currProp, Model)#>");
@@ -508,11 +510,11 @@ namespace <#= webApiServiceNameSpace #> {
         int cnt = Model.ScalarProperties.Count-1;
         for(int i = 0; i < cnt; i++) {
 #>
-                            <#=            GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#=  GetForeignKeyNameChain(Model.ScalarProperties[i].ForeignKeyNameChain) #><#= Model.ScalarProperties[i].OriginalPropertyName #>,
+                            <#=            GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#=  GetForeignKeyNameChainAndProp(Model.ScalarProperties[i], Model) #>,
 <#
         }
 #>
-                            <#=            GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[cnt].ForeignKeyNameChain) #><#= Model.ScalarProperties[cnt].OriginalPropertyName #>
+                            <#=            GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChainAndProp(Model.ScalarProperties[cnt], Model) #>
                             }).ToListAsync();
                 return Ok(resultObject);
         } // the end of GetWithFilter()-method
@@ -576,11 +578,11 @@ namespace <#= webApiServiceNameSpace #> {
                 int cnt = Model.ScalarProperties.Count-1;
                 for(int i = 0; i < cnt; i++) {
 #>
-                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[i].ForeignKeyNameChain) #><#= Model.ScalarProperties[i].OriginalPropertyName #>,
+                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetForeignKeyNameChainAndProp(Model.ScalarProperties[i], Model) #>,
 <#
         } 
 #>
-                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[cnt].ForeignKeyNameChain) #><#= Model.ScalarProperties[cnt].OriginalPropertyName #>
+                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChainAndProp(Model.ScalarProperties[cnt], Model) #>
                     }).FirstOrDefaultAsync();
             if (result == null)
             {
@@ -669,11 +671,11 @@ namespace <#= webApiServiceNameSpace #> {
                 int cnt = Model.ScalarProperties.Count-1;
                 for(int i = 0; i < cnt; i++) {
 #>
-                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[i].ForeignKeyNameChain) #><#= Model.ScalarProperties[i].OriginalPropertyName #>,
+                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetForeignKeyNameChainAndProp(Model.ScalarProperties[i], Model) #>,
 <#
         } 
 #>
-                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[cnt].ForeignKeyNameChain) #><#= Model.ScalarProperties[cnt].OriginalPropertyName #>
+                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChainAndProp(Model.ScalarProperties[cnt], Model) #>
                     }).FirstOrDefaultAsync();
             if (result == null)
             {
@@ -747,11 +749,11 @@ namespace <#= webApiServiceNameSpace #> {
                 int cnt = Model.ScalarProperties.Count-1;
                 for(int i = 0; i < cnt; i++) {
 #>
-                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[i].ForeignKeyNameChain) #><#= Model.ScalarProperties[i].OriginalPropertyName #>,
+                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetForeignKeyNameChainAndProp(Model.ScalarProperties[i], Model) #>,
 <#
         } 
 #>
-                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[cnt].ForeignKeyNameChain) #><#= Model.ScalarProperties[cnt].OriginalPropertyName #>
+                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChainAndProp(Model.ScalarProperties[cnt], Model) #>
                     }).FirstOrDefaultAsync();
             if (result == null)
             {
@@ -823,11 +825,11 @@ namespace <#= webApiServiceNameSpace #> {
                 int cnt = Model.ScalarProperties.Count-1;
                 for(int i = 0; i < cnt; i++) {
 #>
-                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[i].ForeignKeyNameChain) #><#= Model.ScalarProperties[i].OriginalPropertyName #>,
+                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetForeignKeyNameChainAndProp(Model.ScalarProperties[i], Model) #>,
 <#
         } 
 #>
-                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[cnt].ForeignKeyNameChain) #><#= Model.ScalarProperties[cnt].OriginalPropertyName #>
+                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChainAndProp(Model.ScalarProperties[cnt], Model) #>
                     }).FirstOrDefaultAsync();
                 if (result == null)
                 {
@@ -936,6 +938,30 @@ namespace <#= webApiServiceNameSpace #> {
             return foreignKeyNameChain + ".";
         }
     }
+    String GetForeignKeyNameChainAndProp(ModelViewPropertyOfVwSerializable sProp, ModelViewSerializable model) {
+        if (String.IsNullOrEmpty(sProp.ForeignKeyNameChain)) {
+            return sProp.OriginalPropertyName;
+        } else {
+            if((sProp.ForeignKeyNameChain == sProp.ForeignKeyName) && (model.ForeignKeys != null)) {
+                ModelViewForeignKeySerializable fk = model.ForeignKeys.Where(f => f.NavigationName == sProp.ForeignKeyName).FirstOrDefault();
+                if(fk != null) {
+                    if((fk.ForeignKeyProps != null) && (fk.PrincipalKeyProps != null)) {
+                        for(int i = 0; i < fk.PrincipalKeyProps.Count; i++) {
+                            if(i < fk.ForeignKeyProps.Count) {
+                                if(fk.PrincipalKeyProps[i].OriginalPropertyName == sProp.OriginalPropertyName) {
+                                    return fk.ForeignKeyProps[i].OriginalPropertyName;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return sProp.ForeignKeyNameChain + "." + sProp.OriginalPropertyName;
+        }
+    }
+
+
+
     String GetWebApiServicePrefix(ModelViewSerializable model) {
         string result = model.WebApiServiceName;
         if( !string.IsNullOrEmpty( result ) ) {

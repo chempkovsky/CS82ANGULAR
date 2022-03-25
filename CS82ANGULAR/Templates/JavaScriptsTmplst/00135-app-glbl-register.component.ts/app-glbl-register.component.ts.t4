@@ -109,6 +109,7 @@ export class <#= appRegisterComponentClassName #> {
         this.<#= securityServiceName #>.<#= loginMethodName #>(this.registerFormGroup.controls['email'].value, this.registerFormGroup.controls['password'].value)
         .subscribe({
             next: (respdata: any) => { // success path
+                this.<#= AppSettingServicePropName #>.userName = this.registerFormGroup.controls['email'].value;
                 this.<#= AppSettingServicePropName #>.<#= setAuthIntoMethodName #>(respdata);
                 this.router.navigate(['/']);
             },

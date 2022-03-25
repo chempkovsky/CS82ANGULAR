@@ -80,11 +80,9 @@
     string filterComponentCssFolder     = "00025-web-service-filter.component.css";
     string filterComponentHtmlFolder    = "00025-web-service-filter.component.html";
     string filterComponentFolder        = "00025-web-service-filter.component.ts";
-    string eformModeEnumlFolder         = "00026-eform-mode.enum.ts";
     string menuItemDataModelFolder      = "00017-menu-item-data.interface.ts";
     string eventEmitterDataModelFolder  = "00018-event-emitter-data.interface.ts";
 
-    string EformModeEnumName = GetCommonEnumClassName(Context, eformModeEnumlFolder);
     
     string viewInterfaceFolder      = "01100-.interface.ts";
     string viewInterfacePageFolder  = "01200-Page.interface.ts";

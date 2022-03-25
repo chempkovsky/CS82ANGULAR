@@ -951,7 +951,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 <#
     } else {
 #>
-        <#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http',{message: 'Update is not implemeted for the current ViewModel'});
+        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http',{message: 'Update is not implemeted for the current ViewModel'});
 <#
     } // if (Model.IsWebApiUpdate) { ... } else { ... }
 #>
@@ -977,7 +977,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 <#
     } else {
 #>
-        <#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Insert is not implemeted for the current ViewModel'});
+        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Insert is not implemeted for the current ViewModel'});
 <#
     } // if (Model.IsWebApiUpdate) { ... } else { ... }
 #>
@@ -1034,7 +1034,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         }
     } else {
 #>
-        <#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Delete is not implemeted for the current ViewModel'});
+        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Delete is not implemeted for the current ViewModel'});
 <#
     } // if (Model.IsWebApiUpdate) { ... } else { ... }
 #>

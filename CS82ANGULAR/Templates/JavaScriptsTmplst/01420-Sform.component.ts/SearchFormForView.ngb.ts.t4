@@ -121,7 +121,6 @@
     string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
     string filterDefModelFolder         = "00022-web-service-filter-def.interface.ts";
     string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
-    string eformModeEnumlFolder         = "00026-eform-mode.enum.ts";
     string menuItemDataModelFolder      = "00017-menu-item-data.interface.ts";
     string eventEmitterDataModelFolder  = "00018-event-emitter-data.interface.ts";
     string eventEmitterPubModelFolder   = "00019-event-emitter-pub.interface.ts";
@@ -165,7 +164,6 @@
 
 
 
-    string eformModeEnumName = GetCommonEnumClassName(Context, eformModeEnumlFolder);
     string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, sformComponentFolder);
 
     string serviceClassName = GetServiceClassName(Model, viewServiceFolder);

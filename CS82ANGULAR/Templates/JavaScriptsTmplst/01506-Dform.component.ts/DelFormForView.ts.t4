@@ -200,7 +200,13 @@
             continue;
         }
         foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
-            if(ForeignKeyNameChainList.Any(f => f.Item1 == fk.NavigationName)) {
+//
+// we have to applay check only for Add operation
+// if(ForeignKeyNameChainList.Any(f => f.Item1 == fk.NavigationName))
+//
+//
+
+//            if(ForeignKeyNameChainList.Any(f => f.Item1 == fk.NavigationName)) {
                 if ((fk.PrincipalKeyProps != null) && (fk.ForeignKeyProps != null)) {
                     for(int i =0; i <  fk.ForeignKeyProps.Count; i++) {
                         if(i < fk.PrincipalKeyProps.Count) {
@@ -212,7 +218,7 @@
                         }
                     }
                 }
-            }
+//            }
             if(!isNotExists) break;
         }
         if(isNotExists) {
@@ -234,7 +240,6 @@
     string filterComponentCssFolder                 = "00025-web-service-filter.component.css";
     string filterComponentHtmlFolder                = "00025-web-service-filter.component.html";
     string filterComponentFolder                    = "00025-web-service-filter.component.ts";
-    string eformModeEnumlFolder                     = "00026-eform-mode.enum.ts";
     string viewModelDatasourceInterfaceFolder       = "00600-view-model-datasource.interface.ts";
 
 
@@ -261,7 +266,6 @@
     string eventEmitterPubModelClassName            = GetModelClassName(Context, eventEmitterPubModelFolder);
 
 
-    string eformModeEnumName = GetCommonEnumClassName(Context, eformModeEnumlFolder);
     string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, delformComponentFolder);
 
     string serviceClassName = GetServiceClassName(Model, viewServiceFolder);
@@ -282,7 +286,6 @@ import { of } from 'rxjs/internal/observable/of';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
 import { Subscription } from 'rxjs';
 
-import { <#= eformModeEnumName #> } from '<#=  GetCommonFolderName(Model, Context,  eformModeEnumlFolder, delformComponentFolder)#>';
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, delformComponentFolder)#>';
 import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, delformComponentFolder)#>';
 import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, delformComponentFolder)#>';

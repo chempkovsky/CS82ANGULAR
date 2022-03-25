@@ -109,8 +109,16 @@
         List<ModelViewPropertyOfVwSerializable> aModelPrincipals = GetModelPrimaryKeyProps(aModel);
         string fileNm_rdl = GeFileNameWithoutExt(aModel, rdlLazyModuleFolder);
         
+#>
+
+//
+// Info: Root Master View  [<#= Model.ViewName #>] 
+// Info: Detail View  [<#= aModel.ViewName #>] 
+//
+<#
+
         if(aModel.IsWebApiSelectManyWithPagination) {
-            if(!string.IsNullOrEmpty(fileNm_rdl)) {
+            if(!string.IsNullOrEmpty(fileNm_rdl)  && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rdlLazyModuleFolder)))) {
 
 
 
@@ -163,6 +171,7 @@
     string GeFileNameWithoutExt(ModelViewSerializable model, string fileType) {
         string result= "";
         if ((model == null) || string.IsNullOrEmpty(fileType)) return result;
+        if(model.CommonStaffs == null) return result;
         CommonStaffSerializable refItem= 
             model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
         if (refItem == null) {
