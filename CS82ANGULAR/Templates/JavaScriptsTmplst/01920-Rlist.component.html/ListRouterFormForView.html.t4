@@ -67,12 +67,19 @@
     string captionPropName              = "caption";
     string captionSelector              = "caption";
 
+    string LOutletNamePrefix            = "loltnm"; //
     string showMultiSelectedRowSelector = "show-multi-selected-row";
     string showMultiSelectedRowPropName = "showMultiSelectedRow";
     string multiSelectedRowSelector     = "multi-selected-row";
     string multiSelectedRowPropName     = "multiSelectedRow";
     string onMultiSelectedRowPropName   = "onMultiSelectedRow";
     string currentMultiRowPropName      = "currentMultiRow";
+    string AppearancePropName           = "appearance";
+    string ShowDetailsPropName          = "showDetails";
+    string OnDetailChangedMethodName    = "onDetailChanged";
+    string SelectedDetailPropName       = "selectedDetail";
+    string DetailViewsPropName          = "detailViews";
+    string OnSelectRowMethodName        = "onSelectRow";
 
 
     string sformComponentFolder         = "01420-Sform.component.ts";
@@ -96,12 +103,23 @@
     (<#= beforeSquerySelector #>)="<#= OnBeforeSqueryMethodName #>($event)"
     [<#= externalFilterSelector #>]="<#= externalFilterPropName #>"
     
+    (<#= selectedRowSelector #>)="<#= OnSelectRowMethodName #>($event)"
     [<#= showMultiSelectedRowSelector #>]="<#= showMultiSelectedRowPropName #>"  
     (<#= multiSelectedRowSelector #>)="<#= onMultiSelectedRowPropName #>($event)"  
 
     [<#= MaxHeightPropSelector #>]="<#= MaxHeightPropName #>"  
     [<#= FilterMaxHeightPropSelector #>]="<#= FilterMaxHeightPropName #>"  
  ></app-<#= componentSelectorCommonPart #>>
+
+ <div fxLayout="row"  *ngIf="<#= ShowDetailsPropName #>">
+  <mat-form-field [appearance]="<#= AppearancePropName #>" fxFlex="100" >
+    <mat-select (selectionChange)="<#= OnDetailChangedMethodName #>($event)" [value]="<#= SelectedDetailPropName #>">
+        <mat-option *ngFor="let v of  <#= DetailViewsPropName #>;" [value]="v">{{ v.caption }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+ <router-outlet name='<#=  LOutletNamePrefix + Model.ViewName #>'></router-outlet>
 
 <#+
 

@@ -19,6 +19,54 @@
     string rlComponentClassName                     = GetComponentClassName(Model, rlComponentFolder);
     string rlComponentLazyRoutingModuleClassName    = GetModuleClassName(Model, rlComponentLazyRoutingModuleFolder);
     string appSettingServiceClassName               = GetCommonServiceClassName(Context, appSettingServiceFolder);
+
+
+    string OutletNmPropName             = "outletNm";
+    string HiddenFilterPrefix           = "hf";
+    string IdPrefix                     = "id";
+    string VPrefix                      = "View";
+    string APrefix                      = "Add";
+    string UPrefix                      = "Upd";
+    string DPrefix                      = "Del";
+    string DepthParamName               = "depth"; 
+    string uidParamName                 = "uid"; 
+    string OutletNamePrefix             = "loltnm";
+    string OutletParent                 = "oltParent";
+
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string FilterMaxHeightPropSelector  = "filter-max-height";
+    string FilterMaxHeightPropName      = "filterMaxHeight";
+    string ShowFilterPropName           = "showFilter";
+    string TitlePropName                = "title";
+    string RDLMPrefix                   = "RDLM";
+    string NavPrefix                    = "NavPrefix";
+
+    string rvLazyModuleFolder           = "01970-Rv-lazy.routing.module.ts";
+    string raLazyModuleFolder           = "01972-Ra-lazy.routing.module.ts";
+    string ruLazyModuleFolder           = "01974-Ru-lazy.routing.module.ts";
+    string rdLazyModuleFolder           = "01976-Rd-lazy.routing.module.ts";
+    string rlLazyModuleFolder           = "01968-Rl.routing.module.ts";
+
+    string OutletNameValue = OutletNamePrefix + Model.ViewName;
+
+    // Model, url, depth
+    List<Tuple<ModelViewSerializable, string, int>> nodes = new List<Tuple<ModelViewSerializable, string, int>>();
+    List<string> viewNames = GetDetailViews(Model, Context, null);
+    List<string> detailViewNames = new List<string>();
+    foreach(string viewName in viewNames) {
+        ModelViewSerializable detail = GetModelViewByName(Context, viewName);
+        string newPath = OutletNameValue + "2" + viewName + "/:" + HiddenFilterPrefix + "102";
+        List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detail, null);
+        detailViewNames.Clear();
+        foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+            if (!detailViewNames.Any(v => v == detail.ViewName)) {
+                nodes.Add(new Tuple<ModelViewSerializable, string, int>(detail, newPath, 2));
+                detailViewNames.Add(detail.ViewName);
+            }
+        }
+    }
+
 #>
 
 
@@ -34,7 +82,202 @@ const routes: Routes = [
  {
     path: '',
     component: <#= rlComponentClassName #>,
-    canActivate: [<#= appSettingServiceClassName + "Activator" #>]
+    canActivate: [<#= appSettingServiceClassName + "Activator" #>],
+    children: [
+
+
+
+
+
+
+
+<#
+{
+    for(int k = nodes.Count-1; k > -1; k--) {
+        Tuple<ModelViewSerializable, string, int> node = nodes[k];
+        ModelViewSerializable aModel = node.Item1;
+        int CurrDepth = node.Item3 + 1;
+        string fileNm_rl  = GetCrossComponentFolderName(Model, rlComponentLazyRoutingModuleFolder, Context, aModel.ViewName, rlLazyModuleFolder);
+        string fileNm_rv  = GetCrossComponentFolderName(Model, rlComponentLazyRoutingModuleFolder, Context, aModel.ViewName, rvLazyModuleFolder);
+        string fileNm_ra  = GetCrossComponentFolderName(Model, rlComponentLazyRoutingModuleFolder, Context, aModel.ViewName, raLazyModuleFolder);
+        string fileNm_ru  = GetCrossComponentFolderName(Model, rlComponentLazyRoutingModuleFolder, Context, aModel.ViewName, ruLazyModuleFolder);
+        string fileNm_rd  = GetCrossComponentFolderName(Model, rlComponentLazyRoutingModuleFolder, Context, aModel.ViewName, rdLazyModuleFolder);
+#>
+
+//
+// Info: Root Master View  [<#= Model.ViewName #>] 
+// Info: Detail View  [<#= aModel.ViewName #>] 
+//
+<#
+
+        if(aModel.IsWebApiSelectManyWithPagination) {
+            if(!string.IsNullOrEmpty(fileNm_rl) && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rlLazyModuleFolder)))) {
+
+            
+
+                if(aModel.IsWebApiSelectOneByPrimarykey) {
+                    if(!string.IsNullOrEmpty(fileNm_rv) && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rvLazyModuleFolder)))) {
+#>
+    { 
+        outlet: '<#=  OutletNameValue #>',
+        path: '<#= OutletNameValue + "2" + VPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + (CurrDepth+100).ToString() + "/:" + IdPrefix + (CurrDepth+100).ToString() #>', 
+        loadChildren: () => import('<#= fileNm_rv #>').then(m => m.<#= GetModuleClassName(aModel, rvLazyModuleFolder) #>),
+        data: { <#= OutletParent #>: '<#= OutletNameValue + "2" + aModel.ViewName #>', <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'View <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + (CurrDepth+100).ToString() #>', <#= DepthParamName #>: <#= CurrDepth.ToString() #>},
+        canActivate: [<#= appSettingServiceClassName + "Activator" #>],
+    },
+
+<#
+                    } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the component [<#= rvLazyModuleFolder #>] has not been generated yet
+//
+<#
+                    } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
+                } else { // if(aModel.IsWebApiSelectOneByPrimarykey) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] SelectOneByPrimarykey is set to false
+//
+<#
+                } // if(aModel.IsWebApiSelectOneByPrimarykey) { ... } else { ... }
+
+
+
+
+                if(aModel.IsWebApiAdd) {
+                    if(!string.IsNullOrEmpty(fileNm_ra) && (!string.IsNullOrEmpty(GetModuleClassName(aModel, raLazyModuleFolder)))) {
+#>
+    { 
+        outlet: '<#=  OutletNameValue #>',
+        path: '<#= OutletNameValue + "2" + APrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + (CurrDepth+100).ToString() #>', 
+        loadChildren: () => import('<#= fileNm_ra #>').then(m => m.<#= GetModuleClassName(aModel, raLazyModuleFolder) #>),
+        data: { <#= OutletParent#>: '<#= OutletNameValue + "2" + aModel.ViewName #>', <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Add <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>},
+        canActivate: [<#= appSettingServiceClassName + "Activator" #>],
+    },
+
+<#
+                    } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the component [<#= raLazyModuleFolder #>] has not been generated yet
+//
+<#
+                    } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
+                } else { // if(aModel.IsWebApiAdd) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] WebApiAdd is set to false
+//
+<#
+                } // if(aModel.IsWebApiAdd) { ... } else { ... }
+
+
+
+
+                if(aModel.IsWebApiUpdate) {
+                    if(!string.IsNullOrEmpty(fileNm_ru) && (!string.IsNullOrEmpty(GetModuleClassName(aModel, ruLazyModuleFolder)))) {
+#>
+    { 
+        outlet: '<#=  OutletNameValue #>',
+        path: '<#= OutletNameValue + "2" + UPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + (CurrDepth+100).ToString() + "/:" + IdPrefix + (CurrDepth+100).ToString() #>', 
+        loadChildren: () => import('<#= fileNm_ru #>').then(m => m.<#= GetModuleClassName(aModel, ruLazyModuleFolder) #>),
+        data: { <#= OutletParent#>: '<#= OutletNameValue + "2" + aModel.ViewName #>', <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Update <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + (CurrDepth+100).ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>},
+        canActivate: [<#= appSettingServiceClassName + "Activator" #>],
+    },
+
+<#
+                    } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the component [<#= ruLazyModuleFolder #>] has not been generated yet
+//
+<#
+                    } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
+                } else { // if(aModel.IsWebApiUpdate) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] WebApiUpdate is set to false
+//
+<#
+                } // if(aModel.IsWebApiUpdate) { ... } else { ... }
+
+
+
+
+                if(aModel.IsWebApiDelete) {
+                    if(!string.IsNullOrEmpty(fileNm_rd) && (!string.IsNullOrEmpty(GetModuleClassName(aModel, rdLazyModuleFolder)))) {
+#>
+    { 
+        outlet: '<#=  OutletNameValue #>',
+        path: '<#= OutletNameValue + "2" + DPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + (CurrDepth+100).ToString() + "/:" + IdPrefix + (CurrDepth+100).ToString() #>', 
+        loadChildren: () => import('<#= fileNm_rd #>').then(m => m.<#= GetModuleClassName(aModel, rdLazyModuleFolder) #>),
+        data: { <#= OutletParent#>: '<#= OutletNameValue + "2" + aModel.ViewName #>', <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Delete <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + (CurrDepth+100).ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>},
+        canActivate: [<#= appSettingServiceClassName + "Activator" #>],
+    },
+
+<#
+                    } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the component [<#= rdLazyModuleFolder #>] has not been generated yet
+//
+<#
+                    } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
+                } else { // if(aModel.IsWebApiDelete) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] WebApiDelete is set to false
+//
+<#
+                } // if(aModel.IsWebApiDelete) { ... } else { ... }
+
+#>
+    { 
+        outlet: '<#=  OutletNameValue #>',
+        path: '<#= node.Item2 #>', 
+        loadChildren: () => import('<#= fileNm_rl #>').then(m => m.<#= GetModuleClassName(aModel, rlLazyModuleFolder) #>),
+        data: { <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
+        canActivate: [<#= appSettingServiceClassName + "Activator" #>],
+    },
+
+<#
+
+            } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the component [<#= rlLazyModuleFolder #>] has not been generated yet
+//
+<#
+            }
+        } else { // if(aModel.IsWebApiSelectManyWithPagination) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] SelectManyWithPagination is set to false
+//
+<#
+        } // if(aModel.IsWebApiSelectManyWithPagination) { } else { ... }
+    }
+
+}
+#>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ]
   }
 ];
 
@@ -283,6 +526,270 @@ export class <#= rlComponentLazyRoutingModuleClassName #> { }
                 
         }
         return sb.ToString();
+    }
+    List<string> GetDetailViews(ModelViewSerializable model, DbContextSerializable context, List<string> result)
+        {
+            if (result == null)
+            {
+                result = new List<string>();
+            }
+            if ((model == null) || (context == null))
+            {
+                return result;
+            }
+            if ((model.ScalarProperties == null) || (model.PrimaryKeyProperties == null) || (context.ModelViews == null)) {
+                return result;
+            }
+            if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1))
+            {
+                return result;
+            }
+            List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(model);
+            if(primKeys == null)
+            {
+                return result;
+            }
+            if (primKeys.Count != model.PrimaryKeyProperties.Count)
+            {
+                return result;
+            }
+            string RootEntityFullClassName = model.RootEntityFullClassName;
+            string RootEntityUniqueProjectName = model.RootEntityUniqueProjectName;
+            List<ModelViewSerializable> details =
+                context.ModelViews.Where(m => m.ForeignKeys.Any(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName))).ToList();
+            if(details.Count < 1)
+            {
+                return result;
+            }
+            foreach(ModelViewSerializable detail in details)
+            {
+                if (detail.ScalarProperties == null) continue;
+                if (detail.ForeignKeys == null) continue;
+                if (detail.ForeignKeys.Count < 1) continue;
+                List<ModelViewForeignKeySerializable> ForeignKeys =
+                    detail.ForeignKeys.Where(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName)).ToList();
+                if (ForeignKeys.Count < 1) continue;
+                bool canBeUsed = false;
+                foreach(ModelViewForeignKeySerializable ForeignKey in ForeignKeys)
+                {
+                    bool hasForeignKeyProps = true;
+                    if (ForeignKey.ForeignKeyProps != null)
+                    {
+                        for(int i = 0; i < ForeignKey.ForeignKeyProps.Count; i++)
+                        {
+                            ModelViewKeyPropertySerializable ForeignKeyProp = ForeignKey.ForeignKeyProps[i];
+                            if (!(detail.ScalarProperties.Any(s => (s.OriginalPropertyName == ForeignKeyProp.OriginalPropertyName) && (string.IsNullOrEmpty(s.ForeignKeyNameChain)))))
+                            {
+                                hasForeignKeyProps = false;
+                            }
+                            if(!hasForeignKeyProps)
+                            {
+                                ModelViewKeyPropertySerializable PrincipalKeyProp = ForeignKey.PrincipalKeyProps[i];
+                                if (detail.ScalarProperties.Any(s => (s.OriginalPropertyName == PrincipalKeyProp.OriginalPropertyName) && (s.ForeignKeyNameChain == ForeignKey.NavigationName)))
+                                {
+                                    hasForeignKeyProps = true;
+                                } else
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    } else
+                    {
+                        hasForeignKeyProps = false;
+                    }
+                    if (hasForeignKeyProps)
+                    {
+                        canBeUsed = true;
+                        break;
+                    }
+                }
+                if(canBeUsed)
+                {
+                    if(!result.Contains(detail.ViewName))
+                    {
+                        result.Add(detail.ViewName);
+                    }
+                }
+            }
+            return result;
+    }
+    ModelViewSerializable GetModelViewByName(DbContextSerializable context, string viewName) {
+        if ((context == null) || (string.IsNullOrEmpty(viewName))) {
+            return null;
+        }
+        if (context.ModelViews == null) {
+            return null;
+        }
+        return context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+    }
+    List<ModelViewForeignKeySerializable> GetDetailViewForeignKeys(ModelViewSerializable model, ModelViewSerializable detail, List<ModelViewForeignKeySerializable> result)
+    {
+            if (result == null) result = new List<ModelViewForeignKeySerializable>();
+            if ((model == null) || (detail == null))
+            {
+                return result;
+            }
+            if ((model.PrimaryKeyProperties == null) || (detail.ScalarProperties == null) || (detail.ForeignKeys == null))
+            {
+                return result;
+            }
+            if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1))
+            {
+                return result;
+            }
+            List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(model);
+            if (primKeys == null)
+            {
+                return result;
+            }
+            if (primKeys.Count != model.PrimaryKeyProperties.Count)
+            {
+                return result;
+            }
+            string RootEntityFullClassName = model.RootEntityFullClassName;
+            string RootEntityUniqueProjectName = model.RootEntityUniqueProjectName;
+            List<ModelViewForeignKeySerializable> ForeignKeys =
+                detail.ForeignKeys.Where(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName)).ToList();
+            if (ForeignKeys.Count < 1)
+            {
+                return result;
+            }
+            foreach (ModelViewForeignKeySerializable ForeignKey in ForeignKeys)
+            {
+                bool hasForeignKeyProps = true;
+                if (ForeignKey.ForeignKeyProps != null)
+                {
+                    for (int i = 0; i < ForeignKey.ForeignKeyProps.Count; i++)
+                    {
+                        ModelViewKeyPropertySerializable ForeignKeyProp = ForeignKey.ForeignKeyProps[i];
+                        hasForeignKeyProps =
+                            detail.ScalarProperties.Any(s => (s.OriginalPropertyName == ForeignKeyProp.OriginalPropertyName) && (string.IsNullOrEmpty(s.ForeignKeyNameChain)));
+                        if (!hasForeignKeyProps)
+                        {
+                            ModelViewKeyPropertySerializable PrincipalKeyProp = ForeignKey.PrincipalKeyProps[i];
+                            hasForeignKeyProps = detail.ScalarProperties.Any(s => (s.OriginalPropertyName == PrincipalKeyProp.OriginalPropertyName) && (s.ForeignKeyNameChain == ForeignKey.NavigationName));
+                            {
+                                hasForeignKeyProps = true;
+                            }
+                            if(!hasForeignKeyProps)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    hasForeignKeyProps = false;
+                }
+                if (hasForeignKeyProps)
+                {
+                    result.Add(ForeignKey);
+                    break;
+                }
+            }
+            return result;
+    }
+        string GetCrossComponentFolderName(ModelViewSerializable model, string currFolder, DbContextSerializable context, string refViewName, string refFolder)
+        {
+            string result = "./";
+            if ((model == null) || string.IsNullOrEmpty(currFolder) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(refViewName))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (context.ModelViews == null))
+            {
+                return result;
+            }
+            ModelViewSerializable refModel = context.ModelViews.Where(v => v.ViewName == refViewName).FirstOrDefault();
+            if (refModel == null)
+            {
+                return result;
+            }
+            if (refModel.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                refModel.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            string[] refFolders = new string[] { };
+            if (!string.IsNullOrEmpty(refItem.FileFolder))
+            {
+                refFolders = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+            }
+            string[] currFolders = new string[] { };
+            if (!string.IsNullOrEmpty(curItem.FileFolder))
+            {
+                currFolders = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+            }
+            int refLen = refFolders.Length;
+            int currLen = currFolders.Length;
+            int minLen = refLen < currLen ? refLen : currLen;
+            int cnt = 0;
+            for (int i = 0; i < minLen; i++)
+            {
+                if (!refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase)) break;
+                cnt++;
+            }
+            if (currLen > cnt)
+            {
+                result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
+            }
+            if (refLen > cnt)
+            {
+                result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+            }
+            result += refItem.FileName;
+            return result;
+        }
+    List<ModelViewPropertyOfVwSerializable> GetModelPrimaryKeyProps(ModelViewSerializable model) {
+        List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
+        if (model == null)
+        {
+            return result;
+        }
+        if ((model.PrimaryKeyProperties == null) || (model.ScalarProperties == null)) {
+            return result;
+        }
+        foreach(ModelViewKeyPropertySerializable modelViewKeyPropertySerializable in model.PrimaryKeyProperties) {
+            ModelViewPropertyOfVwSerializable prop =
+                model.ScalarProperties.Where(p => p.ViewPropertyName == modelViewKeyPropertySerializable.ViewPropertyName).FirstOrDefault();
+            if(prop != null) {
+                result.Add(prop);
+            } else {
+                if(model.ForeignKeys != null) {
+                    foreach(ModelViewForeignKeySerializable modelViewForeignKeySerializable in model.ForeignKeys) {
+                        if ((modelViewForeignKeySerializable.PrincipalKeyProps != null) && (modelViewForeignKeySerializable.ForeignKeyProps != null)) {
+                            for(int i = 0; i < modelViewForeignKeySerializable.ForeignKeyProps.Count; i++) {
+                                if(modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName == modelViewKeyPropertySerializable.OriginalPropertyName ) {
+                                    if(i < modelViewForeignKeySerializable.PrincipalKeyProps.Count) {
+                                        prop =
+                                        model.ScalarProperties.Where(p => 
+                                            (p.OriginalPropertyName == modelViewForeignKeySerializable.PrincipalKeyProps[i].OriginalPropertyName)
+                                            &&
+                                            (p.ForeignKeyName == modelViewForeignKeySerializable.NavigationName)
+                                        ).FirstOrDefault();
+                                    }
+                                }
+                                if(prop != null) break;
+                            }
+                        }
+                        if(prop != null) break;
+                    }
+                    if(prop != null) {
+                        result.Add(prop);
+                    }
+                }
+            }
+        }
+        return result;
     }
 
 #>

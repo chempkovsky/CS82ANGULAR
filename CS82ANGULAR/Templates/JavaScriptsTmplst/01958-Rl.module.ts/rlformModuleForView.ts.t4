@@ -69,6 +69,7 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  flexModuleFolder, rlFormModuleFolder)#>';
 import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  materialModuleFolder, rlFormModuleFolder)#>';
@@ -160,6 +161,7 @@ import { <#=  delformModuleClassName #> } from '<#=  GetFolderName(Model, delfor
     ],
     imports: [
         CommonModule,
+        RouterModule,
         // BrowserModule,
         <#= materialModuleClassName #>,
         <#= flexModuleClassName #>,

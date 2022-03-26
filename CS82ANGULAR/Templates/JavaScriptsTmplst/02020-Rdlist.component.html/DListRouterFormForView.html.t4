@@ -35,8 +35,6 @@
     string OnTableCommandSelector   = "on-table-command";
     string OnTableCommandPropName   = "onTableCommand";
 
-    string selectedRowSelector        = "selected-row";
-    string selectedRowPropName        = "selectedRow";
 
     string applyFilterSelector        = "apply-filter";
     string applyFilterPropName        = "applyFilter";
@@ -74,6 +72,19 @@
     string onMultiSelectedRowPropName   = "onMultiSelectedRow";
     string currentMultiRowPropName      = "currentMultiRow";
 
+    string DlOutletNamePrefix           = "dloltnm";
+    string AppearancePropName           = "appearance";
+    string ShowDetailsPropName          = "showDetails";
+    string OnDetailChangedMethodName    = "onDetailChanged";
+    string SelectedDetailPropName       = "selectedDetail";
+    string DetailViewsPropName          = "detailViews";
+    string selectedRowSelector          = "selected-row";
+    string selectedRowPropName          = "selectedRow";
+    string OnSelectRowMethodName        = "onSelectRow";
+
+    string currentRowPropName           = "currentRow";
+
+
     string sformComponentFolder         = "01420-Sform.component.ts";
     string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, sformComponentFolder);
 #>
@@ -94,12 +105,24 @@
     (<#= beforeSquerySelector #>)="<#= OnBeforeSqueryMethodName #>($event)"
     [<#= externalFilterSelector #>]="<#= externalFilterPropName #>"
     
+
+    (<#= selectedRowSelector #>)="<#= OnSelectRowMethodName #>($event)"
     [<#= showMultiSelectedRowSelector #>]="<#= showMultiSelectedRowPropName #>"  
     (<#= multiSelectedRowSelector #>)="<#= onMultiSelectedRowPropName #>($event)"  
 
     [<#= MaxHeightPropSelector #>]="<#= MaxHeightPropName #>"  
     [<#= FilterMaxHeightPropSelector #>]="<#= FilterMaxHeightPropName #>"  
  ></app-<#= componentSelectorCommonPart #>>
+
+<div fxLayout="row"  *ngIf="<#= ShowDetailsPropName #>">
+  <mat-form-field [appearance]="<#= AppearancePropName #>" fxFlex="100" >
+    <mat-select (selectionChange)="<#= OnDetailChangedMethodName #>($event)" [value]="<#= SelectedDetailPropName #>">
+        <mat-option *ngFor="let v of  <#= DetailViewsPropName #>;" [value]="v">{{ v.caption }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+ <router-outlet name='<#=  DlOutletNamePrefix + Model.ViewName #>'></router-outlet>
 
 <#+
 

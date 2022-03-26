@@ -119,15 +119,6 @@
     string rlistHtmlFolder              = "01920-Rlist.component.html";
     string rlistComponentFolder         = "01920-Rlist.component.ts";
 
-    string showMultiSelectedRowSelector = "show-multi-selected-row";
-    string showMultiSelectedRowPropName = "showMultiSelectedRow";
-    string multiSelectedRowSelector     = "multi-selected-row";
-    string multiSelectedRowPropName     = "multiSelectedRow";
-    string onMultiSelectedRowPropName   = "onMultiSelectedRow";
-    string currentMultiRowPropName      = "currentMultiRow";
-    string showMultiSelectPropName      = "showMultiSelect";
-    string currentRowPropName        = "currentRow";
-    string OnSelectRowMethodName     = "onSelectRow";
 
 
     string ActionColumnDefProperty      = "menuAction";
@@ -161,6 +152,27 @@
     string captionPropName              = "caption";
     string captionSelector              = "caption";
 
+    string currentRowPropName           = "currentRow";
+    string OnSelectRowMethodName        = "onSelectRow";
+    string showMultiSelectPropName      = "showMultiSelect";
+    string showMultiSelectedRowSelector = "show-multi-selected-row";
+    string showMultiSelectedRowPropName = "showMultiSelectedRow";
+    string multiSelectedRowSelector     = "multi-selected-row";
+    string multiSelectedRowPropName     = "multiSelectedRow";
+    string onMultiSelectedRowPropName   = "onMultiSelectedRow";
+    string currentMultiRowPropName      = "currentMultiRow";
+    string LOutletNamePrefix            = "loltnm"; //
+    string OnDetailChangedMethodName    = "onDetailChanged";
+    string ToDetailMethodName           = "toDetail";
+    string SelectedDetailPropName       = "selectedDetail";
+    string DetailViewsPropName          = "detailViews";
+    string ShowDetailsPropName          = "showDetails";
+    string AppearancePropName           = "appearance";
+    string selectedRowSelector          = "selected-row";
+    string selectedRowPropName          = "selectedRow";
+
+    string OutletNameValue = LOutletNamePrefix + Model.ViewName;
+
 #>
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap, UrlSegment, ActivatedRouteSnapshot } from '@angular/router';
@@ -168,6 +180,7 @@ import { ActivatedRoute, Router, ParamMap, UrlSegment, ActivatedRouteSnapshot } 
 import { MatSelectChange } from '@angular/material/select';
 import { MatDialog } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
+import { MatFormFieldAppearance } from '@angular/material/form-field';
 
 
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, rlistComponentFolder)#>';
@@ -190,7 +203,9 @@ import { <#= messageDialogComponentClassName #> } from '<#=  GetCommonFolderName
   styleUrls: ['<#=  GetFolderName(Model, rlistCssFolder, rlistComponentFolder)#>.css']
 })
 export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
+    public <#= ShowDetailsPropName #>: boolean = false;
     @Input('<#= showMultiSelectedRowSelector #>') <#= showMultiSelectedRowPropName #>: boolean = true;
+    public <#= AppearancePropName #>: MatFormFieldAppearance = 'outline';
 
     @Output('<#= multiSelectedRowSelector #>') <#= multiSelectedRowPropName #>: EventEmitter<Array<<#= GetInterfaceName(Model) #>>> = new EventEmitter<Array<<#= GetInterfaceName(Model) #>>>();
     <#= onMultiSelectedRowPropName #>(e: Array<<#= GetInterfaceName(Model) #>>): void {
@@ -316,7 +331,8 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     {
         if (detailViewNames.Count > 0) {
 #>
-        let msk: number = 0;
+        if(this.<#= OutletNmPropName #> === 'primary') {
+            let msk: number = 0;
 <#
         }
         int id = 1;
@@ -335,28 +351,88 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             {
                 foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
 #>
-        msk = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= detailViewName #>');
-        if((msk & 1) === 1) {
-            this.rowMenuItemsData.push(
-             { id: '<#= id #>', caption: 'Navigate to: <#= detailViewName #> : <#= foreignKey.NavigationName #>', iconName: 'arrow_forward', iconColor: 'primary', enabled: true, 
-                data: {
-                    <#= ViewNameParamName #>: '<#= detailViewName #>',
-                    <#= NavigationParamName #>: '<#= foreignKey.NavigationName #>',
-                }
-             }
-            );
-        }
+            msk = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= detailViewName #>');
+            if((msk & 1) === 1) {
+                this.rowMenuItemsData.push(
+                 { id: '<#= id #>', caption: 'Navigate to: <#= detailViewName #> : <#= foreignKey.NavigationName #>', iconName: 'arrow_forward', iconColor: 'primary', enabled: true, 
+                    data: {
+                        <#= ViewNameParamName #>: '<#= detailViewName #>',
+                        <#= NavigationParamName #>: '<#= foreignKey.NavigationName #>',
+                    }
+                 }
+                );
+            }
 <#
                     id++;
                 }
             }
         }
+        if (detailViewNames.Count > 0) {
+#>
+        }
+<#
+        }
+    }
+    if(detailViewNames.Count > 0) {
+#>
+        this.<#= SelectedDetailPropName #> = this.<#= DetailViewsPropName #>[0];
+        this.<#= ShowDetailsPropName #> = (this.<#= OutletNmPropName #> === 'primary');
+<#
     }
 #>
         this.isOnInitCalled = true;
     }
     @Output('on-row-command') onRowCommand: EventEmitter<<#= eventEmitterDataModelClassName #>> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
     @Output('on-table-command') onTableCommand: EventEmitter<<#= eventEmitterDataModelClassName #>> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
+    @Output('<#= selectedRowSelector #>') <#= selectedRowPropName #>: EventEmitter<<#= GetInterfaceName(Model) #>> = new EventEmitter<<#= GetInterfaceName(Model) #>>();
+    <#= OnSelectRowMethodName #>(e: <#= GetInterfaceName(Model) #>|any) {
+        this.<#= ToDetailMethodName #>();
+        this.<#= selectedRowPropName #>.emit(e);
+    }
+    @ViewChild(<#= GetComponentClassName(Model, sformComponentFolder) #>) childForm!: <#= GetComponentClassName(Model, sformComponentFolder) #>;
+    public <#= SelectedDetailPropName #>: {caption: string, vw: string|null, nv: string|null}|null = null;
+    public <#= DetailViewsPropName #>: Array<{caption: string, vw: string|null, nv: string|null}> = [
+        {caption:'Hide details', vw:null, nv:null},
+<#
+    {
+        foreach(string detailVwnm in detailViewNames) {
+            ModelViewSerializable detail = GetModelViewByName(Context, detailVwnm);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detail, null);
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+#>
+        {caption:'<#= detailVwnm + ": " + foreignKey.NavigationName #>', vw: '<#= detailVwnm #>', nv: '<#= foreignKey.NavigationName #>'},
+<#
+            }
+            
+        }
+    }
+#>
+    ];
+    public <#= OnDetailChangedMethodName #>(v: MatSelectChange) {
+        if(v) {
+            this.<#= SelectedDetailPropName #> = v.value;
+        } else {
+            this.<#= SelectedDetailPropName #> = this.<#= DetailViewsPropName #>[0];
+        }
+        this.<#= ToDetailMethodName #>();
+    }
+    public <#= ToDetailMethodName #>() {
+        if(!this.<#= ShowDetailsPropName #>) return;
+        let isNtDef: boolean = (this.<#= SelectedDetailPropName #> === null) || (typeof this.childForm.<#= selectedRowPropName #> == 'undefined');
+        isNtDef = isNtDef ? isNtDef : ((this.<#= SelectedDetailPropName #>!.vw === null) || (this.<#= SelectedDetailPropName #>!.nv === null) || (this.childForm.<#= selectedRowPropName #> == null))
+        if(isNtDef) {
+            this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route});
+        } else {
+            this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(
+                () => {
+                    let qp: string[] = [];
+                    qp.push( '<#= OutletNameValue +"2" #>' + this.<#= SelectedDetailPropName #>!.vw );
+                    qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(this.childForm.<#= currentRowPropName #>, this.<#= SelectedDetailPropName #>!.nv)));
+                    this.router.navigate([{ outlets: { '<#=  OutletNameValue #>' : qp } }], {relativeTo: this.route});
+                }
+            );
+        }
+    }
 
     onDeleteMultiple(sender: <#= searchComponentClassName #>) {
 <#
@@ -456,8 +532,13 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             if(id < 0) return;
             let mnItm: IMenuItemData = this.rowMenuItemsData[id];
             if (!(typeof mnItm.data === 'undefined')) {
-                qp.push( this.<#= NavPrefix #> +  mnItm.data.view );
-                qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(v.value, mnItm.data.nav)));
+                if(this.<#= OutletNmPropName #> === 'primary') {
+                    qp.push( this.<#= NavPrefix #> +  mnItm.data.view );
+                    qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(v.value, mnItm.data.nav)));
+                } else {
+                    this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('navigation', {message: 'Navigating to detail form is not allowed in One-to-Many mode'});
+                    return;
+                }
             } else {
                 this.onRowCommand.emit(v);
                 return;
@@ -1221,6 +1302,15 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             }
         }
         return sb.ToString();
+    }
+    ModelViewSerializable GetModelViewByName(DbContextSerializable context, string viewName) {
+        if ((context == null) || (string.IsNullOrEmpty(viewName))) {
+            return null;
+        }
+        if (context.ModelViews == null) {
+            return null;
+        }
+        return context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
     }
 
 #>

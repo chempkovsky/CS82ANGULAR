@@ -20,7 +20,7 @@
     string raLazyModuleFolder           = "01972-Ra-lazy.routing.module.ts";
     string ruLazyModuleFolder           = "01974-Ru-lazy.routing.module.ts";
     string rdLazyModuleFolder           = "01976-Rd-lazy.routing.module.ts";
-    string rlMltLazyModuleFolder        = "01978-Rlm-lazy.routing.module.ts";
+    string rlLazyModuleFolder           = "01968-Rl.routing.module.ts";
 
 
     string rvComponentClassName                     = GetComponentClassName(Model, rvComponentFolder);
@@ -37,7 +37,6 @@
     string DepthParamName               = "depth"; 
     string uidParamName                 = "uid"; 
     string OutletNamePrefix             = "oltnm";
-    string MLTDetailPrefix              = "MLTDT";
     string OutletParent                 = "oltParent";
 
     string MaxHeightPropSelector        = "max-height";
@@ -90,7 +89,7 @@ const routes: Routes = [
         Tuple<ModelViewSerializable, string, int> node = nodes[k];
         ModelViewSerializable aModel = node.Item1;
         int CurrDepth = node.Item3 + 1;
-        string fileNm_rlm = GetCrossComponentFolderName(Model, rvComponentLazyRoutingModuleFolder, Context, aModel.ViewName, rlMltLazyModuleFolder);
+        string fileNm_rl  = GetCrossComponentFolderName(Model, rvComponentLazyRoutingModuleFolder, Context, aModel.ViewName, rlLazyModuleFolder);
         string fileNm_rv  = GetCrossComponentFolderName(Model, rvComponentLazyRoutingModuleFolder, Context, aModel.ViewName, rvLazyModuleFolder);
         string fileNm_ra  = GetCrossComponentFolderName(Model, rvComponentLazyRoutingModuleFolder, Context, aModel.ViewName, raLazyModuleFolder);
         string fileNm_ru  = GetCrossComponentFolderName(Model, rvComponentLazyRoutingModuleFolder, Context, aModel.ViewName, ruLazyModuleFolder);
@@ -104,7 +103,7 @@ const routes: Routes = [
 <#
 
         if(aModel.IsWebApiSelectManyWithPagination) {
-            if(!string.IsNullOrEmpty(fileNm_rlm) && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rlMltLazyModuleFolder)))) {
+            if(!string.IsNullOrEmpty(fileNm_rl) && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rlLazyModuleFolder)))) {
 
             
 
@@ -115,7 +114,7 @@ const routes: Routes = [
         outlet: '<#=  OutletNameValue #>',
         path: '<#= OutletNameValue + "2" + VPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + (CurrDepth+100).ToString() + "/:" + IdPrefix + (CurrDepth+100).ToString() #>', 
         loadChildren: () => import('<#= fileNm_rv #>').then(m => m.<#= GetModuleClassName(aModel, rvLazyModuleFolder) #>),
-        data: { <#= OutletParent #>: '<#= OutletNameValue + "2" + aModel.ViewName #>', <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '<#= MLTDetailPrefix #>', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'View <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + (CurrDepth+100).ToString() #>', <#= DepthParamName #>: <#= CurrDepth.ToString() #>},
+        data: { <#= OutletParent #>: '<#= OutletNameValue + "2" + aModel.ViewName #>', <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'View <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + (CurrDepth+100).ToString() #>', <#= DepthParamName #>: <#= CurrDepth.ToString() #>},
         canActivate: [<#= appSettingServiceClassName + "Activator" #>],
     },
 
@@ -145,7 +144,7 @@ const routes: Routes = [
         outlet: '<#=  OutletNameValue #>',
         path: '<#= OutletNameValue + "2" + APrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + (CurrDepth+100).ToString() #>', 
         loadChildren: () => import('<#= fileNm_ra #>').then(m => m.<#= GetModuleClassName(aModel, raLazyModuleFolder) #>),
-        data: { <#= OutletParent#>: '<#= OutletNameValue + "2" + aModel.ViewName #>', <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '<#= MLTDetailPrefix #>', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Add <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>},
+        data: { <#= OutletParent#>: '<#= OutletNameValue + "2" + aModel.ViewName #>', <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Add <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>},
         canActivate: [<#= appSettingServiceClassName + "Activator" #>],
     },
 
@@ -175,7 +174,7 @@ const routes: Routes = [
         outlet: '<#=  OutletNameValue #>',
         path: '<#= OutletNameValue + "2" + UPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + (CurrDepth+100).ToString() + "/:" + IdPrefix + (CurrDepth+100).ToString() #>', 
         loadChildren: () => import('<#= fileNm_ru #>').then(m => m.<#= GetModuleClassName(aModel, ruLazyModuleFolder) #>),
-        data: { <#= OutletParent#>: '<#= OutletNameValue + "2" + aModel.ViewName #>', <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '<#= MLTDetailPrefix #>', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Update <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + (CurrDepth+100).ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>},
+        data: { <#= OutletParent#>: '<#= OutletNameValue + "2" + aModel.ViewName #>', <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Update <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + (CurrDepth+100).ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>},
         canActivate: [<#= appSettingServiceClassName + "Activator" #>],
     },
 
@@ -205,7 +204,7 @@ const routes: Routes = [
         outlet: '<#=  OutletNameValue #>',
         path: '<#= OutletNameValue + "2" + DPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + (CurrDepth+100).ToString() + "/:" + IdPrefix + (CurrDepth+100).ToString() #>', 
         loadChildren: () => import('<#= fileNm_rd #>').then(m => m.<#= GetModuleClassName(aModel, rdLazyModuleFolder) #>),
-        data: { <#= OutletParent#>: '<#= OutletNameValue + "2" + aModel.ViewName #>', <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '<#= MLTDetailPrefix #>', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Delete <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + (CurrDepth+100).ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>},
+        data: { <#= OutletParent#>: '<#= OutletNameValue + "2" + aModel.ViewName #>', <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Delete <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + (CurrDepth+100).ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>},
         canActivate: [<#= appSettingServiceClassName + "Activator" #>],
     },
 
@@ -229,8 +228,8 @@ const routes: Routes = [
     { 
         outlet: '<#=  OutletNameValue #>',
         path: '<#= node.Item2 #>', 
-        loadChildren: () => import('<#= fileNm_rlm #>').then(m => m.<#= GetModuleClassName(aModel, rlMltLazyModuleFolder) #>),
-        data: { <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '<#= MLTDetailPrefix #>', <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
+        loadChildren: () => import('<#= fileNm_rl #>').then(m => m.<#= GetModuleClassName(aModel, rlLazyModuleFolder) #>),
+        data: { <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
         canActivate: [<#= appSettingServiceClassName + "Activator" #>],
     },
 
@@ -239,7 +238,7 @@ const routes: Routes = [
             } else {
 #>
 //
-//warning: for the View   [<#= aModel.ViewName #>] the component [<#= rlMltLazyModuleFolder #>] has not been generated yet
+//warning: for the View   [<#= aModel.ViewName #>] the component [<#= rlLazyModuleFolder #>] has not been generated yet
 //
 <#
             }

@@ -393,9 +393,13 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             if(id < 0) return;
             let mnItm: IMenuItemData = this.rowMenuItemsData[id];
             if (!(typeof mnItm.data === 'undefined')) {
-                if(this.<#= OutletNmPropName #> !== 'primary') return;
-                qp.push( this.<#= NavPrefix #> + mnItm.data.view );
-                qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(v.value, mnItm.data.nav)));
+                if(this.<#= OutletNmPropName #> === 'primary') {
+                    qp.push( this.<#= NavPrefix #> + mnItm.data.view );
+                    qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(v.value, mnItm.data.nav)));
+                } else {
+                    this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('navigation', {message: 'Navigating to detail form is not allowed in One-to-Many mode'});
+                    return;
+                }
             } else {
                 this.onRowCommand.emit(v);
                 return;

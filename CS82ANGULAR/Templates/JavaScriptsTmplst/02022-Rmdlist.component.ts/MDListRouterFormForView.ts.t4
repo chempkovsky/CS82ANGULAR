@@ -644,12 +644,15 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 if(this.<#= OutletNmPropName #> === 'primary') {
                     this.router.navigate(qp, {relativeTo: this.route});
                 } else {
+                    this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('navigation', {message: 'Navigating to detail form is not allowed in One-to-Many mode'});
+/*
                     qp[0] = this.<#= OutletNmPropName #> + '2' + qp[0];
                     this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route.parent!.parent}).then(
                         ()=> {
                             this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: qp }}], {relativeTo: this.route.parent!.parent});
                         }
                     );
+*/
                 }
 
             } else {

@@ -49,6 +49,7 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  flexModuleFolder, rdlFormModuleFolder)#>';
 import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  materialModuleFolder, rdlFormModuleFolder)#>';
@@ -116,6 +117,7 @@ import { <#=  GetModuleClassName(masterView, searchModuleFolder) #> } from '<#= 
     ],
     imports: [
         CommonModule,
+        RouterModule,
         // BrowserModule,
         <#= materialModuleClassName #>,
         <#= flexModuleClassName #>,
