@@ -1,0 +1,219 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "1.",
+    "  Please make sure that you selected src\\app folder",
+    "",
+    "2.",
+    " Please make that AspNet ModelViews has the following names",
+    " (Names are case sensitive)",
+    "     aspnetmodelView",
+    "     aspnetuserView",
+    "     aspnetroleView",
+    "     aspnetuserrolesView",
+    "     aspnetrolemaskView",
+    "     aspnetusermaskView",
+    "     aspnetuserpermsView",
+    "",
+    "",
+    ""
+  ],
+  "BatchItems": [
+
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\raform",
+      "GeneratorType": "01822-RA.component.css",
+      "GeneratorSript": "AddRouterFormForView.css.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\raform",
+      "GeneratorType": "01822-RA.component.html",
+      "GeneratorSript": "AddRouterFormForView.html.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\raform",
+      "GeneratorType": "01822-RA.component.ts",
+      "GeneratorSript": "AddRouterFormForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01952-Ra.module.ts",
+      "GeneratorSript": "raformModuleForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01962-Ra.routing.module.ts",
+      "GeneratorSript": "ra.routing.module.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01972-Ra-lazy.routing.module.ts",
+      "GeneratorSript": "ra-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+
+
+
+
+
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\raform",
+      "GeneratorType": "01822-RA.component.css",
+      "GeneratorSript": "AddRouterFormForView.css.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\raform",
+      "GeneratorType": "01822-RA.component.html",
+      "GeneratorSript": "AddRouterFormForView.html.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\raform",
+      "GeneratorType": "01822-RA.component.ts",
+      "GeneratorSript": "AddRouterFormForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01952-Ra.module.ts",
+      "GeneratorSript": "raformModuleForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01962-Ra.routing.module.ts",
+      "GeneratorSript": "ra.routing.module.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01972-Ra-lazy.routing.module.ts",
+      "GeneratorSript": "ra-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+
+
+
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\raform",
+      "GeneratorType": "01822-RA.component.css",
+      "GeneratorSript": "AddRouterFormForView.css.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\raform",
+      "GeneratorType": "01822-RA.component.html",
+      "GeneratorSript": "AddRouterFormForView.html.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\raform",
+      "GeneratorType": "01822-RA.component.ts",
+      "GeneratorSript": "AddRouterFormForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01952-Ra.module.ts",
+      "GeneratorSript": "raformModuleForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01962-Ra.routing.module.ts",
+      "GeneratorSript": "ra.routing.module.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01972-Ra-lazy.routing.module.ts",
+      "GeneratorSript": "ra-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+
+
+
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\raform",
+      "GeneratorType": "01822-RA.component.css",
+      "GeneratorSript": "AddRouterFormForView.css.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\raform",
+      "GeneratorType": "01822-RA.component.html",
+      "GeneratorSript": "AddRouterFormForView.html.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\raform",
+      "GeneratorType": "01822-RA.component.ts",
+      "GeneratorSript": "AddRouterFormForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01952-Ra.module.ts",
+      "GeneratorSript": "raformModuleForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01962-Ra.routing.module.ts",
+      "GeneratorSript": "ra.routing.module.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01972-Ra-lazy.routing.module.ts",
+      "GeneratorSript": "ra-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\raform",
+      "GeneratorType": "01822-RA.component.css",
+      "GeneratorSript": "AddRouterFormForView.css.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\raform",
+      "GeneratorType": "01822-RA.component.html",
+      "GeneratorSript": "AddRouterFormForView.html.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\raform",
+      "GeneratorType": "01822-RA.component.ts",
+      "GeneratorSript": "AddRouterFormForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01952-Ra.module.ts",
+      "GeneratorSript": "raformModuleForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01962-Ra.routing.module.ts",
+      "GeneratorSript": "ra.routing.module.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01972-Ra-lazy.routing.module.ts",
+      "GeneratorSript": "ra-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    }
+
+
+  ]
+}

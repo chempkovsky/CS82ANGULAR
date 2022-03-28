@@ -46,6 +46,7 @@
     string AppSettingServicePropName    = "appGlblSettings";
     string getAuthIntoMethodName        = "getAuthInto";
     string setAuthIntoMethodName        = "setAuthInto";
+    string vwModelsPropName             = "vwModels";
                                 
 #>
 import { Component } from '@angular/core';
@@ -69,18 +70,26 @@ export class <#= appLogoutComponentClassName #> {
         this.appearance = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
     } 
     doSubmit() {
+        this.<#= AppSettingServicePropName #>.perms = [0,0,0,0,  0,0,0,0,  0,0,0,0,  0,0,  1,0,0];
+        this.<#= AppSettingServicePropName #>.<#= setAuthIntoMethodName #>(null);
+        this.<#= AppSettingServicePropName #>.userName = null;
+        this.<#= AppSettingServicePropName #>.<#= vwModelsPropName #> = {};
+        this.router.navigate(['/']);
+/*
         this.<#= securityServiceName #>.<#= logoutMethodName #>()
         .subscribe({
             next: (respdata: any ) => { // success path
                 this.<#= AppSettingServicePropName #>.perms = [0,0,0,0,  0,0,0,0,  0,0,0,0,  0,0,  1,0,0];
                 this.<#= AppSettingServicePropName #>.<#= setAuthIntoMethodName #>(null);
                 this.<#= AppSettingServicePropName #>.userName = null;
+                this.<#= AppSettingServicePropName #>.<#= vwModelsPropName #> = {};
                 this.router.navigate(['/']);
             },
             error: (error) => { // error path
                 this.appGlblSettings.showError('http', error)
             }
         });
+*/
     }
     onCancel(){
         this.router.navigate(['/']);

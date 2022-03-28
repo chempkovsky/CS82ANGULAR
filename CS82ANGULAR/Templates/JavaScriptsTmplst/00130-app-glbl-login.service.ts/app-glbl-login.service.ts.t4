@@ -50,19 +50,20 @@ export class <#= appLoginServiceClassName #> {
         this.serviceUrl = this.<#= AppSettingServicePropName #>.getSecurityWebApiPrefix();  
     }
     login(usrNm: string, pssWrd: string): Observable<any> {
-        /*
+        
             let rqDt: <#= appLoginModelClassName #> = {
                 username: usrNm, 
                 password: pssWrd,
                 grant_type: 'password'
             };
             return this.http.post<<#= appLoginModelClassName #>>(this.serviceUrl+'token', rqDt); 
-        */
+        /*
         let params: HttpParams  = new HttpParams();
         params = params.append('username', usrNm);
         params = params.append('password', pssWrd);
         params = params.append('grant_type', 'password');
         return this.http.post(this.serviceUrl+'token', params.toString());
+        */
     }
     register(rqDt: <#= appRegisterModelClassName #>): Observable<any> {
         return this.http.post<<#= appLoginModelClassName #>>(this.serviceUrl+'api/Account/Register', rqDt); 
@@ -72,6 +73,10 @@ export class <#= appLoginServiceClassName #> {
     }
     changePassword(chPwd: <#= appChangePasswordModelClassName #>): Observable<any> {
         return this.http.post<<#= appChangePasswordModelClassName #>>(this.serviceUrl+'api/Account/ChangePassword', chPwd); 
+    }
+    getPermissions() {
+        let str: string = this.<#= AppSettingServicePropName #>.getPermissionWebApiPrefix();  
+        return this.http.get<{modelName: string, userPerms: number}[]>(str+'api/aspnetuserpermsviewwebapi/getall');
     }
 }
 

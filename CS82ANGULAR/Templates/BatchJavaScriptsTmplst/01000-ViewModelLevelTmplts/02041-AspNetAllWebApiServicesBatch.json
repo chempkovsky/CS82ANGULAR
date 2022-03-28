@@ -1,0 +1,134 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "1.",
+    "  Please make sure that you selected src\\app folder",
+    "",
+    "2.",
+    " Please make that AspNet ModelViews has the following names",
+    " (Names are case sensitive)",
+    "     aspnetmodelView",
+    "     aspnetuserView",
+    "     aspnetroleView",
+    "     aspnetuserrolesView",
+    "     aspnetrolemaskView",
+    "     aspnetusermaskView",
+    "     aspnetuserpermsView",
+    "",
+    "",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "services\\aspnetmodel-view",
+      "GeneratorType": "01400-.service.ts",
+      "GeneratorSript": "WebServiceForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "services\\aspnetmodel-view",
+      "GeneratorType": "01418-Datasource.class.ts",
+      "GeneratorSript": "Datasource.class.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+
+
+    {
+      "DestinationFolder": "services\\aspnetuser-view",
+      "GeneratorType": "01400-.service.ts",
+      "GeneratorSript": "WebServiceForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "services\\aspnetuser-view",
+      "GeneratorType": "01418-Datasource.class.ts",
+      "GeneratorSript": "Datasource.class.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+
+
+    {
+      "DestinationFolder": "services\\aspnetrole-view",
+      "GeneratorType": "01400-.service.ts",
+      "GeneratorSript": "WebServiceForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "services\\aspnetrole-view",
+      "GeneratorType": "01418-Datasource.class.ts",
+      "GeneratorSript": "Datasource.class.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+
+
+    {
+      "DestinationFolder": "services\\aspnetuserroles-view",
+      "GeneratorType": "01400-.service.ts",
+      "GeneratorSript": "WebServiceForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "services\\aspnetuserroles-view",
+      "GeneratorType": "01418-Datasource.class.ts",
+      "GeneratorSript": "Datasource.class.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+
+    {
+      "DestinationFolder": "services\\aspnetuserroles-view",
+      "GeneratorType": "01400-.service.ts",
+      "GeneratorSript": "WebServiceForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "services\\aspnetuserroles-view",
+      "GeneratorType": "01418-Datasource.class.ts",
+      "GeneratorSript": "Datasource.class.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+
+    {
+      "DestinationFolder": "services\\aspnetrolemask-view",
+      "GeneratorType": "01400-.service.ts",
+      "GeneratorSript": "WebServiceForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "services\\aspnetrolemask-view",
+      "GeneratorType": "01418-Datasource.class.ts",
+      "GeneratorSript": "Datasource.class.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+
+    {
+      "DestinationFolder": "services\\aspnetusermask-view",
+      "GeneratorType": "01400-.service.ts",
+      "GeneratorSript": "WebServiceForView.ts.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "services\\aspnetusermask-view",
+      "GeneratorType": "01418-Datasource.class.ts",
+      "GeneratorSript": "Datasource.class.ts.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+
+    {
+      "DestinationFolder": "services\\aspnetuserperms-view",
+      "GeneratorType": "01400-.service.ts",
+      "GeneratorSript": "WebServiceForView.ts.t4",
+      "ViewModel": "aspnetuserpermsView"
+    },
+    {
+      "DestinationFolder": "services\\aspnetuserperms-view",
+      "GeneratorType": "01418-Datasource.class.ts",
+      "GeneratorSript": "Datasource.class.ts.t4",
+      "ViewModel": "aspnetuserpermsView"
+    }
+
+
+
+  ]
+
+}

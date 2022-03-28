@@ -124,6 +124,7 @@ namespace <#= GetNameSpaceName(Model, accountcontrollerFolder, DefaultProjectNam
         }
 
         // POST api/Account/ChangePassword
+        [HttpPost]
         [Route("api/[controller]/ChangePassword")]
         public async Task<ActionResult> ChangePassword(<#= GetEntityClassName(Model, changepasswordBindingModelFolder) #> model)
         {

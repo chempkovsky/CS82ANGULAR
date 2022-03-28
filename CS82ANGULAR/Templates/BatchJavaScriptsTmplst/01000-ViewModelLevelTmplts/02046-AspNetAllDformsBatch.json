@@ -1,0 +1,277 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "1.",
+    "  Please make sure that you selected src\\app folder",
+    "",
+    "2.",
+    " Please make that AspNet ModelViews has the following names",
+    " (Names are case sensitive)",
+    "     aspnetmodelView",
+    "     aspnetuserView",
+    "     aspnetroleView",
+    "     aspnetuserrolesView",
+    "     aspnetrolemaskView",
+    "     aspnetusermaskView",
+    "     aspnetuserpermsView",
+    "",
+    "",
+    ""
+  ],
+  "BatchItems": [
+
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\dform",
+      "GeneratorType": "01506-Dform.component.css",
+      "GeneratorSript": "DelFormForView.css.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\dform",
+      "GeneratorType": "01506-Dform.component.html",
+      "GeneratorSript": "DelFormForView.html.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\dform",
+      "GeneratorType": "01506-Dform.component.ts",
+      "GeneratorSript": "DelFormForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\ddlg",
+      "GeneratorType": "01516-Ddlg.interface.ts",
+      "GeneratorSript": "InterfaceForDdlg.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\ddlg",
+      "GeneratorType": "01526-Ddlg.component.css",
+      "GeneratorSript": "DelDlgFormForView.css.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\ddlg",
+      "GeneratorType": "01526-Ddlg.component.html",
+      "GeneratorSript": "DelDlgFormForView.html.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\ddlg",
+      "GeneratorType": "01526-Ddlg.component.ts",
+      "GeneratorSript": "DelDlgFormForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01556-D.module.ts",
+      "GeneratorSript": "dformModuleForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+
+
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\dform",
+      "GeneratorType": "01506-Dform.component.css",
+      "GeneratorSript": "DelFormForView.css.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\dform",
+      "GeneratorType": "01506-Dform.component.html",
+      "GeneratorSript": "DelFormForView.html.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\dform",
+      "GeneratorType": "01506-Dform.component.ts",
+      "GeneratorSript": "DelFormForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\ddlg",
+      "GeneratorType": "01516-Ddlg.interface.ts",
+      "GeneratorSript": "InterfaceForDdlg.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\ddlg",
+      "GeneratorType": "01526-Ddlg.component.css",
+      "GeneratorSript": "DelDlgFormForView.css.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\ddlg",
+      "GeneratorType": "01526-Ddlg.component.html",
+      "GeneratorSript": "DelDlgFormForView.html.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\ddlg",
+      "GeneratorType": "01526-Ddlg.component.ts",
+      "GeneratorSript": "DelDlgFormForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01556-D.module.ts",
+      "GeneratorSript": "dformModuleForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+
+
+
+
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\dform",
+      "GeneratorType": "01506-Dform.component.css",
+      "GeneratorSript": "DelFormForView.css.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\dform",
+      "GeneratorType": "01506-Dform.component.html",
+      "GeneratorSript": "DelFormForView.html.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\dform",
+      "GeneratorType": "01506-Dform.component.ts",
+      "GeneratorSript": "DelFormForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\ddlg",
+      "GeneratorType": "01516-Ddlg.interface.ts",
+      "GeneratorSript": "InterfaceForDdlg.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\ddlg",
+      "GeneratorType": "01526-Ddlg.component.css",
+      "GeneratorSript": "DelDlgFormForView.css.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\ddlg",
+      "GeneratorType": "01526-Ddlg.component.html",
+      "GeneratorSript": "DelDlgFormForView.html.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\ddlg",
+      "GeneratorType": "01526-Ddlg.component.ts",
+      "GeneratorSript": "DelDlgFormForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01556-D.module.ts",
+      "GeneratorSript": "dformModuleForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+
+
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\dform",
+      "GeneratorType": "01506-Dform.component.css",
+      "GeneratorSript": "DelFormForView.css.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\dform",
+      "GeneratorType": "01506-Dform.component.html",
+      "GeneratorSript": "DelFormForView.html.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\dform",
+      "GeneratorType": "01506-Dform.component.ts",
+      "GeneratorSript": "DelFormForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\ddlg",
+      "GeneratorType": "01516-Ddlg.interface.ts",
+      "GeneratorSript": "InterfaceForDdlg.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\ddlg",
+      "GeneratorType": "01526-Ddlg.component.css",
+      "GeneratorSript": "DelDlgFormForView.css.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\ddlg",
+      "GeneratorType": "01526-Ddlg.component.html",
+      "GeneratorSript": "DelDlgFormForView.html.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\ddlg",
+      "GeneratorType": "01526-Ddlg.component.ts",
+      "GeneratorSript": "DelDlgFormForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01556-D.module.ts",
+      "GeneratorSript": "dformModuleForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+
+
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\dform",
+      "GeneratorType": "01506-Dform.component.css",
+      "GeneratorSript": "DelFormForView.css.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\dform",
+      "GeneratorType": "01506-Dform.component.html",
+      "GeneratorSript": "DelFormForView.html.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\dform",
+      "GeneratorType": "01506-Dform.component.ts",
+      "GeneratorSript": "DelFormForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\ddlg",
+      "GeneratorType": "01516-Ddlg.interface.ts",
+      "GeneratorSript": "InterfaceForDdlg.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\ddlg",
+      "GeneratorType": "01526-Ddlg.component.css",
+      "GeneratorSript": "DelDlgFormForView.css.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\ddlg",
+      "GeneratorType": "01526-Ddlg.component.html",
+      "GeneratorSript": "DelDlgFormForView.html.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\ddlg",
+      "GeneratorType": "01526-Ddlg.component.ts",
+      "GeneratorSript": "DelDlgFormForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01556-D.module.ts",
+      "GeneratorSript": "dformModuleForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    }
+
+
+  ]
+}

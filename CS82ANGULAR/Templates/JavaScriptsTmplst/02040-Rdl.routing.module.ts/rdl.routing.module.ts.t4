@@ -46,6 +46,10 @@
     string NavPrefix                    = "NavPrefix";
     string DlOutletNamePrefix           = "dloltnm";
 
+    string routeDataViewNamePropName        = "vn";
+    string routeDataViewActionPropName      = "va";
+    string routeDataShowMultiSelectPropName = "showMultiSelect";
+
     string OutletNameValue = DlOutletNamePrefix + Model.ViewName;
     // Model, url, depth
     List<Tuple<ModelViewSerializable, string, int>> nodes = new List<Tuple<ModelViewSerializable, string, int>>();
@@ -103,7 +107,7 @@ const routes: Routes = [
         outlet: '<#=  OutletNameValue #>',
         path: '<#= node.Item2 #>', 
         loadChildren: () => import('<#= fileNm_rdl #>').then(m => m.<#= GetModuleClassName(aModel, rdlLazyModuleFolder) #>),
-        data: { <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
+        data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
         canActivate: [<#= appSettingServiceClassName + "Activator" #>],
     },
 

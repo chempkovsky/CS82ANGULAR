@@ -33,6 +33,9 @@
     string TitlePropName                = "title";
 
 
+    string routeDataViewNamePropName        = "vn";
+    string routeDataViewActionPropName      = "va";
+    string routeDataShowMultiSelectPropName = "showMultiSelect";
 
 
                                            
@@ -133,7 +136,7 @@
 #>
     { path: '<#= node.Item2 + "/" + VPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
         loadChildren: () => import('<#= fileNm_rv #>').then(m => m.<#= GetModuleClassName(aModel, rvLazyModuleFolder) #>),
-        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'View <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>', <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
+        data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'v', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'View <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>', <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
                     } else {
@@ -159,7 +162,7 @@
 #>
     { path: '<#= node.Item2 + "/" + APrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() #>', 
         loadChildren: () => import('<#= fileNm_ra #>').then(m => m.<#= GetModuleClassName(aModel, raLazyModuleFolder) #>),
-        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Add <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
+        data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'a', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Add <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
                     } else {
@@ -185,7 +188,7 @@
 #>
     { path: '<#= node.Item2 + "/" + UPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
         loadChildren: () => import('<#= fileNm_ru #>').then(m => m.<#= GetModuleClassName(aModel, ruLazyModuleFolder) #>),
-        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Update <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
+        data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'u', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Update <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
                     } else {
@@ -211,7 +214,7 @@
 #>
     { path: '<#= node.Item2 + "/" + DPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
         loadChildren: () => import('<#= fileNm_rd #>').then(m => m.<#= GetModuleClassName(aModel, rdLazyModuleFolder) #>),
-        data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Delete <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
+        data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'd', <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Delete <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
                     } else {
@@ -234,7 +237,7 @@
 #>
     { path: '<#= node.Item2 #>', 
         loadChildren: () => import('<#= fileNm_rl #>').then(m => m.<#= GetModuleClassName(aModel, rlLazyModuleFolder) #>),
-        data: { <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + node.Item3.ToString() #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+        data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true,  <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>', <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + node.Item3.ToString() #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
 
@@ -242,7 +245,7 @@
 #>
     { path: '<#= node.Item2 #>', 
         loadChildren: () => import('<#= fileNm_rl #>').then(m => m.<#= GetModuleClassName(aModel, rlLazyModuleFolder) #>),
-        data: { <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+        data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true,  <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List <#= aModel.ViewName #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
                 } // if(node.Item3 > 1) { ... } else { ... }

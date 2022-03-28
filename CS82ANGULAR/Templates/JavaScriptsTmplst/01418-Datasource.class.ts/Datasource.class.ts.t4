@@ -150,8 +150,9 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
             string IsRequiredInView = prop.IsRequiredInView ? "true" : "false";
             string fk = string.IsNullOrEmpty( prop.ForeignKeyName ) ? "" : prop.ForeignKeyName;
             string fkchain = string.IsNullOrEmpty( prop.ForeignKeyNameChain ) ? "" : prop.ForeignKeyNameChain;
+            string defVal = IsBooleanTypeName(prop) ? "false" : "undefined";
 #>
-      '<#= GetTypeScriptPropertyName(prop, Model) #>': undefined,  // <#= GetPropertyTypeScriptTypeName(prop) #>, <#= GetPropertyTypeName(prop) #>
+      '<#= GetTypeScriptPropertyName(prop, Model) #>': <#= defVal #>,  // <#= GetPropertyTypeScriptTypeName(prop) #>, <#= GetPropertyTypeName(prop) #>
 <#
 
         }
@@ -252,7 +253,11 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         return this._<#= ValuesSuffix #>[key];
     }
     public set<#= ValueSuffix #>(key: string, value: any): void {
-        return this._<#= ValuesSuffix #>[key] = value;
+        if( this.<#= formRootService #>.getDtTp<#= ValueSuffix #>(key) === 'boolean' ) {
+            if(typeof value === 'undefined') { this._<#= ValuesSuffix #>[key] = false; } else { this._<#= ValuesSuffix #>[key] = value; }
+        } else {
+            return this._<#= ValuesSuffix #>[key] = value;
+        }
     }
     public getByOrg<#= ValueSuffix #>(org: string, fkchain: string): any {
         let i: string|any = this.<#= formRootService #>.getKeyByOrg<#= ValueSuffix #>(org, fkchain);
@@ -279,13 +284,22 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         return true;
     }
     public clear<#= ValueSuffix #>(key: string): void {
-        return this._<#= ValuesSuffix #>[key] = undefined;
+        if( this.<#= formRootService #>.getDtTp<#= ValueSuffix #>(key) === 'boolean' ) {
+            this._<#= ValuesSuffix #>[key] = false;
+        } else {
+            this._<#= ValuesSuffix #>[key] = undefined;
+        }
     }
     public <#= ClearMethodName #>(doNotify: boolean = true): boolean {
         let hasChanged: boolean = false;
         for(let i in this._<#= ValuesSuffix #>) {
-            if (typeof this._<#= ValuesSuffix #>[i] !== 'undefined') hasChanged = true;
-            this._<#= ValuesSuffix #>[i] = undefined;
+            if( this.<#= formRootService #>.getDtTp<#= ValueSuffix #>(i) === 'boolean' ) {
+                if (this._<#= ValuesSuffix #>[i] !== false) hasChanged = true;
+                this._<#= ValuesSuffix #>[i] = false;
+            } else {
+                if (typeof this._<#= ValuesSuffix #>[i] !== 'undefined') hasChanged = true;
+                this._<#= ValuesSuffix #>[i] = undefined;
+            }
         }
         if(!hasChanged) return hasChanged;
         if(doNotify) this.<#= DoEmitEventMethodName #>(true);
@@ -1419,6 +1433,14 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
             return prop.UnderlyingTypeName + " ?";
         }
         return prop.UnderlyingTypeName;
+    }
+    bool IsBooleanTypeName(ModelViewPropertyOfVwSerializable prop)
+    {
+        if(prop == null) return false;
+        return 
+            "System.Boolean".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase) || 
+            "Boolean".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase) ||
+            "bool".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase) ;
     }
     string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
         string result="./";

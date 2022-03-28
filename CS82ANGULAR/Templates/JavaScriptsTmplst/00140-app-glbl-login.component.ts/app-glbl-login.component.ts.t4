@@ -39,6 +39,7 @@
     string AppSettingServicePropName    = "appGlblSettings";
     string getAuthIntoMethodName        = "getAuthInto";
     string setAuthIntoMethodName        = "setAuthInto";
+    string vwModelsPropName             = "vwModels";
 
                                 
 #>
@@ -93,6 +94,18 @@ export class <#= appLoginComponentClassName #> {
                 this.<#= AppSettingServicePropName #>.<#= setAuthIntoMethodName #>(respdata);
                 this.<#= AppSettingServicePropName #>.userName = this.loginFormGroup.controls['username'].value;
                 this.router.navigate(['/']);
+
+                this.<#= securityServiceName #>.getPermissions().subscribe({
+                    next: (rspdt: {modelName: string, userPerms: number}[]) => {
+                        this.<#= AppSettingServicePropName #>.<#= vwModelsPropName #> = {};
+                        rspdt.forEach((r: {modelName: string, userPerms: number}) => {
+                            this.<#= AppSettingServicePropName #>.<#= vwModelsPropName #>[r.modelName] = r.userPerms;
+                        });
+                    },
+                    error: (error) => { 
+                        this.appGlblSettings.showError('http', error)
+                    }
+                });
             },
             error: (error) => { // error path
                 this.appGlblSettings.showError('http', error)

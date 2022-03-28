@@ -143,6 +143,7 @@
 
     List<ModelViewPropertyOfVwSerializable> primKeys= GetModelPrimaryKeyProps(Model);
     List<string> detailViewNames =  GetDetailViews(Model, Context, null);
+    List<string> detailViewNamesToExclude = new List<string>();
 
     string OnBackBtnMethodName          = "onBackBtnMd";
     string OnBackBtnPropName            = "onBackBtn";
@@ -337,6 +338,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         }
         int id = 1;
         foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
             ModelViewSerializable detailView = GetViewByName(Context, detailViewName);
             if(detailView == null) {
                 continue;
@@ -396,6 +398,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
 <#
     {
         foreach(string detailVwnm in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailVwnm)) continue;
             ModelViewSerializable detail = GetModelViewByName(Context, detailVwnm);
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detail, null);
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
@@ -421,7 +424,9 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         let isNtDef: boolean = (this.<#= SelectedDetailPropName #> === null) || (typeof this.childForm.<#= selectedRowPropName #> == 'undefined');
         isNtDef = isNtDef ? isNtDef : ((this.<#= SelectedDetailPropName #>!.vw === null) || (this.<#= SelectedDetailPropName #>!.nv === null) || (this.childForm.<#= selectedRowPropName #> == null))
         if(isNtDef) {
-            this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route});
+            this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(()=>{
+                this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route});
+            });
         } else {
             this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(
                 () => {
@@ -546,7 +551,9 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         }
         // this.router.navigate(qp, {relativeTo: this.route});
         if(this.<#= OutletNmPropName #> === 'primary') {
-            this.router.navigate(qp, {relativeTo: this.route});
+            this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(()=>{
+                this.router.navigate(qp, {relativeTo: this.route})
+            });
         } else {
             qp[0] = this.<#= OutletNmPropName #> + '2' + qp[0];
             this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route.parent!.parent}).then(
@@ -569,7 +576,9 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             }
             // this.router.navigate(qp, {relativeTo: this.route});
             if(this.<#= OutletNmPropName #> === 'primary') {
-                this.router.navigate(qp, {relativeTo: this.route});
+                this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(()=>{
+                    this.router.navigate(qp, {relativeTo: this.route});
+                });
             } else {
                 qp[0] = this.<#= OutletNmPropName #> + '2' + qp[0];
                 this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route.parent!.parent}).then(
@@ -682,7 +691,9 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             this.<#= AppSettingServicePropName #>.<#= removeStorageItemMethodName #>(this.<#= uidParamName #> as string);
             // this.router.navigate(['../../'], {relativeTo: this.route});
             if(this.<#= OutletNmPropName #> === 'primary') {
-                this.router.navigate(['../../'], {relativeTo: this.route});
+                this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(()=>{
+                    this.router.navigate(['../../'], {relativeTo: this.route});
+                });
             } else {
                 // there is no parant, so do just hide detail component
                 this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: null }}], {relativeTo: this.route.parent!.parent});

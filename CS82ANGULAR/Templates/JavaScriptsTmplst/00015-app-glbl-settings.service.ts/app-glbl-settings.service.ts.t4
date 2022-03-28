@@ -26,7 +26,7 @@
     string removeStorageItemMethodName  = "removeStorageItem";
     string getStorageKeyMethodName      = "getStorageKey";
     string clearStorageMethodName       = "clearStorage";
-
+    string vwModelsPropName             = "vwModels";
 
 
 
@@ -94,14 +94,18 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
                 //
                 // here: defining url by ViewName
                 //
-                reslt = 'http://localhost:50819/';
+                reslt = 'https://localhost:7148/';
             }
         }
         return reslt;
     } 
     public getSecurityWebApiPrefix(): string {
-        return 'http://localhost:50819/';
+        return 'https://localhost:7148/';
     } 
+    public getPermissionWebApiPrefix(): string {
+        return 'https://localhost:7148/';
+    }
+
     getValidationErrorMessage(fc: AbstractControl): string {
         let rslt: string = 'Validation Error. ';
         if (typeof fc === 'undefined') {
@@ -186,7 +190,7 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
     }
 
     public perms: number[] = [0,0,0,0,  0,0,0,0,  0,0,0,0,  0,0,  1,0,0];
-    vwModels:  { [key: string]: number } = {
+    public <#= vwModelsPropName #>:  { [key: string]: number } = {
 /*        
         'LitAuthorView': 0,
         'LitBookView': 1,
@@ -199,13 +203,19 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
         'LitPublisherView':8,
 */
     };
-    dshBrds:  { [key: string]: number } = {
+    public dshBrds:  { [key: string]: number } = {
 /*
       'FirstFtrComponent': 0
 */
     };
     getViewModelMask(vwModel: string): number {
-      return 15; // delete this line when vwModels is ready
+      return 15; // delete this line when <#= vwModelsPropName #> is ready
+      let pk = this.<#= vwModelsPropName #>[vwModel];
+      if(typeof pk === 'undefined') { return 0; } else { return pk; }
+/*
+
+deprecated
+
       let pk = this.vwModels[vwModel];
       if(typeof pk === 'undefined') return 0;
       let rid: number = Math.floor(pk/7);
@@ -216,9 +226,16 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
         rslt = this.perms[rid] >> sft;
       }
       return rslt; 
+*/
     }
     getDashBrdMask(dshBrd: string): number {
       return 1; // delete this line when dshBrds is ready
+      let pk = this.dshBrds[dshBrd];
+      if(typeof pk === 'undefined') { return 0; } else { return pk; }
+/* 
+
+deprecated
+
       let pk = this.dshBrds[dshBrd];
       if(typeof pk === 'undefined') return 0;
       let rid: number = Math.floor(pk/31);
@@ -229,8 +246,32 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
         rslt = (this.perms[rid+14]) >> sft;
       }
       return rslt; 
+*/
     }
     canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean  {
+      if((typeof childRoute.data['vn'] === 'undefined') || (typeof childRoute.data['va'] === 'undefined')) return false;
+      if((childRoute.data['vn'] === null) || (childRoute.data['va'] === null)) return false;
+      let msk = this.getViewModelMask(childRoute.data['vn']);
+      let rslt: boolean = false;
+
+      switch( childRoute.data['va'] ) {
+        case 'a':
+          rslt = ((msk & 8) === 8);
+        case 'u':
+          rslt = ((msk & 4) === 4);
+        case 'd':
+          rslt = ((msk & 2) === 2);
+        case 'l':
+          rslt = ((msk & 1) === 1);
+        case 'v':
+          rslt = ((msk & 1) === 1);
+      };
+      if(!rslt) this.<#= ShowErrorMethodName #>('navigation', {message: 'Access denied'});
+      return rslt;
+/*
+
+deprecated
+
       if (childRoute.routeConfig === null) return false;
       if ( typeof ((childRoute.routeConfig as Route).path) === 'undefined') return false;
       let pth: string[] = ((childRoute.routeConfig as Route).path as string).split('/');
@@ -267,6 +308,7 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
         };
       } 
       return (this.getViewModelMask(vnm) & act) === act;
+*/
     }
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean  {
       if(route.routeConfig === null) return false;

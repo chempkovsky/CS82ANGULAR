@@ -1,0 +1,277 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "1.",
+    "  Please make sure that you selected src\\app folder",
+    "",
+    "2.",
+    " Please make that AspNet ModelViews has the following names",
+    " (Names are case sensitive)",
+    "     aspnetmodelView",
+    "     aspnetuserView",
+    "     aspnetroleView",
+    "     aspnetuserrolesView",
+    "     aspnetrolemaskView",
+    "     aspnetusermaskView",
+    "     aspnetuserpermsView",
+    "",
+    "",
+    ""
+  ],
+  "BatchItems": [
+
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\uform",
+      "GeneratorType": "01504-Uform.component.css",
+      "GeneratorSript": "UpdFormForView.css.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\uform",
+      "GeneratorType": "01504-Uform.component.html",
+      "GeneratorSript": "UpdFormForView.html.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\uform",
+      "GeneratorType": "01504-Uform.component.ts",
+      "GeneratorSript": "UpdFormForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\udlg",
+      "GeneratorType": "01514-Udlg.interface.ts",
+      "GeneratorSript": "InterfaceForUdlg.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\udlg",
+      "GeneratorType": "01524-Udlg.component.css",
+      "GeneratorSript": "UpdDlgFormForView.css.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\udlg",
+      "GeneratorType": "01524-Udlg.component.html",
+      "GeneratorSript": "UpdDlgFormForView.html.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\udlg",
+      "GeneratorType": "01524-Udlg.component.ts",
+      "GeneratorSript": "UpdDlgFormForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01554-U.module.ts",
+      "GeneratorSript": "uformModuleForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+
+
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\uform",
+      "GeneratorType": "01504-Uform.component.css",
+      "GeneratorSript": "UpdFormForView.css.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\uform",
+      "GeneratorType": "01504-Uform.component.html",
+      "GeneratorSript": "UpdFormForView.html.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\uform",
+      "GeneratorType": "01504-Uform.component.ts",
+      "GeneratorSript": "UpdFormForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\udlg",
+      "GeneratorType": "01514-Udlg.interface.ts",
+      "GeneratorSript": "InterfaceForUdlg.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\udlg",
+      "GeneratorType": "01524-Udlg.component.css",
+      "GeneratorSript": "UpdDlgFormForView.css.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\udlg",
+      "GeneratorType": "01524-Udlg.component.html",
+      "GeneratorSript": "UpdDlgFormForView.html.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\udlg",
+      "GeneratorType": "01524-Udlg.component.ts",
+      "GeneratorSript": "UpdDlgFormForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01554-U.module.ts",
+      "GeneratorSript": "uformModuleForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+
+
+
+
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\uform",
+      "GeneratorType": "01504-Uform.component.css",
+      "GeneratorSript": "UpdFormForView.css.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\uform",
+      "GeneratorType": "01504-Uform.component.html",
+      "GeneratorSript": "UpdFormForView.html.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\uform",
+      "GeneratorType": "01504-Uform.component.ts",
+      "GeneratorSript": "UpdFormForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\udlg",
+      "GeneratorType": "01514-Udlg.interface.ts",
+      "GeneratorSript": "InterfaceForUdlg.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\udlg",
+      "GeneratorType": "01524-Udlg.component.css",
+      "GeneratorSript": "UpdDlgFormForView.css.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\udlg",
+      "GeneratorType": "01524-Udlg.component.html",
+      "GeneratorSript": "UpdDlgFormForView.html.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\udlg",
+      "GeneratorType": "01524-Udlg.component.ts",
+      "GeneratorSript": "UpdDlgFormForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01554-U.module.ts",
+      "GeneratorSript": "uformModuleForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+
+
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\uform",
+      "GeneratorType": "01504-Uform.component.css",
+      "GeneratorSript": "UpdFormForView.css.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\uform",
+      "GeneratorType": "01504-Uform.component.html",
+      "GeneratorSript": "UpdFormForView.html.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\uform",
+      "GeneratorType": "01504-Uform.component.ts",
+      "GeneratorSript": "UpdFormForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\udlg",
+      "GeneratorType": "01514-Udlg.interface.ts",
+      "GeneratorSript": "InterfaceForUdlg.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\udlg",
+      "GeneratorType": "01524-Udlg.component.css",
+      "GeneratorSript": "UpdDlgFormForView.css.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\udlg",
+      "GeneratorType": "01524-Udlg.component.html",
+      "GeneratorSript": "UpdDlgFormForView.html.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\udlg",
+      "GeneratorType": "01524-Udlg.component.ts",
+      "GeneratorSript": "UpdDlgFormForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01554-U.module.ts",
+      "GeneratorSript": "uformModuleForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+
+
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\uform",
+      "GeneratorType": "01504-Uform.component.css",
+      "GeneratorSript": "UpdFormForView.css.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\uform",
+      "GeneratorType": "01504-Uform.component.html",
+      "GeneratorSript": "UpdFormForView.html.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\uform",
+      "GeneratorType": "01504-Uform.component.ts",
+      "GeneratorSript": "UpdFormForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\udlg",
+      "GeneratorType": "01514-Udlg.interface.ts",
+      "GeneratorSript": "InterfaceForUdlg.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\udlg",
+      "GeneratorType": "01524-Udlg.component.css",
+      "GeneratorSript": "UpdDlgFormForView.css.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\udlg",
+      "GeneratorType": "01524-Udlg.component.html",
+      "GeneratorSript": "UpdDlgFormForView.html.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\udlg",
+      "GeneratorType": "01524-Udlg.component.ts",
+      "GeneratorSript": "UpdDlgFormForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01554-U.module.ts",
+      "GeneratorSript": "uformModuleForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    }
+
+
+  ]
+}

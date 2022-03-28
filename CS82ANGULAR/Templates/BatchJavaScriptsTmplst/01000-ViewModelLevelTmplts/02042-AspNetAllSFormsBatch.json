@@ -1,0 +1,327 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "1.",
+    "  Please make sure that you selected src\\app folder",
+    "",
+    "2.",
+    " Please make that AspNet ModelViews has the following names",
+    " (Names are case sensitive)",
+    "     aspnetmodelView",
+    "     aspnetuserView",
+    "     aspnetroleView",
+    "     aspnetuserrolesView",
+    "     aspnetrolemaskView",
+    "     aspnetusermaskView",
+    "     aspnetuserpermsView",
+    "",
+    "",
+    ""
+  ],
+  "BatchItems": [
+
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\sform",
+      "GeneratorType": "01420-Sform.component.css",
+      "GeneratorSript": "SearchFormForView.css.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\sform",
+      "GeneratorType": "01420-Sform.component.html",
+      "GeneratorSript": "SearchFormForView.html.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\sform",
+      "GeneratorType": "01420-Sform.component.ts",
+      "GeneratorSript": "SearchFormForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\sdlg",
+      "GeneratorType": "01430-Dlg.interface.ts",
+      "GeneratorSript": "InterfaceForDlg.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.css",
+      "GeneratorSript": "SearchDlgFormForView.css.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.html",
+      "GeneratorSript": "SearchDlgFormForView.html.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.ts",
+      "GeneratorSript": "SearchDlgFormForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01450-S.module.ts",
+      "GeneratorSript": "SearchModuleForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+
+
+
+
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\sform",
+      "GeneratorType": "01420-Sform.component.css",
+      "GeneratorSript": "SearchFormForView.css.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\sform",
+      "GeneratorType": "01420-Sform.component.html",
+      "GeneratorSript": "SearchFormForView.html.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\sform",
+      "GeneratorType": "01420-Sform.component.ts",
+      "GeneratorSript": "SearchFormForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\sdlg",
+      "GeneratorType": "01430-Dlg.interface.ts",
+      "GeneratorSript": "InterfaceForDlg.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.css",
+      "GeneratorSript": "SearchDlgFormForView.css.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.html",
+      "GeneratorSript": "SearchDlgFormForView.html.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.ts",
+      "GeneratorSript": "SearchDlgFormForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01450-S.module.ts",
+      "GeneratorSript": "SearchModuleForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+
+
+
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\sform",
+      "GeneratorType": "01420-Sform.component.css",
+      "GeneratorSript": "SearchFormForView.css.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\sform",
+      "GeneratorType": "01420-Sform.component.html",
+      "GeneratorSript": "SearchFormForView.html.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\sform",
+      "GeneratorType": "01420-Sform.component.ts",
+      "GeneratorSript": "SearchFormForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\sdlg",
+      "GeneratorType": "01430-Dlg.interface.ts",
+      "GeneratorSript": "InterfaceForDlg.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.css",
+      "GeneratorSript": "SearchDlgFormForView.css.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.html",
+      "GeneratorSript": "SearchDlgFormForView.html.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.ts",
+      "GeneratorSript": "SearchDlgFormForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01450-S.module.ts",
+      "GeneratorSript": "SearchModuleForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+
+
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\sform",
+      "GeneratorType": "01420-Sform.component.css",
+      "GeneratorSript": "SearchFormForView.css.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\sform",
+      "GeneratorType": "01420-Sform.component.html",
+      "GeneratorSript": "SearchFormForView.html.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\sform",
+      "GeneratorType": "01420-Sform.component.ts",
+      "GeneratorSript": "SearchFormForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\sdlg",
+      "GeneratorType": "01430-Dlg.interface.ts",
+      "GeneratorSript": "InterfaceForDlg.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.css",
+      "GeneratorSript": "SearchDlgFormForView.css.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.html",
+      "GeneratorSript": "SearchDlgFormForView.html.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.ts",
+      "GeneratorSript": "SearchDlgFormForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01450-S.module.ts",
+      "GeneratorSript": "SearchModuleForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+
+
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\sform",
+      "GeneratorType": "01420-Sform.component.css",
+      "GeneratorSript": "SearchFormForView.css.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\sform",
+      "GeneratorType": "01420-Sform.component.html",
+      "GeneratorSript": "SearchFormForView.html.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\sform",
+      "GeneratorType": "01420-Sform.component.ts",
+      "GeneratorSript": "SearchFormForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\sdlg",
+      "GeneratorType": "01430-Dlg.interface.ts",
+      "GeneratorSript": "InterfaceForDlg.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.css",
+      "GeneratorSript": "SearchDlgFormForView.css.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.html",
+      "GeneratorSript": "SearchDlgFormForView.html.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.ts",
+      "GeneratorSript": "SearchDlgFormForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01450-S.module.ts",
+      "GeneratorSript": "SearchModuleForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+
+    {
+      "DestinationFolder": "components\\aspnetusermask-view\\sform",
+      "GeneratorType": "01420-Sform.component.css",
+      "GeneratorSript": "SearchFormForView.css.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetusermask-view\\sform",
+      "GeneratorType": "01420-Sform.component.html",
+      "GeneratorSript": "SearchFormForView.html.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetusermask-view\\sform",
+      "GeneratorType": "01420-Sform.component.ts",
+      "GeneratorSript": "SearchFormForView.ts.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetusermask-view\\sdlg",
+      "GeneratorType": "01430-Dlg.interface.ts",
+      "GeneratorSript": "InterfaceForDlg.ts.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetusermask-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.css",
+      "GeneratorSript": "SearchDlgFormForView.css.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetusermask-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.html",
+      "GeneratorSript": "SearchDlgFormForView.html.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetusermask-view\\sdlg",
+      "GeneratorType": "01440-Sdlg.component.ts",
+      "GeneratorSript": "SearchDlgFormForView.ts.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetusermask-view",
+      "GeneratorType": "01450-S.module.ts",
+      "GeneratorSript": "SearchModuleForView.ts.t4",
+      "ViewModel": "aspnetusermaskView"
+    }
+
+
+  ]
+}

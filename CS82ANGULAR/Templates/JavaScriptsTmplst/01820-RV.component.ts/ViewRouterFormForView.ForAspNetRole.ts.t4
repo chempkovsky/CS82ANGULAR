@@ -93,7 +93,7 @@
 
     
     List<string> detailViewNames = GetDetailViews(Model, Context, null);
-    List<string> detailViewNamesToExclude = new List<string>(); // { "aspnetuserrolesView", "Bob", "Sam" };
+    List<string> detailViewNamesToExclude = new List<string>() { "aspnetuserrolesView", "Bob", "Sam" };
 
 
 
