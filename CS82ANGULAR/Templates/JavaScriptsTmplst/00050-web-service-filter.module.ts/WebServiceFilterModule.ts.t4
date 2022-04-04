@@ -24,7 +24,6 @@
     string filterComponentCssFolder     = "00025-web-service-filter.component.css";
     string filterComponentHtmlFolder    = "00025-web-service-filter.component.html";
     string filterComponentFolder        = "00025-web-service-filter.component.ts";
-    string eformModeEnumlFolder         = "00026-eform-mode.enum.ts";
     string columnSelectorItemInterfaceFolder    = "00032-column-selector-item.interface.ts";
     string columnSelectorComponentFolder        = "00033-column-selector.component.ts";
     string columnSelectorDlgComponentFolder     = "00035-column-selector-dlg.component.ts";
@@ -37,7 +36,6 @@
 
     string filterModuleFolder           = "00050-web-service-filter.module.ts";
 
-    string eformModeEnumName = GetEnumClassName(Model, eformModeEnumlFolder);
     string materialModuleClassName = GetModuleClassName(Model, materialModuleFolder);
     string flexModuleClassName = GetModuleClassName(Model, flexModuleFolder);
     string filterModelClassName = GetModelClassName(Model, filterModelFolder);
@@ -67,7 +65,6 @@ import { <#= filterOperatorModelClassName #> } from '<#= GetFolderName(Model, fi
 import { <#= filterResultModelClassName #> } from '<#= GetFolderName(Model, filterResultModelFolder, filterModuleFolder)#>';
 import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, filterModuleFolder)#>';
 import { <#= filterComponentClassName #> } from '<#= GetFolderName(Model, filterComponentFolder, filterModuleFolder)#>';
-import { <#= eformModeEnumName #> } from '<#= GetFolderName(Model, eformModeEnumlFolder, filterModuleFolder)#>';
 
 import { <#= columnSelectorComponentClassName #> } from '<#= GetFolderName(Model, columnSelectorComponentFolder, filterModuleFolder)#>';
 import { <#= columnSelectorDlgComponentClassName #> } from '<#= GetFolderName(Model, columnSelectorDlgComponentFolder, filterModuleFolder)#>';
@@ -86,7 +83,6 @@ import { <#= messageDialogComponentClassName #> } from '<#= GetFolderName(Model,
         <#= columnSelectorComponentClassName #>,
         <#= columnSelectorDlgComponentClassName #>,
         <#= messageDialogComponentClassName #>,
-     //   <#= eformModeEnumName #>
     ],
     imports: [
         CommonModule,
@@ -96,7 +92,6 @@ import { <#= messageDialogComponentClassName #> } from '<#= GetFolderName(Model,
     ],
     exports: [
         <#= filterComponentClassName #>,
-      //  <#= eformModeEnumName #>,
         <#= columnSelectorComponentClassName #>,
         <#= columnSelectorDlgComponentClassName #>,
         <#= messageDialogComponentClassName #>,

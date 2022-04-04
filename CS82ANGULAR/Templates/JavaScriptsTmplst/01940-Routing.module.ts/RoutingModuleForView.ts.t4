@@ -50,7 +50,6 @@
 
     string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
     string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
-    string eformModeEnumlFolder         = "00026-eform-mode.enum.ts";
     string viewInterfaceFolder          = "01100-.interface.ts";
     string viewServiceFolder            = "01400-.service.ts";
 
@@ -67,7 +66,6 @@
     string routingModuleFolder          = "01940-Routing.module.ts";
                                            
 
-    string eformModeEnumName = GetCommonEnumClassName(Context, eformModeEnumlFolder);
     string appSettingServiceClassName = GetCommonServiceClassName(Context, appSettingServiceFolder);
     string serviceClassName = GetServiceClassName(Model, viewServiceFolder);
     string filterResultModelClassName = GetModelClassName(Context, filterResultModelFolder);

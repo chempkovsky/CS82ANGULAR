@@ -129,7 +129,6 @@
     string filterComponentHtmlFolder    = "00025-web-service-filter.component.html";
     string filterComponentFolder        = "00025-web-service-filter.component.ts";
 
-    string eformModeEnumlFolder         = "00026-eform-mode.enum.ts";
 
     string messageDialogInterfaceFolder = "00037-message-dialog.interface.ts";
     string messageDialogComponentFolder = "00038-message-dialog.component.ts";
@@ -144,9 +143,6 @@
 
     string sformComponentFolder         = "01420-Sform.component.ts";
 
-
-    string viewInterfaceEDlgFolder      = "01510-Edlg.interface.ts";
-    string edlgComponentFolder          = "01520-Edlg.component.ts";
 
     string viewInterfaceVDlgFolder      = "01510-Vdlg.interface.ts";
     string vdlgComponentFolder          = "01520-Vdlg.component.ts";
@@ -185,7 +181,6 @@
     string appSettingServiceClassName           = GetCommonServiceClassName(Context, appSettingServiceFolder);
 
 
-    string eformModeEnumName = GetCommonEnumClassName(Context, eformModeEnumlFolder);
     string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, lformComponentFolder);
 
     string serviceClassName = GetServiceClassName(Model, viewServiceFolder);
@@ -206,7 +201,6 @@
     string eventEmitterPubModelClassName    = GetModelClassName(Context, eventEmitterPubModelFolder);
     string itemHeightDataModelClassName   = GetModelClassName(Context, itemHeightDataModelFolder);
 
-    string dlgComponentClassName = GetComponentClassName(Model, edlgComponentFolder);
 
     string vdlgComponentClassName = GetComponentClassName(Model, vdlgComponentFolder);
     string adlgComponentClassName = GetComponentClassName(Model, adlgComponentFolder);

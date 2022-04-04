@@ -20,11 +20,9 @@
     string FormControlNewModelPropName  = "eformNewControlModel";
 
     string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
-    string eformModeEnumlFolder         = "00026-eform-mode.enum.ts";
     string viewInterfaceFolder          = "01100-.interface.ts";
     string viewInterfaceUDlgFolder      = "01514-Udlg.interface.ts";
 
-    string eformModeEnumName = GetCommonEnumClassName(Context, eformModeEnumlFolder);
     string filterResultModelClassName = GetModelClassName(Context, filterResultModelFolder);
 #>
 
