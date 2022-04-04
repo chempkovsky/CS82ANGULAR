@@ -22,6 +22,11 @@
     string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
     string appSettingServiceClassName               = GetServiceClassName(Model, appSettingServiceFolder);
 
+
+    string appConfigServiceFolder                   = "00014-app-config.service.ts";
+    string appConfigServiceClassName                = GetServiceClassName(Model, appConfigServiceFolder);
+
+
     string formatterModuleFolder                    = "00070-app-formatter.module.ts";
     string formatterModuleClassName                 = GetModuleClassName(Model, formatterModuleFolder);
 
@@ -51,7 +56,7 @@
 #>
 
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
@@ -61,6 +66,8 @@ import { <#= appComponentClassName #> } from '<#= GetFolderName(Model, appCompon
 import { <#= materialModuleClassName #> } from '<#= GetFolderName(Model, materialModuleFolder, appModuleFolder)#>';
 import { <#= flexModuleClassName #> } from '<#= GetFolderName(Model, flexModuleFolder, appModuleFolder)#>';
 import { <#= appInterceptorClassName #> } from '<#= GetFolderName(Model, appInterceptorFolder, appModuleFolder)#>';
+import { <#= appConfigServiceClassName #> } from '<#= GetFolderName(Model, appConfigServiceFolder, appModuleFolder)#>';
+
 import { <#= formatterModuleClassName #> } from '<#= GetFolderName(Model, formatterModuleFolder, appModuleFolder)#>';
 <#
     if(! string.IsNullOrEmpty(homeComponentClassName)) {
@@ -75,6 +82,11 @@ import { <#= pagenotfoundComponentClassName #> } from '<#= GetFolderName(Model, 
     }
 #>
 
+const appInitializerFn = (appConfig: <#= appConfigServiceClassName #>) => {
+  return () => {
+      return appConfig.loadAppConfig();
+  }
+};
 
 
 @NgModule({
@@ -113,6 +125,13 @@ import { <#= pagenotfoundComponentClassName #> } from '<#= GetFolderName(Model, 
       useClass: <#= appInterceptorClassName #>,
       multi: true
     },
+    <#= appConfigServiceClassName #>,
+    {
+        provide: APP_INITIALIZER,
+        useFactory: appInitializerFn,
+        multi: true,
+        deps: [<#= appConfigServiceClassName #>]
+    }        
   ],
   bootstrap: [<#= appComponentClassName #>]
 })

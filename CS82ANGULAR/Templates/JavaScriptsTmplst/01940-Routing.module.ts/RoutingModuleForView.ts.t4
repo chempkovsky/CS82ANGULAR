@@ -158,12 +158,12 @@ const routes: Routes = [
         }
         if (incEdit) {
 #>
-    { path: '<#= node.Item2 + aPath #>', component: <#= GetComponentClassName(aModel, reditComponentFolder) #>, data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Modify(Delete) <#= aModel.ViewName #>' }  },
-    { path: '<#= node.Item2 + "/:" + ActionParamName #>', component: <#= GetComponentClassName(aModel, reditComponentFolder) #>, data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Add <#= aModel.ViewName #>'  }  },
+    { path: '<#= node.Item2 + aPath #>', component: <#= GetComponentClassName(aModel, reditComponentFolder) #>, data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Modify(Delete) <#= aModel.Title #>' }  },
+    { path: '<#= node.Item2 + "/:" + ActionParamName #>', component: <#= GetComponentClassName(aModel, reditComponentFolder) #>, data: { <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'Add <#= aModel.Title #>'  }  },
 <#
         }
 #>
-    { path: '<#= node.Item2 #>', component: <#= GetComponentClassName(aModel, rlistComponentFolder) #>, data: { <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: 'List of <#= aModel.ViewName #>'  }  },
+    { path: '<#= node.Item2 #>', component: <#= GetComponentClassName(aModel, rlistComponentFolder) #>, data: { <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: '<#= aModel.PluralTitle #>'  }  },
 <#
     }
     if (nodes.Count > 0) {

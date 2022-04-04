@@ -112,6 +112,21 @@ export class <#= appRegisterComponentClassName #> {
                 this.<#= AppSettingServicePropName #>.userName = this.registerFormGroup.controls['email'].value;
                 this.<#= AppSettingServicePropName #>.<#= setAuthIntoMethodName #>(respdata);
                 this.router.navigate(['/']);
+/*
+must be uncommented when security is to be turn on
+                this.<#= securityServiceName #>.getPermissions().subscribe({
+                    next: (rspdt: {modelName: string, userPerms: number}[]) => {
+                        this.appGlblSettings.vwModels = {};
+                        rspdt.forEach((r: {modelName: string, userPerms: number}) => {
+                            this.appGlblSettings.vwModels[r.modelName] = r.userPerms;
+                        });
+                        console.log(this.appGlblSettings.vwModels)
+                    },
+                    error: (error) => { 
+                        this.appGlblSettings.showError('http', error)
+                    }
+                });
+*/
             },
             error: (error) => { // error path
                 this.appGlblSettings.showError('http', error)

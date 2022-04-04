@@ -405,6 +405,8 @@ namespace CS82ANGULAR.ViewModel
             if (existedModelViewSerializable != null)
             {
                 existedModelViewSerializable.PageViewName = modelViewSerializable.PageViewName;
+                existedModelViewSerializable.Title = modelViewSerializable.Title;
+                existedModelViewSerializable.PluralTitle = modelViewSerializable.PluralTitle;
                 existedModelViewSerializable.RootEntityClassName = modelViewSerializable.RootEntityClassName;
                 existedModelViewSerializable.RootEntityFullClassName = modelViewSerializable.RootEntityFullClassName;
                 existedModelViewSerializable.RootEntityUniqueProjectName = modelViewSerializable.RootEntityUniqueProjectName;

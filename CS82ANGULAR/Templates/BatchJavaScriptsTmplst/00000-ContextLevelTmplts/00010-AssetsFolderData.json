@@ -1,0 +1,23 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please make sure that you selected [src] folder",
+    "",
+    "Please make sure that you executed two commands",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "assets",
+      "GeneratorType": "00001-app-config.json",
+      "GeneratorSript": "app-config.json.t4"
+    },
+    {
+      "DestinationFolder": "assets",
+      "GeneratorType": "00002-app-config.template.json",
+      "GeneratorSript": "app-config.template.json.t4"
+    }
+  ]
+
+}

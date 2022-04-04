@@ -107,11 +107,7 @@ namespace <#= webApiServiceNameSpace #> {
                 return _userManager;
             }
         }
-        public <#= Model.WebApiServiceName #>(
-                    IHttpContextAccessor httpContextAccessor,
-                    UserManager<IdentityUser> userManager,
-                    RoleManager<IdentityRole> roleManager,
-                    IConfiguration configuration)
+        public <#= Model.WebApiServiceName #>(UserManager<IdentityUser> userManager)
         {
             _userManager = userManager;
         }
@@ -147,7 +143,7 @@ namespace <#= webApiServiceNameSpace #> {
 #>
         [HttpGet]
         [Route("[controller]/<#= GetWithFilterMethodName #>")]
-        public async Task<ActionResult> <#= GetWithFilterMethodName #>(<#
+        public ActionResult <#= GetWithFilterMethodName #>(<#
         int counter = 0;
         foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
             if (prop.IsUsedByfilter) {

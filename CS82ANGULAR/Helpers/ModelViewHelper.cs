@@ -33,6 +33,8 @@ namespace CS82ANGULAR.Helpers
             if (selectedModel == null) return selectedModel;
             selectedModel.ViewName = "";
             selectedModel.PageViewName = "";
+            selectedModel.Title = "";
+            selectedModel.PluralTitle = "";
             selectedModel.RootEntityClassName = "";
             selectedModel.RootEntityFullClassName = "";
             selectedModel.RootEntityUniqueProjectName = "";
@@ -70,6 +72,9 @@ namespace CS82ANGULAR.Helpers
             selectedModel.RootEntityClassName = "";
             selectedModel.RootEntityFullClassName = "";
             selectedModel.RootEntityUniqueProjectName = "";
+            selectedModel.Title = "";
+            selectedModel.PluralTitle = "";
+
             if (selectedModel.ScalarProperties == null)
             {
                 selectedModel.ScalarProperties = new List<ModelViewPropertyOfVwSerializable>();
@@ -454,6 +459,8 @@ namespace CS82ANGULAR.Helpers
             destModel.ViewFolder = srcModel.ViewFolder;
             destModel.GenerateJSonAttribute = srcModel.GenerateJSonAttribute;
             destModel.PageViewName = srcModel.PageViewName;
+            destModel.Title = srcModel.Title;
+            destModel.PluralTitle = srcModel.PluralTitle;
             if (srcModel.ScalarProperties != null)
             {
                 foreach (ModelViewProperty prop in srcModel.ScalarProperties)
@@ -816,6 +823,8 @@ namespace CS82ANGULAR.Helpers
             {
                 ViewName = srcModelViewSerializable.ViewName,
                 PageViewName = srcModelViewSerializable.PageViewName,
+                Title = srcModelViewSerializable.Title,
+                PluralTitle = srcModelViewSerializable.PluralTitle,
                 RootEntityClassName = srcModelViewSerializable.RootEntityClassName,
                 RootEntityFullClassName = srcModelViewSerializable.RootEntityFullClassName,
                 RootEntityUniqueProjectName = srcModelViewSerializable.RootEntityUniqueProjectName,
@@ -890,8 +899,12 @@ namespace CS82ANGULAR.Helpers
                 destModelView.RootEntityDbContextPropertyName = srcModelView.RootEntityDbContextPropertyName;
             }
             destModelView.ViewName = srcModelView.ViewName;
+            destModelView.Title = srcModelView.Title;
+            destModelView.PluralTitle = srcModelView.PluralTitle;
             destModelView.GenerateJSonAttribute = srcModelView.GenerateJSonAttribute;
             destModelView.PageViewName = srcModelView.PageViewName;
+            destModelView.Title = srcModelView.Title;
+            destModelView.PluralTitle = srcModelView.PluralTitle;
             if (srcModelView.ScalarProperties != null)
             {
                 if (destModelView.ScalarProperties == null)
@@ -1527,6 +1540,9 @@ namespace CS82ANGULAR.Helpers
 
                 ViewName = srcModelViewSerializable.ViewName,
                 PageViewName = srcModelViewSerializable.PageViewName,
+                Title = srcModelViewSerializable.Title,
+                PluralTitle = srcModelViewSerializable.PluralTitle,
+
                 ViewProject = destinationProject,
                 ViewDefaultProjectNameSpace = defaultProjectNameSpace,
                 ViewFolder = destinationFolder,
@@ -1566,6 +1582,8 @@ namespace CS82ANGULAR.Helpers
 
                 ViewName = srcModelViewSerializable.ViewName,
                 PageViewName = srcModelViewSerializable.PageViewName,
+                Title = srcModelViewSerializable.Title,
+                PluralTitle = srcModelViewSerializable.PluralTitle,
                 ViewProject = destinationProject,
                 ViewDefaultProjectNameSpace = defaultProjectNameSpace,
                 ViewFolder = destinationFolder,

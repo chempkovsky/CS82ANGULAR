@@ -78,11 +78,7 @@ namespace <#= webApiServiceNameSpace #> {
                 return _roleManager;
             }
         }
-        public <#= Model.WebApiServiceName #>(
-                    IHttpContextAccessor httpContextAccessor,
-                    UserManager<IdentityUser> userManager,
-                    RoleManager<IdentityRole> roleManager,
-                    IConfiguration configuration)
+        public <#= Model.WebApiServiceName #>(RoleManager<IdentityRole> roleManager)
         {
             _roleManager = roleManager;
         }
@@ -118,7 +114,7 @@ namespace <#= webApiServiceNameSpace #> {
 #>
         [HttpGet]
         [Route("[controller]/<#= GetWithFilterMethodName #>")]
-        public async Task<ActionResult> <#= GetWithFilterMethodName #>(<#
+        public ActionResult <#= GetWithFilterMethodName #>(<#
         int counter = 0;
         foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
             if (prop.IsUsedByfilter) {
@@ -538,7 +534,7 @@ namespace <#= webApiServiceNameSpace #> {
 #>
         [HttpGet]
         [Route("[controller]/<#= localRouteName #>")]
-        public async Task<ActionResult<<#= Model.ViewName #>>> <#= localRouteName #>(<#
+        public ActionResult<<#= Model.ViewName #>> <#= localRouteName #>(<#
         int counter = 0;
         foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
             if(counter > 0) { 
@@ -587,6 +583,63 @@ namespace <#= webApiServiceNameSpace #> {
 
     } // the end of if (Model.IsWebApiAdd)
 #>
+
+
+
+
+<# 
+    if (Model.IsWebApiAdd) { 
+        int counter = 0;
+        ModelViewUniqueKeyOfVwSerializable locPrimKey = GetModelPrimKeyFromList(uniqueKeys);
+        List<ModelViewPropertyOfVwSerializable> primKeys = locPrimKey.UniqueKeyProperties;
+
+#>
+        [HttpPost]
+        [Route("<#= AddOneMethodName #>")]
+        public async Task<ActionResult<<#= Model.ViewName#>>> <#= AddOneMethodName #>([FromBody] <#= Model.ViewName#> viewToAdd)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            IdentityRole entityToAdd = new IdentityRole()  { Name = viewToAdd.Name };
+            IdentityResult rslt = await RoleManager.CreateAsync(entityToAdd);
+            if (!rslt.Succeeded)
+            {
+                return BadRequest(rslt);
+            }
+
+
+                <#= Model.ViewName#> result = RoleManager.Roles
+<#
+        for(int pkId= 0; pkId < primKeys.Count; pkId++) {
+             ModelViewPropertyOfVwSerializable primKeyProp = primKeys[pkId];
+#>
+                    .Where(p => p.<#= Model.PrimaryKeyProperties[pkId].OriginalPropertyName #> == entityToAdd.<#= Model.PrimaryKeyProperties[pkId].OriginalPropertyName #>)
+<#
+        }
+#>
+                    .Select(itm => new <#= Model.ViewName #>() {
+<#
+                int cnt = Model.ScalarProperties.Count-1;
+                for(int i = 0; i < cnt; i++) {
+#>
+                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[i].ForeignKeyNameChain) #><#= Model.ScalarProperties[i].OriginalPropertyName #>,
+<#
+        } 
+#>
+                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChain(Model.ScalarProperties[cnt].ForeignKeyNameChain) #><#= Model.ScalarProperties[cnt].OriginalPropertyName #>
+                    }).FirstOrDefault();
+                if (result == null)
+                {
+                    return NotFound();
+                }
+                return Ok(result);
+        }
+<#
+    }
+#>
+
 
 
 <# 

@@ -117,10 +117,8 @@ namespace <#= webApiServiceNameSpace #> {
             }
         }
         public <#= Model.WebApiServiceName #>(
-                    IHttpContextAccessor httpContextAccessor,
                     UserManager<IdentityUser> userManager,
-                    RoleManager<IdentityRole> roleManager,
-                    IConfiguration configuration)
+                    RoleManager<IdentityRole> roleManager)
         {
             _roleManager = roleManager;
             _userManager = userManager;

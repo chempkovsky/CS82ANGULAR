@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 <#
 
@@ -83,10 +84,10 @@ namespace <#= webApiServiceNameSpace #> {
         }
 
         [HttpGet]
-        [Route("[controller]/<#= GetAllMethodName #>")]
+        [Route("api/[controller]/<#= GetAllMethodName #>")]
         public async Task<ActionResult<IEnumerable<<#=Model.ViewName#>>>> <#= GetAllMethodName #>()
         {
-            string[]? roles = _httpContextAccessor?.HttpContext?.User?.Claims.Where(c => c.Type == ClaimTypes.Role).Select(cl => cl.Value).ToArray();
+            string[] roles = _httpContextAccessor?.HttpContext?.User?.Claims.Where(c => c.Type == ClaimTypes.Role).Select(cl => cl.Value).ToArray();
             if(roles == null) return new List<<#=Model.ViewName#>>();
             return  await db.aspnetrolemaskDbSet.Where(u=> roles.Contains( u.RoleName))
                 .GroupBy(u => u.ModelPkRef)

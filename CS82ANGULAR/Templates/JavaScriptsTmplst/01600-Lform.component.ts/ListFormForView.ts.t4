@@ -294,7 +294,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         this.<#= multiSelectedRowPropName #>.emit(e);
     }
 
-    @Input('<#= captionSelector #>') <#= captionPropName #>: string = '<#= Model.ViewName #>';
+    @Input('<#= captionSelector #>') <#= captionPropName #>: string = '<#= Model.Title #>';
 
     @Input('<#= FilterMaxHeightPropSelector #>')  <#= FilterMaxHeightPropName #>: number | any = null;
     @Input('<#= MaxHeightPropSelector #>') <#= MaxHeightPropName #>: number | any = null;

@@ -2978,6 +2978,9 @@ namespace CS82ANGULAR.Helpers
             SelectedModel.ViewName = srcClass.Name + viewSufix;
             SelectedModel.PageViewName = srcClass.Name + pageViewNameSufix;
 
+            SelectedModel.PluralTitle = SelectedModel.ViewName + "s";
+            SelectedModel.Title = SelectedModel.ViewName;
+
 
             if (SelectedModel.AllProperties == null)
             {

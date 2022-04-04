@@ -412,7 +412,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             msk = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= detailViewName #>');
             if((msk & 1) === 1) {
                 this.rowMenuItemsData.push(
-                 { id: '<#= id #>', caption: 'Navigate to: <#= detailViewName #> : <#= foreignKey.NavigationName #>', iconName: 'arrow_forward', iconColor: 'primary', enabled: true, 
+                 { id: '<#= id #>', caption: '<#= detailView.PluralTitle #>(<#= foreignKey.NavigationName #>)', iconName: 'arrow_forward', iconColor: 'primary', enabled: true, 
                     data: {
                         <#= ViewNameParamName #>: '<#= detailViewName #>',
                         <#= NavigationParamName #>: '<#= foreignKey.NavigationName #>',
@@ -457,7 +457,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detail, null);
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
 #>
-        {caption:'<#= detailVwnm + ": " + foreignKey.NavigationName #>', vw: '<#= detailVwnm #>', nv: '<#= foreignKey.NavigationName #>'},
+        {caption:'<#= detail.PluralTitle + "(" + foreignKey.NavigationName + ")" #> ', vw: '<#= detailVwnm #>', nv: '<#= foreignKey.NavigationName #>'},
 <#
             }
             

@@ -6,6 +6,8 @@ namespace CS82ANGULAR.Model.Serializable
     [Serializable]
     public class ModelViewSerializable
     {
+        public string PluralTitle { get; set; }
+        public string Title { get; set; }
         public string ViewName { get; set; }
         public string PageViewName { get; set; }
         public string RootEntityDbContextPropertyName { get; set; }

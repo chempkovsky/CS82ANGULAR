@@ -16,7 +16,41 @@ namespace CS82ANGULAR.Model
         protected bool _GenerateJSonAttribute;
         protected string _RootEntityDbContextPropertyName;
         protected string _PageViewName;
+        protected string _PluralTitle = "";
+        protected string _Title = "";
+
         #endregion
+        public string Title
+        {
+            get
+            {
+                return _Title;
+            }
+            set
+            {
+                if (_Title != value)
+                {
+                    _Title = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public string PluralTitle
+        {
+            get
+            {
+                return _PluralTitle;
+            }
+            set
+            {
+                if (_PluralTitle != value)
+                {
+                    _PluralTitle = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public string ViewName
         {
             get

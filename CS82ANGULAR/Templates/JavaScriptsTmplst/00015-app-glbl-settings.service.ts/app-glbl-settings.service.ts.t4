@@ -15,10 +15,21 @@
 
     string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
     string appSettingServiceClassName   = GetServiceClassName(Model, appSettingServiceFolder);
+    string appConfigServiceFolder       = "00014-app-config.service.ts";
+    string appConfigServiceClassName    = GetServiceClassName(Model, appConfigServiceFolder);
+
+
     string AppearancePropName           = "appearance";
     string ShowErrorMethodName          = "showError";
     string ShowMessageMethodName        = "showMsg";
     string AppSettingServicePropName    = "appGlblSettings";
+
+    string configPropName               = "config";
+    string settingsPropName             = "settings";
+    string webApiUrlPropName            = "webApiUrl";
+    string securityUrlPropName          = "securityUrl";
+    string permissionWebApiPropName     = "permissionWebApi";
+
 
     string getStorageItemMethodName     = "getStorageItem";
     string setStorageItemMethodName     = "setStorageItem";
@@ -38,6 +49,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot, CanActivateChild, Route } from '@angular/router';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
+import { <#= appConfigServiceClassName #> } from '<#= GetFolderName(Model, appConfigServiceFolder, appSettingServiceFolder)#>';
 
 @Injectable({
   providedIn: 'root'
@@ -49,7 +61,7 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
     public tableHeightAddition: number = 0;
     public tableHeightFactor: number = 31;
 
-    constructor(private _snackBar: MatSnackBar) {}
+    constructor(private _snackBar: MatSnackBar, private _<#= settingsPropName #>: <#= appConfigServiceClassName #>) {}
     public <#= ShowMessageMethodName #>(msg: string) {
       this._snackBar.open(msg, 'Close', { duration: 4000 });
     }
@@ -67,17 +79,23 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
                         text = text + ' ' +  errorStruct.message;
                     }
                 }
-                if(!(typeof errorStruct.statusText === 'undefined')) {
+                if(!(typeof errorStruct.status === 'undefined')) {
+                  if(!(errorStruct.status === null)) {
+                      text = text + ' status: ' +  errorStruct.status;
+                  }
+              }
+              if(!(typeof errorStruct.statusText === 'undefined')) {
                     if(!(errorStruct.statusText === null)) {
-                        text = text + ' ' +  errorStruct.statusText;
+                        text = text + ' Status Text:' +  errorStruct.statusText;
                     }
                 }
                 if(!(typeof errorStruct.error === 'undefined')) {
                   if(!(errorStruct.error === null)) {
-                    if(!(typeof errorStruct.error.ModelState === 'undefined')) {
-                      if(Array.isArray( errorStruct.error.ModelState[''] )) {
-                        errorStruct.error.ModelState[''].forEach(element => {
-                          text = text + ' ' +  element;
+                    if(!(typeof errorStruct.error.errors === 'undefined')) {
+                      if(Array.isArray( errorStruct.error.errors )) {
+                        errorStruct.error.errors.forEach((e: any) => {
+                          if(e.code) text = text + ' error code:' + e.code;
+                          if(e.description) text = text + ' error descr: ' + e.description;
                         });
                       }
                     }
@@ -94,16 +112,16 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
                 //
                 // here: defining url by ViewName
                 //
-                reslt = 'https://localhost:7148/';
+                reslt =  this._<#= settingsPropName #>.<#= configPropName #>.<#= webApiUrlPropName #>; // 'https://localhost:7148/';
             }
         }
         return reslt;
     } 
     public getSecurityWebApiPrefix(): string {
-        return 'https://localhost:7148/';
+        return this._<#= settingsPropName #>.<#= configPropName #>.<#= securityUrlPropName #>; //'https://localhost:7148/';
     } 
     public getPermissionWebApiPrefix(): string {
-        return 'https://localhost:7148/';
+        return this._<#= settingsPropName #>.<#= configPropName #>.<#= permissionWebApiPropName #>; // 'https://localhost:7148/';
     }
 
     getValidationErrorMessage(fc: AbstractControl): string {
@@ -428,6 +446,46 @@ export class <#= appSettingServiceClassName + "Activator" #> implements CanActiv
             }
         }
         return sb.ToString();
+    }
+    string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
     }
 
 #>
