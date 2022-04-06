@@ -19,16 +19,19 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using LinqKit;
 
 <#
 
-    string GetAllMethodName         = "getall";
-    string GetWithFilterMethodName  = "getwithfilter";
-    string GetOneMethodName         = "getone";
-    string UpdateOneMethodName      = "updateone";
-    string AddOneMethodName         = "addone";
-    string DeleteOneMethodName      = "deleteone";
-    string GetOneByMethodNamePrefix = "getoneby";
+    string GetAllMethodName             = "getall";
+    string GetWithFilterMethodName      = "getwithfilter";
+    string GetOneMethodName             = "getone";
+    string UpdateOneMethodName          = "updateone";
+    string AddOneMethodName             = "addone";
+    string DeleteOneMethodName          = "deleteone";
+    string GetOneByMethodNamePrefix         = "getoneby";
+    string GetManyByRepPrimMethodNamePrefix = "getmanybyrepprim";
+    string GetManyByRepUnqMethodNamePrefix  = "getmanybyrepunq";
 
     string OperatorSufix = "Oprtr";
     string webApiServiceNameSpace = GetDestinationNameSpace(Model);
@@ -529,9 +532,11 @@ namespace <#= webApiServiceNameSpace #> {
             string indErrrorText = "";
             bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, pk, out indErrrorText);
             string localRouteName = GetOneMethodName;
+            string localRouteManyName = GetManyByRepPrimMethodNamePrefix;
             if (!pk.IsPrimary) {
                     
                 localRouteName = GetOneByMethodNamePrefix + pk.UniqueKeyName;
+                localRouteManyName = GetManyByRepUnqMethodNamePrefix + pk.UniqueKeyName;
             }
             if (!indIsCorrect) {
 
@@ -575,8 +580,8 @@ namespace <#= webApiServiceNameSpace #> {
 #>
                     .Select(itm => new <#= Model.ViewName #>() {
 <#
-                int cnt = Model.ScalarProperties.Count-1;
-                for(int i = 0; i < cnt; i++) {
+        int cnt = Model.ScalarProperties.Count-1;
+        for(int i = 0; i < cnt; i++) {
 #>
                             <#=GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetForeignKeyNameChainAndProp(Model.ScalarProperties[i], Model) #>,
 <#
@@ -590,6 +595,122 @@ namespace <#= webApiServiceNameSpace #> {
             }
             return Ok(result);
         } // the end of public GetOne()-method
+
+
+        [HttpGet]
+        [Route("[controller]/<#= localRouteManyName #>")]
+        public async Task<ActionResult<<#= Model.PageViewName #>>> <#= localRouteManyName #>(
+<#
+        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+#>                
+             [FromQuery] <#= GetNullableType(prop)#>[] <#= GetFilterPropertyName(prop, Model) #>,
+<#
+        } 
+#>            
+            [FromQuery] string[] orderby = null, 
+            [FromQuery] int? page =null, 
+            [FromQuery] int? pagesize = null)
+        {
+            int currentPageSize = this.defaultPageSize;
+            int currentPage = 1;
+            if (pagesize.HasValue) {
+                currentPageSize = pagesize.Value;
+                if ((currentPageSize < this.minPageSize) || (currentPageSize > this.maxPageSize)) {
+                    currentPageSize = defaultPageSize;
+                }
+            }
+            if (page.HasValue) {
+                currentPage = page.Value+1;
+                if (currentPage < 1) {
+                    currentPage = 1;
+                }
+            }
+
+<#
+        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+#>                
+            int _<#= GetFilterPropertyName(prop, Model) #> = <#= GetFilterPropertyName(prop, Model) #> == null ? 0 : <#= GetFilterPropertyName(prop, Model) #>.Length;
+<#
+        } 
+#>                
+            IQueryable<<#= Model.RootEntityClassName #>> query = db.<#= Model.RootEntityDbContextPropertyName #>;
+            if ( _<#= GetFilterPropertyName(primKeys[0], Model) #> > 0 ) {
+                var _outer = PredicateBuilder.New<<#= Model.RootEntityClassName #>>();
+                bool isOuterModified = false;
+                for(int i = 0; i < _<#= GetFilterPropertyName(primKeys[0], Model) #>; i++) {
+                    var _inner = PredicateBuilder.New<<#= Model.RootEntityClassName #>>();
+<#
+        int cnt02 = 0;
+        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+            if(cnt02 > 0) {
+#>                
+                    if (_<#= GetFilterPropertyName(prop, Model) #> >= i) {
+                        _outer = _outer.Or(_inner);
+                        isOuterModified = true;
+                        continue;
+                    }
+<#
+            }
+            cnt02++;
+            if (prop.IsRequired) {
+#>                
+                    if (<#= GetFilterPropertyName(prop, Model) #>[i] == null) continue; // (required prop == null) returns false
+                    _inner = _inner.And(p => p.<#= prop.OriginalPropertyName #> == <#= GetFilterPropertyName(prop, Model) #>[i]);
+<#
+            } else {
+#>                
+                    if (<#= GetFilterPropertyName(prop, Model) #>[i] == null) {
+                        _inner = _inner.And(p => p.<#= prop.OriginalPropertyName #> == null);
+                    } else {
+                        _inner = _inner.And(p => p.<#= prop.OriginalPropertyName #> == <#= GetFilterPropertyName(prop, Model) #>[i]);
+                    }
+<#
+            }
+        } 
+#>                
+                    _outer = _outer.Or(_inner);
+                    isOuterModified = true;
+                }
+                if(isOuterModified) {
+                    query = query.AsExpandable().Where(_outer); 
+                }
+            }
+            int totals = await query.CountAsync();
+            int pageCount = ((totals > 0) ? ((int)Math.Ceiling((double)totals / (double)currentPageSize)) : 0);
+            List<string> currentOrderBy = null;
+            if (orderby != null) {
+                if (orderby.Length > 0) {
+                    currentOrderBy = orderby.Where(s => (!string.IsNullOrEmpty(s))).ToList();
+                }
+            }   
+
+                IOrderedQueryable<<#= Model.RootEntityClassName #>> orderedQuery = query.OrderBy(p => p.<#= primKeys[0].OriginalPropertyName #>);
+<#
+        for(int i = 1; i < primKeys.Count; i++) {
+#>                
+                orderedQuery = orderedQuery.ThenBy(p => p.<#= primKeys[i].OriginalPropertyName #>);
+<#
+        } 
+#>            
+                <#= Model.PageViewName #> resultObject = new <#= Model.PageViewName #>() {
+                    page = (currentPage > 0) ? (currentPage-1) : currentPage,
+                    pagesize = currentPageSize,
+                    pagecount = pageCount,
+                    total = totals
+                };
+                resultObject.items = await orderedQuery.Skip((currentPage - 1) * currentPageSize).Take(currentPageSize).Select(itm => new <#= Model.ViewName #>() {
+<#
+        int cnt01 = Model.ScalarProperties.Count-1;
+        for(int i = 0; i < cnt01; i++) {
+#>
+                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#=  GetForeignKeyNameChainAndProp(Model.ScalarProperties[i], Model) #>,
+<#
+        }
+#>
+                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[cnt01], Model)#> = itm.<#= GetForeignKeyNameChainAndProp(Model.ScalarProperties[cnt01], Model) #>
+                            }).ToListAsync();
+                return Ok(resultObject);
+        }
 <#
             } // the end of: if (!indIsCorrect) {...} else {}
         } // the end of: foreach(ModelViewUniqueKeyOfVwSerializable pk uniqueKeys) {}

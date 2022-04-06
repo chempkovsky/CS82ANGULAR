@@ -21,9 +21,19 @@
     string filterDefModelFolder         = "00022-web-service-filter-def.interface.ts";
     string filterOperatorModelFolder    = "00023-web-service-filter-operator.interface.ts";
     string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
+    string uniqFilterModelFolder        = "00042-uniq-service-filter.interface.ts";
+    string uniqFilterDefModelFolder     = "00044-uniq-service-filter-def.interface.ts";
+
+
     string filterComponentCssFolder     = "00025-web-service-filter.component.css";
     string filterComponentHtmlFolder    = "00025-web-service-filter.component.html";
     string filterComponentFolder        = "00025-web-service-filter.component.ts";
+
+    string uniqFilterComponentCssFolder     = "00046-uniq-service-filter.component.css";
+    string uniqFilterComponentHtmlFolder    = "00046-uniq-service-filter.component.html";
+    string uniqFilterComponentFolder        = "00046-uniq-service-filter.component.ts";
+
+
     string columnSelectorItemInterfaceFolder    = "00032-column-selector-item.interface.ts";
     string columnSelectorComponentFolder        = "00033-column-selector.component.ts";
     string columnSelectorDlgComponentFolder     = "00035-column-selector-dlg.component.ts";
@@ -38,11 +48,17 @@
 
     string materialModuleClassName = GetModuleClassName(Model, materialModuleFolder);
     string flexModuleClassName = GetModuleClassName(Model, flexModuleFolder);
+
     string filterModelClassName = GetModelClassName(Model, filterModelFolder);
     string filterDefModelClassName = GetModelClassName(Model, filterDefModelFolder);
     string filterOperatorModelClassName = GetModelClassName(Model, filterOperatorModelFolder);
     string filterResultModelClassName = GetModelClassName(Model, filterResultModelFolder);
+    string uniqFilterModelClassName = GetModelClassName(Model, uniqFilterModelFolder);
+    string uniqFilterDefModelClassName = GetModelClassName(Model, uniqFilterDefModelFolder);
+    
+
     string filterComponentClassName = GetComponentClassName(Model, filterComponentFolder);
+    string uniqFilterComponentClassName = GetComponentClassName(Model, uniqFilterComponentFolder);
     string appSettingServiceClassName   = GetServiceClassName(Model, appSettingServiceFolder);
     string appModuleClassName   = GetModuleClassName(Model, filterModuleFolder);
     string columnSelectorComponentClassName = GetComponentClassName(Model, columnSelectorComponentFolder);
@@ -55,16 +71,19 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 //import { BrowserModule } from '@angular/platform-browser';
 
-
-
 import { <#= materialModuleClassName #> } from '<#= GetFolderName(Model, materialModuleFolder, filterModuleFolder)#>';
 import { <#= flexModuleClassName #> } from '<#= GetFolderName(Model, flexModuleFolder, filterModuleFolder)#>';
-import { <#= filterModelClassName #> } from '<#= GetFolderName(Model, filterModelFolder, filterModuleFolder)#>';
-import { <#= filterDefModelClassName #> } from '<#= GetFolderName(Model, filterDefModelFolder, filterModuleFolder)#>';
-import { <#= filterOperatorModelClassName #> } from '<#= GetFolderName(Model, filterOperatorModelFolder, filterModuleFolder)#>';
-import { <#= filterResultModelClassName #> } from '<#= GetFolderName(Model, filterResultModelFolder, filterModuleFolder)#>';
-import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, filterModuleFolder)#>';
+
+// import { <#= uniqFilterDefModelClassName #> } from '<#= GetFolderName(Model, uniqFilterDefModelFolder, filterModuleFolder)#>';
+// import { <#= uniqFilterModelClassName #> } from '<#= GetFolderName(Model, uniqFilterModelFolder, filterModuleFolder)#>';
+// import { <#= filterModelClassName #> } from '<#= GetFolderName(Model, filterModelFolder, filterModuleFolder)#>';
+// import { <#= filterDefModelClassName #> } from '<#= GetFolderName(Model, filterDefModelFolder, filterModuleFolder)#>';
+// import { <#= filterOperatorModelClassName #> } from '<#= GetFolderName(Model, filterOperatorModelFolder, filterModuleFolder)#>';
+// import { <#= filterResultModelClassName #> } from '<#= GetFolderName(Model, filterResultModelFolder, filterModuleFolder)#>';
+// import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, filterModuleFolder)#>';
+
 import { <#= filterComponentClassName #> } from '<#= GetFolderName(Model, filterComponentFolder, filterModuleFolder)#>';
+import { <#= uniqFilterComponentClassName #> } from '<#= GetFolderName(Model, uniqFilterComponentFolder, filterModuleFolder)#>';
 
 import { <#= columnSelectorComponentClassName #> } from '<#= GetFolderName(Model, columnSelectorComponentFolder, filterModuleFolder)#>';
 import { <#= columnSelectorDlgComponentClassName #> } from '<#= GetFolderName(Model, columnSelectorDlgComponentFolder, filterModuleFolder)#>';
@@ -79,6 +98,7 @@ import { <#= messageDialogComponentClassName #> } from '<#= GetFolderName(Model,
      //   <#= filterOperatorModelClassName #>,
      //   <#= filterResultModelClassName #>,
      //   <#= appSettingServiceClassName #>,
+        <#= uniqFilterComponentClassName #>,
         <#= filterComponentClassName #>,
         <#= columnSelectorComponentClassName #>,
         <#= columnSelectorDlgComponentClassName #>,
@@ -91,6 +111,7 @@ import { <#= messageDialogComponentClassName #> } from '<#= GetFolderName(Model,
         <#= flexModuleClassName #>,
     ],
     exports: [
+        <#= uniqFilterComponentClassName #>,
         <#= filterComponentClassName #>,
         <#= columnSelectorComponentClassName #>,
         <#= columnSelectorDlgComponentClassName #>,

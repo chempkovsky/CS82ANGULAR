@@ -1,0 +1,44 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="css" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+.mat-column-selectAction {
+    width: 10px !important;
+    padding-right: 4px;   
+    border-right: 1px solid #e0e0e0;
+}
+.mat-column-menuAction {
+    width: 10px !important;
+    border-left: 1px solid #e0e0e0;
+}
+.mat-tbl-container {
+    overflow-x: auto;
+}
+table.mat-table {
+    width: 100%;
+}
+th.mat-header-cell {
+    padding-left: 4px; 
+}
+td.mat-cell {
+    padding-left: 4px; 
+}
+tr.mat-header-row {
+    height: 15px !important;
+}
+tr.mat-row {
+    height: 15px !important;
+} 
+button.mat-icon-button {
+    height: 15px !important;
+}

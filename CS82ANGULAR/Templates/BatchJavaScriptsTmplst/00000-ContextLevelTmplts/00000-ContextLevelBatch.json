@@ -101,6 +101,16 @@
     },
     {
       "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00042-uniq-service-filter.interface.ts",
+      "GeneratorSript": "uniq-service-filter.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00044-uniq-service-filter-def.interface.ts",
+      "GeneratorSript": "uniq-service-filter-def.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\interfaces",
       "GeneratorType": "00023-web-service-filter-operator.interface.ts",
       "GeneratorSript": "web-service-filter-operator.interface.ts.t4"
     },
@@ -128,6 +138,21 @@
       "DestinationFolder": "shared\\components\\web-service-filter",
       "GeneratorType": "00025-web-service-filter.component.ts",
       "GeneratorSript": "web-service-filter.component.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\uniq-service-filter",
+      "GeneratorType": "00046-uniq-service-filter.component.css",
+      "GeneratorSript": "uniq-service-filter.component.css.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\uniq-service-filter",
+      "GeneratorType": "00046-uniq-service-filter.component.html",
+      "GeneratorSript": "uniq-service-filter.component.html.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\uniq-service-filter",
+      "GeneratorType": "00046-uniq-service-filter.component.ts",
+      "GeneratorSript": "uniq-service-filter.component.ts.t4"
     },
     {
       "DestinationFolder": "shared\\components\\column-selector",
