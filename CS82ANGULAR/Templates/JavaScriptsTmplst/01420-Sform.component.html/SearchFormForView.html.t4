@@ -89,6 +89,7 @@
     string filterComponentFolder        = "00025-web-service-filter.component.ts";
     string menuItemDataModelFolder      = "00017-menu-item-data.interface.ts";
     string eventEmitterDataModelFolder  = "00018-event-emitter-data.interface.ts";
+    string uniqFilterComponentFolder    = "00046-uniq-service-filter.component.ts";
 
     
     string viewInterfaceFolder      = "01100-.interface.ts";
@@ -106,9 +107,11 @@
 
 
     string filterComponentSelectorCommonPart = GetContextComponentSelectorCommonPart(Context, filterComponentFolder);
+    string uniqFilterComponentSelectorCommonPart = GetContextComponentSelectorCommonPart(Context, uniqFilterComponentFolder);
+
 #>
 
-<app-<#= filterComponentSelectorCommonPart #> 
+<app-<#= filterComponentSelectorCommonPart #> *ngIf="curIndexMenuItemsData.id === 'commcase'"
     [<#= captionSelector #>]="<#= captionPropName #>" 
     (<#= OnBackBtnSelector #>)="<#= OnBackBtnMethodName #>($event)"
     [<#= showBackBtnSelector #>]="<#= showBackBtnPropName #>"
@@ -120,6 +123,20 @@
     [<#= containerMenuItemsSelector #>]="<#= containerMenuItemsPropName #>"
     (<#= onContainerMenuItemClickSelector #>)="<#= onContainerMenuItemClickMethodName #>($event)"
     ></app-<#= filterComponentSelectorCommonPart #>>
+
+<app-<#= uniqFilterComponentSelectorCommonPart #> *ngIf="curIndexMenuItemsData.id !== 'commcase'"
+    [<#= captionSelector #>]="<#= captionPropName #>" 
+    (<#= OnBackBtnSelector #>)="<#= OnBackBtnMethodName #>($event)"
+    [<#= showBackBtnSelector #>]="<#= showBackBtnPropName #>"
+    (on-apply-filter)="onApplyFilter($event)" 
+    [<#= externalFilterSelector #>]="<#= externalFilterRsltPropName #>"
+    [<#= MaxHeightPropSelector #>]="<#= FilterMaxHeightPropName #>"  
+    [filter-defs]="filterDefs"  [show-filter]="<#= ShowFilterPropName #>"
+    [<#= containerMenuItemsSelector #>]="<#= containerMenuItemsPropName #>"
+    (<#= onContainerMenuItemClickSelector #>)="<#= onContainerMenuItemClickMethodName #>($event)"
+    ></app-<#= uniqFilterComponentSelectorCommonPart #>>
+
+
 <mat-progress-bar *ngIf="inQuery" mode="query"></mat-progress-bar>
 <div [style.maxHeight.px]="<#= MaxHeightPropName #>X" [style.overflow-y]="<#= OverflowPropName #>" class="mat-tbl-container">
 
@@ -182,7 +199,7 @@
                 <mat-icon>settings</mat-icon>
                 <span>Table columns</span>
               </button>
-              <button mat-menu-item *ngFor="let m of <#= TableCommandsPropName #>;"  [disabled]="!m.enabled" (click)="tableCommand(m.id)">
+              <button mat-menu-item *ngFor="let m of tableMenuItemsData;"  [disabled]="!m.enabled" (click)="tableCommand(m.id)">
                 <mat-icon color="{{m.iconColor}}">{{m.iconName}}</mat-icon>
                 <span>{{m.caption}}</span>
               </button>

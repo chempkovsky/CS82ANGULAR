@@ -342,8 +342,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         tmp = tmp.concat(this.tableIndexMenuItemsData, this._<#= TableCommandsPropName #>);
         this.tableMenuItemsData = tmp;
     }
-
-
     @Input('<#= showBackBtnSelector #>') <#= showBackBtnPropName #>: boolean = false;
     @Output('<#= OnBackBtnSelector #>') <#= OnBackBtnPropName #> = new EventEmitter<any>();
     <#= OnBackBtnMethodName #>(v: any) {
@@ -443,6 +441,12 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 
     protected resetCurFltr(): void {
         this.currentFilter = [];
+        this._<#= HiddenFilterPropName #>.forEach((hf: <#= filterResultModelClassName #>) => { this.currentFilter.push({
+            fltrName: hf.fltrName,
+            fltrDataType: hf.fltrDataType,
+            fltrOperator: hf.fltrOperator,
+            fltrValue: hf.fltrValue,
+        }); });
         this.<#= externalFilterRsltPropName #>.forEach((ef: <#= filterResultModelClassName #>) => { 
           if(this.filterDefs.findIndex((fd: { fltrName: string; }) => { return (fd.fltrName === ef.fltrName); }) > -1) {
             this.currentFilter.push({

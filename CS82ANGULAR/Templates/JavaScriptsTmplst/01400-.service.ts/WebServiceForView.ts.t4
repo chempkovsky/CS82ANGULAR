@@ -20,11 +20,15 @@
     string GetAllMethodName                     = "getall";
     string GetWithFilterMethodName              = "getwithfilter";
     string GetOneMethodName                     = "getone";
+    string GetOneByMethodNamePrefix             = "getoneby";
     string UpdateOneMethodName                  = "updateone";
     string AddOneMethodName                     = "addone";
     string DeleteOneMethodName                  = "deleteone";
+    string GetManyByRepPrimMethodNamePrefix     = "getmanybyrepprim";
+    string GetManyByRepUnqMethodNamePrefix      = "getmanybyrepunq";
+
+
     string AppSettingServicePropName            = "appGlblSettings";
-    string GetOneByMethodNamePrefix             = "getoneby";
     string MasterToClientKeyFieldsMapFieldName  = "m2cKeyfm";
     string MasterToClientFieldsMapFieldName     = "m2cfm";
     string ClientToMasterFieldsMapFieldName     = "c2mfm";
@@ -569,9 +573,11 @@ export class <#= GetJavaScriptServiceName(Model) #> {
             string indErrrorText = "";
             bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, pk, out indErrrorText);
             string localRouteName = GetOneMethodName;
+            string localRouteManyName = GetManyByRepPrimMethodNamePrefix;
             if (!pk.IsPrimary) {
                     
                 localRouteName = GetOneByMethodNamePrefix + pk.UniqueKeyName;
+                localRouteManyName = GetManyByRepUnqMethodNamePrefix + pk.UniqueKeyName;
             }
             if (!indIsCorrect) {
 #>
@@ -639,10 +645,133 @@ export class <#= GetJavaScriptServiceName(Model) #> {
           //   catchError(this.handleError('<#= localRouteName #>', []))
           // );
     }
+
+    <#= localRouteManyName #>(filter: <#=GetInterfaceFilterName(Model)#>): Observable<<#= GetInterfacePageName(Model) #>> {
+        let params: HttpParams  = new HttpParams();
+        let hasFilter: boolean = false;
+        if (!(typeof filter === 'undefined')) {
+            if (!(filter === null )) {
+
 <#
-            }
+        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+
+
+#>
+                if (!(typeof filter.<#= GetTypeScriptPropertyName(prop, Model)#> === 'undefined')) {
+                    if ( Array.isArray(filter.<#= GetTypeScriptPropertyName(prop, Model)#> )) {
+<#          if(prop.IsNullable) { #>
+                        let hasNull: boolean = false;
+<#          } #>
+                        filter.<#= GetTypeScriptPropertyName(prop, Model)#>.forEach(function (value) {
+                            if(!(typeof value === 'undefined')) {
+                                if(!(value === null)) {
+                                    params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', value<#= GetJavaScriptToStringMethod(prop) #>);
+                                    hasFilter = true;
+                                } 
+<#          if(prop.IsNullable) { #>
+                                else {
+                                    hasNull = true;
+                                }
+<#          } #>
+                            }
+                        });
+<#          if(prop.IsNullable) { #>
+                        if(hasNull) {
+                            params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', '');
+                        }
+<#          } #>
+                    } // if ( Array.isArray(filter.<#= GetTypeScriptPropertyName(prop, Model)#> ))
+                } // if (!(typeof filter.<#= GetTypeScriptPropertyName(prop, Model)#> === 'undefined'))
+<#
+        } // foreach(ModelViewPropertyOfVwSerializable prop in primKeys) { }
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(!prop.IsUsedByfilter) continue;
+            if (primKeys.Any(p => p == prop)) continue;
+            if(!IsUsedByForeignKey(prop, Model)) continue;
+#>
+                if (!(typeof filter.<#= GetTypeScriptPropertyName(prop, Model)#> === 'undefined')) {
+                    if ( Array.isArray(filter.<#= GetTypeScriptPropertyName(prop, Model)#> )) {
+<#          if(prop.IsNullable) { #>
+                        let hasNull: boolean = false;
+<#          } #>
+                        filter.<#= GetTypeScriptPropertyName(prop, Model)#>.forEach(function (value) {
+                            if(!(typeof value === 'undefined')) {
+                                if(!(value === null)) {
+                                    params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', value<#= GetJavaScriptToStringMethod(prop) #>);
+                                    hasFilter = true;
+                                } 
+<#          if(prop.IsNullable) { #>
+                                else {
+                                    hasNull = true;
+                                }
+<#          } #>
+                            }
+                        });
+<#          if(prop.IsNullable) { #>
+                        if(hasNull) {
+                            params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', '');
+                        }
+<#          } #>
+                    } // if ( Array.isArray(filter.<#= GetTypeScriptPropertyName(prop, Model)#> ))
+                } // if (!(typeof filter.<#= GetTypeScriptPropertyName(prop, Model)#> === 'undefined'))
+<#
         }
+
+        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+            continue; // we do not need operators
+#>
+                if (!(typeof  filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> === 'undefined')) {
+                    if (Array.isArray(filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> )) {
+                        filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#>.forEach(function (value) {
+                            if(!(typeof value === 'undefined')) {
+                                if(value === null) {
+                                    params = params.append('<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>', '<#= EqualOperator #>');
+                                } 
+                                else {
+                                    params = params.append('<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>', value<#=GetJavaScriptToStringMethod(prop)#>);
+                                }
+                            }
+                        });
+                    } // if (Array.isArray(filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#>))
+                } // if (!(typeof  filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> === 'undefined'))
+<#
+        }
+#>
+
+                if (!(typeof filter.orderby === 'undefined')) {
+                    if ( Array.isArray(filter.orderby)) {
+                        filter.orderby.forEach(function (value) {
+                            if (!(typeof value === 'undefined')) {
+                                if(!(value === null)) {
+                                    params = params.append('orderby', value);
+                                    hasFilter = true;
+                                }
+                            }
+                        });
+                    }
+                }
+                if (!(typeof filter.page === 'undefined')) {
+                    if (!(filter.page === null)) {
+                        params = params.append('page', filter.page.toString());
+                        hasFilter = true;
+                    }
+                }
+                if (!(typeof filter.pagesize === 'undefined')) {
+                    if (!(filter.pagesize === null)) {
+                        params = params.append('pagesize', filter.pagesize.toString());
+                        hasFilter = true;
+                    }
+                }
+            } // if (!(filter === null ))
+        } // if (!(typeof filter === 'undefined'))
+        const options = hasFilter ? { params } : {};
+        return this.http.get<<#= GetInterfacePageName(Model) #>>(this.serviceUrl+'/<#= localRouteManyName #>', options);
     }
+
+<#
+            } // the end of: if (!indIsCorrect) {...} else {}
+        } // the end of: foreach(ModelViewUniqueKeyOfVwSerializable pk uniqueKeys) {}
+    } // if (Model.IsWebApiSelectOneByPrimarykey) { ... }
 #>
 
 <# 
@@ -1614,6 +1743,27 @@ export class <#= GetJavaScriptServiceName(Model) #> {
             return true;
         }
         return HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "identity") || HasFluentAtributeWithValue(prop, "HasDatabaseGeneratedOption", "computed");
+    }
+    bool IsUsedByForeignKey(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return false;
+        if (model.ForeignKeys == null) return false;
+        if (model.ForeignKeys.Count < 1) return false;
+        if(string.IsNullOrEmpty( prop.ForeignKeyName )) {
+            foreach(ModelViewForeignKeySerializable fk in model.ForeignKeys) {
+                if (fk.ForeignKeyProps != null) {
+                    if(fk.ForeignKeyProps.Any(k => k.OriginalPropertyName == prop.OriginalPropertyName)) return true;
+                }
+            }
+        } else if (prop.ForeignKeyName == prop.ForeignKeyNameChain) {
+            ModelViewForeignKeySerializable fk01 = model.ForeignKeys.Where(f => f.NavigationName == prop.ForeignKeyName).FirstOrDefault();
+            if(fk01 == null) return false;
+            if ((fk01.PrincipalKeyProps != null) && (fk01.ForeignKeyProps != null)) {
+                if(fk01.PrincipalKeyProps.Count == fk01.ForeignKeyProps.Count) {
+                    if ( fk01.PrincipalKeyProps.Any(k => k.OriginalPropertyName == prop.OriginalPropertyName) ) return true;
+                }
+            }
+        }
+        return false;
     }
 
 #>
