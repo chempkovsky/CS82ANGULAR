@@ -197,7 +197,7 @@
     string showBackBtnSelector          = "show-back-btn";
     
 
-    Tuple<ModelViewSerializable, ModelViewForeignKey, ModelViewUniqueKeySerializable, ModelViewSerializable, ModelViewForeignKey> masters = GetM2mMasters(Model, Context);
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, ModelViewUniqueKeySerializable, ModelViewSerializable, ModelViewForeignKeySerializable> masters = GetM2mMasters(Model, Context);
     if(masters == null) {
         throw new Exception(
 " For the " + Model.ViewName + "Could not find two foreign keys with the following requirements. \n"+
@@ -221,8 +221,8 @@
     string serviceClassName = GetServiceClassName(Model, viewServiceFolder);
     string serviceM2mClassName = GetServiceClassName(master2Model, viewServiceFolder);
 
-    string componentSelectorCommonPart = GetComponentSelectorCommonPart(serviceM2mClassName, sM2mformComponentFolder);
-    string componentClassName = GetComponentClassName(serviceM2mClassName, sM2mformComponentFolder);
+    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, sM2mformComponentFolder);
+    string componentClassName = GetComponentClassName(Model, sM2mformComponentFolder);
 
 
 #>
@@ -231,33 +231,33 @@ import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { SelectionChange, SelectionModel } from '@angular/cdk/collections';
-import { Observable } from 'rxjs';
 
 
-import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(master2Model, Context,  appSettingServiceFolder, sM2mformComponentFolder)#>';
-import { <#= uniqFilterDefModelClassName #> } from '<#=  GetCommonFolderName(master2Model, Context,  uniqFilterDefModelFolder, sM2mformComponentFolder)#>';
-import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(master2Model, Context,  filterResultModelFolder, sM2mformComponentFolder)#>';
-import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(master2Model, Context,  eventEmitterDataModelFolder, sM2mformComponentFolder)#>';
-import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(master2Model, Context,  menuItemDataModelFolder, sM2mformComponentFolder)#>';
-import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(master2Model, Context, eventEmitterPubModelFolder, sM2mformComponentFolder)#>';
-import { <#= itemHeightDataModelClassName #> } from '<#= GetCommonFolderName(master2Model, Context, itemHeightDataModelFolder, sM2mformComponentFolder)#>';
-import { <#= columnSelectorItemModelClassName #> } from '<#=  GetCommonFolderName(master2Model, Context,  columnSelectorItemInterfaceFolder, sM2mformComponentFolder)#>';
-import { <#= componentSelectorDlgComponentClassName #> } from '<#=  GetCommonFolderName(master2Model, Context,  columnSelectorDlgComponentFolder, sM2mformComponentFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, sM2mformComponentFolder)#>';
+import { <#= uniqFilterDefModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  uniqFilterDefModelFolder, sM2mformComponentFolder)#>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, sM2mformComponentFolder)#>';
+import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, sM2mformComponentFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  menuItemDataModelFolder, sM2mformComponentFolder)#>';
+import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Model, Context, eventEmitterPubModelFolder, sM2mformComponentFolder)#>';
+import { <#= itemHeightDataModelClassName #> } from '<#= GetCommonFolderName(Model, Context, itemHeightDataModelFolder, sM2mformComponentFolder)#>';
+import { <#= columnSelectorItemModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  columnSelectorItemInterfaceFolder, sM2mformComponentFolder)#>';
+import { <#= componentSelectorDlgComponentClassName #> } from '<#=  GetCommonFolderName(Model, Context,  columnSelectorDlgComponentFolder, sM2mformComponentFolder)#>';
 
 
 <# 
     {
         string viewNm = master2Model.ViewName;
 #>
-import { <#= GetInterfaceName(master2Model) #> } from '<#=  GetCrossComponentFolderName(master2Model, sM2mformComponentFolder, Context, viewNm, viewInterfaceFolder) #>';
-import { <#= GetInterfacePageName(master2Model) #> } from '<#= GetCrossComponentFolderName(master2Model, sM2mformComponentFolder, Context, viewNm, viewInterfacePageFolder) #>';
-import { <#= GetInterfaceFilterName(master2Model) #> } from '<#=  GetCrossComponentFolderName(master2Model, sM2mformComponentFolder, Context, viewNm, viewInterfaceFltFolder) #>';
-import { <#= GetServiceClassName(master2Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(master2Model, sM2mformComponentFolder, Context, viewNm, viewServiceFolder) #>';
 
-import { <#= GetInterfaceName(Model) #> } from '<#=  GetCrossComponentFolderName(master2Model, sM2mformComponentFolder, Context, Model.ViewName, viewInterfaceFolder) #>';
-import { <#= GetInterfacePageName(Model) #> } from '<#= GetCrossComponentFolderName(master2Model, sM2mformComponentFolder, Context, Model.ViewName, viewInterfacePageFolder) #>';
-import { <#= GetInterfaceFilterName(Model) #> } from '<#=  GetCrossComponentFolderName(master2Model, sM2mformComponentFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
-import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(master2Model, sM2mformComponentFolder, Context, Model.ViewName, viewServiceFolder) #>';
+import { <#= GetInterfaceName(master2Model) #> } from '<#=  GetCrossComponentFolderName(Model, sM2mformComponentFolder, Context, viewNm, viewInterfaceFolder) #>';
+import { <#= GetInterfacePageName(master2Model) #> } from '<#= GetCrossComponentFolderName(Model, sM2mformComponentFolder, Context, viewNm, viewInterfacePageFolder) #>';
+import { <#= GetInterfaceFilterName(master2Model) #> } from '<#=  GetCrossComponentFolderName(Model, sM2mformComponentFolder, Context, viewNm, viewInterfaceFltFolder) #>';
+import { <#= GetServiceClassName(master2Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, sM2mformComponentFolder, Context, viewNm, viewServiceFolder) #>';
+
+import { <#= GetInterfaceName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, sM2mformComponentFolder, Context, Model.ViewName, viewInterfaceFolder) #>';
+import { <#= GetInterfacePageName(Model) #> } from '<#= GetCrossComponentFolderName(Model, sM2mformComponentFolder, Context, Model.ViewName, viewInterfacePageFolder) #>';
+import { <#= GetInterfaceFilterName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, sM2mformComponentFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
+import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, sM2mformComponentFolder, Context, Model.ViewName, viewServiceFolder) #>';
 <# 
     }
 #>
@@ -266,11 +266,10 @@ import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCr
 
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
-  templateUrl: '<#= GetFolderName(master2Model, sM2mformHtmlFolder, sM2mformComponentFolder)#>.html',
-  styleUrls: ['<#=  GetFolderName(master2Model, sM2mformCssFolder, sM2mformComponentFolder)#>.css']
+  templateUrl: '<#= GetFolderName(Model, sM2mformHtmlFolder, sM2mformComponentFolder)#>.html',
+  styleUrls: ['<#=  GetFolderName(Model, sM2mformCssFolder, sM2mformComponentFolder)#>.css']
 })
 export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
-//===============
 
     _<#= showMultiSelectedRowPropName #>: boolean = true;
     @Input('<#= showMultiSelectedRowSelector #>')
@@ -573,7 +572,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     @Output('<#= applyFilterSelector #>') <#= applyFilterPropName #>: EventEmitter<<#= componentClassName #>|null> = new EventEmitter<<#= componentClassName #>|null>();
 
 
-    constructor(private  <#= formRootService #>: <#= serviceM2mClassName #>, <#= formDetailService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, protected dialog: MatDialog, private cd: ChangeDetectorRef) {
+    constructor(private  <#= formRootService #>: <#= serviceM2mClassName #>, private <#= formDetailService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, protected dialog: MatDialog, private cd: ChangeDetectorRef) {
         if(this.tableIndexMenuItemsData.length > 0) {
             this.curIndexMenuItemsData = this.tableIndexMenuItemsData[0];
             //this.onHiddenFilter();
@@ -605,14 +604,15 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         this.onFilter();
     }
 
+    inQuery: boolean = false;
     onFilter() {
-        inQuery: boolean = false;
+        this.inQuery = false;
         let dtlflt: <#= GetInterfaceFilterName(Model) #> | any = { page: this.currentPageIndex, pagesize: this.currentPageSize };
         this.<#= HiddenFilterPropName #>.forEach((hf: <#= filterResultModelClassName #>) => { 
                 if(typeof dtlflt[hf.fltrName] === 'undefined') {
-                    dtlflt[e.fltrName] = [];
+                    dtlflt[hf.fltrName] = [];
                 }
-                dtlflt[e.fltrName].push(e.fltrValue);
+                dtlflt[hf.fltrName].push(hf.fltrValue);
         });
         this.inQuery = true;
         this.<#= formDetailService #>.<#= GetManyByRepPrimMethodNamePrefix #>(dtlflt).subscribe({
@@ -638,15 +638,15 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                     return;
                 }
                 let mp1: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}} = this.<#= formDetailService #>.getm2cKeyfm()['<#= master2Model.ViewName #>'];
-                if(typeof mp1 === 'unndefined') {
+                if(typeof mp1 === 'undefined') {
                     this.dataSource = [];
                     this.<#= applyFilterPropName #>.emit(this);
                     this.<#= OnSelectRowMethodName #>(null);
                     this.cd.detectChanges();
                     return;
                 }
-                let mp2: {[key: string]: {isMstrReq: boolean ,propNm:string}} = mp1[<#= foreignKey2Model.NavigationName #>];
-                if(typeof mp2 === 'unndefined') {
+                let mp2: {[key: string]: {isMstrReq: boolean ,propNm:string}} = mp1['<#= foreignKey2Model.NavigationName #>'];
+                if(typeof mp2 === 'undefined') {
                     this.dataSource = [];
                     this.<#= applyFilterPropName #>.emit(this);
                     this.<#= OnSelectRowMethodName #>(null);
@@ -656,10 +656,10 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 let flt: <#= GetInterfaceFilterName(master2Model) #>|any = { page: this.currentPageIndex, pagesize: this.currentPageSize };
                 rsltd.forEach((src: <#= GetInterfaceName(Model) #> | any) => {
                     for(let i in mp2) {
-                        if(typeof flt[mp2[i]] === 'undefined') {
-                            flt[mp2[i]] = [];
+                        if(typeof flt[i] === 'undefined') {
+                            flt[i] = [];
                         }
-                        flt[mp2[i]].push(src[mp2[i].propNm]);
+                        flt[i].push(src[mp2[i].propNm]);
                     }
                 });
                 if (Array.isArray(this.currentFilter)) {
@@ -2757,34 +2757,42 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         return true;
     }
 
-    ModelViewPropertyOfVwSerializable GetScalarPropByOriginaPropName(string origPropName, ModelViewSerializable model) {
+    ModelViewPropertyOfVwSerializable GetScalarPropByOriginaPropName(string origPropName, ModelViewSerializable model) { 
         if (string.IsNullOrEmpty(origPropName) || (model == null)) return null;
         if ((model.AllProperties == null) || (model.ScalarProperties == null)) return null;
-        ModelViewPropertyOfVwSerializable aprop = model.AllProperties.Where(p => p.OriginalPropertyName == origPropName).FirstOrDefault();
+        ModelViewEntityPropertySerializable aprop = model.AllProperties.Where(p => p.OriginalPropertyName == origPropName).FirstOrDefault();
         if(aprop == null) return null;
-        ModelViewPropertyOfVwSerializable sprop = model.ScalarProperties.Where(p => (p.OriginalPropertyName == origPropName) && string.IsNullOrEmpty(p.ForeignKeyName));
+        ModelViewPropertyOfVwSerializable sprop = model.ScalarProperties.Where(p => 
+                (p.OriginalPropertyName == origPropName) && 
+                string.IsNullOrEmpty(p.ForeignKeyName)).FirstOrDefault();
         if(sprop != null) return sprop;
         if(model.ForeignKeys == null) return null;
         if(model.ForeignKeys.Count < 1) return null;
         foreach(ModelViewForeignKeySerializable fk in model.ForeignKeys) {
             if ((fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) continue;
-            if (fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1) continue;
+            if ((fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1)) continue;
             for(int i = 0; i < fk.ForeignKeyProps.Count; i++) {
                 if(fk.ForeignKeyProps[i].OriginalPropertyName == origPropName) {
-                    sprop = model.ScalarProperties.Where(p => (p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (p.ForeignKeyName == fk.NavigationName) && (p.ForeignKeyName == p.ForeignKeyNameChain));
+                    sprop = model.ScalarProperties.Where(p => 
+                    (p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && 
+                    (p.ForeignKeyName == fk.NavigationName) && 
+                    (p.ForeignKeyName == p.ForeignKeyNameChain)
+                    ).FirstOrDefault();
                     if(sprop != null) return sprop;
                 }
             }
         }
         return null;
     }
-    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, ModelViewSerializable, ModelViewForeignKeySerializable> GetM2mMasters(ModelViewSerializable model, DbContextSerializable context) {
+
+
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, ModelViewUniqueKeySerializable, ModelViewSerializable, ModelViewForeignKeySerializable> GetM2mMasters(ModelViewSerializable model, DbContextSerializable context) { 
         if ((model == null) || (context == null)) return null;
         if ((model.ForeignKeys == null) || (model.PrimaryKeyProperties == null) || (context.ModelViews == null)) return null;
         if (model.PrimaryKeyProperties.Count < 2) return null;
         foreach(ModelViewForeignKeySerializable fk1 in model.ForeignKeys) {
             if ((fk1.ForeignKeyProps == null) || (fk1.PrincipalKeyProps == null)) continue;
-            if ((fk1.PrincipalKeyProps.Count != fk1.ForeignKeyProps.Count) || (fk1.ForeignKeyProps.Count >= model.PrimaryKeyProperties)  || (fk1.ForeignKeyProps.Count < 1))  continue;
+            if ((fk1.PrincipalKeyProps.Count != fk1.ForeignKeyProps.Count) || (fk1.ForeignKeyProps.Count >= model.PrimaryKeyProperties.Count)  || (fk1.ForeignKeyProps.Count < 1))  continue;
             bool passed = false;
             for(int i = 0; i < fk1.ForeignKeyProps.Count; i++) {
                 passed = fk1.ForeignKeyProps[i].OriginalPropertyName == model.PrimaryKeyProperties[i].OriginalPropertyName;
@@ -2806,11 +2814,10 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 if(!passed) break;
             }
             if(!passed) continue;
-
             foreach(ModelViewForeignKeySerializable fk2 in model.ForeignKeys) {
                 if(fk2 == fk1) continue;
                 if ((fk2.ForeignKeyProps == null) || (fk2.PrincipalKeyProps == null)) continue;
-                if ((fk2.PrincipalKeyProps.Count != fk2.ForeignKeyProps.Count) || (fk2.ForeignKeyProps.Count >= model.PrimaryKeyProperties)  || (fk2.ForeignKeyProps.Count < 1))  continue;
+                if ((fk2.PrincipalKeyProps.Count != fk2.ForeignKeyProps.Count) || (fk2.ForeignKeyProps.Count >= model.PrimaryKeyProperties.Count)  || (fk2.ForeignKeyProps.Count < 1))  continue;
                 foreach(ModelViewKeyPropertySerializable fkp in fk2.ForeignKeyProps) {
                     passed = model.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == fkp.OriginalPropertyName);
                     if(!passed) break;
@@ -2824,7 +2831,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 if ((m2.ScalarProperties == null) || (m2.PrimaryKeyProperties == null)) continue; 
                 if ((m2.ScalarProperties.Count < 1) || (m2.PrimaryKeyProperties.Count < 1)) continue; 
                 foreach(ModelViewKeyPropertySerializable pkp in fk2.PrincipalKeyProps) {
-                    passed = m2.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == pkp.OriginalPropertyName);
+                  passed = m2.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == pkp.OriginalPropertyName);
                     if(!passed) break;
                     ModelViewPropertyOfVwSerializable sp04 = GetScalarPropByOriginaPropName(pkp.OriginalPropertyName, m2);
                     passed = sp04 != null;
@@ -2839,7 +2846,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                         ModelViewPropertyOfVwSerializable sp05 = GetScalarPropByOriginaPropName(ukp.OriginalPropertyName, m1);
                         passed = sp05 != null;
                         if(!passed) break;
-                        passed = m2.ScalarProperties.Any(p => p.ViewPropertyName == sp05.ViewPropertyName)
+                        passed = m2.ScalarProperties.Any(p => p.ViewPropertyName == sp05.ViewPropertyName);
                         if(!passed) break;
                     }
                     if (!passed) continue;

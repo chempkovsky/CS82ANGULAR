@@ -110,7 +110,7 @@
     string filterComponentSelectorCommonPart = GetContextComponentSelectorCommonPart(Context, filterComponentFolder);
     string uniqFilterComponentSelectorCommonPart = GetContextComponentSelectorCommonPart(Context, uniqFilterComponentFolder);
 
-    Tuple<ModelViewSerializable, ModelViewForeignKey, ModelViewUniqueKeySerializable, ModelViewSerializable, ModelViewForeignKey> masters = GetM2mMasters(Model, Context);
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, ModelViewUniqueKeySerializable, ModelViewSerializable, ModelViewForeignKeySerializable> masters = GetM2mMasters(Model, Context);
     if(masters == null) {
         throw new Exception(
 " For the " + Model.ViewName + "Could not find two foreign keys with the following requirements. \n"+
@@ -168,8 +168,7 @@
     </td>
   </ng-container>
 
-
-<#
+  <#
     foreach(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable in master2Model.UIListProperties) {
         if (!modelViewUIListPropertySerializable.IsShownInView) {
             continue;
@@ -182,6 +181,8 @@
 <#
     }
 #>
+
+
 
     <ng-container matColumnDef="<#= ActionColumnDefProperty #>" stickyEnd>
         <th mat-header-cell *matHeaderCellDef>
@@ -833,34 +834,42 @@
         }
         return refItem.FileName.Replace(".component","");
     }
-    ModelViewPropertyOfVwSerializable GetScalarPropByOriginaPropName(string origPropName, ModelViewSerializable model) {
+    ModelViewPropertyOfVwSerializable GetScalarPropByOriginaPropName(string origPropName, ModelViewSerializable model) { 
         if (string.IsNullOrEmpty(origPropName) || (model == null)) return null;
         if ((model.AllProperties == null) || (model.ScalarProperties == null)) return null;
-        ModelViewPropertyOfVwSerializable aprop = model.AllProperties.Where(p => p.OriginalPropertyName == origPropName).FirstOrDefault();
+        ModelViewEntityPropertySerializable aprop = model.AllProperties.Where(p => p.OriginalPropertyName == origPropName).FirstOrDefault();
         if(aprop == null) return null;
-        ModelViewPropertyOfVwSerializable sprop = model.ScalarProperties.Where(p => (p.OriginalPropertyName == origPropName) && string.IsNullOrEmpty(p.ForeignKeyName));
+        ModelViewPropertyOfVwSerializable sprop = model.ScalarProperties.Where(p => 
+                (p.OriginalPropertyName == origPropName) && 
+                string.IsNullOrEmpty(p.ForeignKeyName)).FirstOrDefault();
         if(sprop != null) return sprop;
         if(model.ForeignKeys == null) return null;
         if(model.ForeignKeys.Count < 1) return null;
         foreach(ModelViewForeignKeySerializable fk in model.ForeignKeys) {
             if ((fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) continue;
-            if (fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1) continue;
+            if ((fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1)) continue;
             for(int i = 0; i < fk.ForeignKeyProps.Count; i++) {
                 if(fk.ForeignKeyProps[i].OriginalPropertyName == origPropName) {
-                    sprop = model.ScalarProperties.Where(p => (p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (p.ForeignKeyName == fk.NavigationName) && (p.ForeignKeyName == p.ForeignKeyNameChain));
+                    sprop = model.ScalarProperties.Where(p => 
+                    (p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && 
+                    (p.ForeignKeyName == fk.NavigationName) && 
+                    (p.ForeignKeyName == p.ForeignKeyNameChain)
+                    ).FirstOrDefault();
                     if(sprop != null) return sprop;
                 }
             }
         }
         return null;
     }
-    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, ModelViewSerializable, ModelViewForeignKeySerializable> GetM2mMasters(ModelViewSerializable model, DbContextSerializable context) {
+
+
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, ModelViewUniqueKeySerializable, ModelViewSerializable, ModelViewForeignKeySerializable> GetM2mMasters(ModelViewSerializable model, DbContextSerializable context) { 
         if ((model == null) || (context == null)) return null;
         if ((model.ForeignKeys == null) || (model.PrimaryKeyProperties == null) || (context.ModelViews == null)) return null;
         if (model.PrimaryKeyProperties.Count < 2) return null;
         foreach(ModelViewForeignKeySerializable fk1 in model.ForeignKeys) {
             if ((fk1.ForeignKeyProps == null) || (fk1.PrincipalKeyProps == null)) continue;
-            if ((fk1.PrincipalKeyProps.Count != fk1.ForeignKeyProps.Count) || (fk1.ForeignKeyProps.Count >= model.PrimaryKeyProperties)  || (fk1.ForeignKeyProps.Count < 1))  continue;
+            if ((fk1.PrincipalKeyProps.Count != fk1.ForeignKeyProps.Count) || (fk1.ForeignKeyProps.Count >= model.PrimaryKeyProperties.Count)  || (fk1.ForeignKeyProps.Count < 1))  continue;
             bool passed = false;
             for(int i = 0; i < fk1.ForeignKeyProps.Count; i++) {
                 passed = fk1.ForeignKeyProps[i].OriginalPropertyName == model.PrimaryKeyProperties[i].OriginalPropertyName;
@@ -882,11 +891,10 @@
                 if(!passed) break;
             }
             if(!passed) continue;
-
             foreach(ModelViewForeignKeySerializable fk2 in model.ForeignKeys) {
                 if(fk2 == fk1) continue;
                 if ((fk2.ForeignKeyProps == null) || (fk2.PrincipalKeyProps == null)) continue;
-                if ((fk2.PrincipalKeyProps.Count != fk2.ForeignKeyProps.Count) || (fk2.ForeignKeyProps.Count >= model.PrimaryKeyProperties)  || (fk2.ForeignKeyProps.Count < 1))  continue;
+                if ((fk2.PrincipalKeyProps.Count != fk2.ForeignKeyProps.Count) || (fk2.ForeignKeyProps.Count >= model.PrimaryKeyProperties.Count)  || (fk2.ForeignKeyProps.Count < 1))  continue;
                 foreach(ModelViewKeyPropertySerializable fkp in fk2.ForeignKeyProps) {
                     passed = model.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == fkp.OriginalPropertyName);
                     if(!passed) break;
@@ -900,7 +908,7 @@
                 if ((m2.ScalarProperties == null) || (m2.PrimaryKeyProperties == null)) continue; 
                 if ((m2.ScalarProperties.Count < 1) || (m2.PrimaryKeyProperties.Count < 1)) continue; 
                 foreach(ModelViewKeyPropertySerializable pkp in fk2.PrincipalKeyProps) {
-                    passed = m2.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == pkp.OriginalPropertyName);
+                  passed = m2.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == pkp.OriginalPropertyName);
                     if(!passed) break;
                     ModelViewPropertyOfVwSerializable sp04 = GetScalarPropByOriginaPropName(pkp.OriginalPropertyName, m2);
                     passed = sp04 != null;
@@ -915,7 +923,7 @@
                         ModelViewPropertyOfVwSerializable sp05 = GetScalarPropByOriginaPropName(ukp.OriginalPropertyName, m1);
                         passed = sp05 != null;
                         if(!passed) break;
-                        passed = m2.ScalarProperties.Any(p => p.ViewPropertyName == sp05.ViewPropertyName)
+                        passed = m2.ScalarProperties.Any(p => p.ViewPropertyName == sp05.ViewPropertyName);
                         if(!passed) break;
                     }
                     if (!passed) continue;
@@ -925,5 +933,4 @@
         }
         return null;
     }
-
 #>

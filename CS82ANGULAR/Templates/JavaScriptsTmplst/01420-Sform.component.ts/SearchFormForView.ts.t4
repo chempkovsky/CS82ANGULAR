@@ -244,7 +244,6 @@ import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCr
   styleUrls: ['<#=  GetFolderName(Model, sformCssFolder, sformComponentFolder)#>.css']
 })
 export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
-//===============
 
     _<#= showMultiSelectedRowPropName #>: boolean = true;
     @Input('<#= showMultiSelectedRowSelector #>')
