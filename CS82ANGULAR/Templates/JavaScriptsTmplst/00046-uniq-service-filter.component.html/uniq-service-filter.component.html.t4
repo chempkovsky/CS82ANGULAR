@@ -32,6 +32,11 @@
     string fltrSmPropName          = "fltrSm";
     string fltrXsPropName          = "fltrXs";
 
+    string tpAheadVarsPropName          = "tpAheadVars";
+    string tpAheadCptnPropName          = "tpAheadCptn";
+
+    string showFilterExPropName         = "showFilterEx";
+    string MaxHeightExPropName          = "maxHeightEx";
 
 #>
 
@@ -57,17 +62,33 @@
 <span fxFlex="1%"></span>
 </div> 
 
-<div *ngIf="showFilter" [style.maxHeight.em]="<#= MaxHeightPropName #>X" [style.overflow]="<#= OverflowPropName #>"> 
+<div *ngIf="<#= showFilterExPropName #>" [style.maxHeight.em]="<#= MaxHeightExPropName #>" [style.overflow]="<#= OverflowPropName #>"> 
     <div fxLayout="row wrap" fxLayoutAlign="space-between" style="margin: 0 15px;">
-        <div *ngFor="let flt of webServiceFilters;" [fxFlex.gt-md]="flt.<#= fltrMdPropName #>" [fxFlex.gt-sm]="flt.<#= fltrSmPropName #>" [fxFlex.gt-xs]="flt.<#= fltrXsPropName #>" [fxFlex]="flt.<#= fltrFlxPropName #>">
-            <ng-template [ngIf]="flt.fltrDataType !==  'datetime'">
+        <div *ngFor="let flt of webServiceFilters;let i = index" [fxFlex.gt-md]="flt.<#= fltrMdPropName #>" [fxFlex.gt-sm]="flt.<#= fltrSmPropName #>" [fxFlex.gt-xs]="flt.<#= fltrXsPropName #>" [fxFlex]="flt.<#= fltrFlxPropName #>">
+<#
+    for(int iii = 0; iii < 7;iii++) {
+#>
+            <ng-template [ngIf]="(flt.fltrDataType !==  'datetime') && (flt.fltrDataType !==  'bool')  && (flt.fltrDataType !==  'boolean')  && (i === <#= iii #>)">
                 <mat-form-field  [appearance]="<#= AppearancePropName #>" fxFlex="100">
                     <mat-label>{{flt.fltrCaption}}</mat-label>
-                    <input  matInput placeholder="{{flt.fltrCaption}}" [formControl]="flt.fltrValue" [maxlength]="flt.fltrMaxLen">
+                    <input type="text" placeholder="{{flt.fltrCaption}}" matInput [formControl]="flt.fltrValue" [matAutocomplete]="tpAhead<#= iii #>">
+                    <mat-autocomplete autoActiveFirstOption #tpAhead<#= iii #>="matAutocomplete" >
+                        <mat-option *ngFor="let v of (<#= tpAheadVarsPropName #><#= iii #> | async);" [value]="v">{{ <#= tpAheadCptnPropName #>(v,<#= iii #>) }}</mat-option>
+                    </mat-autocomplete>
                     <mat-error *ngIf="flt.fltrValue.invalid">{{getErrorMessage(flt.fltrValue)}}</mat-error>
                     <mat-hint align="end" *ngIf="flt.fltrMaxLen">{{flt.fltrValue.value?.length || 0}}/{{flt.fltrMaxLen}}</mat-hint>
                 </mat-form-field>
             </ng-template>
+<#
+    }
+#>
+
+            <ng-template [ngIf]="flt.fltrDataType === 'boolean' || flt.fltrDataType === 'bool'">
+                <mat-form-field [appearance]="<#= AppearancePropName #>" fxFlex="100">
+                    <mat-checkbox [formControl]="flt.fltrValue"> {{flt.fltrCaption}} </mat-checkbox>
+                </mat-form-field>
+            </ng-template>
+
             <ng-template [ngIf]="flt.fltrDataType === 'datetime'">
                 <mat-form-field [appearance]="<#= AppearancePropName #>" fxFlex="100">
                     <mat-label>{{flt.fltrCaption}}</mat-label>

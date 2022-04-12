@@ -13,8 +13,6 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
     string AppearancePropName           = "appearance";
-    string MaxHeightPropSelector        = "max-height";
-    string MaxHeightPropName            = "maxHeight";
     string OverflowSelector             = "ovrflw";
     string OverflowPropName             = "ovrflw";
     string containerMenuItemsPropName           = "contMenuItems";
@@ -29,6 +27,9 @@
     string captionPropName              = "caption";
     string captionSelector              = "caption";
 
+    string showFilterExPropName         = "showFilterEx";
+    string MaxHeightExPropName          = "maxHeightEx";
+
 #>
 
   <div>
@@ -39,12 +40,12 @@
             <mat-icon>arrow_back</mat-icon>
         </button>         
         <span fxFlex="3%"></span>  
-        <button mat-icon-button color="primary" (click)="addFilter()" *ngIf="showFilter && <#= showAddFltItemPropName #>"
+        <button mat-icon-button color="primary" (click)="addFilter()" *ngIf="<#= showFilterExPropName #> && <#= showAddFltItemPropName #>"
             matTooltip="Add filter item "> 
             <mat-icon  >filter_9_plus</mat-icon>
         </button>        
         <span fxFlex="1%"></span>   
-        <button mat-icon-button color="warn" (click)="removeAllFilters()" *ngIf="showFilter && <#= showAddFltItemPropName #>"
+        <button mat-icon-button color="warn" (click)="removeAllFilters()" *ngIf="<#= showFilterExPropName #> && <#= showAddFltItemPropName #>"
             matTooltip="Remove all filter items"> 
             <mat-icon  >filter_none</mat-icon>
         </button>       
@@ -64,7 +65,7 @@
         <span fxFlex="1%"></span>
      </div> 
 
-    <div *ngIf="showFilter" [style.maxHeight.em]="<#= MaxHeightPropName #>X" [style.overflow]="<#= OverflowPropName #>"> 
+    <div *ngIf="<#= showFilterExPropName #>" [style.maxHeight.em]="<#= MaxHeightExPropName #>" [style.overflow]="<#= OverflowPropName #>"> 
         <div 
             fxLayout
             fxLayout.xs="column"

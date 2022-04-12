@@ -604,16 +604,22 @@ namespace <#= webApiServiceNameSpace #> {
         foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
 #>                
              [FromQuery] <#= GetNullableType(prop)#>[] <#= GetFilterPropertyName(prop, Model) #>,
+             [FromQuery] string[] <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>,
 <#
         } 
         bool hasForeign = false;
+        bool hasForeignUnderPrim = false;
         foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
             if(!prop.IsUsedByfilter) continue;
-            if (primKeys.Any(p => p == prop)) continue;
+            if (primKeys.Any(p => p == prop)) {
+                if(IsUsedByForeignKey(prop, Model)) hasForeignUnderPrim = true;
+                continue;
+            }
             if(!IsUsedByForeignKey(prop, Model)) continue;
             hasForeign = true;
 #>                
              [FromQuery] <#= GetNullableType(prop)#>[] <#= GetFilterPropertyName(prop, Model) #>,
+             [FromQuery] string[] <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>,
 <#
         }
 #>            
@@ -640,53 +646,108 @@ namespace <#= webApiServiceNameSpace #> {
         foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
 #>                
             int _<#= GetFilterPropertyName(prop, Model) #> = <#= GetFilterPropertyName(prop, Model) #> == null ? 0 : <#= GetFilterPropertyName(prop, Model) #>.Length;
+            int _<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #> = <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #> == null ? 0 : <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>.Length;
 <#
+            if(IsUsedByForeignKey(prop, Model)) {
+#>
+            int _appld<#= GetFilterPropertyName(prop, Model) #> = 0;
+<#
+            }
         } 
 #>                
             IQueryable<<#= Model.RootEntityClassName #>> query = db.<#= Model.RootEntityDbContextPropertyName #>;
             var _outer = PredicateBuilder.New<<#= Model.RootEntityClassName #>>(false);
             bool isOuterModified = false;
             if ( _<#= GetFilterPropertyName(primKeys[0], Model) #> > 0 ) {
+                bool isLkOp = false;
                 for(int i = 0; i < _<#= GetFilterPropertyName(primKeys[0], Model) #>; i++) {
                     var _inner = PredicateBuilder.New<<#= Model.RootEntityClassName #>>(true);
 <#
-        int cnt02 = 0;
-        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+        for(int cnt02 = 0; cnt02 < primKeys.Count; cnt02++) {
+            ModelViewPropertyOfVwSerializable prop = primKeys[cnt02];
+            bool propIsString = prop.UnderlyingTypeName.Equals("System.String");
             if(cnt02 > 0) {
 #>                
-                    if (_<#= GetFilterPropertyName(prop, Model) #> >= i) {
+                    if (_<#= GetFilterPropertyName(prop, Model) #> <= i) {
                         _outer = _outer.Or(_inner);
                         isOuterModified = true;
                         continue;
                     }
 <#
             }
-            cnt02++;
+#>
+                    isLkOp = false;
+                    if(i < _<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>) {
+                        isLkOp = <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i] == "lk";
+                    }
+<#
             if (prop.IsRequired) {
 #>                
-                    if (<#= GetFilterPropertyName(prop, Model) #>[i] == null) continue; // (required prop == null) returns false
+                    if (<#= GetFilterPropertyName(prop, Model) #>[i] == null) // continue; (required prop == null) returns false
+                    {
+<#
+            if (cnt02 > 0) {
+#>
+                        if(i < 1) {
+                            _outer = _outer.Or(_inner);
+                            isOuterModified = true;
+                        }
+<#
+            }
+#>
+                        continue;
+                    }
                     var _tmp<#= GetFilterPropertyName(prop, Model) #> = <#= GetFilterPropertyName(prop, Model) #>[i];
+<#
+                    if(propIsString) {
+#>                       
+                    if(isLkOp) { _inner = _inner.And(p => p.<#= prop.OriginalPropertyName #>.StartsWith(_tmp<#= GetFilterPropertyName(prop, Model) #>)); }
+                    else { _inner = _inner.And(p => p.<#= prop.OriginalPropertyName #> == _tmp<#= GetFilterPropertyName(prop, Model) #>); }
+<#
+                    } else {
+#>                        
                     _inner = _inner.And(p => p.<#= prop.OriginalPropertyName #> == _tmp<#= GetFilterPropertyName(prop, Model) #>);
 <#
+                    }
+                    if(IsUsedByForeignKey(prop, Model)) {
+#>
+                    _appld<#= GetFilterPropertyName(prop, Model) #>++;
+<#
+                    }
             } else {
 #>                
                     if (<#= GetFilterPropertyName(prop, Model) #>[i] == null) {
                         _inner = _inner.And(p => p.<#= prop.OriginalPropertyName #> == null);
                     } else {
                         var _tmp<#= GetFilterPropertyName(prop, Model) #> = <#= GetFilterPropertyName(prop, Model) #>[i];
+<#
+                    if(propIsString) {
+#>                       
+                        if(isLkOp) { _inner = _inner.And(p => p.<#= prop.OriginalPropertyName #>.StartsWith(_tmp<#= GetFilterPropertyName(prop, Model) #>)); }
+                        else { _inner = _inner.And(p => p.<#= prop.OriginalPropertyName #> == _tmp<#= GetFilterPropertyName(prop, Model) #>); }
+<#
+                    } else {
+#>                        
                         _inner = _inner.And(p => p.<#= prop.OriginalPropertyName #> == _tmp<#= GetFilterPropertyName(prop, Model) #>);
+<#
+                    }
+                    if(IsUsedByForeignKey(prop, Model)) {
+#>
+                        _appld<#= GetFilterPropertyName(prop, Model) #>++;
+<#
+                    }
+#>                        
                     }
 <#
             }
         } 
-
 #>                
                     _outer = _outer.Or(_inner);
                     isOuterModified = true;
                 }
             }
 <#
-        if(hasForeign) {
+        if(hasForeign || hasForeignUnderPrim) {
 #>
             bool isForeignAdded = false;
             var _outerAnd = PredicateBuilder.New<<#= Model.RootEntityClassName #>>(true);
@@ -694,7 +755,7 @@ namespace <#= webApiServiceNameSpace #> {
         }
         foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
             if(!prop.IsUsedByfilter) continue;
-            if (primKeys.Any(p => p == prop)) continue;
+            // if (primKeys.Any(p => p == prop)) continue;
             if(!IsUsedByForeignKey(prop, Model)) continue;
             string fkOriginalPropertyName = GetFkOriginalPropertyName(prop, Model);
 #>                
@@ -702,13 +763,18 @@ namespace <#= webApiServiceNameSpace #> {
                 if(<#= GetFilterPropertyName(prop, Model) #>.Length > 0) {
                     for(int i = 0; i < <#= GetFilterPropertyName(prop, Model) #>.Length; i++) {
 <#
+            if(IsUsedByForeignKey(prop, Model) && primKeys.Any(p => p == prop)) {
+#>
+                        if(i < _appld<#= GetFilterPropertyName(prop, Model) #>) continue; // skip props which are used by the PrimKey
+<#
+            }
             if (prop.IsRequired) {
 #>                
                         if (<#= GetFilterPropertyName(prop, Model) #>[i] == null) continue; // (required prop == null) returns false
                         var _tmp<#= GetFilterPropertyName(prop, Model) #> = <#= GetFilterPropertyName(prop, Model) #>[i];
                         _outerAnd = _outerAnd.And(p => p.<#= fkOriginalPropertyName #> == _tmp<#= GetFilterPropertyName(prop, Model) #>);
 <#
-                if(hasForeign) {
+                if(hasForeign || hasForeignUnderPrim) {
 #>
                         isForeignAdded = true;
 <#
@@ -722,7 +788,7 @@ namespace <#= webApiServiceNameSpace #> {
                             _outerAnd = _outerAnd.And(p => p.<#= fkOriginalPropertyName #> == _tmp<#= GetFilterPropertyName(prop, Model) #>);
                         }
 <#
-                if(hasForeign) {
+                if(hasForeign || hasForeignUnderPrim) {
 #>
                         isForeignAdded = true;
 <#
@@ -734,7 +800,7 @@ namespace <#= webApiServiceNameSpace #> {
              }
 <#
         }
-        if(hasForeign) {
+        if(hasForeign || hasForeignUnderPrim) {
 #>
             if(isForeignAdded) {
                 if(isOuterModified) {
@@ -755,7 +821,7 @@ namespace <#= webApiServiceNameSpace #> {
             int pageCount = ((totals > 0) ? ((int)Math.Ceiling((double)totals / (double)currentPageSize)) : 0);
             IOrderedQueryable<<#= Model.RootEntityClassName #>> orderedQuery = null;
 <#
-        if(hasForeign) {
+        if(hasForeign || hasForeignUnderPrim) {
 #>
             if(!isForeignAdded)
 <#

@@ -16,23 +16,33 @@
     string showAddFltItemSelector       = "show-add-flt-item";
     string showAddFltItemPropName       = "showAddFltItem";
 
-    string showFilterSelector           = "show-filter";
-    string showFilterPropName           = "showFilter";
-    string inputFilterDefsSelector      = "filter-defs";
-    string inputFilterDefsPropName      = "inputFilterDefs";
     string AppSettingServicePropName    = "appGlblSettings";
     string AppearancePropName           = "appearance";
-    string MaxHeightPropSelector        = "max-height";
-    string MaxHeightPropName            = "maxHeight";
     string OverflowSelector             = "ovrflw";
     string OverflowPropName             = "ovrflw";
+
     string containerMenuItemsPropName           = "contMenuItems";
     string containerMenuItemsSelector           = "cont-menu-items";
     string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
     string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
     string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+
     string externalFilterSelector               = "external-filter";
     string externalFilterPropName               = "externalFilter";
+    string externalFilterExPropName             = "externalFilterEx";
+
+    string MaxHeightPropSelector                = "max-height";
+    string MaxHeightPropName                    = "maxHeight";
+    string MaxHeightExPropName                  = "maxHeightEx";
+
+    string showFilterSelector                   = "show-filter";
+    string showFilterPropName                   = "showFilter";
+    string showFilterExPropName                 = "showFilterEx";
+
+    string inputFilterDefsSelector              = "filter-defs";
+    string inputFilterDefsPropName              = "inputFilterDefs";
+    string inputFilterDefsExPropName            = "inputFilterDefsEx";
+
 
 
     Dictionary<string, string> RegExps = new Dictionary<string, string>() {
@@ -82,11 +92,28 @@
     string captionSelector              = "caption";
     string ShowErrorMethodName          = "showError";
 
+    string tpAheadVarsPropName          = "tpAheadVars";
+    string tpAheadValPropName           = "tpAheadVal";
+    string tpAheadValSelector           = "tp-ahead-val";
+    string tpAheadFncPropName           = "tpAheadFnc";
+    string tpAheadFncSelector           = "tp-ahead-fnc";
+    string tpAheadSrvPropName           = "tpAheadSrv";
+    string tpAheadSrvSelector           = "tp-ahead-srv";
+    string tpAheadCptnPropName          = "tpAheadCptn";
+    string tpAheadCptnSelector          = "tp-ahead-cptn";
+    string clearTpAheadVarsMethodName   = "clrTpAheadVars";
+    string tpahValChangedMethodName     = "tpahVlChngs";
+    string patchcontrolsMethodName      = "patchcontrols";
+    string afterPatchControlsPropName   = "afterPatchControls";
+    string afterPatchControlsSelector   = "after-patch-controls";
+
 
 #>
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { FormControl, Validators, ValidatorFn, ValidationErrors } from '@angular/forms';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
+import { debounceTime, Observable, of, switchMap } from 'rxjs';
+import { MatSelectChange } from '@angular/material/select';
 
 import { <#= uniqFilterModelClassName #> } from '<#= GetFolderName(Model, uniqFilterModelFolder, uniqFilterComponentFolder)#>';
 import { <#= uniqFilterDefModelClassName #> } from '<#= GetFolderName(Model, uniqFilterDefModelFolder, uniqFilterComponentFolder)#>';
@@ -97,7 +124,7 @@ import { <#= eventEmitterDataModelClassName #> } from '<#= GetFolderName(Model, 
 import { <#= eventEmitterPubModelClassName #> } from '<#= GetFolderName(Model, eventEmitterPubModelFolder, uniqFilterComponentFolder)#>';
 
 
-import { MatSelectChange } from '@angular/material/select';
+
 
 
 @Component({
@@ -117,17 +144,17 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
     }
 
     public <#= OverflowPropName #>: string | null = null;   
-    public  <#= MaxHeightPropName #>X: number|null = null;
+    public  <#= MaxHeightExPropName #>: number|null = null;
     protected _<#= MaxHeightPropName #>: number|null = null;
     @Input('<#= MaxHeightPropSelector #>')
-        get <#= MaxHeightPropName #>(): number|null {
-            return this._<#= MaxHeightPropName #>;
-        }
+      get <#= MaxHeightPropName #>(): number|null {
+        return this._<#= MaxHeightPropName #>;
+      }
       set <#= MaxHeightPropName #>(inp: number|null) {
+        this._<#= MaxHeightPropName #> = inp;
         if (!(typeof inp === 'undefined')) {
           if(!(inp === null)) {
-            this.<#= MaxHeightPropName #>X = inp * this.<#= AppSettingServicePropName #>.filterHeightFactor + this.<#= AppSettingServicePropName #>.filterHeightAddition;
-            this._<#= MaxHeightPropName #> = inp;
+            this.<#= MaxHeightExPropName #> = inp * this.<#= AppSettingServicePropName #>.filterHeightFactor + this.<#= AppSettingServicePropName #>.filterHeightAddition;
             this.<#= OverflowPropName #> = 'auto';
             if(this.isOnInitCalled) {
               this.cd.detectChanges();
@@ -135,8 +162,7 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
             return;
           }
         }
-        this._<#= MaxHeightPropName #> = null;
-        this.<#= MaxHeightPropName #>X = null;
+        this.<#= MaxHeightExPropName #> = null;
         this.<#= OverflowPropName #> = null;
         if(this.isOnInitCalled) {
             this.cd.detectChanges();
@@ -154,15 +180,17 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
         this.<#= onContainerMenuItemClickEmitter #>.emit(e);
     }
 
-    protected _<#= showFilterPropName #>: boolean = true;
+    public <#= showFilterExPropName #>: boolean = true;
+    protected _<#= showFilterPropName #>: boolean|any = true;
     @Input('<#= showFilterSelector #>') 
       get <#= showFilterPropName #>(): boolean {
         return this._<#= showFilterPropName #>;
       }
-      set <#= showFilterPropName #>(inshow: boolean) {
+      set <#= showFilterPropName #>(inshow: boolean|any) {
+        this._<#= showFilterPropName #> = inshow;
         if (!(typeof inshow === 'undefined')) {
           if(!(inshow === null)) {
-            this._<#= showFilterPropName #> = inshow;
+            this.<#= showFilterExPropName #> = inshow as boolean;
             if(this.isOnInitCalled) {
               this.onFilterDefsChanged();
             }
@@ -171,19 +199,20 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
       }
 
 
+    <#= inputFilterDefsExPropName #>: Array<<#= uniqFilterDefModelClassName #>> = [];
     protected _<#= inputFilterDefsPropName #>: Array<<#= uniqFilterDefModelClassName #>> = [];
-
     @Input('<#= inputFilterDefsSelector #>') 
         get <#= inputFilterDefsPropName #>(): Array<<#= uniqFilterDefModelClassName #>> {
           return this._<#= inputFilterDefsPropName #>;
         }
         set <#= inputFilterDefsPropName #>(inDef: Array<<#= uniqFilterDefModelClassName #>>) {
+          this._<#= inputFilterDefsPropName #> = inDef
           if (typeof inDef === 'undefined') {
-            this._<#= inputFilterDefsPropName #> = [];
+            this.<#= inputFilterDefsExPropName #> = [];
           } else if(!Array.isArray(inDef)) {
-            this._<#= inputFilterDefsPropName #> = [];
+            this.<#= inputFilterDefsExPropName #> = [];
           } else {
-            this._<#= inputFilterDefsPropName #> =  inDef;
+            this.<#= inputFilterDefsExPropName #> =  inDef;
           }
           if(this.isOnInitCalled) {
             this.onFilterDefsChanged();
@@ -203,17 +232,19 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
     ngOnInit(): void {
         this.onFilterDefsChanged();
         this.isOnInitCalled = true;
+        this.cd.detectChanges();
     }
 
     onFilterDefsChanged(): void {
         this.webServiceFilterDefs = [];
-        this.<#= inputFilterDefsPropName #>.forEach(i => {
-            this.webServiceFilterDefs.push({ fltrName: i.fltrName, fltrCaption: i.fltrCaption, fltrDataType: i.fltrDataType, fltrMaxLen: i.fltrMaxLen, fltrMin: i.fltrMin, fltrMax: i.fltrMax, fltrFlx: i.fltrFlx, fltrMd: i.fltrMd, fltrSm: i.fltrSm, fltrXs: i.fltrXs });
-        });    
+        this.<#= clearTpAheadVarsMethodName #>();
         if(this.<#= showFilterPropName #>) {
+            this.<#= inputFilterDefsExPropName #>.forEach(i => {
+                this.webServiceFilterDefs.push({ fltrName: i.fltrName, fltrCaption: i.fltrCaption, fltrDataType: i.fltrDataType, fltrMaxLen: i.fltrMaxLen, fltrMin: i.fltrMin, fltrMax: i.fltrMax, fltrFlx: i.fltrFlx, fltrMd: i.fltrMd, fltrSm: i.fltrSm, fltrXs: i.fltrXs });
+            });    
             let wsfd: Array<<#= uniqFilterModelClassName #>> = [];
             this.webServiceFilterDefs.forEach(i => {
-                let k: number = this._<#= externalFilterPropName #>.findIndex((h: <#= filterResultModelClassName #>) => { h.fltrName = i.fltrName });
+                let k: number = this.<#= externalFilterExPropName #>.findIndex((h: <#= filterResultModelClassName #>) => { return h.fltrName === i.fltrName; });
                 let flt: <#= uniqFilterModelClassName #> = {
                     fltrDataType: i.fltrDataType, 
                     fltrValue: new FormControl({ value: null, disabled: false }), 
@@ -222,10 +253,23 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
                     fltrFlx: i.fltrFlx, fltrMd: i.fltrMd, fltrSm: i.fltrSm, fltrXs: i.fltrXs
                 };
                 this.resetVldtrs(flt);
-                if ((k > -1) && (!(typeof this._<#= externalFilterPropName #>[k].fltrValue === 'undefined'))) flt.fltrValue.reset({ value: this._<#= externalFilterPropName #>[k].fltrValue, disabled: false });
+                if ((k > -1) && (!(typeof this.<#= externalFilterExPropName #>[k].fltrValue === 'undefined'))) flt.fltrValue.reset({ value: this.<#= externalFilterExPropName #>[k].fltrValue, disabled: false });
                 wsfd.push(flt);
             });
             this.webServiceFilters = wsfd;
+            let indx: number = 0;
+            this.webServiceFilters.forEach((flt: <#= uniqFilterModelClassName #>) => {
+              if((flt.fltrDataType === 'boolean') || (flt.fltrDataType === 'bool')) {
+                if ((typeof flt.fltrValue.value === 'undefined') || (flt.fltrValue.value === null)) flt.fltrValue.patchValue(false, {emitEvent: false});
+                flt.fltrValue.valueChanges.subscribe({next: (e: any) => this.<#= afterPatchControlsPropName #>.emit(null) });
+              } else if ((flt.fltrDataType === 'datetime'))  {
+                if (typeof flt.fltrValue.value === 'undefined') flt.fltrValue.patchValue(null, {emitEvent: false});
+                flt.fltrValue.valueChanges.subscribe({next: (e: any) => this.<#= afterPatchControlsPropName #>.emit(null) });
+              } else {
+                this.<#= tpahValChangedMethodName #>(flt.fltrValue, indx);
+              }
+              indx = indx + 1;
+            });
         } else {
             this.webServiceFilters = [];
         }
@@ -361,33 +405,103 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
         this.onApplyFilter.emit(result);
     }
 
-
+    <#= externalFilterExPropName #>: Array<<#= filterResultModelClassName #>> = [];
     protected _<#= externalFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
     @Input('<#= externalFilterSelector #>') 
     get <#= externalFilterPropName #>(): Array<<#= filterResultModelClassName #>> {
-        return this._externalFilter;
+        return this._<#= externalFilterPropName #>;
     }
     set <#= externalFilterPropName #>(ef: Array<<#= filterResultModelClassName #>>|any) {
+        this._<#= externalFilterPropName #> = ef;
         let isNDf = (typeof ef === 'undefined');
         isNDf = isNDf ? isNDf : (ef === null);
         isNDf = isNDf ? isNDf : (!Array.isArray(ef));
         if(isNDf) {
-          if(this._<#= externalFilterPropName #>.length > 0) {
-            this._<#= externalFilterPropName #> = [];
+          if(this.<#= externalFilterExPropName #>.length > 0) {
+            this.<#= externalFilterExPropName #> = [];
             if(this.isOnInitCalled) {
               this.onFilterDefsChanged();
             }
           }
         } else {
-          this._<#= externalFilterPropName #> = [];
+          this.<#= externalFilterExPropName #> = [];
           ef.forEach((fi: <#= filterResultModelClassName #>) => {
-            this._<#= externalFilterPropName #>.push({fltrName: fi.fltrName, fltrDataType: fi.fltrDataType, fltrOperator: fi.fltrOperator, fltrValue:fi.fltrValue});
+            this.<#= externalFilterExPropName #>.push({fltrName: fi.fltrName, fltrDataType: fi.fltrDataType, fltrOperator: fi.fltrOperator, fltrValue:fi.fltrValue});
           });
           if(this.isOnInitCalled) {
             this.onFilterDefsChanged();
           }
       }
     }
+
+
+<#
+    for(int iii = 0; iii < 7; iii++) {
+#>
+    <#= tpAheadVarsPropName #><#= iii #>: Observable<Array<any>>| any = null;
+<#
+    }
+#>
+
+    @Input('<#= tpAheadValSelector #>') <#= tpAheadValPropName #>!: (v: any, i: number) => any;
+    @Input('<#= tpAheadFncSelector #>') <#= tpAheadFncPropName  #>!: (srv: any, wsfs: Array<<#= uniqFilterModelClassName #>>, value: any, i: number) => Observable<Array<any>>;
+    @Input('<#= tpAheadSrvSelector #>') <#= tpAheadSrvPropName #>!: any
+    @Input('<#= tpAheadCptnSelector #>') <#= tpAheadCptnPropName #>!: (v: any, i: number) => string;
+    <#= clearTpAheadVarsMethodName #>(): void {
+      this.<#= tpAheadVarsPropName #>0 = null;
+<#
+    for(int iii = 0; iii < 7; iii++) {
+#>
+      this.<#= tpAheadVarsPropName #><#= iii #> = null;
+<#
+    }
+#>
+    }
+
+    <#= tpahValChangedMethodName #>(fc: FormControl, indx: number): void {
+      let pp: Observable<Array<any>> = fc.valueChanges.pipe(
+          debounceTime(100),
+          switchMap((value: any) => {
+            if(typeof value === 'string') {  
+                if(typeof this.<#= tpAheadFncPropName  #> === 'undefined') {
+                  return of([]);      
+                } 
+                if(this.<#= tpAheadFncPropName  #> === null) {
+                  return of([]);      
+                } 
+                this.<#= afterPatchControlsPropName #>.emit(null);
+                return this.<#= tpAheadFncPropName  #>(this.<#= tpAheadSrvPropName #>,this.webServiceFilters, value, indx)
+            } else {
+                this.<#= patchcontrolsMethodName #>(value, indx);
+            }
+            return of([]);
+          })
+      );
+      switch(indx) {
+<#
+    for(int iii = 0; iii < 7; iii++) {
+#>
+        case <#= iii #>:
+          this.<#= tpAheadVarsPropName #><#= iii #> = pp;
+          break;
+<#
+    }
+#>
+      }
+    }
+    <#= patchcontrolsMethodName #>(v: any, i: number): void {
+      if (typeof this.<#= tpAheadValPropName #> === 'undefined') 
+        return;
+      this.webServiceFilters.forEach((f: <#= uniqFilterModelClassName #>, indx: number) => {
+        // if (i >= indx) {
+          f.fltrValue.patchValue( this.<#= tpAheadValPropName #>(v, indx), {emitEvent: false});
+        // }
+      });
+      this.<#= afterPatchControlsPropName #>.emit(v);
+    }
+    @Output('<#= afterPatchControlsSelector #>') <#= afterPatchControlsPropName #> = new EventEmitter<any>();
+
+
 
 }
 

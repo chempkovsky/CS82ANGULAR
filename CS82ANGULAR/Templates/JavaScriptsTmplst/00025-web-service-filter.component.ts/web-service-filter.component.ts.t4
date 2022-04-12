@@ -16,16 +16,8 @@
     string showAddFltItemSelector       = "show-add-flt-item";
     string showAddFltItemPropName       = "showAddFltItem";
 
-    string showFilterSelector           = "show-filter";
-    string showFilterPropName           = "showFilter";
-    string inputFilterDefsSelector      = "filter-defs";
-    string inputFilterDefsPropName      = "inputFilterDefs";
-    string HiddenFilterSelector         = "hidden-filter";
-    string HiddenFilterPropName         = "hiddenFilter";
     string AppSettingServicePropName    = "appGlblSettings";
     string AppearancePropName           = "appearance";
-    string MaxHeightPropSelector        = "max-height";
-    string MaxHeightPropName            = "maxHeight";
     string OverflowSelector             = "ovrflw";
     string OverflowPropName             = "ovrflw";
     string containerMenuItemsPropName           = "contMenuItems";
@@ -33,8 +25,26 @@
     string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
     string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
     string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+
     string externalFilterSelector               = "external-filter";
     string externalFilterPropName               = "externalFilter";
+    string externalFilterExPropName             = "externalFilterEx";
+
+    string HiddenFilterSelector                 = "hidden-filter";
+    string HiddenFilterPropName                 = "hiddenFilter";
+    string HiddenFilterExPropName               = "hiddenFilterEx";
+
+    string MaxHeightPropSelector                = "max-height";
+    string MaxHeightPropName                    = "maxHeight";
+    string MaxHeightExPropName                  = "maxHeightEx";
+
+    string showFilterSelector                   = "show-filter";
+    string showFilterPropName                   = "showFilter";
+    string showFilterExPropName                 = "showFilterEx";
+
+    string inputFilterDefsSelector              = "filter-defs";
+    string inputFilterDefsPropName              = "inputFilterDefs";
+    string inputFilterDefsExPropName            = "inputFilterDefsEx";
 
 
     Dictionary<string, string> RegExps = new Dictionary<string, string>() {
@@ -116,17 +126,17 @@ export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterP
     }
 
     public <#= OverflowPropName #>: string | null = null;   
-    public  <#= MaxHeightPropName #>X: number|null = null;
+    public  <#= MaxHeightExPropName #>: number|null = null;
     protected _<#= MaxHeightPropName #>: number|null = null;
     @Input('<#= MaxHeightPropSelector #>')
-        get <#= MaxHeightPropName #>(): number|null {
-            return this._<#= MaxHeightPropName #>;
-        }
+      get <#= MaxHeightPropName #>(): number|null {
+        return this._<#= MaxHeightPropName #>;
+      }
       set <#= MaxHeightPropName #>(inp: number|null) {
+        this._<#= MaxHeightPropName #> = inp;
         if (!(typeof inp === 'undefined')) {
           if(!(inp === null)) {
-            this.<#= MaxHeightPropName #>X = inp * this.<#= AppSettingServicePropName #>.filterHeightFactor + this.<#= AppSettingServicePropName #>.filterHeightAddition;
-            this._<#= MaxHeightPropName #> = inp;
+            this.<#= MaxHeightExPropName #> = inp * this.<#= AppSettingServicePropName #>.filterHeightFactor + this.<#= AppSettingServicePropName #>.filterHeightAddition;
             this.<#= OverflowPropName #> = 'auto';
             if(this.isOnInitCalled) {
               this.cd.detectChanges();
@@ -134,8 +144,7 @@ export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterP
             return;
           }
         }
-        this._<#= MaxHeightPropName #> = null;
-        this.<#= MaxHeightPropName #>X = null;
+        this.<#= MaxHeightExPropName #> = null;
         this.<#= OverflowPropName #> = null;
         if(this.isOnInitCalled) {
             this.cd.detectChanges();
@@ -153,15 +162,17 @@ export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterP
         this.<#= onContainerMenuItemClickEmitter #>.emit(e);
     }
 
-    protected _<#= showFilterPropName #>: boolean = true;
+    public <#= showFilterExPropName #>: boolean = true;
+    protected _<#= showFilterPropName #>: boolean|any = true;
     @Input('<#= showFilterSelector #>') 
       get <#= showFilterPropName #>(): boolean {
         return this._<#= showFilterPropName #>;
       }
-      set <#= showFilterPropName #>(inshow: boolean) {
+      set <#= showFilterPropName #>(inshow: boolean|any) {
+        this._<#= showFilterPropName #> = inshow;
         if (!(typeof inshow === 'undefined')) {
           if(!(inshow === null)) {
-            this._<#= showFilterPropName #> = inshow;
+            this.<#= showFilterExPropName #> = inshow as boolean;
             if(this.isOnInitCalled) {
               this.onFilterDefsChanged();
             }
@@ -169,38 +180,40 @@ export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterP
         }
       }
 
+    <#= HiddenFilterExPropName #>: Array<<#= filterResultModelClassName #>> = [];
     protected _<#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
-
     @Input('<#= HiddenFilterSelector #>') 
         get <#= HiddenFilterPropName #>(): Array<<#= filterResultModelClassName #>>|any {
           return this._<#= HiddenFilterPropName #>;
         }
         set <#= HiddenFilterPropName #>(inDef: Array<<#= filterResultModelClassName #>>|any) {
+          this._<#= HiddenFilterPropName #> = inDef;
           if (typeof inDef === 'undefined') {
-            this._<#= HiddenFilterPropName #> = [];
+            this.<#= HiddenFilterExPropName #> = [];
           } else if(!Array.isArray(inDef)) {
-            this._<#= HiddenFilterPropName #> = [];
+            this.<#= HiddenFilterExPropName #> = [];
           } else {
-            this._<#= HiddenFilterPropName #> = inDef as Array<<#= filterResultModelClassName #>>;
+            this.<#= HiddenFilterExPropName #> = inDef as Array<<#= filterResultModelClassName #>>;
           }
           if(this.isOnInitCalled) {
             this.onFilterDefsChanged();
           }
         } 
 
+    <#= inputFilterDefsExPropName #>: Array<<#= filterDefModelClassName #>> = [];
     protected _<#= inputFilterDefsPropName #>: Array<<#= filterDefModelClassName #>> = [];
-
     @Input('<#= inputFilterDefsSelector #>') 
         get <#= inputFilterDefsPropName #>(): Array<<#= filterDefModelClassName #>> {
           return this._<#= inputFilterDefsPropName #>;
         }
         set <#= inputFilterDefsPropName #>(inDef: Array<<#= filterDefModelClassName #>>) {
+          this._<#= inputFilterDefsPropName #> = inDef;
           if (typeof inDef === 'undefined') {
-            this._<#= inputFilterDefsPropName #> = [];
+            this.<#= inputFilterDefsExPropName #> = [];
           } else if(!Array.isArray(inDef)) {
-            this._<#= inputFilterDefsPropName #> = [];
+            this.<#= inputFilterDefsExPropName #> = [];
           } else {
-            this._<#= inputFilterDefsPropName #> =  inDef;
+            this.<#= inputFilterDefsExPropName #> =  inDef;
           }
           if(this.isOnInitCalled) {
             this.onFilterDefsChanged();
@@ -233,17 +246,17 @@ export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterP
 
     onFilterDefsChanged(): void {
         this.webServiceFilterDefs = [{fltrName: '', fltrCaption: '--No filter--',  fltrDataType: '', fltrMaxLen: null, fltrMin: null, fltrMax: null }];
-        this.<#= inputFilterDefsPropName #>.forEach(i => {
-            if(this.<#= HiddenFilterPropName #>.findIndex((h: { fltrName: string; }) => { return (h.fltrName === i.fltrName); }) < 0) {
+        this.<#= inputFilterDefsExPropName #>.forEach(i => {
+            if(this.<#= HiddenFilterExPropName #>.findIndex((h: { fltrName: string; }) => { return (h.fltrName === i.fltrName); }) < 0) {
             this.webServiceFilterDefs.push({ fltrName: i.fltrName, fltrCaption: i.fltrCaption, fltrDataType: i.fltrDataType, fltrMaxLen: i.fltrMaxLen, fltrMin: i.fltrMin, fltrMax: i.fltrMax });
             }
         });    
         if(this.<#= showFilterPropName #>) {
             this.webServiceFilters = [];
-            this._<#= externalFilterPropName #>.forEach((fi: IWebServiceFilterRslt) => {
-                let i: number = this.<#= inputFilterDefsPropName #>.findIndex((h: { fltrName: string; }) => { return (h.fltrName === fi.fltrName); });
+            this.<#= externalFilterExPropName #>.forEach((fi: IWebServiceFilterRslt) => {
+                let i: number = this.<#= inputFilterDefsExPropName #>.findIndex((h: { fltrName: string; }) => { return (h.fltrName === fi.fltrName); });
                 if(i > -1) {
-                  let fDf: IWebServiceFilterDef = this.<#= inputFilterDefsPropName #>[i];
+                  let fDf: IWebServiceFilterDef = this.<#= inputFilterDefsExPropName #>[i];
                   this.webServiceFilters.push({ fltrName: new FormControl(fDf.fltrName), fltrDataType: fDf.fltrDataType, 
                       fltrOperator: new FormControl(fi.fltrOperator), fltrValue: new FormControl({ value: fi.fltrValue, disabled: false }), 
                       fltrMaxLen: fDf.fltrMaxLen, fltrMin: fDf.fltrMin, fltrMax: fDf.fltrMax });
@@ -407,7 +420,7 @@ export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterP
 
     onApplyFilterClicked(): void {
         let result: Array<<#= filterResultModelClassName #>> = [];
-        this.<#= HiddenFilterPropName #>.forEach((i: IWebServiceFilterRslt) => {
+        this.<#= HiddenFilterExPropName #>.forEach((i: IWebServiceFilterRslt) => {
           result.push(i);
         });
         this.webServiceFilters.forEach(i => {
@@ -420,27 +433,28 @@ export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterP
         this.onApplyFilter.emit(result);
     }
 
-
+    <#= externalFilterExPropName #>: Array<<#= filterResultModelClassName #>> = [];
     protected _<#= externalFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
     @Input('<#= externalFilterSelector #>') 
     get <#= externalFilterPropName #>(): Array<<#= filterResultModelClassName #>> {
         return this._externalFilter;
     }
     set <#= externalFilterPropName #>(ef: Array<<#= filterResultModelClassName #>>|any) {
+        this._externalFilter = ef;
         let isNDf = (typeof ef === 'undefined');
         isNDf = isNDf ? isNDf : (ef === null);
         isNDf = isNDf ? isNDf : (!Array.isArray(ef));
         if(isNDf) {
-          if(this._<#= externalFilterPropName #>.length > 0) {
-            this._<#= externalFilterPropName #> = [];
+          if(this.<#= externalFilterExPropName #>.length > 0) {
+            this.<#= externalFilterExPropName #> = [];
             if(this.isOnInitCalled) {
               this.onFilterDefsChanged();
             }
           }
         } else {
-          this._<#= externalFilterPropName #> = [];
+          this.<#= externalFilterExPropName #> = [];
           ef.forEach((fi: <#= filterResultModelClassName #>) => {
-            this._<#= externalFilterPropName #>.push({fltrName: fi.fltrName, fltrDataType: fi.fltrDataType, fltrOperator: fi.fltrOperator, fltrValue:fi.fltrValue});
+            this.<#= externalFilterExPropName #>.push({fltrName: fi.fltrName, fltrDataType: fi.fltrDataType, fltrOperator: fi.fltrOperator, fltrValue:fi.fltrValue});
           });
           if(this.isOnInitCalled) {
             this.onFilterDefsChanged();

@@ -376,7 +376,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         let si: string|any = this.<#= AppSettingServicePropName #>.<#= getStorageItemMethodName #>(this.<#= uidParamName #>);
         if(!(typeof si === 'undefined')) {
             if(!(si === null)) {
-                this.<#= externalFilterPropName #> = JSON.parse(si);
+                this.<#= externalFilterPropName #> = si;
             }
         }
         
@@ -512,17 +512,17 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         }
     }
 
-    public <#= externalFilterPropName #>: <#= GetInterfaceFilterName(Model) #> | any = {}
+    public <#= externalFilterPropName #>: string | any;
 
-    <#= OnBeforeSqueryMethodName #>(cf: <#= GetInterfaceFilterName(Model) #> | any): void {
+    <#= OnBeforeSqueryMethodName #>(cf: string | any): void {
         if (this.<#= uidParamName #> === null) return;
-        let cfs: <#= GetInterfaceFilterName(Model) #> = {};
+        let cfs: string = '';
         if(!(typeof cf === 'undefined')) {
             if(!(cf === null)) {
                 cfs = cf;
             }
         }
-        this.<#= AppSettingServicePropName #>.<#= setStorageItemMethodName #>(this.<#= uidParamName #> as string, JSON.stringify(cfs));
+        this.<#= AppSettingServicePropName #>.<#= setStorageItemMethodName #>(this.<#= uidParamName #> as string, cfs);
     }
 
 

@@ -41,8 +41,10 @@
     string KeysSuffix                           = "Keys";
     string ValueSuffix                          = "Value";
     string ValuesSuffix                         = "Values";
-
-
+    string row2FilterRsltMethodName             = "row2FilterRslt";
+    string filterRslt2rowMethodName             = "filterRslt2row";
+    string row2FilterMethodName                 = "row2Filter";
+    string filter2rowMethodName                 = "filter2row";
 
     string src2destMethodName                   = "src2dest";
 
@@ -718,7 +720,6 @@ export class <#= GetJavaScriptServiceName(Model) #> {
         }
 
         foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
-            continue; // we do not need operators
 #>
                 if (!(typeof  filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> === 'undefined')) {
                     if (Array.isArray(filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> )) {
@@ -926,6 +927,78 @@ export class <#= GetJavaScriptServiceName(Model) #> {
 #>        
     }
 
+    <#= row2FilterRsltMethodName #>(r: <#= GetInterfaceName(Model) #>| any): Array<<#= filterResultModelClassName #>> {
+        let rslt: Array<<#= filterResultModelClassName #>> = [];
+        if (typeof r === 'undefined') return rslt;
+        if (r === null) return rslt;
+        for(let i in this._Values) {
+            if (!(typeof r[i] === 'undefined')) {
+                rslt.push({
+                    fltrName: i,
+                    fltrDataType: this._Values[i].dttp,
+                    fltrOperator: 'eq',
+                    fltrValue: r[i]
+                });
+            }
+        }
+        return rslt
+    }
+
+<#                
+  if(false) {
+#>        
+
+    <#= filterRslt2rowMethodName #>(f: Array<<#= filterResultModelClassName #>>|any): <#= GetInterfaceName(Model) #>|null {
+        if (typeof f === 'undefined') return null;
+        if (f === null) return null;
+        if (!Array.isArray(f)) return null;
+        let isDef = false;
+        let rslt: <#= GetInterfaceName(Model) #>|any ={};
+        f.forEach((i: <#= filterResultModelClassName #>) => {
+            if(!(typeof i.fltrValue === 'undefined')) {
+                if(i.fltrName in this._Values) {
+                    rslt[i.fltrName] = i.fltrValue;
+                    isDef = true;
+                }
+            }
+        });
+        if (isDef) return rslt;
+        return null;
+    }
+
+    <#= row2FilterMethodName #>(r: <#= GetInterfaceName(Model) #>|any): <#= GetInterfaceFilterName(Model) #> {
+        let rslt: <#= GetInterfaceFilterName(Model) #>|any = {};
+        if (typeof r === 'undefined') return rslt;
+        if (r === null) return rslt;
+        for(let i in this._Values) {
+            if (!(typeof r[i] === 'undefined')) {
+                rslt[i] = [r[i]];
+            }
+        }
+        return rslt;
+    }
+    <#= filter2rowMethodName #>(f: <#= GetInterfaceFilterName(Model) #>|any): <#= GetInterfaceName(Model) #>|null {
+        if (typeof f === 'undefined') return null;
+        if (f === null) return null;
+        let isDef = false;
+        let rslt: <#= GetInterfaceName(Model) #>|any ={};
+        for(let i in this._Values) {
+            if(typeof f[i] === 'undefined')
+            if (Array.isArray( f[i] )) {
+                if(f[i].length > 0) {
+                    if (!(typeof f[i][0] === 'undefined')) {
+                        rslt[i] = f[i][0];
+                        isDef = true;
+                    }
+                }
+            }
+        }
+        if (isDef) return rslt;
+        return null;
+    }
+<#                
+  } // if(false) {}
+#>        
 
 }
 

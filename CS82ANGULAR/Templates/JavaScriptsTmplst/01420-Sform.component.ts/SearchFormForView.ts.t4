@@ -14,6 +14,7 @@
 <#
     string OperatorSufix        = "Oprtr";
     string EqualOperator        = "eq";
+    string LikeOperator         = "lk";
 
     // WebApi service's method names
 
@@ -29,7 +30,16 @@
     string GetManyByRepPrimMethodNamePrefix     = "getmanybyrepprim";
     string GetManyByRepUnqMethodNamePrefix      = "getmanybyrepunq";
     string src2destMethodName       = "src2dest";
-    string ActionParamChangeMode    = "Change";
+
+    string searchShowFilterPropName     = "searchShowFilter";
+    string searchShowAddFltItemPropName = "searchShowAddFltItem";
+    string searchOnSelectRowMethodName  = "srchOnSlctRw";
+    string searchDoSelectRowMethodName  = "srchDoSlctRw";
+    string searchSelectRowPropName      = "srchSlctRw";
+    string searchMaxHeightPropName      = "searchMaxHeight";
+    string searchFilterMaxHeightPropName= "searchFilterMaxHeight";
+    string scannByMode                  = "scannBy";
+    string currentSortColumnPropName    = "currentSortColumn";
 
 
     string DisplayLabelProperty     = "Name";
@@ -41,34 +51,32 @@
     string CanUpdPropName           = "canUpdate";
     string CanDelSelector           = "can-delete";
     string CanDelPropName           = "canDelete";
-    string HiddenFilterSelector     = "hidden-filter";
-    string HiddenFilterPropName     = "hiddenFilter";
     string ShowFilterSelector       = "show-filter";
     string ShowFilterPropName       = "showFilter";
 
     string externalFilterSelector       = "external-filter";
     string externalFilterPropName       = "externalFilter";
+    string externalFilterExPropName     = "externalFilterEx";
     string externalFilterRsltPropName   = "externalFilterRslt";
     string beforeSquerySelector         = "before-squery";
     string beforeSqueryPropName         = "beforeSquery";
+    string onBeforeSqueryPropName       = "onBeforeSquery";
     string OnSelectRowMethodName        = "onSelectRow";
-
+    string HiddenFilterAsFltRsltSuffix  = "HiddenFilterAsFltRslt";
+    string HiddenFilterByRowSuffix      = "HiddenFilterByRow";
+    string clearDatasourceMethodName    = "clrDs";
+    string row2FilterRsltMethodName     = "row2FilterRslt";
+    string filterRslt2rowMethodName     = "filterRslt2row";
 
 
     string RowCommandsSelector      = "row-commands";
     string RowCommandsPropName      = "rowCommands";
-    string TableCommandsSelector    = "table-commands";
-    string TableCommandsPropName    = "tableCommands";
 
     string OnRowCommandSelector     = "on-row-command";
     string OnRowCommandPropName     = "onRowCommand";
     string OnTableCommandSelector   = "on-table-command";
     string OnTableCommandPropName   = "onTableCommand";
 
-    string MaxHeightPropSelector        = "max-height";
-    string MaxHeightPropName            = "maxHeight";
-    string FilterMaxHeightPropSelector  = "filter-max-height";
-    string FilterMaxHeightPropName      = "filterMaxHeight";
     string OverflowSelector             = "ovrflw";
     string OverflowPropName             = "ovrflw";
 
@@ -107,6 +115,22 @@
 
     string showMultiSelectedRowSelector   = "show-multi-selected-row";
     string showMultiSelectedRowPropName   = "showMultiSelectedRow";
+    string showMultiSelectedRowExPropName = "showMultiSelectedRowEx";
+
+    string TableCommandsSelector    = "table-commands";
+    string TableCommandsPropName    = "tableCommands";
+    string TableCommandsExPropName  = "tableCommandsEx";
+
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string MaxHeightExPropName          = "maxHeightEx";
+
+    string HiddenFilterSelector     = "hidden-filter";
+    string HiddenFilterPropName     = "hiddenFilter";
+    string HiddenFilterExPropName   = "hiddenFilterEx";
+
+    string FilterMaxHeightPropSelector  = "filter-max-height";
+    string FilterMaxHeightPropName      = "filterMaxHeight";
 
     string applyFilterSelector        = "apply-filter";
     string applyFilterPropName        = "applyFilter";
@@ -132,6 +156,21 @@
     string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
     string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
 
+    string tpAheadVarsPropName          = "tpAheadVars";
+    string tpAheadValPropName           = "tpAheadVal";
+    string tpAheadValSelector           = "tp-ahead-val";
+    string tpAheadFncPropName           = "tpAheadFnc";
+    string tpAheadFncSelector           = "tp-ahead-fnc";
+    string tpAheadSrvPropName           = "tpAheadSrv";
+    string tpAheadSrvSelector           = "tp-ahead-srv";
+    string tpAheadCptnPropName          = "tpAheadCptn";
+    string tpAheadCptnSelector          = "tp-ahead-cptn";
+    string clearTpAheadVarsMethodName   = "clrTpAheadVars";
+    string tpahValChangedMethodName     = "tpahVlChngs";
+    string patchcontrolsMethodName      = "patchcontrols";
+    string afterPatchControlsPropName   = "afterPatchControls";
+    string afterPatchControlsSelector   = "after-patch-controls";
+
 
     List<string> FKViewsDict =  GetFKViewsList(Model, Context, new List<string>());
     if (! FKViewsDict.Contains(Model.ViewName) ) {
@@ -146,6 +185,7 @@
     
     string columnSelectorItemInterfaceFolder    = "00032-column-selector-item.interface.ts";
     string columnSelectorDlgComponentFolder     = "00035-column-selector-dlg.component.ts";
+    string uniqFilterModelFolder                = "00042-uniq-service-filter.interface.ts";
     string uniqFilterDefModelFolder             = "00044-uniq-service-filter-def.interface.ts";
 
 
@@ -181,6 +221,7 @@
 
 
     string uniqFilterDefModelClassName = GetModelClassName(Context, uniqFilterDefModelFolder);
+    string uniqFilterModelClassName = GetModelClassName(Context, uniqFilterModelFolder);
 
     string filterResultModelClassName = GetModelClassName(Context, filterResultModelFolder);
     string eventEmitterDataModelClassName   = GetModelClassName(Context, eventEmitterDataModelFolder);
@@ -203,6 +244,9 @@
     List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = GetModelUniqueKeys(Model, new List<ModelViewUniqueKeyOfVwSerializable>());
     ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
     if(pk!= null) uniqueKeys.Add(pk);
+    // m2mModel, m2mForeignKey, List<Tuple< model.ForeignKey, m2mModel.additionalForeignKey >>, searchModel, searchFk, searchUk
+    List<Tuple<ModelViewSerializable,ModelViewForeignKeySerializable,List<Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>>,ModelViewSerializable,ModelViewForeignKeySerializable,ModelViewUniqueKeySerializable>> searchSchemas =
+        GetSearchResources(Model, Context);
 
 #>
 import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, ChangeDetectorRef } from '@angular/core';
@@ -210,11 +254,11 @@ import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { SelectionChange, SelectionModel } from '@angular/cdk/collections';
-import { Observable } from 'rxjs';
-
+import { catchError, Observable, of, switchMap } from 'rxjs';
 
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, sformComponentFolder)#>';
 import { <#= uniqFilterDefModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  uniqFilterDefModelFolder, sformComponentFolder)#>';
+import { <#= uniqFilterModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  uniqFilterModelFolder, sformComponentFolder)#>';
 import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, sformComponentFolder)#>';
 import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, sformComponentFolder)#>';
 import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  menuItemDataModelFolder, sformComponentFolder)#>';
@@ -233,6 +277,24 @@ import { <#= GetInterfacePageName(Model) #> } from '<#= GetCrossComponentFolderN
 import { <#= GetInterfaceFilterName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, viewNm, viewInterfaceFltFolder) #>';
 import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, viewNm, viewServiceFolder) #>';
 <# 
+        if(searchSchemas!= null) {
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable searchModel = sch.Item4;
+                ModelViewSerializable m2mModel = sch.Item1;
+#>
+import { <#= GetServiceClassName(searchModel, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, searchModel.ViewName, viewServiceFolder) #>';
+import { <#= GetInterfaceName(searchModel) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, searchModel.ViewName, viewInterfaceFolder) #>';
+import { <#= GetInterfacePageName(searchModel) #> } from '<#= GetCrossComponentFolderName(Model, sformComponentFolder, Context, searchModel.ViewName, viewInterfacePageFolder) #>';
+import { <#= GetInterfaceFilterName(searchModel) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, searchModel.ViewName, viewInterfaceFltFolder) #>';
+import { <#= GetServiceClassName(m2mModel, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, m2mModel.ViewName, viewServiceFolder) #>';
+import { <#= GetInterfaceName(m2mModel) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, m2mModel.ViewName, viewInterfaceFolder) #>';
+import { <#= GetInterfacePageName(m2mModel) #> } from '<#= GetCrossComponentFolderName(Model, sformComponentFolder, Context, m2mModel.ViewName, viewInterfacePageFolder) #>';
+import { <#= GetInterfaceFilterName(m2mModel) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, m2mModel.ViewName, viewInterfaceFltFolder) #>';
+<#
+            }
+        } // if(searchSchemas!= null) {...}
+
+
     }
 #>
 
@@ -245,23 +307,25 @@ import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCr
 })
 export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
 
-    _<#= showMultiSelectedRowPropName #>: boolean = true;
+    <#= showMultiSelectedRowExPropName #>: boolean = true;
+    protected _<#= showMultiSelectedRowPropName #>: boolean|null = true;
     @Input('<#= showMultiSelectedRowSelector #>')
-        get <#= showMultiSelectedRowPropName #>(): boolean {
+        get <#= showMultiSelectedRowPropName #>(): boolean|null {
             return this._<#= showMultiSelectedRowPropName #>;
         }
       set <#= showMultiSelectedRowPropName #>(inp: boolean|null) {
+        this._<#= showMultiSelectedRowPropName #> = inp;
         if (!(typeof inp === 'undefined')) {
             let nc: boolean = false;
             if(inp) {
-                nc = this._<#= showMultiSelectedRowPropName #>;
+                nc = this.<#= showMultiSelectedRowExPropName #>;
             } else {
-                nc = !this._<#= showMultiSelectedRowPropName #>;
+                nc = !this.<#= showMultiSelectedRowExPropName #>;
             }
             if(nc) return;
-            this._<#= showMultiSelectedRowPropName #> = !this._<#= showMultiSelectedRowPropName #>;
+            this.<#= showMultiSelectedRowExPropName #> = !this.<#= showMultiSelectedRowExPropName #>;
             let r: string[] = ['<#= SelectColumnDefProperty #>']
-            if(this._<#= showMultiSelectedRowPropName #>) r.push('<#= SelectMultColumnDefProperty #>');
+            if(this.<#= showMultiSelectedRowExPropName #>) r.push('<#= SelectMultColumnDefProperty #>');
             this.<#= DisplayedColumnsProperty #>.forEach((s: string) => {if(s !== '<#= SelectColumnDefProperty #>' && s !== '<#= SelectMultColumnDefProperty #>') r.push(s)});
             this.<#= DisplayedColumnsProperty #> = r;
             this.cd.detectChanges();
@@ -314,7 +378,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 //===============
     isOnInitCalled: boolean = false;
     protected currentFilter: Array<<#= filterResultModelClassName #>> = [];
-    protected currentSortColumn: string = '';
+    protected <#= currentSortColumnPropName #>: string = '';
     protected currentSortdirection: string = '';
     public currentPageIndex: number = 0;
     public currentPageSize: number = <#= MatPaginatorPageSize #>;
@@ -326,21 +390,24 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     @Input('<#= captionSelector #>') <#= captionPropName #>: string = '<#= Model.ViewName #>';
     @Input('<#= ShowFilterSelector #>') <#= ShowFilterPropName #>: boolean = true;
     @Input('<#= RowCommandsSelector #>')  <#= RowCommandsPropName #>:Array<<#= menuItemDataModelClassName #>>|any;
-    _<#= TableCommandsPropName #>: Array<<#= menuItemDataModelClassName #>> = [];
+
+    <#= TableCommandsExPropName #>: Array<<#= menuItemDataModelClassName #>> = [];
+    protected _<#= TableCommandsPropName #>: Array<<#= menuItemDataModelClassName #>> = [];
     @Input('<#= TableCommandsSelector #>')  
         get <#= TableCommandsPropName #>(): Array<<#= menuItemDataModelClassName #>> {
             return this._<#= TableCommandsPropName #>;
         }
         set <#= TableCommandsPropName #>(v :Array<<#= menuItemDataModelClassName #>>) {
+            this._<#= TableCommandsPropName #> = v;
             if (typeof v === 'undefined') {
-                this._<#= TableCommandsPropName #> = [];
+                this.<#= TableCommandsExPropName #> = [];
             } else if (!Array.isArray(v)) {
-                this._<#= TableCommandsPropName #> = [];
+                this.<#= TableCommandsExPropName #> = [];
             } else {
-                this._<#= TableCommandsPropName #> =  v;
+                this.<#= TableCommandsExPropName #> =  v;
             }
+            this.onTableMenuItemsData();
             if(this.isOnInitCalled) {
-                this.onTableMenuItemsData();
                 this.cd.detectChanges();
             }
         }
@@ -348,7 +415,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     @Input('<#= showAddFltItemSelector #>') <#= showAddFltItemPropName #>: boolean = true;
     onTableMenuItemsData() {
         let tmp: Array<<#= menuItemDataModelClassName #>> = [];
-        tmp = tmp.concat(this.tableIndexMenuItemsData, this._<#= TableCommandsPropName #>);
+        tmp = tmp.concat(this.tableIndexMenuItemsData, this.<#= TableCommandsExPropName #>);
         this.tableMenuItemsData = tmp;
     }
 
@@ -358,7 +425,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         this.<#= OnBackBtnPropName #>.emit(v);
     }
 
-    @Output('<#= beforeSquerySelector #>') <#= beforeSqueryPropName #> = new EventEmitter<<#= GetInterfaceFilterName(Model) #> | any>();
+    @Output('<#= beforeSquerySelector #>') <#= beforeSqueryPropName #> = new EventEmitter<string>();
 
     @Output('<#= onContainerMenuItemClickSelector #>') <#= onContainerMenuItemClickEmitter #> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
     @Input('<#= containerMenuItemsSelector #>') <#= containerMenuItemsPropName #>: Array<<#= menuItemDataModelClassName #>> = [];
@@ -369,17 +436,17 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     @Input('<#= FilterMaxHeightPropSelector #>')  <#= FilterMaxHeightPropName #>: number | null = null;
     public <#= OverflowPropName #>: string | null = null;   
 
-    public <#= MaxHeightPropName #>X: number|null = null;
+    <#= MaxHeightExPropName #>: number|null = null;
     protected _<#= MaxHeightPropName #>: number|null = null;
     @Input('<#= MaxHeightPropSelector #>')
         get <#= MaxHeightPropName #>(): number|null {
             return this._<#= MaxHeightPropName #>;
         }
       set <#= MaxHeightPropName #>(inp: number|null) {
+        this._<#= MaxHeightPropName #> = inp;
         if (!(typeof inp === 'undefined')) {
           if(!(inp === null)) {
-            this._<#= MaxHeightPropName #> = inp;
-            this.<#= MaxHeightPropName #>X = inp * this.<#= AppSettingServicePropName #>.tableHeightFactor + this.<#= AppSettingServicePropName #>.tableHeightAddition;
+            this.<#= MaxHeightExPropName #> = inp * this.<#= AppSettingServicePropName #>.tableHeightFactor + this.<#= AppSettingServicePropName #>.tableHeightAddition;
             this.<#= OverflowPropName #> = 'auto';
             if(this.isOnInitCalled) {
               this.cd.detectChanges();
@@ -387,8 +454,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             return;
           }
         }
-        this.<#= MaxHeightPropName #>X = null;
-        this._<#= MaxHeightPropName #> = null;
+        this.<#= MaxHeightExPropName #> = null;
         this.<#= OverflowPropName #> = null;
         if(this.isOnInitCalled) {
             this.cd.detectChanges();
@@ -405,9 +471,52 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     tableIndexMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
 <#
     { 
+        // m2mModel, m2mForeignKey, List<Tuple< model.ForeignKey, m2mModel.additionalForeignKey >>, searchModel, searchFk, searchUk
+        if(searchSchemas!= null) {
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable searchModel = sch.Item4;
+                ModelViewUniqueKeySerializable searchUk = sch.Item6;
+                ModelViewSerializable m2mModel = sch.Item1;
+
+#>
+        {id: '<#= m2mModel.ViewName #>', caption: 'filter: <#= m2mModel.ViewName #>', iconName: 'search', iconColor: 'primary', enabled: true, data: [
+<#
+                int ukrows = searchUk.UniqueKeyProperties.Count / 4;
+                ukrows *= 4;
+                int theRest = searchUk.UniqueKeyProperties.Count % 4;
+                int theHRest = theRest / 2; 
+                if(theHRest < 1) theHRest = 1;
+                int cnt = 0;
+                foreach(ModelViewKeyPropertySerializable ukprp in searchUk.UniqueKeyProperties) {
+                    ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetScalarPropByOriginaPropName(ukprp.OriginalPropertyName, searchModel);
+                    if(cnt >= ukrows) break;
+                    cnt++;
+                    if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
+#>
+           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>', fltrCaption: '<#= GetDisplayAttributeValueString(modelViewPropertyOfVwSerializable, searchModel, DisplayLabelProperty) #>',  fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, searchModel) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100},
+<#
+                    }
+                }
+                cnt = 0;
+                foreach(ModelViewKeyPropertySerializable ukprp in searchUk.UniqueKeyProperties) {
+                    ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetScalarPropByOriginaPropName(ukprp.OriginalPropertyName, searchModel);
+                    if(cnt < ukrows) continue;
+                    cnt++;
+                    if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
+#>
+           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>', fltrCaption: '<#= GetDisplayAttributeValueString(modelViewPropertyOfVwSerializable, searchModel, DisplayLabelProperty) #>',  fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, searchModel) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrFlx:100, fltrMd: (100 / <#= theRest #>) - 1, fltrSm: (100 / <#= theHRest #>) - 1, fltrXs: 100},
+<#
+                    }
+                }
+#>
+        ]},
+<#
+            }
+        } // if(searchSchemas!= null) {...}
+
         for(int i = 0; i < uniqueKeys.Count; i++) { 
             string indErrrorText = "";
-            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, pk, out indErrrorText);
+            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
             if (!indIsCorrect) {
 #>
 
@@ -425,7 +534,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                     caption = uniqueKeys[i].UniqueKeyName;
                 }
 #>
-        {id: '<#= ActionParamChangeMode + caption #>', caption: 'filter: <#= caption #>', iconName: 'search', iconColor: 'primary', enabled: true, data: [
+        {id: '<#= scannByMode + caption #>', caption: 'filter: <#= caption #>', iconName: 'search', iconColor: 'primary', enabled: true, data: [
 <#
                 int ukrows = uniqueKeys[i].UniqueKeyProperties.Count / 4;
                 ukrows *= 4;
@@ -458,7 +567,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             } // if (!indIsCorrect) { ... } else { ... }
         } // for(int i = 0; i < uniqueKeys.Count; i++) { ... }
 #>
-        {id: 'commcase', caption: 'common case', iconName: 'search', iconColor: 'primary', enabled: true, data: [
+        {id: 'fullscann', caption: 'full scann', iconName: 'search', iconColor: 'primary', enabled: true, data: [
 <#
         foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in Model.ScalarProperties) {
             if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
@@ -495,71 +604,114 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         });
     }
 
+    <#= HiddenFilterExPropName #>: Array<<#= filterResultModelClassName #>> = [];
     protected _<#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
     @Input('<#= HiddenFilterSelector #>') 
         get <#= HiddenFilterPropName #>(): Array<<#= filterResultModelClassName #>> | any {
           return this._<#= HiddenFilterPropName #>;
         }
         set <#= HiddenFilterPropName #>(inDef: Array<<#= filterResultModelClassName #>> | any) {
+          this._<#= HiddenFilterPropName #> =  inDef;
           if (typeof inDef === 'undefined') {
-            this._<#= HiddenFilterPropName #> = [];
+            this.<#= HiddenFilterExPropName #> = [];
           } else if(!Array.isArray(inDef)) {
-            this._<#= HiddenFilterPropName #> = [];
+            this.<#= HiddenFilterExPropName #> = [];
           } else {
-            this._<#= HiddenFilterPropName #> =  inDef;
+            this.<#= HiddenFilterExPropName #> =  inDef;
           }
           this.onHiddenFilter();
           this.reset<#= externalFilterPropName #>();
         } 
 
     public <#= externalFilterRsltPropName #>: Array<<#= filterResultModelClassName #>> = [];
-    protected _<#= externalFilterPropName #>: <#= GetInterfaceFilterName(Model) #> | any = {};
+    <#= externalFilterExPropName #>: string|null = null;
+    protected _<#= externalFilterPropName #>: string|null = null;
     @Input('<#= externalFilterSelector #>') 
-    get <#= externalFilterPropName #>(): <#= GetInterfaceFilterName(Model) #> {
-        return this._<#= externalFilterPropName #>;
-    }
-    set <#= externalFilterPropName #>(ef: <#= GetInterfaceFilterName(Model) #> | any) {
-        let isNDf = (typeof ef === 'undefined');
-        isNDf = isNDf ? isNDf : (ef === null);
-        if(isNDf) {
-          this._<#= externalFilterPropName #> = {};
-          this.reset<#= externalFilterPropName #>();
-        } else {
-            this._<#= externalFilterPropName #> = ef;
-            this.reset<#= externalFilterPropName #>();
+        get <#= externalFilterPropName #>(): string|any {
+            return this._<#= externalFilterPropName #>;
         }
-    }
-    reset<#= externalFilterPropName #>() {
-        let ef: <#= GetInterfaceFilterName(Model) #> | any = this._<#= externalFilterPropName #>;
-        this.currentSortColumn = '';
-        if(Array.isArray(ef.orderby)) {
-            if(ef.orderby.length > 0) {
-                this.currentSortColumn = ef.orderby[0];
+        set <#= externalFilterPropName #>(ef: string|any) {
+            this._<#= externalFilterPropName #> = ef;
+            let isNDf = (typeof ef === 'undefined');
+            isNDf = isNDf ? isNDf : (ef === null);
+            if(isNDf) {
+              this.<#= externalFilterExPropName #> = null;
+              this.reset<#= externalFilterPropName #>();
+            } else {
+                this.<#= externalFilterExPropName #> = ef;
+                this.reset<#= externalFilterPropName #>();
             }
-        }  
-        if(ef.page) { this.currentPageIndex = ef.page; } else { this.currentPageIndex = 0; }
-        if(ef.pagesize) { this.currentPageSize = ef.pagesize; } else { this.currentPageSize = <#= MatPaginatorPageSize #>; }
-        let rslt: Array<<#= filterResultModelClassName #>> = [];
-        this.filterDefs.forEach((fd: <#= uniqFilterDefModelClassName #>) => {
-            if(!this.<#= HiddenFilterPropName #>.some((v: { fltrName: string; }) => v.fltrName === fd.fltrName)) {
-                if( Array.isArray(ef[fd.fltrName]) ) {
-                    let oprtrs: Array<string> = [];    
-                    if( Array.isArray(ef[fd.fltrName+'<#= OperatorSufix #>']) ) {
-                        oprtrs = ef[fd.fltrName+'<#= OperatorSufix #>'];
-                    }
-                    ef[fd.fltrName].forEach((val: any, i: number) => {
-                        let op = 'eq';
-                        if(oprtrs.length > i) op = oprtrs[i];
-                        rslt.push({fltrName: fd.fltrName, fltrDataType: fd.fltrDataType, fltrOperator: op, fltrValue:val});
+        }
+    reset<#= externalFilterPropName #>() {
+        if(this.isOnInitCalled) return;
+        let efs: string| any = this.<#= externalFilterExPropName #>;
+        if ((typeof efs === 'undefined') ? true : ((efs === null) ? true : (efs === ''))) return;
+        let ef: {id: string; f: string|any; csc: string; pgi: number; pgsz: number} = JSON.parse(efs);
+
+        this.<#= currentSortColumnPropName #> = '';
+        // since if(this.isOnInitCalled) return; we ned to reset props if input is defined
+        if(ef.csc) { this.<#= currentSortColumnPropName #> = ef.csc; } else { this.<#= currentSortColumnPropName #> = ''; } 
+        if(ef.pgi) { this.currentPageIndex = ef.pgi; } else { this.currentPageIndex = 0; }
+        if(ef.pgsz) { this.currentPageSize = ef.pgsz; } else { this.currentPageIndex = <#= MatPaginatorPageSize #>; }
+        if(typeof ef.id === 'undefined') return;
+        let mi: <#= menuItemDataModelClassName #>|any = this.tableIndexMenuItemsData.find((e: <#= menuItemDataModelClassName #>) => e.id === ef.id);
+        if(mi) {
+            this.curIndexMenuItemsData = mi;
+            this.onHiddenFilter();
+        } else {
+            return;
+        }
+        if(typeof ef.f === 'undefined') return;
+        if((ef.f === null) || (ef.f === 'null') || (ef.f === '')) return;
+        let r: Array<<#= filterResultModelClassName #>> = [];
+        switch(ef.id) {
+<#
+        if(searchSchemas!= null) {
+            if(searchSchemas.Count > 0) {
+                foreach(var sch in searchSchemas) {
+                    ModelViewSerializable searchModel = sch.Item4;
+                    ModelViewSerializable m2mModel = sch.Item1;
+#>
+            case '<#= m2mModel.ViewName #>':  
+                this.<#= searchSelectRowPropName + m2mModel.ViewName #> = JSON.parse(ef.f);
+                r = this.<#= formServicePrefix + searchModel.ViewName #>.<#= row2FilterRsltMethodName #>(this.<#= searchSelectRowPropName + m2mModel.ViewName #>);
+                break;           
+<#
+                }
+            }
+        }
+#>
+            default:
+                let flt: <#= GetInterfaceFilterName(Model) #>|any = JSON.parse(ef.f);
+                if(flt) {
+                    this.filterDefs.forEach((fd: <#= uniqFilterDefModelClassName #>) => {
+                        if(!this.<#= HiddenFilterExPropName #>.some((v: <#= filterResultModelClassName #>) => v.fltrName === fd.fltrName)) {
+                            if( Array.isArray(flt[fd.fltrName]) ) {
+                                let oprtrs: Array<string> = [];    
+                                if( Array.isArray(flt[fd.fltrName+'<#= OperatorSufix #>']) ) {
+                                    oprtrs = flt[fd.fltrName+'<#= OperatorSufix #>'];
+                                }
+                                flt[fd.fltrName].forEach((val: any, i: number) => {
+                                    let op = 'eq';
+                                    if(oprtrs.length > i) op = oprtrs[i];
+                                    r.push({fltrName: fd.fltrName, fltrDataType: fd.fltrDataType, fltrOperator: op, fltrValue:val});
+                                });
+                            }
+                        }
                     });
                 }
+                this.<#= externalFilterRsltPropName #> = r;
+                this.resetCurFltr();
+                return;
+        } // switch(ef.id) {}
+        let rslt: Array<<#= filterResultModelClassName #>> = [];
+        this.filterDefs.forEach((fd: <#= uniqFilterDefModelClassName #>) => {
+            if(!this.<#= HiddenFilterExPropName #>.some((v: <#= filterResultModelClassName #>) => v.fltrName === fd.fltrName)) {
+                rslt = rslt.concat( r.filter((ri: <#= filterResultModelClassName #>) => ri.fltrName === fd.fltrName) );
             }
         });
         this.<#= externalFilterRsltPropName #> = rslt;
         this.resetCurFltr();
-        if(this.isOnInitCalled) {
-            this.onFilter();
-        }
     }
 
     public <#= currentRowPropName #>: <#= GetInterfaceName(Model) #> | null = null;
@@ -567,7 +719,22 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     @Output('<#= applyFilterSelector #>') <#= applyFilterPropName #>: EventEmitter<<#= componentClassName #>|null> = new EventEmitter<<#= componentClassName #>|null>();
 
 
-    constructor(private  <#= formRootService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, protected dialog: MatDialog, private cd: ChangeDetectorRef) {
+    constructor(public  <#= formRootService #>: <#= serviceClassName #>, public <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
+<#
+        if(searchSchemas!= null) {
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable searchModel = sch.Item4;
+                ModelViewSerializable m2mModel = sch.Item1;
+
+
+#>
+                public  <#= formServicePrefix + m2mModel.ViewName #>: <#= GetServiceClassName(m2mModel, viewServiceFolder) #>,
+                public  <#= formServicePrefix + searchModel.ViewName #>: <#= GetServiceClassName(searchModel, viewServiceFolder) #>,
+<#
+            }
+        } // if(searchSchemas!= null) {...}
+#>    
+            protected dialog: MatDialog, private cd: ChangeDetectorRef) {
         if(this.tableIndexMenuItemsData.length > 0) {
             this.curIndexMenuItemsData = this.tableIndexMenuItemsData[0];
             this.onHiddenFilter();
@@ -577,32 +744,90 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 
     onHiddenFilter() {
         if(this.curIndexMenuItemsData) {
-
-            let dimi: Array<<#= uniqFilterDefModelClassName #>> = this.curIndexMenuItemsData.data as Array<<#= uniqFilterDefModelClassName #>>;
-            if(this._<#= HiddenFilterPropName #>.length < 1) {
-                this.filterDefs = dimi;
-            } else {
-                let rslt: Array<<#= uniqFilterDefModelClassName #>> = [];
-                dimi.forEach((e: <#= uniqFilterDefModelClassName #>) => {
-                    if(!this.<#= HiddenFilterPropName #>.some((h: <#= filterResultModelClassName #>) => h.fltrName === e.fltrName)) {
-                        rslt.push(e);
-                    }
-                });
-                this.filterDefs = rslt;
+            if(this.curIndexMenuItemsData.data) {
+                let dimi: Array<<#= uniqFilterDefModelClassName #>> = this.curIndexMenuItemsData.data as Array<<#= uniqFilterDefModelClassName #>>;
+                if(this.<#= HiddenFilterExPropName #>.length < 1) {
+                    this.filterDefs = dimi;
+                } else {
+                    let rslt: Array<<#= uniqFilterDefModelClassName #>> = [];
+                    dimi.forEach((e: <#= uniqFilterDefModelClassName #>) => {
+                        if(!this.<#= HiddenFilterExPropName #>.some((h: <#= filterResultModelClassName #>) => h.fltrName === e.fltrName)) {
+                            rslt.push(e);
+                        }
+                    });
+                    this.filterDefs = rslt;
+                }
+                return;
             }
-        } else {
-            this.filterDefs = [];
         }
+        this.filterDefs = [];
     }
     
+    <#= onBeforeSqueryPropName #>(flt: <#= GetInterfaceFilterName(Model) #>|any) {
+        let r: {id: string; f: string|any; csc: string; pgi: number; pgsz: number} = {id: this.curIndexMenuItemsData.id, f: undefined, csc:this.<#= currentSortColumnPropName #>, pgi: this.currentPageIndex, pgsz: this.currentPageSize};
+        switch (r.id) {
+<#
+        if(searchSchemas!= null) {
+            if(searchSchemas.Count > 0) {
+                foreach(var sch in searchSchemas) {
+                    ModelViewSerializable searchModel = sch.Item4;
+                    ModelViewSerializable m2mModel = sch.Item1;
+#>
+            case '<#= m2mModel.ViewName #>':  
+                if(this.<#= searchSelectRowPropName + m2mModel.ViewName #>) {
+                    r.f = JSON.stringify(this.<#= searchSelectRowPropName + m2mModel.ViewName #>);
+                }
+                break;           
+<#
+                }
+            }
+        }
+        for(int i = 0; i < uniqueKeys.Count; i++) { 
+            string indErrrorText = "";
+            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
+            if (!indIsCorrect) {
+#>
+
+//
+// Could not generate fragment of code
+// Primary/Unique Index Is not correct:
+// <#= indErrrorText #>
+//
+
+<#
+            } else {
+                string caption = "Primary";
+                if(!uniqueKeys[i].IsPrimary) {
+                    caption = uniqueKeys[i].UniqueKeyName;
+                }
+#>
+            case '<#= caption #>':  
+                if(flt) {
+                    r.f = JSON.stringify(flt);
+                }
+                break;           
+<#
+            }
+        }
+#>
+            case 'fullscann':
+                if(flt) {
+                    r.f = JSON.stringify(flt);
+                }
+                break;           
+            default:
+                return;
+        } // switch (this.curIndexMenuItemsData.id) {...}
+        this.<#= beforeSqueryPropName #>.emit(JSON.stringify(r));
+    }
     ngAfterViewInit() {
         setTimeout(() => {
-            this.onFilter();
             this.isOnInitCalled = true;
+            this.onFilter();
         });
     }    
     onSort(srt: Sort) {
-        this.currentSortColumn = srt.active;
+        this.<#= currentSortColumnPropName #> = srt.active;
         this.currentSortdirection = srt.direction;
         this.onFilter();
     }
@@ -613,7 +838,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     }
     onApplyFilter(flt: Array<IWebServiceFilterRslt>) {
         this.currentFilter = flt; 
-        this._<#= HiddenFilterPropName #>.forEach((hf: <#= filterResultModelClassName #>) => { this.currentFilter.push({
+        this.<#= HiddenFilterExPropName #>.forEach((hf: <#= filterResultModelClassName #>) => { this.currentFilter.push({
             fltrName: hf.fltrName,
             fltrDataType: hf.fltrDataType,
             fltrOperator: hf.fltrOperator,
@@ -625,10 +850,31 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 
     inQuery: boolean = false;
     onFilter() {
+<#
+        if(searchSchemas!= null) {
+            if(searchSchemas.Count > 0) {
+#>
+        switch (this.curIndexMenuItemsData.id) {
+<#
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable searchModel = sch.Item4;
+                ModelViewSerializable m2mModel = sch.Item1;
+#>
+            case '<#= m2mModel.ViewName #>':  
+                this.<#= searchDoSelectRowMethodName + m2mModel.ViewName #>();
+                return;
+<#
+            }
+#>
+        }
+<#
+            }
+        }
+#>
         let flt: <#= GetInterfaceFilterName(Model) #>|any = { page: this.currentPageIndex, pagesize: this.currentPageSize };
-        if (!(typeof this.currentSortColumn === 'undefined')) {
-            if (!(this.currentSortColumn === null)) {
-                if(!(this.currentSortColumn === '')) {
+        if (!(typeof this.<#= currentSortColumnPropName #> === 'undefined')) {
+            if (!(this.<#= currentSortColumnPropName #> === null)) {
+                if(!(this.<#= currentSortColumnPropName #> === '')) {
                     flt.orderby = [];
                     let asc: string = '';
                     if (!(typeof this.currentSortdirection === 'undefined')) {
@@ -638,7 +884,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                             }
                         }
                     }
-                    flt.orderby.push(asc + this.currentSortColumn);
+                    flt.orderby.push(asc + this.<#= currentSortColumnPropName #>);
                 }
             }
         }
@@ -653,14 +899,16 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 flt[opNm].push(e.fltrOperator);
             });
         }
-        this.<#= beforeSqueryPropName #>.emit(flt);
+        this.<#= onBeforeSqueryPropName #>(flt);
         this.inQuery = true;
         let mc: Observable<<#= GetInterfacePageName(Model) #>> | any;
         switch (this.curIndexMenuItemsData.id) {
+
+
 <#
         for(int i = 0; i < uniqueKeys.Count; i++) { 
             string indErrrorText = "";
-            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, pk, out indErrrorText);
+            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
             if (!indIsCorrect) {
 #>
 
@@ -681,7 +929,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                     localRouteManyName = GetManyByRepUnqMethodNamePrefix + caption;
                 }
 #>
-            case '<#= ActionParamChangeMode + caption #>':  
+            case '<#= scannByMode + caption #>':  
                 mc = this.<#= formRootService #>.<#= localRouteManyName #>(flt);
                 break;
 <#
@@ -749,20 +997,42 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 #>
         if(
 <#
+        if(searchSchemas != null) {
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable searchModel = sch.Item4;
+                ModelViewSerializable m2mModel = sch.Item1;
+#>
+           (id === '<#= m2mModel.ViewName #>') ||
+<#
+            }
+        }
+
         for(int i = 0; i < uniqueKeys.Count; i++) {
             string caption = "Primary";
             if(!uniqueKeys[i].IsPrimary) {
                 caption = uniqueKeys[i].UniqueKeyName;
             }
 #>
-           (id === '<#= ActionParamChangeMode + caption #>') ||
+           (id === '<#= scannByMode + caption #>') ||
 <#
         }
 #>
-           (id === 'commcase'))
+           (id === 'fullscann'))
         {
             let mi: <#= menuItemDataModelClassName #>|any = this.tableIndexMenuItemsData.find((e: <#= menuItemDataModelClassName #>) => e.id === id);
             if(mi) {
+<#
+        if(searchSchemas != null) {
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable searchModel = sch.Item4;
+                ModelViewSerializable m2mModel = sch.Item1;
+#>
+                this.<#= searchSelectRowPropName + m2mModel.ViewName #> = null;
+<#
+            }
+        }
+#>
+                this.<#= externalFilterRsltPropName #> = [];
                 this.curIndexMenuItemsData = mi;
                 this.onHiddenFilter();
             }
@@ -809,7 +1079,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 if (!(typeof rslt === 'undefined')) {
                     if (!(rslt === null)) {
                         let r: string[] = ['<#= SelectColumnDefProperty #>']
-                        if(this._<#= showMultiSelectedRowPropName #>) r.push('<#= SelectMultColumnDefProperty #>');
+                        if(this.<#= showMultiSelectedRowExPropName #>) r.push('<#= SelectMultColumnDefProperty #>');
                         rslt.forEach((e: { checked: any; name: string; }) => { if (e.checked) { r.push(e.name) }});
                         r.push('<#= ActionColumnDefProperty #>');
                         this.<#= DisplayedColumnsProperty #> = r;
@@ -819,6 +1089,344 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             }
         });
     } 
+
+
+
+<#
+    // m2mModel, m2mForeignKey, List<Tuple< model.ForeignKey, m2mModel.additionalForeignKey >>, searchModel, searchFk, searchUk
+    if(searchSchemas!= null) {
+        if(searchSchemas.Count > 0) {
+#>
+    <#= clearDatasourceMethodName #>(): void {
+        this.dataSource = [];
+        this.inQuery = false;
+        this.<#= applyFilterPropName #>.emit(this);
+        this.<#= OnSelectRowMethodName #>(null);
+        this.cd.detectChanges();
+    }
+<#
+        }
+        foreach(var sch in searchSchemas) {
+            ModelViewSerializable searchModel = sch.Item4;
+            ModelViewSerializable m2mModel = sch.Item1;
+            ModelViewUniqueKeySerializable searchUk = sch.Item6;
+            ModelViewForeignKeySerializable foreignKey2Model = sch.Item2;
+
+#>
+/////////////////////////////////////////
+    <#= searchSelectRowPropName + m2mModel.ViewName #>: <#= GetInterfaceName(searchModel) #> | any = null;
+    <#= searchDoSelectRowMethodName + m2mModel.ViewName #>() {
+        if(!this.isOnInitCalled) return;
+            let dtlflt: <#= GetInterfaceFilterName(m2mModel) #> | any = { page: this.currentPageIndex, pagesize: this.currentPageSize };
+        if (this.<#= searchSelectRowPropName + m2mModel.ViewName #>) {
+            let dfltrslt: Array<<#= filterResultModelClassName #>> = 
+                this.<#= formServicePrefix + m2mModel.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(this.<#= formServicePrefix + searchModel.ViewName #>.get<#= HiddenFilterByRowSuffix #>(this.<#= searchSelectRowPropName + m2mModel.ViewName #>, '<#= sch.Item5.NavigationName #>'));
+            if (Array.isArray(dfltrslt)) {
+                dfltrslt.forEach(e => {
+                    if(typeof dtlflt[e.fltrName] === 'undefined') {
+                        dtlflt[e.fltrName] = [];
+                    }
+                    dtlflt[e.fltrName].push(e.fltrValue);
+                });
+            }
+        } else {
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message:'Could not apply filter as not all attributes are set'});
+        }
+        // by requirements all common foreignkey props have the same names for <#= m2mModel.ViewName #> and <#= Model.ViewName #>
+        this.<#= HiddenFilterPropName #>.forEach((hf: <#= filterResultModelClassName #>) => { 
+                if(typeof dtlflt[hf.fltrName] === 'undefined') {
+                    dtlflt[hf.fltrName] = [];
+                }
+                dtlflt[hf.fltrName].push(hf.fltrValue);
+        });
+        this.inQuery = true;
+        this.<#= onBeforeSqueryPropName #>(null);
+        this.<#= formServicePrefix + m2mModel.ViewName #>.<#= GetManyByRepPrimMethodNamePrefix #>(dtlflt).subscribe({
+            next: (vd: <#= GetInterfacePageName(m2mModel) #>) => {
+                let pl: number = 0;
+                if (!(typeof vd.total === 'undefined')) {
+                    if(!(vd.total === null)) {
+                        pl = vd.total;
+                    }
+                }
+                this.matPaginatorLen = pl;
+                let rsltd: Array<<#= GetInterfaceName(m2mModel) #>> = [];
+                if (!(typeof vd.items === 'undefined')) {
+                    if(!(vd.items === null)) {
+                        rsltd = vd.items;
+                    }
+                }
+                if(rsltd.length < 1) {
+                    this.<#= clearDatasourceMethodName #>();
+                    return;
+                }
+                let mp1: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}} = this.<#= formServicePrefix + m2mModel.ViewName #>.getm2cKeyfm()['<#= Model.ViewName #>'];
+                if(typeof mp1 === 'undefined') {
+                    this.<#= clearDatasourceMethodName #>();
+                    return;
+                }
+                let mp2: {[key: string]: {isMstrReq: boolean ,propNm:string}} = mp1['<#= foreignKey2Model.NavigationName #>'];
+                if(typeof mp2 === 'undefined') {
+                    this.<#= clearDatasourceMethodName #>();
+                    return;
+                }
+                // it must be this.currentPageIndex == 0
+                let flt: <#= GetInterfaceFilterName(Model) #>|any = { page: 0, pagesize: this.currentPageSize };
+                rsltd.forEach((src: <#= GetInterfaceName(m2mModel) #> | any) => {
+                    for(let i in mp2) {
+                        if(typeof flt[i] === 'undefined') {
+                            flt[i] = [];
+                        }
+                        flt[i].push(src[mp2[i].propNm]);
+                    }
+                });
+                this.<#= formRootService #>.<#= GetManyByRepPrimMethodNamePrefix #>(flt).subscribe({
+                    next: (v: <#= GetInterfacePageName(Model) #>) =>{
+                        this.inQuery = false;
+                        let rslt: Array<<#= GetInterfaceName(Model) #>> = [];
+                        if (!(typeof v.items === 'undefined')) {
+                            if(!(v.items === null)) {
+                                rslt = v.items;
+                            }
+                        }
+                        this.dataSource = rslt;
+                        this.<#= applyFilterPropName #>.emit(this);
+                        let currow: <#= GetInterfaceName(Model) #> | null = null;
+                        if(Array.isArray(this.dataSource)) {
+                            if(this.dataSource.length > 0) {
+                                currow = this.dataSource[0];
+                            }
+                        }
+                        this.<#= OnSelectRowMethodName #>(currow);
+                        this.cd.detectChanges();
+                    },
+                    error: (error: any) => {
+                        this.<#= clearDatasourceMethodName #>();
+                        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
+                    }
+                });
+            },
+            error: (error: any) => {
+                this.<#= clearDatasourceMethodName #>();
+                this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
+            }
+        });
+    }
+
+    <#= afterPatchControlsPropName + m2mModel.ViewName #>(v: any) {
+        this.<#= searchSelectRowPropName + m2mModel.ViewName #> = v;
+    }
+    <#= tpAheadValPropName + m2mModel.ViewName #>(v: any, i: number): any {
+        if(v) {
+            switch(i) {
+<#
+            {
+                int ukprpcnt = 0;
+                foreach(ModelViewKeyPropertySerializable ukprp in searchUk.UniqueKeyProperties) {
+                   ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetScalarPropByOriginaPropName(ukprp.OriginalPropertyName, searchModel);
+#>
+                case <#= ukprpcnt #>: 
+                 return v.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>;
+<#
+                    ukprpcnt++;
+                }
+            }
+#>
+            }
+
+        } 
+        return null;
+    }
+    <#= tpAheadFncPropName + m2mModel.ViewName #>(srv: any, wsfd: Array<<#= uniqFilterModelClassName #>>, value: any, i: number): Observable<Array<any>> {
+        let fltr: <#= GetInterfaceFilterName(searchModel) #> | any = { page: 0, pagesize: 15 };
+<#
+            {
+                int ukprpcnt = 0;
+                foreach(ModelViewKeyPropertySerializable ukprp in searchUk.UniqueKeyProperties) {
+                   ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetScalarPropByOriginaPropName(ukprp.OriginalPropertyName, searchModel);
+#>
+        if(i > <#= ukprpcnt #>) { 
+            fltr.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#> = [wsfd[<#= ukprpcnt #>].fltrValue.value]; 
+            fltr.<#= GetFilterPropertyOperatorName(modelViewPropertyOfVwSerializable, Model, OperatorSufix)#> = ['<#= EqualOperator #>']
+        }
+         else if(i === <#= ukprpcnt #>) { 
+            fltr.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#> = [value]; 
+            fltr.<#= GetFilterPropertyOperatorName(modelViewPropertyOfVwSerializable, Model, OperatorSufix)#> = ['<#= LikeOperator #>']
+         }
+<#
+                    ukprpcnt++;
+                }
+            }
+#>
+        return srv.<#= GetManyByRepUnqMethodNamePrefix + searchUk.UniqueKeyName #>(fltr)
+            .pipe(
+                switchMap((rslt: <#= GetInterfacePageName(searchModel) #>) => {
+                    if (!(typeof rslt === 'undefined')) {
+                    if (!(rslt === null)) {
+                            if (!(typeof rslt.items === 'undefined')) {
+                                if (Array.isArray( rslt.items )) {
+                                    return of(rslt.items);
+                                }
+                            }
+                        }
+                    }
+                    return of([]);
+                }),
+                catchError((x:any) =>of([]))
+            );
+    }
+    <#= tpAheadCptnPropName + m2mModel.ViewName #>(v: any, i: number): string {
+        let retStr = '';
+        if(v) {
+<#
+            {
+                int ukprpcnt = 0;
+                foreach(ModelViewKeyPropertySerializable ukprp in searchUk.UniqueKeyProperties) {
+                   ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetScalarPropByOriginaPropName(ukprp.OriginalPropertyName, searchModel);
+#>
+            if (!(typeof v.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#> === 'undefined')) {
+                if(!(v.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#> === null)) {
+                    retStr = retStr + ' ' + v.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>;
+                }
+            }
+<#
+                }
+            }
+#>
+        } 
+        return retStr;
+    }
+/////////////////////////////////////////
+<#
+        } // foreach(var sch in searchSchemas) {}
+    } // if(searchSchemas!= null) {}
+#>
+
+
+
+
+<#
+        for(int i = 0; i < uniqueKeys.Count; i++) { 
+            string indErrrorText = "";
+            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
+            if (!indIsCorrect) {
+#>
+
+//
+// Could not generate fragment of code
+// Primary/Unique Index Is not correct:
+// <#= indErrrorText #>
+//
+
+<#
+            } else {
+                string caption = "Primary";
+                string localRouteManyName = GetManyByRepPrimMethodNamePrefix;
+                if(!uniqueKeys[i].IsPrimary) {
+                    caption = uniqueKeys[i].UniqueKeyName;
+                }
+                if(!uniqueKeys[i].IsPrimary) {
+                    localRouteManyName = GetManyByRepUnqMethodNamePrefix + caption;
+                }
+
+#>
+/////////////////////////////////////////
+
+    <#= searchSelectRowPropName + caption #>: <#= GetInterfaceName(Model) #> | any = null;
+    <#= afterPatchControlsPropName + caption #>(v: any) {
+        if(v) {
+            this.<#= searchSelectRowPropName + caption #> = v as <#= GetInterfaceName(Model) #>;
+        } else {
+            this.<#= searchSelectRowPropName + caption #> = null;
+        }
+    }
+
+    <#= tpAheadValPropName + caption #>(v: any, i: number): any {
+        if(v) {
+            switch(i) {
+<#
+            {
+                int ukprpcnt = 0;
+                
+                foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
+                    //ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetModelScalarPropByKeyProp(Model, kps);
+                    
+#>
+                case <#= ukprpcnt #>: 
+                 return v.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>;
+<#
+                    ukprpcnt++;
+                }
+            }
+#>
+            }
+        } 
+        return null;
+    }
+    <#= tpAheadFncPropName + caption #>(srv: any, wsfd: Array<<#= uniqFilterModelClassName #>>, value: any, i: number): Observable<Array<any>> {
+        let fltr: <#= GetInterfaceFilterName(Model) #> | any = { page: 0, pagesize: 15 };
+<#
+            {
+                int ukprpcnt = 0;
+                foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
+                    //ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetModelScalarPropByKeyProp(Model, kps);
+#>
+        if(i > <#= ukprpcnt #>) { 
+            fltr.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#> = [wsfd[<#= ukprpcnt #>].fltrValue.value]; 
+            fltr.<#= GetFilterPropertyOperatorName(modelViewPropertyOfVwSerializable, Model, OperatorSufix)#> = ['<#= EqualOperator #>']
+         } else if(i === <#= ukprpcnt #>) { 
+            fltr.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#> = [value]; 
+            fltr.<#= GetFilterPropertyOperatorName(modelViewPropertyOfVwSerializable, Model, OperatorSufix)#> = ['<#= LikeOperator #>']
+         }
+<#
+                    ukprpcnt++;
+                }
+            }
+#>
+        return srv.<#= localRouteManyName #>(fltr)
+            .pipe(
+                switchMap((rslt: <#= GetInterfacePageName(Model) #>) => {
+                    if (!(typeof rslt === 'undefined')) {
+                    if (!(rslt === null)) {
+                            if (!(typeof rslt.items === 'undefined')) {
+                                if (Array.isArray( rslt.items )) {
+                                    return of(rslt.items);
+                                }
+                            }
+                        }
+                    }
+                    return of([]);
+                }),
+                catchError((x:any) =>of([]))
+            );
+    }
+    <#= tpAheadCptnPropName + caption #>(v: any, i: number): string {
+        let retStr = '';
+        if(v) {
+<#
+            {
+                int ukprpcnt = 0;
+                foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
+                    //ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetModelScalarPropByKeyProp(Model, kps);
+#>
+            if (!(typeof v.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#> === 'undefined')) {
+                if(!(v.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#> === null)) {
+                    retStr = retStr + ' ' + v.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>;
+                }
+            }
+<#
+                }
+            }
+#>
+        } 
+        return retStr;
+    }
+<#
+            }
+        }
+#>
+/////////////////////////////////////////
+
 }
 
 
@@ -2774,6 +3382,207 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         }
         error = "";
         return true;
+    }
+    ModelViewPropertyOfVwSerializable GetScalarPropByOriginaPropName(string origPropName, ModelViewSerializable model) { 
+        if (string.IsNullOrEmpty(origPropName) || (model == null)) return null;
+        if ((model.AllProperties == null) || (model.ScalarProperties == null)) return null;
+        ModelViewEntityPropertySerializable aprop = model.AllProperties.Where(p => p.OriginalPropertyName == origPropName).FirstOrDefault();
+        if(aprop == null) return null;
+        ModelViewPropertyOfVwSerializable sprop = model.ScalarProperties.Where(p => 
+                (p.OriginalPropertyName == origPropName) && 
+                string.IsNullOrEmpty(p.ForeignKeyName)).FirstOrDefault();
+        if(sprop != null) return sprop;
+        if(model.ForeignKeys == null) return null;
+        if(model.ForeignKeys.Count < 1) return null;
+        foreach(ModelViewForeignKeySerializable fk in model.ForeignKeys) {
+            if ((fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) continue;
+            if ((fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1)) continue;
+            for(int i = 0; i < fk.ForeignKeyProps.Count; i++) {
+                if(fk.ForeignKeyProps[i].OriginalPropertyName == origPropName) {
+                    sprop = model.ScalarProperties.Where(p => 
+                    (p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && 
+                    (p.ForeignKeyName == fk.NavigationName) && 
+                    (p.ForeignKeyName == p.ForeignKeyNameChain)
+                    ).FirstOrDefault();
+                    if(sprop != null) return sprop;
+                }
+            }
+        }
+        return null;
+    }
+    bool IsForeigKeyMapedToPrimKey(ModelViewForeignKeySerializable fk, ModelViewSerializable model) {
+        if ((model == null) || (fk == null)) return false;
+        if ((model.PrimaryKeyProperties == null) || (model.ForeignKeys == null) || (fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) return false;
+        if ((model.PrimaryKeyProperties.Count < 1) || (fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1) || (fk.ForeignKeyProps.Count >= model.PrimaryKeyProperties.Count) ) return false;
+        foreach(ModelViewKeyPropertySerializable fkp in fk.ForeignKeyProps) {
+            if( !model.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == fkp.OriginalPropertyName) ) return false;
+        }
+        return true;
+    }
+    bool IsForeigKeyMapedToScalars(ModelViewForeignKeySerializable fk, ModelViewSerializable model) {
+        if ((model == null) || (fk == null)) return false;
+        if ((model.ScalarProperties == null) || (fk.ForeignKeyProps == null)) return false;
+        if (fk.ForeignKeyProps.Count < 1) return false;
+        foreach(ModelViewKeyPropertySerializable fkp in fk.ForeignKeyProps) {
+             if(GetScalarPropByOriginaPropName(fkp.OriginalPropertyName, model) == null) return false;
+        }
+        return true;
+    }
+    bool IsForeigKeyMapedToScalarsEx(ModelViewForeignKeySerializable searchFk, ModelViewSerializable searchModel, ModelViewSerializable model) {
+        if ((searchModel == null) || (searchFk == null) || (model == null)) return false;
+        if ((searchModel.ScalarProperties == null) || (searchFk.ForeignKeyProps == null) || (model.ScalarProperties == null)) return false;
+        if ((searchFk.ForeignKeyProps.Count < 1) || (model.ScalarProperties.Count < 1)) return false;
+        foreach(ModelViewKeyPropertySerializable ukp in searchFk.ForeignKeyProps) {
+             ModelViewPropertyOfVwSerializable sprp = GetScalarPropByOriginaPropName(ukp.OriginalPropertyName, searchModel);
+             if(sprp == null) return false;
+             if(!model.ScalarProperties.Any(p => p.ViewPropertyName == sprp.ViewPropertyName)) return false;
+        }
+        return true;
+    }
+
+    bool IsUniqKeyMapedToScalars(ModelViewUniqueKeySerializable searchUk, ModelViewSerializable searchModel) {
+        if ((searchModel == null) || (searchUk == null)) return false;
+        if ((searchModel.ScalarProperties == null) || (searchUk.UniqueKeyProperties == null)) return false;
+        if (searchUk.UniqueKeyProperties.Count < 1) return false;
+        foreach(ModelViewKeyPropertySerializable ukp in searchUk.UniqueKeyProperties) {
+             if(GetScalarPropByOriginaPropName(ukp.OriginalPropertyName, searchModel) == null) return false;
+        }
+        return true;
+    }
+    bool IsUniqKeyMapedToScalarsEx(ModelViewUniqueKeySerializable searchUk, ModelViewSerializable searchModel, ModelViewSerializable model) {
+        if ((searchModel == null) || (searchUk == null) || (model == null)) return false;
+        if ((searchModel.ScalarProperties == null) || (searchUk.UniqueKeyProperties == null) || (model.ScalarProperties == null)) return false;
+        if ((searchUk.UniqueKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1)) return false;
+        foreach(ModelViewKeyPropertySerializable ukp in searchUk.UniqueKeyProperties) {
+             ModelViewPropertyOfVwSerializable sprp = GetScalarPropByOriginaPropName(ukp.OriginalPropertyName, searchModel);
+             if(sprp == null) return false;
+             if(!model.ScalarProperties.Any(p => p.ViewPropertyName == sprp.ViewPropertyName)) return false;
+        }
+        return true;
+    }
+    bool IsForeigKeyMapedToHeaderOfPrimKey(ModelViewForeignKeySerializable fk, ModelViewSerializable model) {
+        if ((model == null) || (fk == null)) return false;
+        if ((model.PrimaryKeyProperties == null) || (model.ForeignKeys == null) || (fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) return false;
+        if ((model.PrimaryKeyProperties.Count < 1) || (fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1) || (fk.ForeignKeyProps.Count >= model.PrimaryKeyProperties.Count) ) return false;
+        for(int i = 0; i < fk.ForeignKeyProps.Count; i++) {
+            if (fk.ForeignKeyProps[i].OriginalPropertyName != model.PrimaryKeyProperties[i].OriginalPropertyName) return false;
+        }
+        return true;
+    }
+    bool IsForeigKeyMapedToTailOfPrimKey(ModelViewForeignKeySerializable fk, ModelViewSerializable model) {
+        if ((model == null) || (fk == null)) return false;
+        if ((model.PrimaryKeyProperties == null) || (model.ForeignKeys == null) || (fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) return false;
+        if ((model.PrimaryKeyProperties.Count < 1) || (fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1) || (fk.ForeignKeyProps.Count >= model.PrimaryKeyProperties.Count) ) return false;
+        for(int i = 0; i < fk.ForeignKeyProps.Count; i++) {
+            if (fk.ForeignKeyProps[fk.ForeignKeyProps.Count - (1 + i)].OriginalPropertyName != model.PrimaryKeyProperties[model.PrimaryKeyProperties.Count - (1 + i)].OriginalPropertyName) return false;
+        }
+        return true;
+    }
+    bool IsForeigKeyMapedToMidleOfPrimKey(ModelViewForeignKeySerializable fk, ModelViewSerializable model) {
+        if ((model == null) || (fk == null)) return false;
+        if ((model.PrimaryKeyProperties == null) || (model.ForeignKeys == null) || (fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) return false;
+        if ((model.PrimaryKeyProperties.Count < 1) || (fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1) || (fk.ForeignKeyProps.Count >= model.PrimaryKeyProperties.Count) ) return false;
+        int k  = -1;
+        // from 1 till fk.PrimaryKeyProperties.Count-2
+        for(int i = 1; i < model.PrimaryKeyProperties.Count-1; i++) {
+            if(model.PrimaryKeyProperties[i].OriginalPropertyName == fk.ForeignKeyProps[0].OriginalPropertyName) {
+                k = i;
+                break;
+            }
+        }
+        if (k < 0) return false;
+        if ((k + fk.ForeignKeyProps.Count) >= model.PrimaryKeyProperties.Count) return false;
+        for(int i = k; i < fk.ForeignKeyProps.Count; i++) {
+            if (fk.ForeignKeyProps[i].OriginalPropertyName != model.PrimaryKeyProperties[i].OriginalPropertyName) return false;
+        }
+        return true;
+    }
+    List<Tuple<ModelViewSerializable,ModelViewForeignKeySerializable,List<Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>>,ModelViewSerializable,ModelViewForeignKeySerializable,ModelViewUniqueKeySerializable>> GetSearchResources(ModelViewSerializable model, DbContextSerializable context) {
+        if ((context == null) || (model == null)) return null;
+        if ((context.ModelViews == null) || (model.PrimaryKeyProperties == null) || (model.ScalarProperties == null) ) return null;
+        if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1)) return null;
+        List<ModelViewSerializable> m2mMdls = context.ModelViews.Where(p => (p.ForeignKeys.Any(f => f.ViewName == model.ViewName) && (p.ForeignKeys.Count > 1))).ToList();
+        if(m2mMdls.Count < 1) return null;
+        // m2mModel, m2mForeignKey, List<Tuple< model.ForeignKey, m2mModel.additionalForeignKey >>, searchModel, searchFk, searchUk
+        List<Tuple<ModelViewSerializable,ModelViewForeignKeySerializable,List<Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>>,ModelViewSerializable,ModelViewForeignKeySerializable,ModelViewUniqueKeySerializable>> result = null;
+        // return new List<Tuple<ModelViewSerializable,ModelViewForeignKeySerializable,List<Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>>,ModelViewSerializable,ModelViewForeignKeySerializable,ModelViewUniqueKeySerializable>>();
+        foreach(ModelViewSerializable m2mMdl in m2mMdls) {
+            if(m2mMdl.PrimaryKeyProperties == null) continue;
+            if(m2mMdl.PrimaryKeyProperties.Count < 1) continue;
+            List<ModelViewForeignKeySerializable> m2mFks = m2mMdl.ForeignKeys.Where(f => f.ViewName == model.ViewName).ToList();
+            foreach(ModelViewForeignKeySerializable m2mFk in m2mFks) {
+                if(!IsForeigKeyMapedToTailOfPrimKey(m2mFk, m2mMdl)) continue;
+                if(!IsForeigKeyMapedToScalars(m2mFk, m2mMdl)) continue;
+                // m2mMdl - m2mModel, m2mFk - m2mForeignKey,
+                foreach(ModelViewForeignKeySerializable searchFk in m2mMdl.ForeignKeys) {
+                    if(searchFk == m2mFk) continue;
+                    ModelViewSerializable searchMdl = context.ModelViews.Where(mv => (mv.ViewName == searchFk.ViewName)).FirstOrDefault();
+                    if(searchMdl == null) continue;
+                    if(searchMdl.UniqueKeys == null) continue;
+                    if(searchMdl.UniqueKeys.Count < 1) continue;
+                    if(!IsForeigKeyMapedToHeaderOfPrimKey(searchFk, m2mMdl)) continue;
+                    if(!IsForeigKeyMapedToScalars(searchFk, m2mMdl)) continue;
+                    foreach(ModelViewUniqueKeySerializable searchUk in searchMdl.UniqueKeys) {
+                        if(!IsUniqKeyMapedToScalarsEx(searchUk, searchMdl, model)) continue;
+                        // searchMdl, searchFk, searchUk
+                        List<Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>> fkpairs = null;
+                        if(model.ForeignKeys != null) {
+                            foreach(ModelViewForeignKeySerializable modelFk in model.ForeignKeys) {
+                                if(!IsForeigKeyMapedToScalars(modelFk, model)) continue;
+                                List<ModelViewForeignKeySerializable> additionalM2mFks = m2mMdl.ForeignKeys.Where(f => f.ViewName == modelFk.ViewName).ToList();
+                                foreach(ModelViewForeignKeySerializable additionalM2mFk in additionalM2mFks) {
+                                    if(!IsForeigKeyMapedToScalarsEx(additionalM2mFk, m2mMdl, model)) continue;
+                                    if(fkpairs == null) {
+                                        fkpairs = new List<Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>>();
+                                    }
+                                    fkpairs.Add( new Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>(modelFk,additionalM2mFk)  );
+                                }
+                            }
+                        }
+                        if(result == null) {
+                            result = new List<Tuple<ModelViewSerializable,ModelViewForeignKeySerializable,List<Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>>,ModelViewSerializable,ModelViewForeignKeySerializable,ModelViewUniqueKeySerializable>>();
+                        }
+                        result.Add(
+                          new Tuple<ModelViewSerializable,ModelViewForeignKeySerializable,List<Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>>,ModelViewSerializable,ModelViewForeignKeySerializable,ModelViewUniqueKeySerializable>(
+                            m2mMdl, m2mFk, fkpairs, searchMdl, searchFk, searchUk
+                          ));
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    ModelViewPropertyOfVwSerializable GetModelScalarPropByKeyProp(ModelViewSerializable model, ModelViewKeyPropertySerializable pk) {
+        ModelViewPropertyOfVwSerializable rslt = null;
+        if ((model == null) || (pk == null)) return null;
+        if (model.ScalarProperties == null) return null;
+        ModelViewPropertyOfVwSerializable scProp = 
+            model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+        if (scProp != null) return scProp;
+        if (model.ForeignKeys != null) {
+            foreach(ModelViewForeignKeySerializable fk in model.ForeignKeys) {
+                scProp = null;
+                if ((fk.ForeignKeyProps != null) && (fk.PrincipalKeyProps != null)) {
+                    int cnt = fk.ForeignKeyProps.Count;
+                    if (cnt < fk.PrincipalKeyProps.Count)
+                    {
+                        cnt = fk.PrincipalKeyProps.Count;
+                    }
+                    for(int i = 0; i < cnt; i++)
+                    {
+                        if(fk.ForeignKeyProps[i].OriginalPropertyName == pk.OriginalPropertyName)
+                        {
+                            scProp=
+                                model.ScalarProperties.Where(p =>
+                                ((p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (p.ForeignKeyNameChain == fk.NavigationName))).FirstOrDefault();
+                        }
+                        if(scProp != null) return scProp;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 
