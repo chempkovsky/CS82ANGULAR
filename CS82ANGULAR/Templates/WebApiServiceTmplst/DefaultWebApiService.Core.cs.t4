@@ -149,305 +149,60 @@ namespace <#= webApiServiceNameSpace #> {
 <#
         foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
             if(!prop.IsUsedByfilter) continue;
-            if (!IsEntityTypeString(prop)) {
 #>
-            if(<#=  GetFilterPropertyName(prop, Model) #> != null) {
-                if(<#=  GetFilterPropertyName(prop, Model) #>.Length > 0) {
-                    int filterCnt = <#=  GetFilterPropertyName(prop, Model) #>.Length;
-                    int operatorCnt = 0;
-                    if(<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #> != null) {
-                        operatorCnt = <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>.Length;
-                    }
-                    List<KeyValuePair<String, int >> filterOprtLst = new List<KeyValuePair<String, int>>();
+            int _<#= GetFilterPropertyName(prop, Model) #> = <#= GetFilterPropertyName(prop, Model) #> == null ? 0 : <#= GetFilterPropertyName(prop, Model) #>.Length;
+            if (_<#= GetFilterPropertyName(prop, Model) #> > 0) {
+                int _<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #> = <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #> == null ? 0 : <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>.Length;
+                for(int i = 0; i < _<#= GetFilterPropertyName(prop, Model) #>; i++) {
+                    string op_<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #> = (i >= _<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>) ? "eq" : (<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i] == null) ? "eq" : <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i];
+                    var _tmp<#= GetFilterPropertyName(prop, Model) #> = <#= GetFilterPropertyName(prop, Model) #>[i];
 <#
-                if (prop.IsNullable) {
+            if (IsEntityTypeString(prop)) {
 #>
-                    List<<#= prop.UnderlyingTypeName#> ?> filterLst = new List<<#=  prop.UnderlyingTypeName#> ?>();
-                    for(int i = 0; i < filterCnt; i++) {
-                        if( !(<#=  GetFilterPropertyName(prop, Model) #>[i].HasValue) ) continue;
-                        string currOprtr = EqualOperators[0];
-                        if (i < operatorCnt) {
-                            if( ! string.IsNullOrEmpty( <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i] ) ) {
-                                if (ExpectedOperators.Contains(<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i])) {
-                                    currOprtr = <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i];
-                                }
-                            }
-                        }
-                        if (EqualOperators.Contains(currOprtr)) {
-                            filterLst.Add(<#=  GetFilterPropertyName(prop, Model) #>[i]);
-                        } else {
-                            filterOprtLst.Add( new KeyValuePair<String, int>(currOprtr, i) );
-                        }
-                    }
-                    //
-                    // <#= prop.UnderlyingTypeName#> ?[] filter = <#= GetFilterPropertyName(prop, Model)#>.Where(i => i.HasValue).Select(i => i).ToArray();
-                    //
-                    <#= prop.UnderlyingTypeName#> ?[] filter = filterLst.ToArray();
-<#              
-                } else { 
-#>
-                    List<<#= prop.UnderlyingTypeName#> > filterLst = new List<<#= prop.UnderlyingTypeName#> >();
-                    for(int i = 0; i < filterCnt; i++) {
-                        if( !(<#=  GetFilterPropertyName(prop, Model) #>[i].HasValue) ) continue;
-                        string currOprtr = EqualOperators[0];
-                        if (i < operatorCnt) {
-                            if( ! string.IsNullOrEmpty( <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i] ) ) {
-                                if (ExpectedOperators.Contains(<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i])) {
-                                    currOprtr = <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i];
-                                }
-                            }
-                        }
-                        if (EqualOperators.Contains(currOprtr)) {
-                            filterLst.Add(<#=  GetFilterPropertyName(prop, Model) #>[i].Value);
-                        } else {
-                            filterOprtLst.Add( new KeyValuePair<String, int>(currOprtr, i) );
-                        }
-                    }
-
-                   // 
-                   // <#= prop.UnderlyingTypeName#>[] filter = <#=  GetFilterPropertyName(prop, Model)#>.Where(i => i.HasValue).Select(i => i.Value).ToArray();
-                   //
-                   <#= prop.UnderlyingTypeName#>[] filter = filterLst.ToArray();
-<#
-                }
-#>
-<#
-                if (prop.IsNullable) {
-#>
-                    if ( (filter.Length + filterOprtLst.Count) != filterCnt) {
-                        if (filter.Length > 0) {
-                            query = query.Where(p => (filter.Contains(p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#>)) || (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> == null));
-                        } else {
-                            query = query.Where(p => (p.<#= GetForeignKeyNameChainAndProp(prop, Model)#> == null) );
-                        }
-                    } else if (filter.Length > 0) {
-                        query = query.Where(p => filter.Contains(p.<#= GetForeignKeyNameChainAndProp(prop, Model)#>));
-                    }
-                    foreach(var fltItm in filterOprtLst) {
-                        <#= prop.TypeFullName #> aflt = <#=  GetFilterPropertyName(prop, Model) #>[ fltItm.Value ];
-                        switch(fltItm.Key) {
-<# 
-                        if(! IsEntityTypeBoolean(prop) ) {
-#>
-                            case "gt":
-                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> >= aflt );
-                                break;
-                            case "lt":
-                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> <= aflt );
-                                break;
-<#
-                        }
-#>
-                            case "ne":
-                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> != aflt );
-                                break;
-                        }
+                    switch(op_<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>) {
+                        case "eq": 
+                            query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(_tmp<#= GetFilterPropertyName(prop, Model) #>));
+                            break;
+                        case "lk":
+                            query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(_tmp<#= GetFilterPropertyName(prop, Model) #>));
+                            break;
+                        case "gt":
+                            query = query.Where(p => (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#>.CompareTo(_tmp<#= GetFilterPropertyName(prop, Model) #>) >= 0));
+                            break;
+                        case "lt": 
+                            query = query.Where(p => (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#>.CompareTo(_tmp<#= GetFilterPropertyName(prop, Model) #>) <= 0));
+                            break;
+                        case "ne":
+                            query = query.Where(p => (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#>.CompareTo(_tmp<#= GetFilterPropertyName(prop, Model) #>) != 0));
+                            break;
                     }
 <#
-                } else {
+            } else {
 #>
-                    if (filter.Length > 0) {
-                        query = query.Where(p => filter.Contains(p.<#= GetForeignKeyNameChainAndProp(prop, Model)#>));
-                    }
-                    foreach(var fltItm in filterOprtLst) {
-                        <#= prop.TypeFullName #> aflt = <#=  GetFilterPropertyName(prop, Model) #>[ fltItm.Value ].Value;
-                        switch(fltItm.Key) {
-<# 
-                        if(! IsEntityTypeBoolean(prop) ) {
-#>
-                            case "gt":
-                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> >= aflt );
-                                break;
-                            case "lt":
-                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> <= aflt );
-                                break;
-<#
-                        }
-#>
-                            case "ne":
-                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> != aflt );
-                                break;
-                        }
+                    switch(op_<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>) {
+                        case "eq": 
+                            query = query.Where(p => (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> == _tmp<#= GetFilterPropertyName(prop, Model) #>));
+                            break;
+                        case "lk":
+                            query = query.Where(p => (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> == _tmp<#= GetFilterPropertyName(prop, Model) #>));
+                            break;
+                        case "gt":
+                            query = query.Where(p => (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> >= _tmp<#= GetFilterPropertyName(prop, Model) #>));
+                            break;
+                        case "lt": 
+                            query = query.Where(p => (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> <= _tmp<#= GetFilterPropertyName(prop, Model) #>));
+                            break;
+                        case "ne":
+                            query = query.Where(p => (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> != _tmp<#= GetFilterPropertyName(prop, Model) #>));
+                            break;
                     }
 <#
-                }  /////////// if (prop.IsNullable)
+            }
 #>
-
                 }
             }
 <#
-            } else { /////////////// if (!IsEntityTypeString(prop))
-#>
-            if(<#=                    GetFilterPropertyName(prop, Model)#> != null) {
-                if(<#=                    GetFilterPropertyName(prop, Model)#>.Length > 0) {
-                    int filterCnt = <#=                    GetFilterPropertyName(prop, Model) #>.Length;
-                    int operatorCnt = 0;
-                    if(<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #> != null) {
-                        operatorCnt = <#=                    GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>.Length;
-                    }
-                    List<KeyValuePair<String, int >> filterOprtLst = new List<KeyValuePair<String, int>>();
-                    List<<#= prop.UnderlyingTypeName#>> filterLst = new List<<#=  prop.UnderlyingTypeName#>>();
-                    for(int i = 0; i < filterCnt; i++) {
-                        if(  string.IsNullOrEmpty(<#=  GetFilterPropertyName(prop, Model) #>[i]) ) continue;
-                        string currOprtr = EqualOperators[0];
-                        if (i < operatorCnt) {
-                            if( ! string.IsNullOrEmpty( <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i] ) ) {
-                                if (ExpectedOperators.Contains(<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i])) {
-                                    currOprtr = <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>[i];
-                                }
-                            }
-                        }
-                        if (EqualOperators.Contains(currOprtr)) {
-                            filterLst.Add(<#=  GetFilterPropertyName(prop, Model) #>[i]);
-                        } else {
-                            filterOprtLst.Add( new KeyValuePair<String, int>(currOprtr, i) );
-                        }
-                    }
-
-                    // 
-                    // <#= prop.UnderlyingTypeName#>[] filter = <#=  GetFilterPropertyName(prop, Model)#>.Where(i => (!string.IsNullOrEmpty(i)) ).ToArray();
-                    //
-                    <#= prop.UnderlyingTypeName#>[] filter = filterLst.ToArray();
-                    bool hasNUllFilter = <#= GetFilterPropertyName(prop, Model)#>.Length > (filterLst.Count + filterOprtLst.Count);
-                    switch(filter.Length)
-                    {
-                        case 0:
-                            if (hasNUllFilter) {
-                                query = query.Where(p => p.<#=    GetForeignKeyNameChainAndProp(prop, Model)#> == null);
-                            }
-                            break;
-                        case 1:
-                            {
-                                string aflt0 = filter[0].Trim();
-                                if (hasNUllFilter) {
-                                    query = query.Where(p => (
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#> == null) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0))
-                                            ));
-                                } else {
-                                    query = query.Where(p => (
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0))
-                                            ));
-                                }
-                            }
-                            break;
-                        case 2:
-                            {
-                                string aflt0 = filter[0].Trim();
-                                string aflt1 = filter[1].Trim();
-                                if (hasNUllFilter) {
-                                    query = query.Where(p => (
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#> == null) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt1))
-                                            ));
-                                } else {
-                                    query = query.Where(p => (
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt1))
-                                            ));
-                                }
-                            }
-                            break;
-                        case 3:
-                            {
-                                string aflt0 = filter[0].Trim();
-                                string aflt1 = filter[1].Trim();
-                                string aflt2 = filter[2].Trim();
-                                if (hasNUllFilter) {
-                                    query = query.Where(p => (
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#> == null) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt1)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt2))
-                                            ));
-                                } else {
-                                    query = query.Where(p => (
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt1)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt2))
-                                            ));
-                                }
-                            }
-                            break;
-                        case 4:
-                            {
-                                string aflt0 = filter[0].Trim();
-                                string aflt1 = filter[1].Trim();
-                                string aflt2 = filter[2].Trim();
-                                string aflt3 = filter[3].Trim();
-                                if (hasNUllFilter) {
-                                    query = query.Where(p => (
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#> == null) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt1)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt2)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt3))
-                                            ));
-                                } else {
-                                    query = query.Where(p => (
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt1)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt2)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt3))
-                                            ));
-                                }
-                            }
-                            break;
-                        default:
-                            {
-                                string aflt0 = filter[0].Trim();
-                                string aflt1 = filter[1].Trim();
-                                string aflt2 = filter[2].Trim();
-                                string aflt3 = filter[3].Trim();
-                                string aflt4 = filter[4].Trim();
-                                if (hasNUllFilter) {
-                                    query = query.Where(p => (
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#> == null) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt1)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt2)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt3)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt4))
-                                            ));
-                                } else {
-                                    query = query.Where(p => (
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt0)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt1)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt2)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt3)) ||
-                                            (p.<#=                    GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(aflt4))
-                                            ));
-                                }
-
-                            }
-                            break;
-                    }
-                    foreach(var fltItm in filterOprtLst) {
-                        string aflt = <#=  GetFilterPropertyName(prop, Model) #>[ fltItm.Value ];
-                        switch(fltItm.Key) {
-<# 
-                        if(! IsEntityTypeBoolean(prop) ) {
-#>
-                            case "gt":
-                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#>.CompareTo(aflt) >= 0 );
-                                break;
-                            case "lt":
-                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#>.CompareTo(aflt) <= 0 );
-                                break;
-<#
-                        }
-#>
-                            case "ne":
-                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#>.CompareTo(aflt) != 0 );
-                                break;
-                        }
-                    }
-                }
-            }
-<#
-            }
-        }
+    }
 #>
                 int totals = await query.CountAsync();
                 int pageCount = ((totals > 0) ? ((int)Math.Ceiling((double)totals / (double)currentPageSize)) : 0);
