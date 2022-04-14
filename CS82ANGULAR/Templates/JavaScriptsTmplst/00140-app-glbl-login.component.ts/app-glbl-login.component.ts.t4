@@ -12,6 +12,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    bool localize = true;
 
     string appSettingServiceFolder          = "00015-app-glbl-settings.service.ts";
     string appRegisterInterfaceFolder       = "00118-app-glbl-register.interface.ts";
@@ -58,7 +59,18 @@ import { <#= appLoginServiceClassName #> } from '<#= GetFolderName(Model, appLog
   styleUrls: ['<#= GetFolderName(Model, appLoginCssComponentFolder, appLoginComponentFolder) #>.css']
 })
 export class <#= appLoginComponentClassName #> {
+<# 
+    if(localize) {
+#>
+    title: string = $localize`:Sign in@@<#= appLoginComponentClassName #>.Sign-in:Sign in`;
+<# 
+    } else {
+#>
     title: string = 'Sign in';
+<# 
+    }
+#>
+
     cnfPwdhide: boolean = true;
     pwdhide: boolean = true;
     public <#= AppearancePropName #>: MatFormFieldAppearance = 'outline';

@@ -63,7 +63,18 @@ import { <#= appLoginServiceClassName #> } from '<#= GetFolderName(Model, appLog
   styleUrls: ['<#= GetFolderName(Model, appLogoutCssComponentFolder, appLogoutComponentFolder) #>.css']
 })
 export class <#= appLogoutComponentClassName #> {
+<# 
+    if(localize) {
+#>
+    title: string = $localize`:Do you want to Sign Out@@<#= appLogoutComponentClassName #>.Sign Out:Do you want to Sign Out?`;
+<# 
+    } else {
+#>
     title: string = 'Do you want to Sign Out?';
+<# 
+    }
+#>
+
     public <#= AppearancePropName #>: MatFormFieldAppearance = 'outline';
 
     constructor(private <#= securityServiceName #>: <#= appLoginServiceClassName #>, protected router: Router, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #> ) {

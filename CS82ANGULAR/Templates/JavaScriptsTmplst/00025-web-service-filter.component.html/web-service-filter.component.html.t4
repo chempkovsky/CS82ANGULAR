@@ -12,6 +12,8 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    bool localize = true;
+
     string AppearancePropName           = "appearance";
     string OverflowSelector             = "ovrflw";
     string OverflowPropName             = "ovrflw";
@@ -29,6 +31,9 @@
 
     string showFilterExPropName         = "showFilterEx";
     string MaxHeightExPropName          = "maxHeightEx";
+
+    string filterComponentFolder = "00025-web-service-filter.component.ts";
+    string filterComponentClassName = GetComponentClassName(Model, filterComponentFolder);
 
 #>
 
@@ -51,7 +56,18 @@
         </button>       
         <span fxFlex="1%"></span>  
         <button mat-icon-button color="primary" (click)="onApplyFilterClicked()" 
-            matTooltip="Apply filter"> 
+<# 
+    if(localize) {
+#>
+    i18n-matTooltip="Apply filter@@<#= filterComponentClassName #>.Apply-filter"  matTooltip="Apply filter"> 
+<# 
+    } else {
+#>
+    matTooltip="Apply filter"> 
+<# 
+    }
+#>
+
             <mat-icon   >refresh</mat-icon>
         </button>      
         <span fxFlex="2%"></span>     
@@ -116,6 +132,17 @@
                 
                 <button mat-icon-button fxFlex="5%" aria-label="Clear" 
                     matTooltip="Remove current filter item"
+<# 
+    if(localize) {
+#>
+    i18n-matTooltip="Remove current filter item@@<#= filterComponentClassName #>.Remove-current-filter-item"  matTooltip="Remove current filter item"> 
+<# 
+    } else {
+#>
+    matTooltip="Remove current filter item"> 
+<# 
+    }
+#>
                     color="warn" (click)="removeFltr(flt)">
                     <mat-icon>delete_forever</mat-icon>
                 </button>     

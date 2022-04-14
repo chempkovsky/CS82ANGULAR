@@ -12,6 +12,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    bool localize = true;
 
     string appSettingServiceFolder          = "00015-app-glbl-settings.service.ts";
     string appRegisterInterfaceFolder       = "00118-app-glbl-register.interface.ts";
@@ -58,7 +59,18 @@ import { <#= appChangePasswordModelClassName #> } from '<#= GetFolderName(Model,
   styleUrls: ['<#= GetFolderName(Model, appChangePasswordCssComponentFolder, appChangePasswordComponentFolder) #>.css']
 })
 export class <#= appChangePasswordComponentClassName #> {
+<# 
+    if(localize) {
+#>
+    title: string = $localize`:Change Password@@<#= appChangePasswordComponentClassName #>.Change-Password:Change Password`;
+<# 
+    } else {
+#>
     title: string = 'Change Password';
+<# 
+    }
+#>
+
     cnfPwdhide: boolean = true;
     pwdhide: boolean = true;
     oldpwdhide: boolean = true;
@@ -94,8 +106,29 @@ export class <#= appChangePasswordComponentClassName #> {
         if(!(this.chngpswdFormGroup.controls['newPassword'].value === this.chngpswdFormGroup.controls['confirmPassword'].value)) {
             let msg = {
                 message: 'New Password and Confirm Password must be identical'
+<# 
+    if(localize) {
+#>
+                message: $localize`:New Password and Confirm Password must be identical@@<#= appChangePasswordComponentClassName #>.New-Password-dentical:New Password and Confirm Password must be identical` 
+<# 
+    } else {
+#>
+                message: 'New Password and Confirm Password must be identical'
+<# 
+    }
+#>
             };
+<# 
+    if(localize) {
+#>
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>($localize`:Input Error@@<#= appChangePasswordComponentClassName #>.Input-Error:Input Error`, msg);
+<# 
+    } else {
+#>
             this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('Input Error', msg);
+<# 
+    }
+#>
             return;
         }
         let chPwd: <#= appChangePasswordModelClassName #> = {

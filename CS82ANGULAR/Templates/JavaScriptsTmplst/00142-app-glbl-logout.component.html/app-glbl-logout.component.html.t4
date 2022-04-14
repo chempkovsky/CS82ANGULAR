@@ -12,6 +12,8 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    bool localize = true;
+
     string AppearancePropName           = "appearance";
     string MaxHeightPropSelector        = "max-height";
     string MaxHeightPropName            = "maxHeight";
@@ -27,6 +29,9 @@
     string showBackBtnPropName          = "showBackBtn";
     string showBackBtnSelector          = "show-back-btn";
 
+    string appLogoutComponentFolder         = "00142-app-glbl-logout.component.ts";
+    string appLogoutComponentClassName      = GetComponentClassName(Model, appLogoutComponentFolder);
+
 #>
 
 <mat-card>
@@ -38,8 +43,64 @@
 
     </mat-card-content>
     <mat-card-actions>
+<# 
+    if(localize) {
+#>
+        <button mat-button (click)="onCancel()" cdkFocusInitial i18n="Canceld@@<#= appLogoutComponentClassName #>.Cancel">Cancel</button>
+        <button mat-button (click)="doSubmit()" i18n="Ok@@<#= appLogoutComponentClassName #>.Ok">Ok</button>
+<# 
+    } else {
+#>
         <button mat-button (click)="onCancel()" cdkFocusInitial>Cancel</button>
         <button mat-button (click)="doSubmit()">Ok</button>
+<# 
+    }
+#>
+
     </mat-card-actions>
 </mat-card>
+
+<#+
+
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+#>
 

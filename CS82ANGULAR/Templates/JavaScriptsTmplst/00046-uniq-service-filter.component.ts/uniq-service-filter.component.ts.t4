@@ -12,6 +12,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    bool localize = true;
 
     string showAddFltItemSelector       = "show-add-flt-item";
     string showAddFltItemPropName       = "showAddFltItem";
@@ -359,24 +360,97 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
         Object.keys(errs).forEach(k => {
           switch(k) {
             case 'max':
+<# 
+    if(localize) {
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:The value must be less than@@<#= uniqFilterComponentClassName #>.The-value-must-be-less-than:The value must be less than` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
               rslt +=' The value must be less than ' + errs[k].max;
+<# 
+    }
+#>
               break;
             case 'min':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:The value must be greater than@@<#= uniqFilterComponentClassName #>.The-value-must-be-greater-than:The value must be greater than` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
               rslt +=' Value must be greater than ' + errs[k].min;
+<# 
+    }
+#>
               break;
             case 'pattern':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Icorrect format@@<#= uniqFilterComponentClassName #>.Icorrect-format:Icorrect format` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
               rslt +=' Icorrect format.' ;
+<# 
+    }
+#>
               break;
             case 'matDatepickerMin':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Value must be greater than@@<#= uniqFilterComponentClassName #>.Value-must-be-greater-than:Value must be greater than` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
               rslt +=' Value must be greater than ' + errs[k].min;
+<# 
+    }
+#>
               break;
             case 'matDatepickerMax':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Value must be less than@@<#= uniqFilterComponentClassName #>.Value-must-be-less-than:Value must be less than` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
               rslt +=' The value must be less than ' + errs[k].max;
+<# 
+    }
+#>
               break;
             case 'matDatepickerParse':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Icorrect date format@@<#= uniqFilterComponentClassName #>.Icorrect-date-format:Icorrect date format` + '.';
+<# 
+    } else {
+#>
               rslt +=' Icorrect date format.' ;
+<# 
+    }
+#>
               break;
             default:
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Icorrect format@@<#= uniqFilterComponentClassName #>.Icorrect-format2:Icorrect format` + '.';
+<# 
+    } else {
+#>
+              rslt +=' Icorrect format.' ;
+<# 
+    }
+#>
               rslt +=' Icorrect format.' ;
               break;
           }

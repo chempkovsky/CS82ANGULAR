@@ -12,6 +12,8 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    bool localize = true;
+
     string AppearancePropName           = "appearance";
     string MaxHeightPropSelector        = "max-height";
     string MaxHeightPropName            = "maxHeight";
@@ -27,6 +29,9 @@
     string showBackBtnPropName          = "showBackBtn";
     string showBackBtnSelector          = "show-back-btn";
 
+    string appChangePasswordComponentFolder       = "00144-app-glbl-chngpswd.component.ts";
+    string appChangePasswordComponentClassName    = GetComponentClassName(Model, appChangePasswordComponentFolder);
+
 #>
 
 <mat-card>
@@ -37,37 +42,159 @@
 
     <div [formGroup]="chngpswdFormGroup" (ngSubmit)="doSubmit()" fxLayout="column wrap">
         <mat-form-field  [appearance]="appearance">
+<# 
+    if(localize) {
+#>
+            <mat-label i18n="Old Password@@<#= appChangePasswordComponentClassName #>.Old-Password-label">Old Password</mat-label>
+            <input  matInput i18n-placeholder="Old Password@@<#= appChangePasswordComponentClassName #>.Old-Password-placeholder" placeholder="Old Password..." formControlName="oldpassword" [type]="oldpwdhide ? 'password' : 'text'">
+<# 
+    } else {
+#>
             <mat-label>Old Password</mat-label>
             <input  matInput placeholder="Old Password..." formControlName="oldpassword" [type]="oldpwdhide ? 'password' : 'text'">
+<# 
+    }
+#>
             <button mat-icon-button matSuffix (click)="oldpwdhide = !oldpwdhide">
                 <mat-icon>{{oldpwdhide ? 'visibility_off' : 'visibility'}}</mat-icon>
             </button>
             <mat-error *ngIf="chngpswdFormGroup.controls['oldpassword'].invalid">{{getErrorMessage(chngpswdFormGroup.controls['oldpassword'])}}</mat-error>
+<# 
+    if(localize) {
+#>
+                <mat-hint align="end" i18n="Enter Old Password@@<#= appChangePasswordComponentClassName #>.Enter-Old-Password-hint">Enter Old Password</mat-hint>
+<# 
+    } else {
+#>
             <mat-hint align="end">Enter Old Password</mat-hint>
+<# 
+    }
+#>
+
         </mat-form-field>
         <mat-form-field  [appearance]="appearance" >
+<# 
+    if(localize) {
+#>
+            <mat-label i18n="New Password@@<#= appChangePasswordComponentClassName #>.New-Password-label">New Password</mat-label>
+            <input  matInput i18n-placeholder="New Password@@<#= appChangePasswordComponentClassName #>.New-Password-placeholder" placeholder="New Password"  formControlName="newPassword" [type]="pwdhide ? 'password' : 'text'">
+<# 
+    } else {
+#>
             <mat-label>New Password</mat-label>
             <input  matInput placeholder="New Password..." formControlName="newPassword" [type]="pwdhide ? 'password' : 'text'">
+<# 
+    }
+#>
             <button mat-icon-button matSuffix (click)="pwdhide = !pwdhide">
                 <mat-icon>{{pwdhide ? 'visibility_off' : 'visibility'}}</mat-icon>
             </button>
             <mat-error *ngIf="chngpswdFormGroup.controls['newPassword'].invalid">{{getErrorMessage(chngpswdFormGroup.controls['newPassword'])}}</mat-error>
+<# 
+    if(localize) {
+#>
+                <mat-hint align="end" i18n="Enter New Password@@<#= appLoginComponentClassName #>.Enter-New-Password-hint">Enter New Password</mat-hint>
+<# 
+    } else {
+#>
             <mat-hint align="end">Enter New Password</mat-hint>
+<# 
+    }
+#>
         </mat-form-field>
         <mat-form-field  [appearance]="appearance">
+<# 
+    if(localize) {
+#>
+            <mat-label i18n="Confirm Password@@<#= appChangePasswordComponentClassName #>.Confirm-Password-label">Confirm Password</mat-label>
+            <input  matInput i18n-placeholder="New Password@@<#= appChangePasswordComponentClassName #>.Confirm-Password-placeholder" placeholder="Confirm Password"  formControlName="confirmPassword" [type]="cnfPwdhide ? 'password' : 'text'">
+<# 
+    } else {
+#>
             <mat-label>Confirm Password</mat-label>
             <input  matInput placeholder="Confirm Password..." formControlName="confirmPassword" [type]="cnfPwdhide ? 'password' : 'text'">
+<# 
+    }
+#>
+
+
             <button mat-icon-button matSuffix (click)="cnfPwdhide = !cnfPwdhide">
                 <mat-icon>{{cnfPwdhide ? 'visibility_off' : 'visibility'}}</mat-icon>
             </button>
             <mat-error *ngIf="chngpswdFormGroup.controls['confirmPassword'].invalid">{{getErrorMessage(chngpswdFormGroup.controls['confirmPassword'])}}</mat-error>
+<# 
+    if(localize) {
+#>
+                <mat-hint align="end" i18n="Confirm Password@@<#= appLoginComponentClassName #>.Confirm Password-hint">Confirm Password</mat-hint>
+<# 
+    } else {
+#>
             <mat-hint align="end">Confirm Password</mat-hint>
+<# 
+    }
+#>
+
         </mat-form-field>
     </div>
 
     </mat-card-content>
     <mat-card-actions>
+<# 
+    if(localize) {
+#>
+        <button mat-button (click)="onCancel()" cdkFocusInitial i18n="Canceld@@<#= appChangePasswordComponentClassName #>.Cancel">Cancel</button>
+        <button mat-button (click)="doSubmit()" i18n="Ok@@<#= appChangePasswordComponentClassName #>.Ok">Ok</button>
+<# 
+    } else {
+#>
         <button mat-button (click)="onCancel()" cdkFocusInitial>Cancel</button>
         <button mat-button (click)="doSubmit()">Ok</button>
+<# 
+    }
+#>
     </mat-card-actions>
 </mat-card>
+
+<#+
+
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+#>

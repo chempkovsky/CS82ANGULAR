@@ -12,6 +12,14 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 
+<#
+    bool localize = true;
+
+
+    string pagenotfoundComponentFolder        = "00185-app-glbl-pagenotfound.component.ts";
+    string pagenotfoundComponentClassName = GetComponentClassName(Model, pagenotfoundComponentFolder);
+
+#>
 
 
 <div class="pagenotfound-container">
@@ -21,10 +29,64 @@
               <mat-icon>error</mat-icon>
             </button>
         </h1>
+<# 
+    if(localize) {
+#>
+        <h1 fxLayout="row" fxLayoutAlign="center" i18n="404 Page Not Found@@<#= pagenotfoundComponentClassName#>.404-Page-Not-Found"> 404 Page Not Found </h1>
+<# 
+    } else {
+#>
         <h1 fxLayout="row" fxLayoutAlign="center"> 404 Page Not Found </h1>
+<# 
+    }
+#>
 
         <router-outlet></router-outlet>
     </div>
 </div>
 
+
+<#+
+
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+#>
 

@@ -13,6 +13,8 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
 
+    bool localize = true;
+
     string ShowErrorMethodName          = "showError";
     string AppSettingServicePropName    = "appGlblSettings";
 
@@ -66,7 +68,19 @@ export class <#= columnSelectorComponentClassName #> implements OnInit {
        }
    }
    shwoError(s: string) {
-       this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('Number of columns', { message: s });
+       this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>(
+<# 
+    if(localize) {
+#>
+        let text: string = $localize`:Number of columns@@<#= columnSelectorComponentClassName #>.Number-of-columns:Number of columns` ;
+<# 
+    } else {
+#>
+        'Number of columns', 
+<# 
+    }
+#>
+       { message: s });
    }
 }
 

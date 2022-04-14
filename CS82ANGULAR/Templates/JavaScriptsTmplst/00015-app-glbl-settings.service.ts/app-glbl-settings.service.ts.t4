@@ -13,6 +13,8 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
 
+    bool localize = true;
+
     string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
     string appSettingServiceClassName   = GetServiceClassName(Model, appSettingServiceFolder);
     string appConfigServiceFolder       = "00014-app-config.service.ts";
@@ -66,10 +68,30 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
       this._snackBar.open(msg, 'Close', { duration: 4000 });
     }
     public <#= ShowErrorMethodName #>(errTp: string, errorStruct: any) {
+<# 
+    if(localize) {
+#>
+        let text: string = $localize`:Error prefix@@<#= appSettingServiceClassName #>.Error:Error`+': ';
+<# 
+    } else {
+#>
         let text: string = 'Error :';
+<# 
+    }
+#>
         if(!(typeof errTp === 'undefined')) {
             if(!(errTp === null)) {
+<# 
+    if(localize) {
+#>
+        let text: string = $localize`:Error of type prefix@@<#= appSettingServiceClassName #>.Error-of-type:Error of type` + ' ' + errTp + ' : ';
+<# 
+    } else {
+#>
                 text = 'Error of type ' + errTp + ': ';
+<# 
+    }
+#>
             }
         }
         if(!(typeof errorStruct === 'undefined')) {
@@ -81,12 +103,32 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
                 }
                 if(!(typeof errorStruct.status === 'undefined')) {
                   if(!(errorStruct.status === null)) {
+<# 
+    if(localize) {
+#>
+                      text = text + ' ' + $localize`:Status prefix@@<#= appSettingServiceClassName #>.status:status` + ' ' + errorStruct.status;
+<# 
+    } else {
+#>
                       text = text + ' status: ' +  errorStruct.status;
+<# 
+    }
+#>
                   }
               }
               if(!(typeof errorStruct.statusText === 'undefined')) {
                     if(!(errorStruct.statusText === null)) {
+<# 
+    if(localize) {
+#>
+                      text = text + ' ' + $localize`:Status Text prefix@@<#= appSettingServiceClassName #>.Status-Text:Status Text` + ' ' + errorStruct.statusText;
+<# 
+    } else {
+#>
                         text = text + ' Status Text:' +  errorStruct.statusText;
+<# 
+    }
+#>
                     }
                 }
                 if(!(typeof errorStruct.error === 'undefined')) {
@@ -94,8 +136,19 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
                     if(!(typeof errorStruct.error.errors === 'undefined')) {
                       if(Array.isArray( errorStruct.error.errors )) {
                         errorStruct.error.errors.forEach((e: any) => {
+<# 
+    if(localize) {
+#>
+                          if(e.code) text = text + ' ' + $localize`:error code prefix@@<#= appSettingServiceClassName #>.error-code:error code` + ' ' + e.code;
+                          if(e.description) text = text + ' ' + $localize`:error descr prefix@@<#= appSettingServiceClassName #>.error-descr:error descr` + ' ' + e.description;
+<# 
+    } else {
+#>
                           if(e.code) text = text + ' error code:' + e.code;
                           if(e.description) text = text + ' error descr: ' + e.description;
+<# 
+    }
+#>
                         });
                       }
                     }
@@ -125,7 +178,18 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
     }
 
     getValidationErrorMessage(fc: AbstractControl): string {
+<# 
+    if(localize) {
+#>
+        let rslt: string = $localize`:Validation Error prefix@@<#= appSettingServiceClassName #>.Validation-Error:Validation Error` + '. ';
+<# 
+    } else {
+#>
         let rslt: string = 'Validation Error. ';
+<# 
+    }
+#>
+
         if (typeof fc === 'undefined') {
           return rslt;
         }
@@ -137,34 +201,134 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
         Object.keys(errs).forEach(k => {
           switch(k) {
             case 'maxlength':
-              rslt +=' Required max length. ' + errs[k].requiredLength;
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Required max length@@<#= appSettingServiceClassName #>.Required-max-length:Required max length` + ': ' + errs[k].requiredLength;
+<# 
+    } else {
+#>
+              rslt +=' Required max length: ' + errs[k].requiredLength;
+<# 
+    }
+#>
               break;
             case 'minlength':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Required min length@@<#= appSettingServiceClassName #>.Required-min-length:Required min length` + ': ' + errs[k].requiredLength;
+<# 
+    } else {
+#>
               rslt +=' Required min length: ' + errs[k].requiredLength;
+<# 
+    }
+#>
               break;
             case 'required':
-              rslt +=' Required field. ' ;
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Required field@@<#= appSettingServiceClassName #>.Required-field:Required field` + ': ' + errs[k].requiredLength;
+<# 
+    } else {
+#>
+              rslt +=' Required field: ' ;
+<# 
+    }
+#>
               break;
             case 'max':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:The value must be less than@@<#= appSettingServiceClassName #>.The-value-must-be-less-than:The value must be less than` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
               rslt +=' The value must be less than ' + errs[k].max;
+<# 
+    }
+#>
               break;
             case 'min':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:The value must be greater than@@<#= appSettingServiceClassName #>.The-value-must-be-greater-than:The value must be greater than` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
               rslt +=' Value must be greater than ' + errs[k].min;
+<# 
+    }
+#>
               break;
             case 'pattern':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Icorrect format@@<#= appSettingServiceClassName #>.Icorrect-format:Icorrect format` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
               rslt +=' Icorrect format.' ;
+<# 
+    }
+#>
               break;
             case 'matDatepickerMin':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Value must be greater than@@<#= appSettingServiceClassName #>.Value-must-be-greater-than:Value must be greater than` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
               rslt +=' Value must be greater than ' + errs[k].min;
+<# 
+    }
+#>
               break;
             case 'matDatepickerMax':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Value must be less than@@<#= appSettingServiceClassName #>.Value-must-be-less-than:Value must be less than` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
               rslt +=' The value must be less than ' + errs[k].max;
+<# 
+    }
+#>
               break;
             case 'matDatepickerParse':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Icorrect date format@@<#= appSettingServiceClassName #>.Icorrect-date-format:Icorrect date format` + '.';
+<# 
+    } else {
+#>
               rslt +=' Icorrect date format.' ;
+<# 
+    }
+#>
               break;
             default:
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Icorrect format@@<#= appSettingServiceClassName #>.Icorrect-format2:Icorrect format` + '.';
+<# 
+    } else {
+#>
               rslt +=' Icorrect format.' ;
+<# 
+    }
+#>
               break;
           }
         });
@@ -275,14 +439,19 @@ deprecated
       switch( childRoute.data['va'] ) {
         case 'a':
           rslt = ((msk & 8) === 8);
+          break;
         case 'u':
           rslt = ((msk & 4) === 4);
+          break;
         case 'd':
           rslt = ((msk & 2) === 2);
+          break;
         case 'l':
           rslt = ((msk & 1) === 1);
+          break;
         case 'v':
           rslt = ((msk & 1) === 1);
+          break;
       };
       if(!rslt) this.<#= ShowErrorMethodName #>('navigation', {message: 'Access denied'});
       return rslt;

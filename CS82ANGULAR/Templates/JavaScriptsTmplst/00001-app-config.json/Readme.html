@@ -3,10 +3,10 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>Readme for 00011-app-flex-layout.module.ts</title>
+    <title>Readme for 00001-app-config.json</title>
 </head>
 <body>
-    <h3>(Context level) Readme for 00011-app-flex-layout.module.ts </h3>
+    <h3>(Context level) Readme for 00001-app-config.json </h3>
 
     <table cellspacing="5" border="1">
         <tr>
@@ -14,7 +14,7 @@
                 Type
             </td>
             <td>
-                Angular module
+                Json file for configuration variables
             </td>
         </tr>
         <tr>
@@ -30,7 +30,7 @@
                 Recomended folder
             </td>
             <td>
-                /src/app/shared/modules
+                /src/app/assets
             </td>
         </tr>
         <tr>
@@ -44,12 +44,7 @@
     </table>
 
 
-    <h3>Before continuing</h3>
-    <h4>
-        <strong>
-            <u>Remark</u>
-        </strong>
-    </h4>
+    <h3>Reminder</h3>
     Generators are divided into two groups.
     <ul>
         <li>The first group has a <strong>Context level</strong>.</li>
@@ -64,35 +59,24 @@
     </p>
     Each generator has a title which starts with 5 digits. <br>
     If the first two digits are zeros it is <strong>Context level</strong> generator for Wizards <br>
-    If one the first two digits is non zero it is <strong>View-Model level</strong> generator for Wizards <p />
+    If one of the first two digits is non zero it is <strong>View-Model level</strong> generator for Wizards <p />
 
 
     The currently selected generator is a <strong>Context level</strong> code generator.<p />
 
-    <strong>CLI-related information</strong><br>
-    <em>Inside your Angular project</em><br>
-    <em>1. Run the command</em><br>
-    <pre>
-    <code>
-        ng generate module <b>app-flex-layout</b>
-    </code>
-    </pre>
-    <kbd>It will create <b>app-flex-layout</b>-folder with a file <b>app-flex-layout.module.ts</b> inside</kbd><br>
-    <em>2. In Visual Studio right-click created folder and generate the module-body</em><br>
-    <p />
-    <strong>Project-related information</strong><br>
-    <kbd>Step 0: Do not run the command described under <b>CLI-related information</b>. It's for information purpose only and makes you hint about the type of component you are going to generate</kbd><br>
-    <kbd>Step 1: Inside folder <b>src/app</b> create the folder <b>'shared'</b> (You can choose any folder name you like: 'common' or 'global' and so on) </kbd><br>
-    <kbd>Step 2: Inside folder of step 1 (recommended <b>'shared'</b>) create the folder <b>'modules'</b> (You can choose any folder name you like: 'myfolder' or 'fooooo' and so on) </kbd><br>
-    <kbd>Step 3: In Visual Studio right-click the <strong>'modules'</strong>-folder that you created in step 2 and generate the following items</kbd><br>
+    <h3>Will be used by</h3>
     <ul>
-        <li>00010-app-material.module.ts</li>
-        <li>00011-app-flex-layout.module.ts</li>
+        <li><strong>00014-app-config.service.ts</strong>.</li>
     </ul>
+
+    <h3>Purpose</h3>
+    <ul>
+        <li><strong>Contains configuration variables</strong>.</li>
+        <li><strong>Such a variables will be redefined by Docker environment</strong>.</li>
+    </ul>
+
     <strong>Don't forget to click save-button.</strong> It saves the code into the file and adds some information into repository of the Wizards.
-    Repository information is actively used by all other generators that you will use later.
-    <p />
-    app-material.module.ts is a module that imports and exports angular material components that will be used in in the project.<br>
-    app-flex-layout.module.ts is a module that imports and exports flex components that will be used in in the project.
+    Repository information is actively used by all other generators that you will run later.
+
 </body>
 </html>

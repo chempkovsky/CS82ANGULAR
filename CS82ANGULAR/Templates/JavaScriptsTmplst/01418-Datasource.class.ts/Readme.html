@@ -3,10 +3,10 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>Readme for 01400-.service.ts</title>
+    <title>Readme for 01418-Datasource.class.ts</title>
 </head>
 <body>
-    <h3>(Context level) Readme for 01400-.service.ts</h3>
+    <h3>(Context level) Readme for 01418-Datasource.class.ts</h3>
 
     <table cellspacing="5" border="1">
         <tr>
@@ -14,7 +14,7 @@
                 Type
             </td>
             <td>
-                Angular service
+                Angular class
             </td>
         </tr>
         <tr>
@@ -39,43 +39,6 @@
             </td>
             <td>
                 View-Model level
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Steps after Generation
-            </td>
-            <td>
-                Open generated file and go to 'addone(...)'-method<br>
-                Verify that fields with automatically generated values are correctly defined.<br>
-                An example of automatically generated values is Identity.<br>
-                Here is a sample. Suppose 'publisherId' is a field with an automatically generated value.<br>
-                <pre>
-                <code>
-    if(!(typeof item === 'undefined')) {
-        if(!(item === null)) {
-            if(typeof item.publisherId === 'undefined') {
-                item['publisherId'] = 0;
-            }
-            if(item.publisherId === null) {
-                    item['publisherId'] = 0;
-            }
-        }
-    }
-                    </code>
-                </pre>
-                All is well if the type of 'publisherId' is an integer.<br>
-                But if the type is String or Guid, you must define the assignment with the correct value.<br><br>
-                You can delete the second 'if' statement if you are sure <br>
-                that the 'Add New Item'-form does not define the current field by any value<br>
-                Here is the second 'if' statement
-                <pre>
-                <code>
-            if(item.publisherId === null) {
-                    item['publisherId'] = 0;
-            }
-                    </code>
-                </pre>
             </td>
         </tr>
     </table>
@@ -111,11 +74,11 @@
     <em>Inside your Angular project</em><br>
     <em>1. Run the command</em><br>
     <pre>
-    <code>
-            ng g service <b>ThisIsMyView</b> 
-    </code>
+        <code>
+            ng g class <b>ThisIsMyView</b>
+        </code>
     </pre>
-    <kbd>It will create a file <b>this-is-my-view.service.ts</b></kbd><br>
+    <kbd>It will create a file <b>this-is-my-view-datasource.class.ts</b></kbd><br>
     <em>2. In Visual Studio right-click the folder with a file and generate the service-body</em><br>
     <p />
     <strong>Project-related information</strong><br>
@@ -124,7 +87,7 @@
     <kbd>Step 2: Inside folder of step 1 (recommended <b>'services'</b>) create the folder <b>'this-is-my-view'</b> (You can choose any folder name you like: 'myviewfolder' or 'fooooo' and so on) </kbd><br>
     <kbd>Step 3: In Visual Studio right-click the <strong>'this-is-my-view'</strong>-folder that you created in step 2 and generate the following items</kbd><br>
     <ul>
-        <li>01400-.service.ts</li>
+        <li>01418-Datasource.class.ts</li>
     </ul>
     <strong>Don't forget to click save-button.</strong> It saves the code into the file and adds some information into repository of the Wizards.
     Repository information is actively used by all other generators that you will run later.

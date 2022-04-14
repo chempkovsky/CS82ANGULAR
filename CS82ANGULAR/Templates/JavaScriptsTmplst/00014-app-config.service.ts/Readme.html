@@ -3,10 +3,10 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>Readme for 00015-app-glbl-settings.service.ts</title>
+    <title>Readme for 00014-app-config.service.ts</title>
 </head>
 <body>
-    <h3>(Context level) Readme for 00015-app-glbl-settings.service.ts</h3>
+    <h3>(Context level) Readme for 00014-app-config.service.ts</h3>
     <table cellspacing="5" border="1">
         <tr>
             <td>
@@ -40,191 +40,78 @@
                 Context level
             </td>
         </tr>
-        <tr>
-            <td>
-                Steps after Generation
-            </td>
-            <td>
-                1. Define the http prefix correctly for all web api calls.
-                <pre>
-                <code>
-    getWebApiPrefix(vwNm: string): string {
-        ...
-    }
-                    </code>
-                </pre>
-                2. Define the http prefix correctly for all security web api calls.<br>
-                (app-glbl-login.service.ts uses it)
-                <pre>
-                <code>
-    getSecurityWebApiPrefix(vwNm: string): string {
-        ...
-    }
-                    </code>
-                </pre>
-                3. Define Dialog Width if needed.<br>
-                <pre>
-                <code>
-    getDialogWidth(vwNm: string): string { {
-        ...
-    }
-    getDialogMaxWidth(vwNm: string): string {
-        ...
-    }
-                    </code>
-                </pre>
-                4. Define vwModels-variable.<br>
-                To accomplish this please use the following scripts<br>
-                30180-AllModelViews.sql and 30185-AllModelViews.ts<br>
-                of the Feature-Wizard
-                <pre>
-                <code>
-    vwModels:  { [key: string]: number } = {
-        ...
-    }
-                    </code>
-                </pre>
-                5. Define dshBrds-variable.<br>
-                To accomplish this please use the following scripts<br>
-                30190-AllDashBoards.sql and 30195-AllDashBoards.ts<br>
-                of the Feature-Wizard
-                <pre>
-                <code>
-    vwModels:  { [key: string]: number } = {
-        ...
-    }
-                    </code>
-                </pre>
-                6. In the method getViewModelMask().<br>
-                remove the line <br>
-                'return 15;' <br>
-                when security is ready<br>
-                <pre>
-                <code>
-    getViewModelMask(vwModel: string): number {
-      return 15; // delete this line when vwModels is ready
-        ...
-    }
-                    </code>
-                </pre>
-                7. In the method getDashBrdMask().<br>
-                remove the line <br>
-                'return 1;' <br>
-                when security is ready<br>
-                <pre>
-                <code>
-    getDashBrdMask(dshBrd: string): number {
-      return 1; // delete this line when dshBrds is ready
-        ...
-    }
-                    </code>
-                </pre>
-            </td>
-        </tr>
     </table>
 
-    <h3>Before continuing</h3>
-    <h4>
-        <strong>
-            <u>Remark</u>
-        </strong>
-    </h4>
-    <table cellspacing="5" border="1">
-        <tr>
-            <td>
-                Material UI
-            </td>
-            <td>
-                app-glbl-settings.service.ts.t4
-            </td>
-        </tr>
-        <tr>
-            <td>
-                bootstrap UI
-            </td>
-            <td>
-                app-glbl-settings.service.ngb.ts.t4
-            </td>
-        </tr>
-        <tr>
-            <td>
-                nebular UI
-            </td>
-            <td>
-                app-glbl-settings.service.nebular.ts.t4
-            </td>
-        </tr>
-        <tr>
-            <td>
-                lightning UI
-            </td>
-            <td>
-                app-glbl-settings.service.lightning.ts.t4
-            </td>
-        </tr>
-    </table>
-    <p/>
 
-        Generators are divided into two groups.
-        <ul>
-            <li>The first group has a <strong>Context level</strong>.</li>
-            <li>The second one is a <strong>View-Model level</strong>. </li>
-        </ul>
-        <p>
-            <strong>Context level</strong> code is generated once and shared by other parts of the application.<br>
-            The <strong>View-Model level</strong> code must be regenerated for each view you select.
-            That is, each view you select must have its own copy of the generated code.
-            The <strong>View-Model level</strong> code generated for one view cannot be used by another view.
-            For example, the product attributes input form is <strong>View-Model level</strong> code<br>
-        </p>
-        Each generator has a title which starts with 5 digits.
-        <br>
-        If the first two digits are zeros it is
-        <strong>Context level</strong> generator for Wizards
-        <br>
-        If one the first two digits is non zero it is
-        <strong>View-Model level</strong> generator for Wizards
-        <p />
+    <h3>Reminder</h3>
+    Generators are divided into two groups.
+    <ul>
+        <li>The first group has a <strong>Context level</strong>.</li>
+        <li>The second one is a <strong>View-Model level</strong>. </li>
+    </ul>
+    <p>
+        <strong>Context level</strong> code is generated once and shared by other parts of the application.<br>
+        The <strong>View-Model level</strong> code must be regenerated for each view you select.
+        That is, each view you select must have its own copy of the generated code.
+        The <strong>View-Model level</strong> code generated for one view cannot be used by another view.
+        For example, the product attributes input form is <strong>View-Model level</strong> code<br>
+    </p>
+    Each generator has a title which starts with 5 digits.
+    <br>
+    If the first two digits are zeros it is
+    <strong>Context level</strong> generator for Wizards
+    <br>
+    If one the first two digits is non zero it is
+    <strong>View-Model level</strong> generator for Wizards
+    <p />
 
 
-        The currently selected generator is a
-        <strong>Context level</strong> code generator.
-        <p />
+    The currently selected generator is a
+    <strong>Context level</strong> code generator.
+    <p />
 
-        <strong>CLI-related information</strong>
-        <br>
-        <em>Inside your Angular project</em>
-        <br>
-        <em>1. Run the command</em>
-        <br>
-        <pre>
-        <code>
-        ng generate service <b>app-glbl-settings</b>
+    <strong>CLI-related information</strong>
+    <br>
+    <em>Inside your Angular project</em>
+    <br>
+    <em>1. Run the command</em>
+    <br>
+    <pre>
+    <code>
+        ng generate service <b>app-config</b>
     </code>
     </pre>
-        <kbd>It will create a file <b>app-glbl-settings.service.ts</b> inside</kbd>
-        <br>
-        <em>2. In Visual Studio right-click the folder with a file and generate the service-body</em>
-        <br>
-        <p />
-        <strong>Project-related information</strong>
-        <br>
-        <kbd>Step 0: Do not run the command described under <b>CLI-related information</b>. It's for information purpose only and makes you hint about the type of component you are going to generate</kbd>
-        <br>
-        <kbd>Step 1: Inside folder <b>src/app</b> create the folder <b>'shared'</b> (You can choose any folder name you like: 'common' or 'global' and so on) </kbd>
-        <br>
-        <kbd>Step 2: Inside folder of step 1 (recommended <b>'shared'</b>) create the folder <b>'services'</b> (You can choose any folder name you like: 'myfolder' or 'fooooo' and so on) </kbd>
-        <br>
-        <kbd>Step 3: In Visual Studio right-click the <strong>'services'</strong>-folder that you created in step 2 and generate the following items</kbd>
-        <br>
-        <ul>
-            <li>00015-app-glbl-settings.service.ts</li>
-        </ul>
-        <strong>Don't forget to click save-button.</strong> It saves the code into the file and adds some information into repository of the Wizards.
-        Repository information is actively used by all other generators that you will run later.
-        <p />
-        app-glbl-settings.service.ts is service that injected into almost all other services and components of the project.
-        <br>
-        It holds 'usr'-prefix for webApi services, 'appearance'-type (outline, fill,...) for input controls, default heights for some components and so on.
+    <kbd>It will create a file <b>app-config.service.ts</b> inside</kbd>
+    <br>
+    <em>2. In Visual Studio right-click the folder with a file and generate the service-body</em>
+    <br>
+    <p />
+    <strong>Project-related information</strong>
+    <br>
+    <kbd>Step 0: Do not run the command described under <b>CLI-related information</b>. It's for information purpose only and makes you hint about the type of component you are going to generate</kbd>
+    <br>
+    <kbd>Step 1: Inside folder <b>src/app</b> create the folder <b>'shared'</b> (You can choose any folder name you like: 'common' or 'global' and so on) </kbd>
+    <br>
+    <kbd>Step 2: Inside folder of step 1 (recommended <b>'shared'</b>) create the folder <b>'services'</b> (You can choose any folder name you like: 'myfolder' or 'fooooo' and so on) </kbd>
+    <br>
+    <kbd>Step 3: In Visual Studio right-click the <strong>'services'</strong>-folder that you created in step 2 and generate the following items</kbd>
+    <br>
+    <ul>
+        <li>00014-app-config.service.ts</li>
+    </ul>
+    <strong>Don't forget to click save-button.</strong> It saves the code into the file and adds some information into repository of the Wizards.
+    Repository information is actively used by all other generators that you will run later.
+    <p />
+    app-config.service.ts is service that injected into app.module.ts and executed one before bootstrap app.
+    <br>
+
+    <h3>It Requires</h3>
+    <ul>
+        <li>00001-app-config.json</li>
+        <li>00002-app-config.template.json</li>
+        <li>00013-app-config.interface.ts</li>
+    </ul>
+
+
 </body>
 </html>

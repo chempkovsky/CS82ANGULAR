@@ -13,6 +13,8 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 
 <#
+    bool localize = true;
+
     string OperatorSufix = "Oprtr";
     string EqualOperator = "eq";
 
@@ -942,14 +944,34 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         } // foreach(ModelViewUniqueKeyOfVwSerializable pk in uniqueKeys) {...}
     } // if (Model.IsWebApiSelectOneByPrimarykey) {...}
 #>
+<# 
+    if(localize) {
+#>
+        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Not all Unique or Primary key properties are defined to call Refresh-method@@<#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) + RefreshMethodName #>.Not-all-Unique-Primary:Not all Unique or Primary key properties are defined to call Refresh-method`});
+<# 
+    } else {
+#>
         this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Not all Unique or Primary key properties are defined to call Refresh-method'});
+<# 
+    }
+#>
     }
     public <#= UpdateOneMethodName #>(): void {
 <#
     if (Model.IsWebApiUpdate) { 
 #>
         if(!this.get<#= IsDefinedFieldName #>()) {
+<# 
+    if(localize) {
+#>
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Not all propertes are correctly defined@@<#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) + UpdateOneMethodName #>.Not-all-propertes:Not all propertes are correctly defined`});
+<# 
+    } else {
+#>
             this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Not all propertes are correctly defined'});
+<# 
+    }
+#>
             return;
         }
         let itm: <#= GetInterfaceName(Model) #> | any = this.<#= Values2InterfaceMethodName #>();
@@ -965,7 +987,19 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 <#
     } else {
 #>
-        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http',{message: 'Update is not implemeted for the current ViewModel'});
+
+<# 
+    if(localize) {
+#>
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Update is not implemeted for the current ViewModel@@<#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) + UpdateOneMethodName #>.Update-not-implemeted:Update is not implemeted for the current ViewModel`});
+<# 
+    } else {
+#>
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http',{message: 'Update is not implemeted for the current ViewModel'});
+<# 
+    }
+#>
+
 <#
     } // if (Model.IsWebApiUpdate) { ... } else { ... }
 #>
@@ -975,7 +1009,18 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
     if (Model.IsWebApiAdd) { 
 #>
         if(!this.get<#= IsDefinedFieldName #>()) {
+            
+<# 
+    if(localize) {
+#>
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Not all propertes are correctly defined@@<#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) + AddOneMethodName #>.Not-all-propertes:Not all propertes are correctly defined`});
+<# 
+    } else {
+#>
             this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Not all propertes are correctly defined'});
+<# 
+    }
+#>
             return;
         }
         let itm: <#= GetInterfaceName(Model) #> | any = this.<#= Values2InterfaceMethodName #>();
@@ -991,7 +1036,19 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 <#
     } else {
 #>
+
+<# 
+    if(localize) {
+#>
+        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Insert is not implemeted for the current ViewModel@@<#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) + AddOneMethodName #>.Insert-not-implemeted:Insert is not implemeted for the current ViewModel`});
+<# 
+    } else {
+#>
         this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Insert is not implemeted for the current ViewModel'});
+<# 
+    }
+#>
+
 <#
     } // if (Model.IsWebApiUpdate) { ... } else { ... }
 #>
@@ -1024,7 +1081,16 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 
 #>
         if(!this.get<#= IsDefinedFieldName #>()) {
+<# 
+    if(localize) {
+#>
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Not all propertes are correctly defined@@<#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) + DeleteOneMethodName #>.Not-all-propertes:Not all propertes are correctly defined`});
+<# 
+    } else {
+#>
             this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Not all propertes are correctly defined'});
+<# 
+
             return;
         }
         this.<#= formRootService #>.<#= DeleteOneMethodName #>(<# 
@@ -1048,7 +1114,17 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         }
     } else {
 #>
+
+<# 
+    if(localize) {
+#>
+        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Delete is not implemeted for the current ViewModel@@<#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) + DeleteOneMethodName #>.Delete-not-implemeted:Delete is not implemeted for the current ViewModel`});
+<# 
+    } else {
+#>
         this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Delete is not implemeted for the current ViewModel'});
+<# 
+
 <#
     } // if (Model.IsWebApiUpdate) { ... } else { ... }
 #>

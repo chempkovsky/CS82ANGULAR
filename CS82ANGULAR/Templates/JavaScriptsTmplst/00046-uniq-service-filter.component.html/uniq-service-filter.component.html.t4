@@ -12,6 +12,9 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    bool localize = true;
+
+
     string AppearancePropName           = "appearance";
     string MaxHeightPropSelector        = "max-height";
     string MaxHeightPropName            = "maxHeight";
@@ -38,17 +41,42 @@
     string showFilterExPropName         = "showFilterEx";
     string MaxHeightExPropName          = "maxHeightEx";
 
+    string uniqFilterComponentFolder        = "00046-uniq-service-filter.component.ts";
+    string uniqFilterComponentClassName = GetComponentClassName(Model, uniqFilterComponentFolder);
+
 #>
 
 <div fxLayout="row" fxLayoutAlign="flex-end space-around"> 
     <label fxFlex fxLayoutAlign="flex-start space-around">{{<#= captionPropName #>}}</label>
     <button mat-icon-button color="primary" (click)="<#= OnBackBtnMethodName #>()" *ngIf="<#= showBackBtnPropName #>"
+<# 
+    if(localize) {
+#>
+    i18n-matTooltip="Navigate back to master@@<#= uniqFilterComponentClassName #>.Navigate-back-to-master"  matTooltip="Navigate back to master"> 
+<# 
+    } else {
+#>
     matTooltip="Navigate back to master"> 
+<# 
+    }
+#>
     <mat-icon>arrow_back</mat-icon>
 </button>         
 <span fxFlex="4%"></span>  
 <button mat-icon-button color="primary" (click)="onApplyFilterClicked()" 
+<# 
+    if(localize) {
+#>
+    i18n-matTooltip="Apply filter@@<#= uniqFilterComponentClassName #>.Apply-filter"  matTooltip="Apply filter"> 
+<# 
+    } else {
+#>
     matTooltip="Apply filter"> 
+<# 
+    }
+#>
+
+    
     <mat-icon   >refresh</mat-icon>
 </button>      
 <span fxFlex="2%"></span>     
@@ -101,3 +129,45 @@
         </div>
     </div>
 </div>
+
+<#+
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+#>

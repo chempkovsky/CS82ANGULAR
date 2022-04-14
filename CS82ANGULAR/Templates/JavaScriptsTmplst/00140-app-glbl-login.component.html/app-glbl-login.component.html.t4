@@ -12,6 +12,8 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    bool localize = true;
+
     string AppearancePropName           = "appearance";
     string MaxHeightPropSelector        = "max-height";
     string MaxHeightPropName            = "maxHeight";
@@ -27,6 +29,9 @@
     string showBackBtnPropName          = "showBackBtn";
     string showBackBtnSelector          = "show-back-btn";
 
+    string appLoginComponentFolder      = "00140-app-glbl-login.component.ts";
+    string appLoginComponentClassName   = GetComponentClassName(Model, appLoginComponentFolder);
+
 #>
 
 <mat-card>
@@ -37,26 +42,124 @@
 
         <div [formGroup]="loginFormGroup" (ngSubmit)="doSubmit()" fxLayout="column wrap">
             <mat-form-field  [appearance]="appearance">
+<# 
+    if(localize) {
+#>
+                <mat-label i18n="User name@@<#= appLoginComponentClassName #>.User-name-label">User name</mat-label>
+                <input  matInput i18n-placeholder="Email@@<#= appLoginComponentClassName #>.User-name-placeholder" placeholder="User name" formControlName="username">
+<# 
+    } else {
+#>
                 <mat-label>User name</mat-label>
                 <input  matInput placeholder="User name..." formControlName="username">
+<# 
+    }
+#>
                 <mat-error *ngIf="loginFormGroup.controls['username'].invalid">{{getErrorMessage(loginFormGroup.controls['username'])}}</mat-error>
+<# 
+    if(localize) {
+#>
+                <mat-hint align="end" i18n="Enter User name@@<#= appLoginComponentClassName #>.Enter-User-name-hint">Enter User name</mat-hint>
+<# 
+    } else {
+#>
                 <mat-hint align="end">Enter User name</mat-hint>
+<# 
+    }
+#>
             </mat-form-field>
             <mat-form-field  [appearance]="appearance" >
+<# 
+    if(localize) {
+#>
+                <mat-label i18n="Password@@<#= appLoginComponentClassName #>.Password-label">Password</mat-label>
+                <input  matInput i18n-placeholder="Password@@<#= appLoginComponentClassName #>.Password-placeholder" placeholder="Password" formControlName="password" [type]="pwdhide ? 'password' : 'text'">
+<# 
+    } else {
+#>
                 <mat-label>Password</mat-label>
-                <input  matInput placeholder="Password..." formControlName="password" [type]="pwdhide ? 'password' : 'text'">
+                <input  matInput placeholder="Password" formControlName="password" [type]="pwdhide ? 'password' : 'text'">
+<# 
+    }
+#>
+
                 <button mat-icon-button matSuffix (click)="pwdhide = !pwdhide">
                     <mat-icon>{{pwdhide ? 'visibility_off' : 'visibility'}}</mat-icon>
                 </button>
                 <mat-error *ngIf="loginFormGroup.controls['password'].invalid">{{getErrorMessage(loginFormGroup.controls['password'])}}</mat-error>
+<# 
+    if(localize) {
+#>
+                <mat-hint align="end" i18n="Enter Password@@<#= appLoginComponentClassName #>.Enter-Password-hint">Enter Password</mat-hint>
+<# 
+    } else {
+#>
                 <mat-hint align="end">Enter Password</mat-hint>
+<# 
+    }
+#>
             </mat-form-field>
         </div>
 
     </mat-card-content>
     <mat-card-actions>
+<# 
+    if(localize) {
+#>
+        <button mat-button (click)="onCancel()" cdkFocusInitial i18n="Canceld@@<#= appLoginComponentClassName #>.Cancel">Cancel</button>
+        <button mat-button (click)="doSubmit()" i18n="Ok@@<#= appLoginComponentClassName #>.Ok">Ok</button>
+<# 
+    } else {
+#>
         <button mat-button (click)="onCancel()" cdkFocusInitial>Cancel</button>
         <button mat-button (click)="doSubmit()">Ok</button>
+<# 
+    }
+#>
+
     </mat-card-actions>
 </mat-card>
 
+<#+
+
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+#>

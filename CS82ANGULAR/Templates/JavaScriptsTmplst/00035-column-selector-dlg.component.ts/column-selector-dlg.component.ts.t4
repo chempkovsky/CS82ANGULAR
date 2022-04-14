@@ -12,6 +12,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    bool localize = true;
 
     string columnSelectorItemInterfaceFolder    = "00032-column-selector-item.interface.ts";
     string columnSelectorComponentFolder        = "00033-column-selector.component.ts";
@@ -20,6 +21,7 @@
     string columnSelectorDlgComponentFolder     = "00035-column-selector-dlg.component.ts";
 
     string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, columnSelectorDlgComponentFolder);
+    string columnSelectorDlgComponentClassName  = GetComponentClassName(Model, columnSelectorDlgComponentFolder);
 
 #>
 
@@ -46,7 +48,17 @@ export class <#= GetComponentClassName(Model, columnSelectorDlgComponentFolder) 
         if (this.childForm === null) return;
         let ind = this.childForm.colums.findIndex((e: { checked: boolean; }) => { return e.checked === true; })
         if(ind < 0) {
+<# 
+    if(localize) {
+#>
+            this.childForm.shwoError($localize`:No columns selected@@<#= columnSelectorDlgComponentClassName #>.No-columns-selected:No columns selected`);
+<# 
+    } else {
+#>
             this.childForm.shwoError('No columns selected');
+<# 
+    }
+#>
             return;
         }
         this.dialogRef.close(this.childForm.colums);
