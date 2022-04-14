@@ -13,7 +13,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 
 <#
-    bool localize = true;
+    bool localize = Context.Localize;
 
 
     string pagenotfoundComponentFolder        = "00185-app-glbl-pagenotfound.component.ts";

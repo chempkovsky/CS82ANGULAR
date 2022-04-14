@@ -22,7 +22,7 @@ namespace CS82ANGULAR.ViewModel
         #region Fields
         protected DTE2 Dte;
         protected SolutionCodeElement _SelectedDbContext;
-        protected DbContextSerializable _SerializableDbContext;
+        protected DbContextSerializable _SerializableDbContext = null;
         protected ObservableCollection<ModelViewSerializable> _ModelViews;
         protected ModelViewSerializable _SelectedModel = null;
         protected Object _SelectedTreeViewItem;
@@ -87,6 +87,23 @@ namespace CS82ANGULAR.ViewModel
         }
         public TreeViewItem MainTreeViewRootItem { get; set; }
         public ObservableCollection<InputTypeEnum> UiInputTypes { get; set; }
+        public bool Localize
+        {
+            get { 
+                return SerializableDbContext == null ? false : SerializableDbContext.Localize; 
+            }
+            set
+            {
+                if(SerializableDbContext != null)
+                {
+                    if(SerializableDbContext.Localize != value)
+                    {
+                        SerializableDbContext.Localize = value;
+                        OnPropertyChanged();
+                    }
+                }
+            }
+        }
         public ObservableCollection<ModelViewSerializable> ForeignKeyChainViews
         {
             get { return _ForeignKeyChainViews; }
@@ -112,6 +129,7 @@ namespace CS82ANGULAR.ViewModel
                 SelectedTreeViewItem = null;
                 _SelectedDbContext = value;
                 OnPropertyChanged();
+                OnPropertyChanged("Localize");
                 OnSelectedDbContextChanged();
                 if (this.MainTreeViewRootItem != null)
                 {

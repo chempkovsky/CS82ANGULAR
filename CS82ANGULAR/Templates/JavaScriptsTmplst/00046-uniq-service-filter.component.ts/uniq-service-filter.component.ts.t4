@@ -12,7 +12,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
-    bool localize = true;
+    bool localize = Context.Localize;
 
     string showAddFltItemSelector       = "show-add-flt-item";
     string showAddFltItemPropName       = "showAddFltItem";
@@ -360,8 +360,6 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
         Object.keys(errs).forEach(k => {
           switch(k) {
             case 'max':
-<# 
-    if(localize) {
 <# 
     if(localize) {
 #>

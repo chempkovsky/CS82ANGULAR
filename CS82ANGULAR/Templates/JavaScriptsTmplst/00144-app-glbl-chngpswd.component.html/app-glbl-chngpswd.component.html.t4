@@ -12,7 +12,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
-    bool localize = true;
+    bool localize = Context.Localize;
 
     string AppearancePropName           = "appearance";
     string MaxHeightPropSelector        = "max-height";
@@ -93,7 +93,7 @@
 <# 
     if(localize) {
 #>
-                <mat-hint align="end" i18n="Enter New Password@@<#= appLoginComponentClassName #>.Enter-New-Password-hint">Enter New Password</mat-hint>
+                <mat-hint align="end" i18n="Enter New Password@@<#= appChangePasswordComponentClassName #>.Enter-New-Password-hint">Enter New Password</mat-hint>
 <# 
     } else {
 #>
@@ -125,7 +125,7 @@
 <# 
     if(localize) {
 #>
-                <mat-hint align="end" i18n="Confirm Password@@<#= appLoginComponentClassName #>.Confirm Password-hint">Confirm Password</mat-hint>
+                <mat-hint align="end" i18n="Confirm Password@@<#= appChangePasswordComponentClassName #>.Confirm Password-hint">Confirm Password</mat-hint>
 <# 
     } else {
 #>

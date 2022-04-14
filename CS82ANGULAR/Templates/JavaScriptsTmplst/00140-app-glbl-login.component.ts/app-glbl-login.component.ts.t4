@@ -12,7 +12,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
-    bool localize = true;
+    bool localize = Context.Localize;
 
     string appSettingServiceFolder          = "00015-app-glbl-settings.service.ts";
     string appRegisterInterfaceFolder       = "00118-app-glbl-register.interface.ts";

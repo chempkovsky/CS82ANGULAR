@@ -13,7 +13,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 
 <#
-    bool localize = true;
+    bool localize = Context.Localize;
 
     string OperatorSufix = "Oprtr";
     string EqualOperator = "eq";
@@ -1090,7 +1090,8 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 #>
             this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Not all propertes are correctly defined'});
 <# 
-
+    }
+#>
             return;
         }
         this.<#= formRootService #>.<#= DeleteOneMethodName #>(<# 
@@ -1124,6 +1125,8 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 #>
         this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Delete is not implemeted for the current ViewModel'});
 <# 
+    }
+#>
 
 <#
     } // if (Model.IsWebApiUpdate) { ... } else { ... }

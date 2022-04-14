@@ -13,7 +13,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
 
-    bool localize = true;
+    bool localize = Context.Localize;
 
     string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
     string appSettingServiceClassName   = GetServiceClassName(Model, appSettingServiceFolder);
@@ -84,7 +84,7 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
 <# 
     if(localize) {
 #>
-        let text: string = $localize`:Error of type prefix@@<#= appSettingServiceClassName #>.Error-of-type:Error of type` + ' ' + errTp + ' : ';
+                text = $localize`:Error of type prefix@@<#= appSettingServiceClassName #>.Error-of-type:Error of type` + ' ' + errTp + ' : ';
 <# 
     } else {
 #>
@@ -121,7 +121,7 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
 <# 
     if(localize) {
 #>
-                      text = text + ' ' + $localize`:Status Text prefix@@<#= appSettingServiceClassName #>.Status-Text:Status Text` + ' ' + errorStruct.statusText;
+                        text = text + ' ' + $localize`:Status Text prefix@@<#= appSettingServiceClassName #>.Status-Text:Status Text` + ' ' + errorStruct.statusText;
 <# 
     } else {
 #>

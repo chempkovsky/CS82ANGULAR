@@ -6,6 +6,7 @@ namespace CS82ANGULAR.Model.Serializable
     [Serializable]
     public class DbContextSerializable
     {
+        public bool Localize { get; set; }
         public string DbContextClassName { get; set; }
         public string DbContextFullClassName { get; set; }
         public string DbContextProjectUniqueName { get; set; }

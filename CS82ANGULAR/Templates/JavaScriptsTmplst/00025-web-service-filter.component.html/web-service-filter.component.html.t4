@@ -12,7 +12,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
-    bool localize = true;
+    bool localize = Context.Localize;
 
     string AppearancePropName           = "appearance";
     string OverflowSelector             = "ovrflw";
@@ -131,15 +131,14 @@
                     
                 
                 <button mat-icon-button fxFlex="5%" aria-label="Clear" 
-                    matTooltip="Remove current filter item"
 <# 
     if(localize) {
 #>
-    i18n-matTooltip="Remove current filter item@@<#= filterComponentClassName #>.Remove-current-filter-item"  matTooltip="Remove current filter item"> 
+                    i18n-matTooltip="Remove current filter item@@<#= filterComponentClassName #>.Remove-current-filter-item"  matTooltip="Remove current filter item"
 <# 
     } else {
 #>
-    matTooltip="Remove current filter item"> 
+                    matTooltip="Remove current filter item"
 <# 
     }
 #>
@@ -151,3 +150,47 @@
         
     </div>
 </div>
+
+
+<#+
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+#>

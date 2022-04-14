@@ -13,7 +13,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 
 <#
-    bool localize = true;
+    bool localize = Context.Localize;
 
     string messageDialogComponentFolder         = "00038-message-dialog.component.ts";
     string messageDialogComponentClassName      = GetComponentClassName(Model, messageDialogComponentFolder);

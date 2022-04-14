@@ -12,7 +12,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
-    bool localize = true;
+    bool localize = Context.Localize;
 
     string columnSelectorItemInterfaceFolder    = "00032-column-selector-item.interface.ts";
     string columnSelectorComponentFolder        = "00033-column-selector.component.ts";

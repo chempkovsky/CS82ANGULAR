@@ -13,7 +13,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
 
-    bool localize = true;
+    bool localize = Context.Localize;
 
     string ShowErrorMethodName          = "showError";
     string AppSettingServicePropName    = "appGlblSettings";
@@ -72,7 +72,7 @@ export class <#= columnSelectorComponentClassName #> implements OnInit {
 <# 
     if(localize) {
 #>
-        let text: string = $localize`:Number of columns@@<#= columnSelectorComponentClassName #>.Number-of-columns:Number of columns` ;
+        $localize`:Number of columns@@<#= columnSelectorComponentClassName #>.Number-of-columns:Number of columns`, 
 <# 
     } else {
 #>
