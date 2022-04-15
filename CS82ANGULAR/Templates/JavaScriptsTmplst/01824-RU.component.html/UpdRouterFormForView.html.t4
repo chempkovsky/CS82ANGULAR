@@ -13,6 +13,8 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 
 <#
+    bool localize = Context.Localize;
+
     string HiddenFilterSelector         = "hidden-filter";
     string HiddenFilterPropName         = "hiddenFilter";
     string FormControlModelSelector     = "eform-control-model";
@@ -35,8 +37,10 @@
 
 
 
-    string uformComponentFolder     = "01504-Uform.component.ts";
-    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, uformComponentFolder);
+    string uformComponentFolder         = "01504-Uform.component.ts";
+    string componentSelectorCommonPart  = GetComponentSelectorCommonPart(Model, uformComponentFolder);
+    string ruComponentFolder            = "01824-RU.component.ts";
+    string rucomponentClassName         = GetComponentClassName(Model, ruComponentFolder);
 #>
 <mat-card>
         <!-- <mat-card-subtitle>{{<#= TitlePropName #>}}</mat-card-subtitle> -->
@@ -52,8 +56,19 @@
         ></app-<#= componentSelectorCommonPart #>>
     </mat-card-content>
     <mat-card-actions>
+<# 
+    if(localize) {
+#>
+      <button mat-button (click)="onCancel()" cdkFocusInitial i18n="Cancel@@<#= rucomponentClassName #>.Cancel">Cancel</button>
+      <button mat-button (click)="onOk()" i18n="Ok@@<#= rucomponentClassName #>.Ok">Ok</button>
+<# 
+    } else {
+#>
       <button mat-button (click)="onCancel()" cdkFocusInitial>Cancel</button>
       <button mat-button (click)="onOk()">Ok</button>
+<#
+    }
+#>
     </mat-card-actions>
 </mat-card>
 
@@ -75,5 +90,44 @@
             return result;
         }
         return refItem.FileName.Replace(".component","");
+    }
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
     }
 #>

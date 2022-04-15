@@ -12,6 +12,8 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    bool localize = Context.Localize;
+
     string OperatorSufix        = "Oprtr";
     string EqualOperator        = "eq";
 
@@ -119,6 +121,7 @@
     
     string captionPropName                      = "caption";
     string captionSelector                      = "caption";
+    string frasesPropName                       = "frases";
 
 
     int CurrentInputTypeId = 2;
@@ -317,6 +320,27 @@ import { <#=  GetInterfaceDlgNameEx(Context, viewNm) #> } from '<#= GetCrossComp
   styleUrls: ['<#= GetFolderName(Model, updformCssFolder, updformComponentFolder)#>.css']
 })
 export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEmitterPubModelClassName #> {
+<# 
+    if(localize) {
+#>
+    <#= frasesPropName #>: {[key:string]: string}  = {
+        'Not-all-props': $localize`:Not all properties are set@@<#= componentClassName #>.Not-all-props:Not all properties are set`,
+        '<#= captionPropName #>': $localize`:Review <#= Model.Title #>@@<#= componentClassName #>.Review-Item:Review <#= Model.Title #>`,
+        '<#= TitlePropName #>': $localize`:<#= TitleCaptionVal #>@@<#= componentClassName #>.SelItem:<#= TitleCaptionVal #>`,
+        'Not-all-masters': $localize`:Not all masters have been set@@<#= componentClassName #>.Not-all-masters:Not all masters have been set`,
+    }
+<# 
+    } else {
+#>
+    <#= frasesPropName #>: {[key:string]: string}  = {
+        'Not-all-props': 'Not all properties are set',
+        '<#= captionPropName #>': 'Update <#= Model.Title #>',
+        '<#= TitlePropName #>': '<#= TitleCaptionVal #>'
+        'Not-all-masters': 'Not all masters have been set',
+    }
+<# 
+    }
+#>
     @Output('<#= BeforeSubmitSelector #>') <#= BeforeSubmitPropName #> = new EventEmitter();
     @Output('<#= AfterSubmitSelector #>') <#= AfterSubmitPropName #> = new EventEmitter<<#= GetInterfaceName(Model) #>>();
     public <#= DoSubmitMethodName #>(): void {
@@ -337,7 +361,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         }
     }
 #>
-            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Not all properties are set'});
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: this.<#= frasesPropName #>['Not-all-props']});
             return;
         }
         this.<#= BeforeSubmitPropName #>.emit(this.<#= RootDataSource #>.<#= Values2InterfaceMethodName #>());
@@ -368,7 +392,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         return this.<#= AppSettingServicePropName #>.getValidationErrorMessage(fc);
     } 
     // start: variable declaration section
-    @Input('<#= captionSelector #>') <#= captionPropName #>: string|any = 'Review Item';
+    @Input('<#= captionSelector #>') <#= captionPropName #>: string|any = this.<#= frasesPropName #>['<#= captionPropName #>'];
     @Output('<#= onContainerMenuItemClickSelector #>') <#= onContainerMenuItemClickEmitter #> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
     @Input('<#= containerMenuItemsSelector #>') <#= containerMenuItemsPropName #>: Array<<#= menuItemDataModelClassName #>> = [];
     <#= onContainerMenuItemClickMethodName #>(v: <#= menuItemDataModelClassName #>)  {
@@ -793,11 +817,11 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     }
     public <#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, SearchClickSufix) #>(): void {
         if(!this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#=  IsSetFilterByCurrDirMstrsMethodName #>()) {
-            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Not all masters have been set'});
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message:this.<#= frasesPropName #>['Not-all-masters'],});
             return;
         }
         let flt: <#= GetInterfaceDlgName(fk.Item2) #> = {
-            <#= TitlePropName #>: '<#= TitleCaptionVal #>',
+            <#= TitlePropName #>: this.<#= frasesPropName #>['<#= TitlePropName #>'],
             <#= ShowFilterPropName #>: true,
             <#= CanAddPropName #>: false,
             <#= CanUpdPropName #>: false,

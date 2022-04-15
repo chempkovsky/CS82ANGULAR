@@ -148,6 +148,7 @@ namespace CS82ANGULAR.ViewModel
                 SelectedTreeViewItem = null;
                 _SerializableDbContext = value;
                 OnPropertyChanged();
+                OnPropertyChanged("Localize");
                 OnSerializableDbContextChanged();
             }
         }
@@ -178,6 +179,7 @@ namespace CS82ANGULAR.ViewModel
                     HintVisibility = Visibility.Collapsed;
                 }
                 OnPropertyChanged();
+
             }
         }
         public ObservableCollection<ModelViewPropertyOfVwNotified> ScalarProperties

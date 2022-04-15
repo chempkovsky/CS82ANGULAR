@@ -12,6 +12,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    bool localize = Context.Localize;
 
     string HiddenFilterPrefix           = "hf";
     string IdPrefix                     = "id";
@@ -47,6 +48,7 @@
     string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
     string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
     string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+    string frasesPropName                       = "frases";
 
 
     string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
@@ -95,7 +97,23 @@ import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Mo
 })
 
 export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #> {
-    <#= TitlePropName #>: string|any = 'No title';
+<# 
+    if(localize) {
+#>
+    <#= frasesPropName #>: {[key:string]: string}  = {
+        '<#= TitlePropName #>': $localize`:No title@@<#= componentClassName #>.No-title:No title`,
+    };
+<# 
+    } else {
+#>
+    <#= frasesPropName #>: {[key:string]: string}  = {
+        '<#= TitlePropName #>': 'No title',
+    };
+<# 
+    } 
+#>
+
+    <#= TitlePropName #>: string|any = this.<#= frasesPropName #>['<#= TitlePropName #>'];
     <#= NavPrefix #>: string|any = '';
     <#= OutletNmPropName #> : string = 'primary';
     <#= OutletParent #>: string = '';

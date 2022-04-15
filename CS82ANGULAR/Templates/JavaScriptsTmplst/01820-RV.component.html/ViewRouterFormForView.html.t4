@@ -13,6 +13,8 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 
 <#
+    bool localize = Context.Localize;
+
     string HiddenFilterSelector         = "hidden-filter";
     string HiddenFilterPropName         = "hiddenFilter";
     string FormControlModelSelector     = "eform-control-model";
@@ -41,15 +43,27 @@
 
 
 
-    string vformComponentFolder     = "01500-Vform.component.ts";
-    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, vformComponentFolder);
+    string vformComponentFolder         = "01500-Vform.component.ts";
+    string componentSelectorCommonPart  = GetComponentSelectorCommonPart(Model, vformComponentFolder);
+    string rvComponentFolder            = "01820-RV.component.ts";
+    string rvcomponentClassName         = GetComponentClassName(Model, rvComponentFolder);
+
 #>
 <mat-card>
     <!-- <mat-card-subtitle>{{<#= TitlePropName #>}}</mat-card-subtitle> -->
     <mat-card-subtitle>
         <div fxLayout>
-            <button mat-icon-button color="primary" (click)="onCancel()" fxFlex="19%"
-                matTooltip="Navigate back to master"> 
+<# 
+    if(localize) {
+#>
+            <button mat-icon-button color="primary" (click)="onCancel()" fxFlex="19%" i18n-matTooltip="Navigate back to master@@<#= rvcomponentClassName #>.NavBack-Tooltip">Cancel   matTooltip="Navigate back to master"> 
+<# 
+    } else {
+#>
+            <button mat-icon-button color="primary" (click)="onCancel()" fxFlex="19%" matTooltip="Navigate back to master"> 
+<#
+    }
+#>
                 <mat-icon>arrow_back</mat-icon>
             </button>    
             <mat-form-field [appearance]="<#= AppearancePropName #>" fxFlex="79%" *ngIf="<#= ShowDetailsPropName #>">
@@ -97,4 +111,44 @@
         }
         return refItem.FileName.Replace(".component","");
     }
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
 #>

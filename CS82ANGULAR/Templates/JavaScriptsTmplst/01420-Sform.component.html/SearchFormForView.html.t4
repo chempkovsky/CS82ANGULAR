@@ -13,6 +13,8 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 
 <#
+    bool localize = Context.Localize;
+
     string OperatorSufix = "Oprtr";
     string EqualOperator = "eq";
     int percentEq100 = 99;
@@ -138,6 +140,8 @@
 
     string filterComponentSelectorCommonPart = GetContextComponentSelectorCommonPart(Context, filterComponentFolder);
     string uniqFilterComponentSelectorCommonPart = GetContextComponentSelectorCommonPart(Context, uniqFilterComponentFolder);
+
+    string sFormComponentClassName = GetComponentClassName(Model, sformComponentFolder);
 
     List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = GetModelUniqueKeys(Model, new List<ModelViewUniqueKeyOfVwSerializable>());
     ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
@@ -266,10 +270,26 @@
             continue;
         }
 #>
+<# 
+    if(localize) {
+#>
+    <ng-container matColumnDef="<#= GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>" >
+        <th mat-header-cell *matHeaderCellDef <#= matSortHeaderIfNeeded(modelViewUIListPropertySerializable, Model) #> 
+        i18n="<#= GetDisplayAttributeValueString2(modelViewUIListPropertySerializable, Model, ShortNameLabelProperty) #>@@<#= sFormComponentClassName #>.<#= GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>-ColumnDef"><#= GetDisplayAttributeValueString2(modelViewUIListPropertySerializable, Model, ShortNameLabelProperty) #></th>
+        <td mat-cell *matCellDef="let e"> {{e.<#= GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model) #> <#= GetDataPipeEx2(modelViewUIListPropertySerializable, Model) #> }} </td>
+    </ng-container>
+
+<# 
+    } else {
+#>
     <ng-container matColumnDef="<#= GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>" >
         <th mat-header-cell *matHeaderCellDef <#= matSortHeaderIfNeeded(modelViewUIListPropertySerializable, Model) #> > <#= GetDisplayAttributeValueString2(modelViewUIListPropertySerializable, Model, ShortNameLabelProperty) #> </th>
         <td mat-cell *matCellDef="let e"> {{e.<#= GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model) #> <#= GetDataPipeEx2(modelViewUIListPropertySerializable, Model) #> }} </td>
     </ng-container>
+<# 
+    }
+#>
+
 <#
     }
 #>
@@ -280,6 +300,23 @@
                 <mat-icon>more_vert</mat-icon>
             </button>
             <mat-menu #tblMenu="matMenu">
+
+
+<# 
+    if(localize) {
+#>
+              <button mat-menu-item  (click)="onFilter()">
+                <mat-icon>refresh</mat-icon>
+                <span i18n="Refresh table@@<#= sFormComponentClassName #>.Refreshtable-menu">Refresh table</span>
+              </button>
+              <button mat-menu-item  (click)="onSettings()">
+                <mat-icon>settings</mat-icon>
+                <span i18n="Table columns@@<#= sFormComponentClassName #>.Tablecolumns-menu">Table columns</span>
+                <span>Table columns</span>
+              </button>
+<# 
+    } else {
+#>
               <button mat-menu-item  (click)="onFilter()">
                 <mat-icon>refresh</mat-icon>
                 <span>Refresh table</span>
@@ -288,6 +325,9 @@
                 <mat-icon>settings</mat-icon>
                 <span>Table columns</span>
               </button>
+<# 
+    }
+#>
               <button mat-menu-item *ngFor="let m of tableMenuItemsData;"  [disabled]="!m.enabled" (click)="tableCommand(m.id)">
                 <mat-icon color="{{m.iconColor}}">{{m.iconName}}</mat-icon>
                 <span>{{m.caption}}</span>
@@ -1278,6 +1318,45 @@
         }
         error = "";
         return true;
+    }
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
     }
 
 #>

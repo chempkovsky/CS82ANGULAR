@@ -12,6 +12,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    bool localize = Context.Localize;
 
     string HiddenFilterPrefix           = "hf";
     string IdPrefix                     = "id";
@@ -61,6 +62,7 @@
     string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
     string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
     string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+    string frasesPropName                       = "frases";
 
 
     string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
@@ -122,9 +124,59 @@ import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Mo
 })
 
 export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eventEmitterPubModelClassName #> {
+<# 
+    if(localize) {
+#>
+    <#= frasesPropName #>: {[key:string]: string}  = {
+        '<#= TitlePropName #>': $localize`:No title@@<#= componentClassName #>.No-title:No title`,
+        'Hide-details': $localize`:Hide details@@<#= componentClassName #>.Hide-details:Hide details`,
+<#
+    {
+        foreach(string detailVwnm in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailVwnm)) continue;
+            ModelViewSerializable detail = GetModelViewByName(Context, detailVwnm);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detail, null);
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+#>
+        '<#= detail.ViewName + foreignKey.NavigationName #>': $localize`:<#= detail.PluralTitle + "(" + foreignKey.NavigationName + ")" #>@@<#= componentClassName #>.<#= detail.PluralTitle + foreignKey.NavigationName  #>:<#= detail.PluralTitle + "(" + foreignKey.NavigationName + ")" #>`,
+<#
+            }
+            
+        }
+    }
+#>
+
+    }
+<# 
+    } else {
+#>
+    <#= frasesPropName #>: {[key:string]: string}  = {
+        '<#= TitlePropName #>': 'No title',
+        'Hide-details': 'Hide details',
+<#
+    {
+        foreach(string detailVwnm in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailVwnm)) continue;
+            ModelViewSerializable detail = GetModelViewByName(Context, detailVwnm);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detail, null);
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+#>
+        '<#= detail.ViewName + foreignKey.NavigationName #>': '<#= detail.PluralTitle + "(" + foreignKey.NavigationName + ")" #>',
+<#
+            }
+            
+        }
+    }
+#>
+    }
+<# 
+    }
+#>
+
+
     public <#= ShowDetailsPropName #>: boolean = false;
     public <#= AppearancePropName #>: MatFormFieldAppearance = 'outline';
-    <#= TitlePropName #>: string|any = 'No title';
+    <#= TitlePropName #>: string|any = this.<#= frasesPropName #>['<#= TitlePropName #>'];
     <#= NavPrefix #>: string|any = '';
     <#= OutletNmPropName #> : string = 'primary';
     <#= OutletParent #>: string = '';
@@ -236,7 +288,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 
     public <#= SelectedDetailPropName #>: {caption: string, vw: string|null, nv: string|null}|null = null;
     public <#= DetailViewsPropName #>: Array<{caption: string, vw: string|null, nv: string|null}> = [
-        {caption:'Hide details', vw:null, nv:null},
+        {caption:this.<#= frasesPropName #>['Hide-details'], vw:null, nv:null},
 <#
     {
         foreach(string detailVwnm in detailViewNames) {
@@ -245,7 +297,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detail, null);
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
 #>
-        {caption:'<#= detail.PluralTitle + "(" + foreignKey.NavigationName + ")" #>', vw: '<#= detailVwnm #>', nv: '<#= foreignKey.NavigationName #>'},
+        {caption:this.<#= frasesPropName #>['<#= detail.ViewName + foreignKey.NavigationName #>'], vw: '<#= detailVwnm #>', nv: '<#= foreignKey.NavigationName #>'},
 <#
             }
             

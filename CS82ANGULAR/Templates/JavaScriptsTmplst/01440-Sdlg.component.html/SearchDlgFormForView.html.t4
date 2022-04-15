@@ -13,6 +13,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 
 <#
+    bool localize = Context.Localize;
 
     string CanAddSelector           = "can-add";
     string CanAddPropName           = "canAdd";
@@ -33,8 +34,11 @@
     string showMultiSelectedRowPropName   = "showMultiSelectedRow";
 
 
-    string sformComponentFolder     = "01420-Sform.component.ts";
-    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, sformComponentFolder);
+    string sformComponentFolder         = "01420-Sform.component.ts";
+    string componentSelectorCommonPart  = GetComponentSelectorCommonPart(Model, sformComponentFolder);
+    string sdlgComponentFolder          = "01440-Sdlg.component.ts";
+    string sdlgComponentClassName       = GetComponentClassName(Model, sdlgComponentFolder);
+
 #>
 <h3 mat-dialog-title>{{data.title}}</h3>
 <div mat-dialog-content>
@@ -48,8 +52,22 @@
     ></app-<#= componentSelectorCommonPart #>>
 </div>
 <div mat-dialog-actions>
+
+<# 
+    if(localize) {
+#>
+  <button mat-button (click)="onCancel()" cdkFocusInitial i18n="Cancel@@<#= sdlgComponentClassName #>.Cancel">Cancel</button>
+  <button mat-button (click)="onOk()" i18n="Ok@@<#= sdlgComponentClassName #>.Ok">Ok</button>
+<# 
+    } else {
+#>
   <button mat-button (click)="onCancel()" cdkFocusInitial>Cancel</button>
   <button mat-button (click)="onOk()">Ok</button>
+<# 
+    }
+#>
+
+
 </div>
 
 <#+
@@ -70,6 +88,45 @@
             return result;
         }
         return refItem.FileName.Replace(".component","");
+    }
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
     }
 
 #>

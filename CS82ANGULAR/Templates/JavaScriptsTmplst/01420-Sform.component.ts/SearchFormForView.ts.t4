@@ -12,6 +12,8 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    bool localize = Context.Localize;
+
     string OperatorSufix        = "Oprtr";
     string EqualOperator        = "eq";
     string LikeOperator         = "lk";
@@ -170,7 +172,8 @@
     string patchcontrolsMethodName      = "patchcontrols";
     string afterPatchControlsPropName   = "afterPatchControls";
     string afterPatchControlsSelector   = "after-patch-controls";
-
+    string columnCaptionsPropName       = "clmnCptns";
+    string menuCaptionsPropName         = "menuCptns";
 
     List<string> FKViewsDict =  GetFKViewsList(Model, Context, new List<string>());
     if (! FKViewsDict.Contains(Model.ViewName) ) {
@@ -250,11 +253,11 @@
 
 #>
 import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginatorIntl, PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { SelectionChange, SelectionModel } from '@angular/cdk/collections';
-import { catchError, Observable, of, switchMap } from 'rxjs';
+import { catchError, Observable, of, Subject, switchMap } from 'rxjs';
 
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, sformComponentFolder)#>';
 import { <#= uniqFilterDefModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  uniqFilterDefModelFolder, sformComponentFolder)#>';
@@ -305,7 +308,145 @@ import { <#= GetInterfaceFilterName(m2mModel) #> } from '<#=  GetCrossComponentF
   templateUrl: '<#= GetFolderName(Model, sformHtmlFolder, sformComponentFolder)#>.html',
   styleUrls: ['<#=  GetFolderName(Model, sformCssFolder, sformComponentFolder)#>.css']
 })
-export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
+export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPaginatorIntl, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
+
+<# 
+    if(localize) {
+#>
+// begin: internationalization of the mat-paginator
+    changes = new Subject<void>();
+    firstPageLabel = $localize`First page@@<#= componentClassName #>.firstPageLabel:First page`;
+    itemsPerPageLabel = $localize`Items per page@@<#= componentClassName #>.itemsPerPageLabel:Items per page`;
+    lastPageLabel = $localize`Last page@@<#= componentClassName #>.lastPageLabel:Last page`;
+    nextPageLabel = 'Next page@@<#= componentClassName #>.nextPageLabel:Next page';
+    previousPageLabel = 'Previous page@@<#= componentClassName #>.previousPageLabel:Previous page';
+    getRangeLabel(page: number, pageSize: number, length: number): string {
+        const amountPages = Math.ceil(length / pageSize);
+        return $localize`Page ${page + 1} of ${amountPages}@@<#= componentClassName #>.getRangeLabel:Page ${page + 1} of ${amountPages}`;
+    }
+// end: internationalization of the mat-paginator
+    @Input('<#= captionSelector #>') <#= captionPropName #>: string = $localize`<#= Model.PluralTitle #>@@<#= componentClassName #>.caption:<#= Model.PluralTitle #>`;
+<# 
+    } else {
+#>
+    @Input('<#= captionSelector #>') <#= captionPropName #>: string = '<#= Model.PluralTitle #>';
+<# 
+    }
+#>
+
+
+    <#= columnCaptionsPropName + Model.ViewName #>: {[key:string]: string}  = {
+<# 
+    if(localize) {
+        foreach(ModelViewPropertyOfVwSerializable dispSclProp in Model.ScalarProperties) {
+#>
+        '<#= GetTypeScriptPropertyName(dispSclProp, Model) #>': $localize`:<#=  GetDisplayAttributeValueString(dispSclProp, Model, DisplayLabelProperty) #>@@<#= componentClassName #>.<#= GetTypeScriptPropertyName(dispSclProp, Model) #>-colcapt:<#=  GetDisplayAttributeValueString(dispSclProp, Model, DisplayLabelProperty) #>`,
+<#
+        }
+    } else {
+        foreach(ModelViewPropertyOfVwSerializable dispSclProp in Model.ScalarProperties) {
+#>
+        '<#= GetTypeScriptPropertyName(dispSclProp, Model) #>': '<#=  GetDisplayAttributeValueString(dispSclProp, Model, DisplayLabelProperty) #>',
+<#
+        }
+    }
+#>
+    };
+
+<#
+    if(searchSchemas != null) {
+        List<ModelViewSerializable> smds = new List<ModelViewSerializable>();
+        foreach(var sch in searchSchemas) {
+            ModelViewSerializable searchModel = sch.Item4;
+            if(smds.Any(p => p == searchModel)) continue;
+            ModelViewSerializable m2mModel = sch.Item1;
+            smds.Add(searchModel);
+#>
+    <#= columnCaptionsPropName + searchModel.ViewName #>: {[key:string]: string}  = {
+<# 
+
+            if(localize) {
+                foreach(ModelViewPropertyOfVwSerializable dispSclProp in searchModel.ScalarProperties) {
+#>
+        '<#= GetTypeScriptPropertyName(dispSclProp, searchModel) #>': $localize`:<#=  GetDisplayAttributeValueString(dispSclProp, searchModel, DisplayLabelProperty) #>@@<#= componentClassName #>.<#= searchModel.ViewName #>-<#= GetTypeScriptPropertyName(dispSclProp, searchModel) #>-colcapt:<#=  GetDisplayAttributeValueString(dispSclProp, searchModel, DisplayLabelProperty) #>`,
+<#
+                }
+            } else {
+                foreach(ModelViewPropertyOfVwSerializable dispSclProp in searchModel.ScalarProperties) {
+#>
+        '<#= GetTypeScriptPropertyName(dispSclProp, searchModel) #>': '<#=  GetDisplayAttributeValueString(dispSclProp, searchModel, DisplayLabelProperty) #>',
+<#
+                }
+            }
+#>
+    };
+<# 
+
+        }
+    }
+#>
+
+    <#= menuCaptionsPropName #>: {[key:string]: string}  = {
+<# 
+        if(localize) {
+#>
+        'fullscann': $localize`:full scann@@<#= componentClassName #>.fullscann-menu:full scann`,
+<# 
+        } else {
+#>
+        'fullscann': 'full scann',
+<# 
+        }
+        for(int i = 0; i < uniqueKeys.Count; i++) { 
+            string indErrrorText = "";
+            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
+            if (!indIsCorrect) {
+#>
+
+//
+// Could not generate fragment of code
+// Primary/Unique Index Is not correct:
+// <#= indErrrorText #>
+//
+
+<#
+            } else {
+            
+                string caption = "Primary";
+                if(!uniqueKeys[i].IsPrimary) {
+                    caption = uniqueKeys[i].UniqueKeyName;
+                }
+                if(localize) {
+#>
+        '<#= scannByMode + caption #>': $localize`:filter by <#= caption #>@@<#= componentClassName #>.<#= scannByMode + caption #>-menu:filter by <#= caption #>`,
+<# 
+                } else {
+#>
+        '<#= scannByMode + caption #>': 'filter by <#= caption #>',
+<# 
+                } 
+            }
+        }
+        if(searchSchemas!= null) {
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable searchModel = sch.Item4;
+                ModelViewUniqueKeySerializable searchUk = sch.Item6;
+                ModelViewSerializable m2mModel = sch.Item1;
+                if(localize) {
+#>
+        '<#= m2mModel.ViewName #>': $localize`:filter by <#= m2mModel.Title #>@@<#= componentClassName #>.<#= m2mModel.ViewName #>-menu:filter by <#= m2mModel.Title #>`,
+<# 
+                } else {
+#>
+        '<#= m2mModel.ViewName #>': 'filter by <#= m2mModel.Title #>',
+<# 
+                } 
+            }
+        }
+#>
+    };
+
+
 
     <#= showMultiSelectedRowExPropName #>: boolean = true;
     protected _<#= showMultiSelectedRowPropName #>: boolean|null = true;
@@ -387,7 +528,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     matPaginatorPageSize: number = <#= MatPaginatorPageSize #>;
     matPaginatorPageSizeOptions: Array<number> = <#= MatPaginatorPageSizeOptions #>;
     <#= DisplayedColumnsProperty #>:  Array<string> = ['<#= SelectColumnDefProperty #>', '<#= SelectMultColumnDefProperty #>', <#= GetDisplayedColumns(Model) #>, '<#= ActionColumnDefProperty #>'];
-    @Input('<#= captionSelector #>') <#= captionPropName #>: string = '<#= Model.ViewName #>';
     @Input('<#= ShowFilterSelector #>') <#= ShowFilterPropName #>: boolean = true;
     @Input('<#= RowCommandsSelector #>')  <#= RowCommandsPropName #>:Array<<#= menuItemDataModelClassName #>>|any;
 
@@ -479,7 +619,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 ModelViewSerializable m2mModel = sch.Item1;
 
 #>
-        {id: '<#= m2mModel.ViewName #>', caption: 'filter: <#= m2mModel.ViewName #>', iconName: 'search', iconColor: 'primary', enabled: true, data: [
+        {id: '<#= m2mModel.ViewName #>', caption: this.<#= menuCaptionsPropName #>['<#= m2mModel.ViewName #>'], iconName: 'search', iconColor: 'primary', enabled: true, data: [
 <#
                 int ukrows = searchUk.UniqueKeyProperties.Count / 4;
                 ukrows *= 4;
@@ -493,7 +633,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                     cnt++;
                     if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
 #>
-           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>', fltrCaption: '<#= GetDisplayAttributeValueString(modelViewPropertyOfVwSerializable, searchModel, DisplayLabelProperty) #>',  fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, searchModel) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100},
+           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>', fltrCaption: this.<#= columnCaptionsPropName + searchModel.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>'],  fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, searchModel) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100},
 <#
                     }
                 }
@@ -504,7 +644,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                     cnt++;
                     if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
 #>
-           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>', fltrCaption: '<#= GetDisplayAttributeValueString(modelViewPropertyOfVwSerializable, searchModel, DisplayLabelProperty) #>',  fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, searchModel) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrFlx:100, fltrMd: (100 / <#= theRest #>) - 1, fltrSm: (100 / <#= theHRest #>) - 1, fltrXs: 100},
+           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>', fltrCaption: this.<#= columnCaptionsPropName + searchModel.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, searchModel) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrFlx:100, fltrMd: (100 / <#= theRest #>) - 1, fltrSm: (100 / <#= theHRest #>) - 1, fltrXs: 100},
 <#
                     }
                 }
@@ -534,7 +674,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                     caption = uniqueKeys[i].UniqueKeyName;
                 }
 #>
-        {id: '<#= scannByMode + caption #>', caption: 'filter: <#= caption #>', iconName: 'search', iconColor: 'primary', enabled: true, data: [
+        {id: '<#= scannByMode + caption #>', caption: this.<#= menuCaptionsPropName #>['<#= scannByMode + caption #>'], iconName: 'search', iconColor: 'primary', enabled: true, data: [
 <#
                 int ukrows = uniqueKeys[i].UniqueKeyProperties.Count / 4;
                 ukrows *= 4;
@@ -547,7 +687,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                     cnt++;
                     if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
 #>
-           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: '<#= GetDisplayAttributeValueString(modelViewPropertyOfVwSerializable, Model, DisplayLabelProperty) #>',  fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100},
+           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100},
 <#
                     }
                 }
@@ -557,7 +697,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                     cnt++;
                     if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
 #>
-           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: '<#= GetDisplayAttributeValueString(modelViewPropertyOfVwSerializable, Model, DisplayLabelProperty) #>',  fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd: (100 / <#= theRest #>) - 1, fltrSm: (100 / <#= theHRest #>) - 1, fltrXs: 100},
+           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd: (100 / <#= theRest #>) - 1, fltrSm: (100 / <#= theHRest #>) - 1, fltrXs: 100},
 <#
                     }
                 }
@@ -567,12 +707,12 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             } // if (!indIsCorrect) { ... } else { ... }
         } // for(int i = 0; i < uniqueKeys.Count; i++) { ... }
 #>
-        {id: 'fullscann', caption: 'full scann', iconName: 'search', iconColor: 'primary', enabled: true, data: [
+        {id: 'fullscann', caption: this.<#= menuCaptionsPropName #>['fullscann'], iconName: 'search', iconColor: 'primary', enabled: true, data: [
 <#
         foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in Model.ScalarProperties) {
             if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
 #>
-            {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: '<#= GetDisplayAttributeValueString(modelViewPropertyOfVwSerializable, Model, DisplayLabelProperty) #>',  fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100 },
+            {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100 },
 <#
             }
         }
@@ -704,6 +844,10 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 this.resetCurFltr();
                 return;
         } // switch(ef.id) {}
+<#
+        if(searchSchemas!= null) {
+            if(searchSchemas.Count > 0) {
+#>
         let rslt: Array<<#= filterResultModelClassName #>> = [];
         this.filterDefs.forEach((fd: <#= uniqFilterDefModelClassName #>) => {
             if(!this.<#= HiddenFilterExPropName #>.some((v: <#= filterResultModelClassName #>) => v.fltrName === fd.fltrName)) {
@@ -712,6 +856,10 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         });
         this.<#= externalFilterRsltPropName #> = rslt;
         this.resetCurFltr();
+<#
+            }
+        }
+#>
     }
 
     public <#= currentRowPropName #>: <#= GetInterfaceName(Model) #> | null = null;
@@ -1055,7 +1203,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     foreach(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable in Model.UIListProperties) {
         if (modelViewUIListPropertySerializable.IsShownInView) {
 #>
-            { name: '<#=GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model)#>', caption:'<#=  GetDisplayAttributeValueString2(modelViewUIListPropertySerializable, Model, DisplayLabelProperty) #>', checked: false },
+            { name: '<#=GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model)#>', caption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#=GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model)#>'], checked: false },
 <#
         }
     }
@@ -1130,7 +1278,17 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 });
             }
         } else {
+<# 
+    if(localize) {
+#>
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Could not apply filter as not all attributes are set@@<#= componentClassName #>.filter-msg:Could not apply filter as not all attributes are set` });
+<# 
+    } else {
+#>
             this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message:'Could not apply filter as not all attributes are set'});
+<# 
+    }
+#>
         }
         // by requirements all common foreignkey props have the same names for <#= m2mModel.ViewName #> and <#= Model.ViewName #>
         this.<#= HiddenFilterPropName #>.forEach((hf: <#= filterResultModelClassName #>) => { 
