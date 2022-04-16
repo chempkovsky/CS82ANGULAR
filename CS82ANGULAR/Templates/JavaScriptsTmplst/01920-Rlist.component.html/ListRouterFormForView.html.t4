@@ -13,7 +13,8 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 
 <#
-    
+    bool localize = Context.Localize;
+
     string CanAddSelector           = "can-add";
     string CanAddPropName           = "canAdd";
     string CanUpdSelector           = "can-update";
@@ -80,6 +81,7 @@
     string SelectedDetailPropName       = "selectedDetail";
     string DetailViewsPropName          = "detailViews";
     string OnSelectRowMethodName        = "onSelectRow";
+    string frasesPropName               = "frases";
 
 
     string sformComponentFolder         = "01420-Sform.component.ts";

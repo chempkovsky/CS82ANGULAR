@@ -12,7 +12,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
-
+    bool localize = Context.Localize;
 
     string HiddenFilterPrefix           = "hf";
     string IdPrefix                     = "id";
@@ -47,6 +47,7 @@
     string ActionParamUpdateMode        = "update";
     string ActionParamDeleteMode        = "delete";
     string ActionParamViewMode          = "view";
+    string ActionParamDeleteSelMode     = "deletesel";
     string ViewNameParamName            = "view";
     string NavigationParamName          = "nav";
 
@@ -107,6 +108,7 @@
     string currentRowPropName        = "currentRow";
     string OnSelectRowMethodName     = "onSelectRow";
     string showMultiSelectPropName   = "showMultiSelect";
+    string frasesPropName            = "frases";
 
     string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
     string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
@@ -260,6 +262,61 @@ import { <#=  ddlgComponentClassName #> } from '<#= GetFolderName(Model, ddlgCom
   styleUrls: ['<#=  GetFolderName(Model, rdlistCssFolder, rdlistComponentFolder)#>.css']
 })
 export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
+<# 
+    if(localize) {
+#>
+    <#= frasesPropName #>: {[key:string]: string}  = {
+        '<#= captionPropName #>': $localize`:<#= Model.PluralTitle #>@@<#= componentClassName #>.<#= captionPropName #>:<#= Model.PluralTitle #>`,
+        '<#= ActionParamUpdateMode #>': $localize`:Modify Item@@<#= componentClassName #>.<#= ActionParamUpdateMode #>:Modify Item`,
+        '<#= ActionParamDeleteMode #>': $localize`:Delete Item@@<#= componentClassName #>.<#= ActionParamDeleteMode #>:Delete Item`,
+        '<#= ActionParamViewMode #>': $localize`:View Item@@<#= componentClassName #>.<#= ActionParamViewMode #>:View Item`,
+        '<#= ActionParamAddMode #>': $localize`:Add Item@@<#= componentClassName #>.<#= ActionParamAddMode #>:Add Item`,
+        '<#= ActionParamDeleteSelMode #>': $localize`:Delete Selected@@<#= componentClassName #>.<#= ActionParamDeleteSelMode #>:Delete Selected`,
+<#
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
+            ModelViewSerializable detailView = GetViewByName(Context, detailViewName);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) continue;
+            if (foreignKeys.Count < 1) continue;
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+#>
+        '<#=detailView.ViewName + foreignKey.NavigationName #>': $localize`:<#= detailView.PluralTitle #>(<#= foreignKey.NavigationName #>)@@<#= componentClassName #>.<#=detailView.ViewName + foreignKey.NavigationName #>:<#= detailView.PluralTitle #>(<#= foreignKey.NavigationName #>)`,
+<#
+            }
+        }
+#>
+
+    };
+<# 
+    } else {
+#>
+    <#= frasesPropName #>: {[key:string]: string}  = {
+        '<#= captionPropName #>': '<#= Model.PluralTitle #>',
+        '<#= ActionParamUpdateMode #>': 'Modify Item',
+        '<#= ActionParamDeleteMode #>': 'Delete Item',
+        '<#= ActionParamViewMode #>': 'View Item',
+        '<#= ActionParamAddMode #>': 'Add Item',
+        '<#= ActionParamDeleteSelMode #>': 'Delete Selected',
+<#
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
+            ModelViewSerializable detailView = GetViewByName(Context, detailViewName);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) continue;
+            if (foreignKeys.Count < 1) continue;
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+#>
+        '<#=detailView.ViewName + foreignKey.NavigationName #>': '<#= detailView.PluralTitle #>(<#= foreignKey.NavigationName #>)',
+<#
+            }
+        }
+#>
+    };
+<# 
+    } 
+#>
+
     public <#= ShowDetailsPropName #>: boolean = false;
     @Input('<#= showMultiSelectedRowSelector #>') <#= showMultiSelectedRowPropName #>: boolean = true;
     public <#= AppearancePropName #>: MatFormFieldAppearance = 'outline';
@@ -269,7 +326,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         this.<#= multiSelectedRowPropName #>.emit(e);
     }
 
-    @Input('<#= captionSelector #>') <#= captionPropName #>: string = '<#= Model.ViewName #>';
+    @Input('<#= captionSelector #>') <#= captionPropName #>: string = this.<#= frasesPropName #>['<#= captionPropName #>'];
     <#= NavPrefix #>: string|any = '';
     <#= OutletNmPropName #> : string = 'primary';
 
@@ -305,13 +362,13 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             }
         }
     rowMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
-         {id: '<#= ActionParamUpdateMode #>', caption: 'Modify Item', iconName: 'edit', iconColor: 'primary', enabled: true},
-         {id: '<#= ActionParamDeleteMode #>', caption: 'Delete Item', iconName: 'delete_forever', iconColor: 'warn', enabled: true},
-         {id: '<#= ActionParamViewMode #>', caption: 'View Item', iconName: 'preview', iconColor: 'primary', enabled: true},
+         {id: '<#= ActionParamUpdateMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'], iconName: 'edit', iconColor: 'primary', enabled: true},
+         {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'delete_forever', iconColor: 'warn', enabled: true},
+         {id: '<#= ActionParamViewMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'preview', iconColor: 'primary', enabled: true},
       ];
     tableMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
-         {id: '<#= ActionParamAddMode #>', caption: 'Add Item', iconName: 'create', iconColor: 'primary', enabled: true},
-         {id: '<#= ActionParamDeleteMode #>', caption: 'Delete Selected', iconName: 'delete_forever', iconColor: 'warn', enabled: true},
+         {id: '<#= ActionParamAddMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'], iconName: 'create', iconColor: 'primary', enabled: true},
+         {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'], iconName: 'delete_forever', iconColor: 'warn', enabled: true},
       ];
     constructor(protected route: ActivatedRoute, protected router: Router, protected  <#= formRootService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
         public dialog: MatDialog, 
@@ -457,7 +514,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detail, null);
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
 #>
-        {caption:'<#= detail.PluralTitle + "(" + foreignKey.NavigationName + ")" #>', vw: '<#= detailVwnm #>', nv: '<#= foreignKey.NavigationName #>'},
+        {caption: this.<#= frasesPropName #>['<#=detail.ViewName + foreignKey.NavigationName #>'], vw: '<#= detailVwnm #>', nv: '<#= foreignKey.NavigationName #>'},
 <#
             }
             
@@ -531,7 +588,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     if(Model.IsWebApiSelectOneByPrimarykey) {
 #>
         let locdata: <#=  GetInterfaceVDlgName(Model) #> = {
-            title: 'View item',
+            title: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'],
             <#= HiddenFilterPropName #>: this.<#= HiddenFilterPropName #>,
             <#= FormControlModelPropName #>: e,
             <#= FormControlNewModelPropName #>: null
@@ -555,7 +612,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     if(Model.IsWebApiAdd) {
 #>
         let locdata: <#=  GetInterfaceADlgName(Model) #> = {
-            title: 'Add item',
+            title: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'],
             <#= HiddenFilterPropName #>: this.<#= HiddenFilterPropName #>,
             <#= FormControlModelPropName #>: null,
             <#= FormControlNewModelPropName #>: null
@@ -601,7 +658,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     if(Model.IsWebApiUpdate) {
 #>
         let locdata: <#=  GetInterfaceUDlgName(Model) #> = {
-            title: 'Modify item',
+            title: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'],
             <#= HiddenFilterPropName #>: this.<#= HiddenFilterPropName #>,
             <#= FormControlModelPropName #>: e,
             <#= FormControlNewModelPropName #>: null
@@ -634,7 +691,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     if(Model.IsWebApiDelete) {
 #>
         let locdata: <#=  GetInterfaceDDlgName(Model) #> = {
-            title: 'Delete item',
+            title: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'],
             <#= HiddenFilterPropName #>: this.<#= HiddenFilterPropName #>,
             <#= FormControlModelPropName #>: e,
             <#= FormControlNewModelPropName #>: null
@@ -688,8 +745,8 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     if(Model.IsWebApiDelete) {
 #>
         let locdata: <#=  messageDialogInterfaceName #> = {
-            title: 'Delete Items',
-            message: 'Delete Selected Items ?',
+            title: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'],
+            message: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'] + ' ?',
             iconname: 'warning',
             iconcolor: 'warn'
         };

@@ -3558,9 +3558,9 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
             for(int i = 0; i < fk.ForeignKeyProps.Count; i++) {
                 if(fk.ForeignKeyProps[i].OriginalPropertyName == origPropName) {
                     sprop = model.ScalarProperties.Where(p => 
-                    (p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && 
-                    (p.ForeignKeyName == fk.NavigationName) && 
-                    (p.ForeignKeyName == p.ForeignKeyNameChain)
+                        (p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && 
+                        (p.ForeignKeyName == fk.NavigationName) && 
+                        (p.ForeignKeyName == p.ForeignKeyNameChain)
                     ).FirstOrDefault();
                     if(sprop != null) return sprop;
                 }
