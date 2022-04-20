@@ -98,15 +98,15 @@
     string tpAheadValSelector           = "tp-ahead-val";
     string tpAheadFncPropName           = "tpAheadFnc";
     string tpAheadFncSelector           = "tp-ahead-fnc";
-    string tpAheadSrvPropName           = "tpAheadSrv";
-    string tpAheadSrvSelector           = "tp-ahead-srv";
     string tpAheadCptnPropName          = "tpAheadCptn";
     string tpAheadCptnSelector          = "tp-ahead-cptn";
     string clearTpAheadVarsMethodName   = "clrTpAheadVars";
     string tpahValChangedMethodName     = "tpahVlChngs";
     string patchcontrolsMethodName      = "patchcontrols";
-    string afterPatchControlsPropName   = "afterPatchControls";
-    string afterPatchControlsSelector   = "after-patch-controls";
+    string afterObjSelPropName          = "afterObjSel";
+    string afterObjSelSelector          = "after-obj-sel";
+    string notifyAllPropName            = "notifyAll";
+    string notifyAllSelector            = "notify-all";
 
 
 #>
@@ -114,7 +114,6 @@ import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } fro
 import { FormControl, Validators, ValidatorFn, ValidationErrors } from '@angular/forms';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
 import { debounceTime, Observable, of, switchMap } from 'rxjs';
-import { MatSelectChange } from '@angular/material/select';
 
 import { <#= uniqFilterModelClassName #> } from '<#= GetFolderName(Model, uniqFilterModelFolder, uniqFilterComponentFolder)#>';
 import { <#= uniqFilterDefModelClassName #> } from '<#= GetFolderName(Model, uniqFilterDefModelFolder, uniqFilterComponentFolder)#>';
@@ -241,7 +240,7 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
         this.<#= clearTpAheadVarsMethodName #>();
         if(this.<#= showFilterPropName #>) {
             this.<#= inputFilterDefsExPropName #>.forEach(i => {
-                this.webServiceFilterDefs.push({ fltrName: i.fltrName, fltrCaption: i.fltrCaption, fltrDataType: i.fltrDataType, fltrMaxLen: i.fltrMaxLen, fltrMin: i.fltrMin, fltrMax: i.fltrMax, fltrFlx: i.fltrFlx, fltrMd: i.fltrMd, fltrSm: i.fltrSm, fltrXs: i.fltrXs });
+                this.webServiceFilterDefs.push({ fltrName: i.fltrName, fltrCaption: i.fltrCaption, fltrDataType: i.fltrDataType, fltrMaxLen: i.fltrMaxLen, fltrMin: i.fltrMin, fltrMax: i.fltrMax, fltrFlx: i.fltrFlx, fltrMd: i.fltrMd, fltrSm: i.fltrSm, fltrXs: i.fltrXs, fltrSrv: i.fltrSrv });
             });    
             let wsfd: Array<<#= uniqFilterModelClassName #>> = [];
             this.webServiceFilterDefs.forEach(i => {
@@ -262,10 +261,10 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
             this.webServiceFilters.forEach((flt: <#= uniqFilterModelClassName #>) => {
               if((flt.fltrDataType === 'boolean') || (flt.fltrDataType === 'bool')) {
                 if ((typeof flt.fltrValue.value === 'undefined') || (flt.fltrValue.value === null)) flt.fltrValue.patchValue(false, {emitEvent: false});
-                flt.fltrValue.valueChanges.subscribe({next: (e: any) => this.<#= afterPatchControlsPropName #>.emit(null) });
+                flt.fltrValue.valueChanges.subscribe({next: (e: any) => this.<#= afterObjSelPropName #>.emit({v:null, i: indx}) });
               } else if ((flt.fltrDataType === 'datetime'))  {
                 if (typeof flt.fltrValue.value === 'undefined') flt.fltrValue.patchValue(null, {emitEvent: false});
-                flt.fltrValue.valueChanges.subscribe({next: (e: any) => this.<#= afterPatchControlsPropName #>.emit(null) });
+                flt.fltrValue.valueChanges.subscribe({next: (e: any) => this.<#= afterObjSelPropName #>.emit({v:null, i: indx}) });
               } else {
                 this.<#= tpahValChangedMethodName #>(flt.fltrValue, indx);
               }
@@ -517,10 +516,8 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
 
     @Input('<#= tpAheadValSelector #>') <#= tpAheadValPropName #>!: (v: any, i: number) => any;
     @Input('<#= tpAheadFncSelector #>') <#= tpAheadFncPropName  #>!: (srv: any, wsfs: Array<<#= uniqFilterModelClassName #>>, value: any, i: number) => Observable<Array<any>>;
-    @Input('<#= tpAheadSrvSelector #>') <#= tpAheadSrvPropName #>!: any
     @Input('<#= tpAheadCptnSelector #>') <#= tpAheadCptnPropName #>!: (v: any, i: number) => string;
     <#= clearTpAheadVarsMethodName #>(): void {
-      this.<#= tpAheadVarsPropName #>0 = null;
 <#
     for(int iii = 0; iii < 7; iii++) {
 #>
@@ -541,8 +538,8 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
                 if(this.<#= tpAheadFncPropName  #> === null) {
                   return of([]);      
                 } 
-                this.<#= afterPatchControlsPropName #>.emit(null);
-                return this.<#= tpAheadFncPropName  #>(this.<#= tpAheadSrvPropName #>,this.webServiceFilters, value, indx)
+                this.<#= afterObjSelPropName #>.emit({v:null, i: indx});
+                return this.<#= tpAheadFncPropName  #>(this.webServiceFilterDefs[indx].fltrSrv, this.webServiceFilters, value, indx)
             } else {
                 this.<#= patchcontrolsMethodName #>(value, indx);
             }
@@ -561,19 +558,18 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
 #>
       }
     }
-    <#= patchcontrolsMethodName #>(v: any, i: number): void {
+    <#= patchcontrolsMethodName #>(val: any, pos: number): void {
+      this.<#= afterObjSelPropName #>.emit({v:val, i: pos});
       if (typeof this.<#= tpAheadValPropName #> === 'undefined') 
         return;
       this.webServiceFilters.forEach((f: <#= uniqFilterModelClassName #>, indx: number) => {
-        // if (i >= indx) {
-          f.fltrValue.patchValue( this.<#= tpAheadValPropName #>(v, indx), {emitEvent: false});
-        // }
+         if ((pos === indx) || this.<#= notifyAllPropName #>) {
+          f.fltrValue.patchValue( this.<#= tpAheadValPropName #>(val, indx), {emitEvent: false});
+         }
       });
-      this.<#= afterPatchControlsPropName #>.emit(v);
     }
-    @Output('<#= afterPatchControlsSelector #>') <#= afterPatchControlsPropName #> = new EventEmitter<any>();
-
-
+    @Output('<#= afterObjSelSelector #>') <#= afterObjSelPropName #> = new EventEmitter<any>();
+    @Input('<#= notifyAllSelector #>') <#= notifyAllPropName #>: boolean = false;
 
 }
 

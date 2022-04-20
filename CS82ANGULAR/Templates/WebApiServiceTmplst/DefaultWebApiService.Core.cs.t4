@@ -187,10 +187,30 @@ namespace <#= webApiServiceNameSpace #> {
                             query = query.Where(p => (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> == _tmp<#= GetFilterPropertyName(prop, Model) #>));
                             break;
                         case "gt":
+<#
+                if(IsEntityTypeGuid(prop)) {
+#>
+                            query = query.Where(p => (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> == _tmp<#= GetFilterPropertyName(prop, Model) #>));
+<#
+                } else {
+#>
                             query = query.Where(p => (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> >= _tmp<#= GetFilterPropertyName(prop, Model) #>));
+<#
+                }
+#>
                             break;
                         case "lt": 
+<#
+                if(IsEntityTypeGuid(prop)) {
+#>
+                            query = query.Where(p => (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> == _tmp<#= GetFilterPropertyName(prop, Model) #>));
+<#
+                } else {
+#>
                             query = query.Where(p => (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> <= _tmp<#= GetFilterPropertyName(prop, Model) #>));
+<#
+                }
+#>
                             break;
                         case "ne":
                             query = query.Where(p => (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> != _tmp<#= GetFilterPropertyName(prop, Model) #>));
@@ -1014,6 +1034,9 @@ namespace <#= webApiServiceNameSpace #> {
     }
     bool IsEntityTypeBoolean(ModelViewPropertySerializable prop) {
         return prop.UnderlyingTypeName.Equals("System.Boolean");
+    }
+    bool IsEntityTypeGuid(ModelViewPropertySerializable prop) {
+        return prop.UnderlyingTypeName.Equals("System.Guid");
     }
     String GetFirstPrimKeyProperty(ModelViewSerializable model) {
         return model.PrimaryKeyProperties.FirstOrDefault().OriginalPropertyName;

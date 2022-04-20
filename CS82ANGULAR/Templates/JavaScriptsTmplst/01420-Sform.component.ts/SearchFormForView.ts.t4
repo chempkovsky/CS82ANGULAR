@@ -170,8 +170,8 @@
     string clearTpAheadVarsMethodName   = "clrTpAheadVars";
     string tpahValChangedMethodName     = "tpahVlChngs";
     string patchcontrolsMethodName      = "patchcontrols";
-    string afterPatchControlsPropName   = "afterPatchControls";
-    string afterPatchControlsSelector   = "after-patch-controls";
+    string afterObjSelPropName          = "afterObjSel";
+    string afterObjSelSelector          = "after-obj-sel";
     string columnCaptionsPropName       = "clmnCptns";
     string menuCaptionsPropName         = "menuCptns";
 
@@ -247,8 +247,8 @@
     List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = GetModelUniqueKeys(Model, new List<ModelViewUniqueKeyOfVwSerializable>());
     ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
     if(pk!= null) uniqueKeys.Add(pk);
-    // m2mModel, m2mForeignKey, List<Tuple< model.ForeignKey, m2mModel.additionalForeignKey >>, searchModel, searchFk, searchUk
-    List<Tuple<ModelViewSerializable,ModelViewForeignKeySerializable,List<Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>>,ModelViewSerializable,ModelViewForeignKeySerializable,ModelViewUniqueKeySerializable>> searchSchemas =
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
         GetSearchResources(Model, Context);
 
 #>
@@ -281,23 +281,46 @@ import { <#= GetInterfaceFilterName(Model) #> } from '<#=  GetCrossComponentFold
 import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, viewNm, viewServiceFolder) #>';
 <# 
         if(searchSchemas!= null) {
+            List<ModelViewSerializable> mdls = new List<ModelViewSerializable>();
+            List<ModelViewSerializable> smdls = new List<ModelViewSerializable>();
             foreach(var sch in searchSchemas) {
-                ModelViewSerializable searchModel = sch.Item4;
                 ModelViewSerializable m2mModel = sch.Item1;
+                List<KeyValuePair<ModelViewForeignKeySerializable,int>> crLst = null;
+                for(int crItm = 0; crItm < 3; crItm++) {
+                    if(crItm > 0) continue;
+                    switch(crItm) {
+                        case 0:  crLst = sch.Item3;
+                            break;
+                        case 1:  crLst = sch.Item4;
+                            break;
+                        default: crLst = sch.Item5;
+                            break;
+                    }
+                    if(crLst != null) {
+                        foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in crLst) {
+                            ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                            if(smdls.Any(p => p == searchModel)) continue;
+                            smdls.Add(searchModel);
 #>
 import { <#= GetServiceClassName(searchModel, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, searchModel.ViewName, viewServiceFolder) #>';
 import { <#= GetInterfaceName(searchModel) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, searchModel.ViewName, viewInterfaceFolder) #>';
 import { <#= GetInterfacePageName(searchModel) #> } from '<#= GetCrossComponentFolderName(Model, sformComponentFolder, Context, searchModel.ViewName, viewInterfacePageFolder) #>';
 import { <#= GetInterfaceFilterName(searchModel) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, searchModel.ViewName, viewInterfaceFltFolder) #>';
+<#
+                        }
+                    }
+                }
+                if(!mdls.Any(p => p == m2mModel)) {
+                mdls.Add(m2mModel);
+#>
 import { <#= GetServiceClassName(m2mModel, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, m2mModel.ViewName, viewServiceFolder) #>';
 import { <#= GetInterfaceName(m2mModel) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, m2mModel.ViewName, viewInterfaceFolder) #>';
 import { <#= GetInterfacePageName(m2mModel) #> } from '<#= GetCrossComponentFolderName(Model, sformComponentFolder, Context, m2mModel.ViewName, viewInterfacePageFolder) #>';
 import { <#= GetInterfaceFilterName(m2mModel) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, m2mModel.ViewName, viewInterfaceFltFolder) #>';
 <#
-            }
+                }
+            } // foreach(var sch in searchSchemas) {...}
         } // if(searchSchemas!= null) {...}
-
-
     }
 #>
 
@@ -357,33 +380,35 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
     if(searchSchemas != null) {
         List<ModelViewSerializable> smds = new List<ModelViewSerializable>();
         foreach(var sch in searchSchemas) {
-            ModelViewSerializable searchModel = sch.Item4;
-            if(smds.Any(p => p == searchModel)) continue;
-            ModelViewSerializable m2mModel = sch.Item1;
-            smds.Add(searchModel);
+            if(localize) {
+                
+                foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                    ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                    if(smds.Any(p => p == searchModel)) continue;
+                    smds.Add(searchModel);
+                    ModelViewPropertyOfVwSerializable dispSclProp = GetFirstPropOfFirstUniqueKey(searchModel);
+                
 #>
     <#= columnCaptionsPropName + searchModel.ViewName #>: {[key:string]: string}  = {
-<# 
-
-            if(localize) {
-                foreach(ModelViewPropertyOfVwSerializable dispSclProp in searchModel.ScalarProperties) {
-#>
         '<#= GetTypeScriptPropertyName(dispSclProp, searchModel) #>': $localize`:<#=  GetDisplayAttributeValueString(dispSclProp, searchModel, DisplayLabelProperty) #>@@<#= componentClassName #>.<#= searchModel.ViewName #>-<#= GetTypeScriptPropertyName(dispSclProp, searchModel) #>-colcapt:<#=  GetDisplayAttributeValueString(dispSclProp, searchModel, DisplayLabelProperty) #>`,
+    };
 <#
                 }
             } else {
-                foreach(ModelViewPropertyOfVwSerializable dispSclProp in searchModel.ScalarProperties) {
+                foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                    ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                    if(smds.Any(p => p == searchModel)) continue;
+                    smds.Add(searchModel);
+                    ModelViewPropertyOfVwSerializable dispSclProp = GetFirstPropOfFirstUniqueKey(searchModel);
 #>
+    <#= columnCaptionsPropName + searchModel.ViewName #>: {[key:string]: string}  = {
         '<#= GetTypeScriptPropertyName(dispSclProp, searchModel) #>': '<#=  GetDisplayAttributeValueString(dispSclProp, searchModel, DisplayLabelProperty) #>',
+    };
 <#
                 }
             }
-#>
-    };
-<# 
-
-        }
-    }
+        } // foreach(var sch in searchSchemas) {...}
+    } // if(searchSchemas != null) {...}
 #>
 
     <#= menuCaptionsPropName #>: {[key:string]: string}  = {
@@ -429,8 +454,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         }
         if(searchSchemas!= null) {
             foreach(var sch in searchSchemas) {
-                ModelViewSerializable searchModel = sch.Item4;
-                ModelViewUniqueKeySerializable searchUk = sch.Item6;
                 ModelViewSerializable m2mModel = sch.Item1;
                 if(localize) {
 #>
@@ -608,51 +631,86 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
     filterDefs: Array<<#= uniqFilterDefModelClassName #>> = [];
     tableMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [];
     curIndexMenuItemsData: <#= menuItemDataModelClassName #>|any;
-    tableIndexMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
+    tableIndexMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [];
+    redefTableIndexMenuItemsData(): void {
+        this.tableIndexMenuItemsData = this.defineTableIndexMenuItemsData();
+        this.onTableMenuItemsData();
+        if(this.tableIndexMenuItemsData.length > 0) {
+          if(this.curIndexMenuItemsData) {
+            let mi: <#= menuItemDataModelClassName #>|any = this.tableIndexMenuItemsData.find((e: <#= menuItemDataModelClassName #>) => e.id === this.curIndexMenuItemsData.id);
+            if (mi) {
+                this.curIndexMenuItemsData = mi;
+            } else {
+                this.curIndexMenuItemsData = this.tableIndexMenuItemsData[0];
+            }
+          } else this.curIndexMenuItemsData = this.tableIndexMenuItemsData[0];
+        }
+    }
+    defineTableIndexMenuItemsData(): Array<<#= menuItemDataModelClassName #>> {
+        let rslt: Array<<#= menuItemDataModelClassName #>> = [];
+        
 <#
     { 
-        // m2mModel, m2mForeignKey, List<Tuple< model.ForeignKey, m2mModel.additionalForeignKey >>, searchModel, searchFk, searchUk
-        if(searchSchemas!= null) {
-            foreach(var sch in searchSchemas) {
-                ModelViewSerializable searchModel = sch.Item4;
-                ModelViewUniqueKeySerializable searchUk = sch.Item6;
-                ModelViewSerializable m2mModel = sch.Item1;
-
+        // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+        if(searchSchemas!= null) { 
+          if(searchSchemas.Count > 0) {
 #>
-        {id: '<#= m2mModel.ViewName #>', caption: this.<#= menuCaptionsPropName #>['<#= m2mModel.ViewName #>'], iconName: 'search', iconColor: 'primary', enabled: true, data: [
+        let crrMDFP: Array<string> = [];
+        for (let fld in this.mdlDrctFkProps) { 
+            if (this.<#= HiddenFilterExPropName #>.some((f: <#= filterResultModelClassName #>) => { return f.fltrName === this.mdlDrctFkProps[fld]})) {
+                crrMDFP.push(this.mdlDrctFkProps[fld]);
+            }
+        }
+
+        let doIns: boolean = false;
 <#
-                int ukrows = searchUk.UniqueKeyProperties.Count / 4;
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+#>
+        doIns = crrMDFP.length === this.reqHiddenProps['<#= m2mModel.ViewName #>'].length;
+        if(doIns) {
+            doIns = (this.reqHiddenProps['<#= m2mModel.ViewName #>'].filter(s => crrMDFP.includes(s))).length === crrMDFP.length;
+            if(doIns) {
+                for (let fld in this.extHiddenProps['<#= m2mModel.ViewName #>']) { 
+                    doIns = this.<#= HiddenFilterExPropName #>.some((f: <#= filterResultModelClassName #>) => { return f.fltrName === this.extHiddenProps['<#= m2mModel.ViewName #>'][fld]});
+                    if(!doIns) break;
+                }
+            }
+        }
+        if(doIns) { rslt.push(
+            {id: '<#= m2mModel.ViewName #>', caption: this.<#= menuCaptionsPropName #>['<#= m2mModel.ViewName #>'], iconName: 'search', iconColor: 'primary', enabled: true, data: [
+<#
+                int ukrows = sch.Item3.Count / 4;
                 ukrows *= 4;
-                int theRest = searchUk.UniqueKeyProperties.Count % 4;
+                int theRest = sch.Item3.Count % 4;
                 int theHRest = theRest / 2; 
                 if(theHRest < 1) theHRest = 1;
                 int cnt = 0;
-                foreach(ModelViewKeyPropertySerializable ukprp in searchUk.UniqueKeyProperties) {
-                    ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetScalarPropByOriginaPropName(ukprp.OriginalPropertyName, searchModel);
+                foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                    ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                    ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetFirstPropOfFirstUniqueKey(searchModel);
                     if(cnt >= ukrows) break;
                     cnt++;
-                    if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
 #>
-           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>', fltrCaption: this.<#= columnCaptionsPropName + searchModel.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>'],  fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, searchModel) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100},
+              {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>', fltrCaption: this.<#= columnCaptionsPropName + searchModel.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>'],  fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, searchModel) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100, fltrSrv: this.<#= formServicePrefix + searchModel.ViewName #>},
 <#
-                    }
                 }
                 cnt = 0;
-                foreach(ModelViewKeyPropertySerializable ukprp in searchUk.UniqueKeyProperties) {
-                    ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetScalarPropByOriginaPropName(ukprp.OriginalPropertyName, searchModel);
+                foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                    ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                    ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetFirstPropOfFirstUniqueKey(searchModel);
                     if(cnt < ukrows) continue;
                     cnt++;
-                    if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
 #>
-           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>', fltrCaption: this.<#= columnCaptionsPropName + searchModel.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, searchModel) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrFlx:100, fltrMd: (100 / <#= theRest #>) - 1, fltrSm: (100 / <#= theHRest #>) - 1, fltrXs: 100},
+              {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>', fltrCaption: this.<#= columnCaptionsPropName + searchModel.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, searchModel) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, searchModel) #>, fltrFlx:100, fltrMd: (100 / <#= theRest #>) - 1, fltrSm: (100 / <#= theHRest #>) - 1, fltrXs: 100, fltrSrv: this.<#= formServicePrefix + searchModel.ViewName #>},
 <#
-                    }
                 }
 #>
-        ]},
+        ]})};
 <#
-            }
-        } // if(searchSchemas!= null) {...}
+            } // foreach(var sch in searchSchemas) { ... }
+          } // if(searchSchemas.Count > 0) {...}
+        } // if(searchSchemas!= null) { ... }
 
         for(int i = 0; i < uniqueKeys.Count; i++) { 
             string indErrrorText = "";
@@ -674,6 +732,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                     caption = uniqueKeys[i].UniqueKeyName;
                 }
 #>
+        rslt.push(
         {id: '<#= scannByMode + caption #>', caption: this.<#= menuCaptionsPropName #>['<#= scannByMode + caption #>'], iconName: 'search', iconColor: 'primary', enabled: true, data: [
 <#
                 int ukrows = uniqueKeys[i].UniqueKeyProperties.Count / 4;
@@ -687,7 +746,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                     cnt++;
                     if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
 #>
-           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100},
+           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100, fltrSrv: this.<#= formRootService #>},
 <#
                     }
                 }
@@ -697,36 +756,112 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                     cnt++;
                     if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
 #>
-           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd: (100 / <#= theRest #>) - 1, fltrSm: (100 / <#= theHRest #>) - 1, fltrXs: 100},
+           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd: (100 / <#= theRest #>) - 1, fltrSm: (100 / <#= theHRest #>) - 1, fltrXs: 100, fltrSrv: this.<#= formRootService #>},
 <#
                     }
                 }
 #>
-        ]},
+        ]});
 <#
             } // if (!indIsCorrect) { ... } else { ... }
         } // for(int i = 0; i < uniqueKeys.Count; i++) { ... }
 #>
+        rslt.push(
         {id: 'fullscann', caption: this.<#= menuCaptionsPropName #>['fullscann'], iconName: 'search', iconColor: 'primary', enabled: true, data: [
 <#
         foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in Model.ScalarProperties) {
             if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
 #>
-            {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100 },
+            {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100, fltrSrv: this.<#= formRootService #> },
 <#
             }
         }
 #>
-        ]}
+        ]});
 <#
-
     } //
 #>
-    ];      
+      return rslt;
+    }
+<#
+    { 
+        // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+        if(searchSchemas!= null) {
+            if(searchSchemas.Count > 0) {
+                string mdlFldLst = "";
+                if(Model.ForeignKeys != null) {
+                    List<ModelViewPropertyOfVwSerializable> addedSclPrp = new List<ModelViewPropertyOfVwSerializable>();
+                    foreach(ModelViewForeignKeySerializable mdlFk in Model.ForeignKeys) {
+                        if(!IsForeigKeyMapedToScalars(mdlFk, Model)) continue;
+                        foreach(var fkp in mdlFk.ForeignKeyProps) {
+                            ModelViewPropertyOfVwSerializable sclPrp = GetScalarPropByOriginaPropName(fkp.OriginalPropertyName, Model);
+                            if(addedSclPrp.Any(p => p == sclPrp)) continue;
+                            addedSclPrp.Add(sclPrp);
+                            if(mdlFldLst == "")
+                                mdlFldLst = " \'" + GetTypeScriptPropertyName(sclPrp, Model) + "\'";
+                            else 
+                                mdlFldLst = mdlFldLst + ", \'" + GetTypeScriptPropertyName(sclPrp, Model) + "\'";
+                        }  // foreach(var fkp in mdlFk.ForeignKeyProps) { ... }
+                    } // foreach(ModelViewForeignKeySerializable mdlFk in Model.ForeignKeys) { ... }
+                } // if(Model.ForeignKeys != null) { ... }
     
+#>
+    mdlDrctFkProps: Array<string> = [<#= mdlFldLst #>];
+    reqHiddenProps: {[key: string]: Array<string>} = {
+<#
+                foreach(var sch in searchSchemas) {
+                    string fldLst = "";
+                    ModelViewSerializable m2mModel = sch.Item1;
+                    List<KeyValuePair<ModelViewForeignKeySerializable,int>> otherFks = sch.Item4;
+                    if(otherFks != null) {
+                        foreach(var fk in otherFks) {
+                            foreach(var fkp in fk.Key.ForeignKeyProps) {
+                                ModelViewPropertyOfVwSerializable sclPrp = GetScalarPropByOriginaPropName(fkp.OriginalPropertyName, m2mModel);
+                                if(fldLst == "")
+                                    fldLst = " \'" + GetTypeScriptPropertyName(sclPrp, m2mModel) + "\'";
+                                else 
+                                    fldLst = fldLst + ", \'" + GetTypeScriptPropertyName(sclPrp, m2mModel) + "\'";
+                            }
+                        }
+                    }
+#>
+                    '<#= m2mModel.ViewName #>': [<#= fldLst #>],
+<#
+                } // foreach(var sch in searchSchemas) { ... }
+#>
+    };
+    extHiddenProps: {[key: string]: Array<string>} = {
+<#
+                foreach(var sch in searchSchemas) {
+                    string fldLst = "";
+                    ModelViewSerializable m2mModel = sch.Item1;
+                    List<KeyValuePair<ModelViewForeignKeySerializable,int>> externalFks = sch.Item5;
+                    if(externalFks != null) {
+                        foreach(var fk in externalFks) {
+                            foreach(var fkp in fk.Key.ForeignKeyProps) {
+                                ModelViewPropertyOfVwSerializable sclPrp = GetScalarPropByOriginaPropName(fkp.OriginalPropertyName, m2mModel);
+                                if(fldLst == "")
+                                    fldLst = " \'" + GetTypeScriptPropertyName(sclPrp, m2mModel) + "\'";
+                                else 
+                                    fldLst = fldLst + ", \'" + GetTypeScriptPropertyName(sclPrp, m2mModel) + "\'";
+                            }
+                        }
+                    }
+#>
+                    '<#= m2mModel.ViewName #>': [<#= fldLst #>],
+<#
+                } // foreach(var sch in searchSchemas) { ... }
+#>
+    };
+<#
+            }
+        }
+    }
+#>    
+
     protected resetCurFltr(): void {
         this.currentFilter = [];
-        this._<#= HiddenFilterPropName #>.forEach((hf: <#= filterResultModelClassName #>) => { this.currentFilter.push({
+        this.<#= HiddenFilterExPropName #>.forEach((hf: <#= filterResultModelClassName #>) => { this.currentFilter.push({
             fltrName: hf.fltrName,
             fltrDataType: hf.fltrDataType,
             fltrOperator: hf.fltrOperator,
@@ -759,6 +894,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
           } else {
             this.<#= HiddenFilterExPropName #> =  inDef;
           }
+          this.redefTableIndexMenuItemsData();
           this.onHiddenFilter();
           this.reset<#= externalFilterPropName #>();
         } 
@@ -786,8 +922,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         if(this.isOnInitCalled) return;
         let efs: string| any = this.<#= externalFilterExPropName #>;
         if ((typeof efs === 'undefined') ? true : ((efs === null) ? true : (efs === ''))) return;
-        let ef: {id: string; f: string|any; csc: string; pgi: number; pgsz: number} = JSON.parse(efs);
-
+        let ef: {id: string; f: {[key: string]: string}|any; csc: string; pgi: number; pgsz: number} = JSON.parse(efs);
+        
         this.<#= currentSortColumnPropName #> = '';
         // since if(this.isOnInitCalled) return; we ned to reset props if input is defined
         if(ef.csc) { this.<#= currentSortColumnPropName #> = ef.csc; } else { this.<#= currentSortColumnPropName #> = ''; } 
@@ -809,12 +945,24 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         if(searchSchemas!= null) {
             if(searchSchemas.Count > 0) {
                 foreach(var sch in searchSchemas) {
-                    ModelViewSerializable searchModel = sch.Item4;
                     ModelViewSerializable m2mModel = sch.Item1;
 #>
             case '<#= m2mModel.ViewName #>':  
-                this.<#= searchSelectRowPropName + m2mModel.ViewName #> = JSON.parse(ef.f);
-                r = this.<#= formServicePrefix + searchModel.ViewName #>.<#= row2FilterRsltMethodName #>(this.<#= searchSelectRowPropName + m2mModel.ViewName #>);
+<#
+                foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                    ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+#>
+                if(ef.f['<#= searchModel.ViewName #>']) {
+                    this.<#= searchSelectRowPropName + m2mModel.ViewName + searchModel.ViewName #> = JSON.parse(ef.f['<#= searchModel.ViewName #>']);
+                    if(this.<#= searchSelectRowPropName + m2mModel.ViewName + searchModel.ViewName #>) {
+                        if(!(typeof this.<#= searchSelectRowPropName + m2mModel.ViewName + searchModel.ViewName #> === 'undefined')) {
+                            r = r.concat(this.<#= formServicePrefix + searchModel.ViewName #>.<#= row2FilterRsltMethodName #>(this.<#= searchSelectRowPropName + m2mModel.ViewName + searchModel.ViewName #>));
+                        }
+                    }
+                }
+<#
+                }
+#>
                 break;           
 <#
                 }
@@ -822,7 +970,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         }
 #>
             default:
-                let flt: <#= GetInterfaceFilterName(Model) #>|any = JSON.parse(ef.f);
+                let flt: <#= GetInterfaceFilterName(Model) #>|any = JSON.parse(ef.f['data']);
                 if(flt) {
                     this.filterDefs.forEach((fd: <#= uniqFilterDefModelClassName #>) => {
                         if(!this.<#= HiddenFilterExPropName #>.some((v: <#= filterResultModelClassName #>) => v.fltrName === fd.fltrName)) {
@@ -870,24 +1018,26 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
     constructor(public  <#= formRootService #>: <#= serviceClassName #>, public <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
 <#
         if(searchSchemas!= null) {
+            List<ModelViewSerializable> smds = new List<ModelViewSerializable>();
             foreach(var sch in searchSchemas) {
-                ModelViewSerializable searchModel = sch.Item4;
                 ModelViewSerializable m2mModel = sch.Item1;
-
-
 #>
                 public  <#= formServicePrefix + m2mModel.ViewName #>: <#= GetServiceClassName(m2mModel, viewServiceFolder) #>,
+<#
+                foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                    ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                    if(smds.Any(p => p == searchModel)) continue;
+                    smds.Add(searchModel);
+#>
                 public  <#= formServicePrefix + searchModel.ViewName #>: <#= GetServiceClassName(searchModel, viewServiceFolder) #>,
 <#
+                }
             }
         } // if(searchSchemas!= null) {...}
 #>    
             protected dialog: MatDialog, private cd: ChangeDetectorRef) {
-        if(this.tableIndexMenuItemsData.length > 0) {
-            this.curIndexMenuItemsData = this.tableIndexMenuItemsData[0];
-            this.onHiddenFilter();
-        }
-        this.tableMenuItemsData = this.tableIndexMenuItemsData;
+
+        this.redefTableIndexMenuItemsData();
     }
 
     onHiddenFilter() {
@@ -912,19 +1062,28 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
     }
     
     <#= onBeforeSqueryPropName #>(flt: <#= GetInterfaceFilterName(Model) #>|any) {
-        let r: {id: string; f: string|any; csc: string; pgi: number; pgsz: number} = {id: this.curIndexMenuItemsData.id, f: undefined, csc:this.<#= currentSortColumnPropName #>, pgi: this.currentPageIndex, pgsz: this.currentPageSize};
+        let r: {id: string; f: {[key: string]: string}|any; csc: string; pgi: number; pgsz: number} = {id: this.curIndexMenuItemsData.id, f: undefined, csc:this.<#= currentSortColumnPropName #>, pgi: this.currentPageIndex, pgsz: this.currentPageSize};
+        let kyvl: {[key: string]: string} = {};
         switch (r.id) {
 <#
         if(searchSchemas!= null) {
             if(searchSchemas.Count > 0) {
                 foreach(var sch in searchSchemas) {
-                    ModelViewSerializable searchModel = sch.Item4;
                     ModelViewSerializable m2mModel = sch.Item1;
 #>
             case '<#= m2mModel.ViewName #>':  
-                if(this.<#= searchSelectRowPropName + m2mModel.ViewName #>) {
-                    r.f = JSON.stringify(this.<#= searchSelectRowPropName + m2mModel.ViewName #>);
+<#
+                    foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                        ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                        ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetFirstPropOfFirstUniqueKey(searchModel);
+#>
+                if(this.<#= searchSelectRowPropName + m2mModel.ViewName + searchModel.ViewName #>) {
+                    kyvl['<#= searchModel.ViewName #>'] = JSON.stringify(this.<#= searchSelectRowPropName + m2mModel.ViewName + searchModel.ViewName #>);
                 }
+<#
+                    }
+#>
+                r.f = kyvl;
                 break;           
 <#
                 }
@@ -951,7 +1110,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 #>
             case '<#= caption #>':  
                 if(flt) {
-                    r.f = JSON.stringify(flt);
+                    kyvl['data'] = JSON.stringify(flt);
+                    r.f = kyvl;
                 }
                 break;           
 <#
@@ -960,7 +1120,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 #>
             case 'fullscann':
                 if(flt) {
-                    r.f = JSON.stringify(flt);
+                    kyvl['data'] = JSON.stringify(flt);
+                    r.f = kyvl;
                 }
                 break;           
             default:
@@ -971,6 +1132,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
     ngAfterViewInit() {
         setTimeout(() => {
             this.isOnInitCalled = true;
+            this.resetCurFltr();
             this.onFilter();
         });
     }    
@@ -1005,7 +1167,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         switch (this.curIndexMenuItemsData.id) {
 <#
             foreach(var sch in searchSchemas) {
-                ModelViewSerializable searchModel = sch.Item4;
                 ModelViewSerializable m2mModel = sch.Item1;
 #>
             case '<#= m2mModel.ViewName #>':  
@@ -1147,7 +1308,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 <#
         if(searchSchemas != null) {
             foreach(var sch in searchSchemas) {
-                ModelViewSerializable searchModel = sch.Item4;
                 ModelViewSerializable m2mModel = sch.Item1;
 #>
            (id === '<#= m2mModel.ViewName #>') ||
@@ -1172,11 +1332,13 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 <#
         if(searchSchemas != null) {
             foreach(var sch in searchSchemas) {
-                ModelViewSerializable searchModel = sch.Item4;
                 ModelViewSerializable m2mModel = sch.Item1;
+                foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                    ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
 #>
-                this.<#= searchSelectRowPropName + m2mModel.ViewName #> = null;
+                this.<#= searchSelectRowPropName + m2mModel.ViewName + searchModel.ViewName  #> = null;
 <#
+                }
             }
         }
 #>
@@ -1241,7 +1403,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 
 
 <#
-    // m2mModel, m2mForeignKey, List<Tuple< model.ForeignKey, m2mModel.additionalForeignKey >>, searchModel, searchFk, searchUk
     if(searchSchemas!= null) {
         if(searchSchemas.Count > 0) {
 #>
@@ -1255,29 +1416,40 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 <#
         }
         foreach(var sch in searchSchemas) {
-            ModelViewSerializable searchModel = sch.Item4;
-            ModelViewSerializable m2mModel = sch.Item1;
-            ModelViewUniqueKeySerializable searchUk = sch.Item6;
-            ModelViewForeignKeySerializable foreignKey2Model = sch.Item2;
 
 #>
 /////////////////////////////////////////
-    <#= searchSelectRowPropName + m2mModel.ViewName #>: <#= GetInterfaceName(searchModel) #> | any = null;
+<#
+            ModelViewSerializable m2mModel = sch.Item1;
+            ModelViewForeignKeySerializable foreignKey2Model = sch.Item2;
+            foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+#>
+    <#= searchSelectRowPropName + m2mModel.ViewName + searchModel.ViewName #>: <#= GetInterfaceName(searchModel) #> | any = null;
+<#
+            }
+#>
     <#= searchDoSelectRowMethodName + m2mModel.ViewName #>() {
         if(!this.isOnInitCalled) return;
-            let dtlflt: <#= GetInterfaceFilterName(m2mModel) #> | any = { page: this.currentPageIndex, pagesize: this.currentPageSize };
-        if (this.<#= searchSelectRowPropName + m2mModel.ViewName #>) {
-            let dfltrslt: Array<<#= filterResultModelClassName #>> = 
-                this.<#= formServicePrefix + m2mModel.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(this.<#= formServicePrefix + searchModel.ViewName #>.get<#= HiddenFilterByRowSuffix #>(this.<#= searchSelectRowPropName + m2mModel.ViewName #>, '<#= sch.Item5.NavigationName #>'));
-            if (Array.isArray(dfltrslt)) {
-                dfltrslt.forEach(e => {
-                    if(typeof dtlflt[e.fltrName] === 'undefined') {
-                        dtlflt[e.fltrName] = [];
-                    }
-                    dtlflt[e.fltrName].push(e.fltrValue);
-                });
+        let dtlflt: <#= GetInterfaceFilterName(m2mModel) #> | any = { page: this.currentPageIndex, pagesize: this.currentPageSize };
+        let isFltSet: boolean = true;
+<#
+            foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+#>
+        if(isFltSet) {
+            if (this.<#= searchSelectRowPropName + m2mModel.ViewName + searchModel.ViewName #>) {
+                let dfltrslt: Array<<#= filterResultModelClassName #>> = 
+                    this.<#= formServicePrefix + m2mModel.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(this.<#= formServicePrefix + searchModel.ViewName #>.get<#= HiddenFilterByRowSuffix #>(this.<#= searchSelectRowPropName + m2mModel.ViewName + searchModel.ViewName #>, '<#= kvp.Key.NavigationName #>'));
+                if (Array.isArray(dfltrslt)) {
+                    dfltrslt.forEach(e => { if(typeof dtlflt[e.fltrName] === 'undefined') { dtlflt[e.fltrName] = []; } dtlflt[e.fltrName].push(e.fltrValue); });
+                } else { isFltSet = false; }
+            } else { isFltSet = false; }
+        }
+<#
             }
-        } else {
+#>
+        if(!isFltSet) {
 <# 
     if(localize) {
 #>
@@ -1291,12 +1463,15 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 #>
         }
         // by requirements all common foreignkey props have the same names for <#= m2mModel.ViewName #> and <#= Model.ViewName #>
-        this.<#= HiddenFilterPropName #>.forEach((hf: <#= filterResultModelClassName #>) => { 
+        for (let fld in this.reqHiddenProps['<#= m2mModel.ViewName #>']) { 
+            let hf: <#= filterResultModelClassName #>|any = this.<#= HiddenFilterExPropName #>.find((f: <#= filterResultModelClassName #>) => { return f.fltrName === fld});
+            if(hf) {
                 if(typeof dtlflt[hf.fltrName] === 'undefined') {
                     dtlflt[hf.fltrName] = [];
                 }
                 dtlflt[hf.fltrName].push(hf.fltrValue);
-        });
+            }
+        }
         this.inQuery = true;
         this.<#= onBeforeSqueryPropName #>(null);
         this.<#= formServicePrefix + m2mModel.ViewName #>.<#= GetManyByRepPrimMethodNamePrefix #>(dtlflt).subscribe({
@@ -1371,52 +1546,55 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         });
     }
 
-    <#= afterPatchControlsPropName + m2mModel.ViewName #>(v: any) {
-        this.<#= searchSelectRowPropName + m2mModel.ViewName #> = v;
+    <#= afterObjSelPropName + m2mModel.ViewName #>(e:{v: any, i: number}) {
+        if(typeof e === 'undefined') return;
+        if(e === null) return;
+        switch(e.i) {
+<#
+            for(int i = 0; i < sch.Item3.Count; i++) {
+                KeyValuePair<ModelViewForeignKeySerializable,int> kvp = sch.Item3[i];
+                ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+#>
+            case <#= i #>:
+                this.<#= searchSelectRowPropName + m2mModel.ViewName + searchModel.ViewName #> = e.v;
+                break;
+<#
+            }
+#>
+        }
     }
     <#= tpAheadValPropName + m2mModel.ViewName #>(v: any, i: number): any {
         if(v) {
             switch(i) {
 <#
-            {
-                int ukprpcnt = 0;
-                foreach(ModelViewKeyPropertySerializable ukprp in searchUk.UniqueKeyProperties) {
-                   ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetScalarPropByOriginaPropName(ukprp.OriginalPropertyName, searchModel);
+            for(int i = 0; i < sch.Item3.Count; i++) {
+                KeyValuePair<ModelViewForeignKeySerializable,int> kvp = sch.Item3[i];
+                ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                ModelViewPropertyOfVwSerializable mvSclPrp = GetFirstPropOfFirstUniqueKey(searchModel);
 #>
-                case <#= ukprpcnt #>: 
-                 return v.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>;
+                case <#= i #>: 
+                    return v.<#=  GetTypeScriptPropertyName(mvSclPrp, searchModel) #>;
+                    break;
 <#
-                    ukprpcnt++;
-                }
             }
 #>
             }
-
-        } 
+        }
         return null;
     }
     <#= tpAheadFncPropName + m2mModel.ViewName #>(srv: any, wsfd: Array<<#= uniqFilterModelClassName #>>, value: any, i: number): Observable<Array<any>> {
-        let fltr: <#= GetInterfaceFilterName(searchModel) #> | any = { page: 0, pagesize: 15 };
+      switch(i) {
 <#
-            {
-                int ukprpcnt = 0;
-                foreach(ModelViewKeyPropertySerializable ukprp in searchUk.UniqueKeyProperties) {
-                   ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetScalarPropByOriginaPropName(ukprp.OriginalPropertyName, searchModel);
+            for(int i = 0; i < sch.Item3.Count; i++) {
+                KeyValuePair<ModelViewForeignKeySerializable,int> kvp = sch.Item3[i];
+                ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetFirstPropOfFirstUniqueKey(searchModel);
 #>
-        if(i > <#= ukprpcnt #>) { 
-            fltr.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#> = [wsfd[<#= ukprpcnt #>].fltrValue.value]; 
-            fltr.<#= GetFilterPropertyOperatorName(modelViewPropertyOfVwSerializable, Model, OperatorSufix)#> = ['<#= EqualOperator #>']
-        }
-         else if(i === <#= ukprpcnt #>) { 
-            fltr.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#> = [value]; 
-            fltr.<#= GetFilterPropertyOperatorName(modelViewPropertyOfVwSerializable, Model, OperatorSufix)#> = ['<#= LikeOperator #>']
-         }
-<#
-                    ukprpcnt++;
-                }
-            }
-#>
-        return srv.<#= GetManyByRepUnqMethodNamePrefix + searchUk.UniqueKeyName #>(fltr)
+        case <#= i #>: {
+          let fltr: <#= GetInterfaceFilterName(searchModel) #> | any = { page: 0, pagesize: 15 };
+          fltr.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#> = [value]; 
+          fltr.<#= GetFilterPropertyOperatorName(modelViewPropertyOfVwSerializable, Model, OperatorSufix)#> = ['<#= LikeOperator #>']
+          return srv.<#= GetManyByRepUnqMethodNamePrefix + searchModel.UniqueKeys[0].UniqueKeyName #>(fltr)
             .pipe(
                 switchMap((rslt: <#= GetInterfacePageName(searchModel) #>) => {
                     if (!(typeof rslt === 'undefined')) {
@@ -1432,23 +1610,29 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                 }),
                 catchError((x:any) =>of([]))
             );
+        }
+<#
+            }
+#>
+
+      }
+      return of([]);
     }
     <#= tpAheadCptnPropName + m2mModel.ViewName #>(v: any, i: number): string {
         let retStr = '';
         if(v) {
 <#
-            {
-                int ukprpcnt = 0;
-                foreach(ModelViewKeyPropertySerializable ukprp in searchUk.UniqueKeyProperties) {
-                   ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetScalarPropByOriginaPropName(ukprp.OriginalPropertyName, searchModel);
+            for(int i = 0; i < sch.Item3.Count; i++) {
+                KeyValuePair<ModelViewForeignKeySerializable,int> kvp = sch.Item3[i];
+                ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetFirstPropOfFirstUniqueKey(searchModel);
 #>
             if (!(typeof v.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#> === 'undefined')) {
                 if(!(v.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#> === null)) {
-                    retStr = retStr + ' ' + v.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>;
+                    retStr = retStr + v.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, searchModel)#>;
                 }
             }
 <#
-                }
             }
 #>
         } 
@@ -1491,9 +1675,11 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 /////////////////////////////////////////
 
     <#= searchSelectRowPropName + caption #>: <#= GetInterfaceName(Model) #> | any = null;
-    <#= afterPatchControlsPropName + caption #>(v: any) {
-        if(v) {
-            this.<#= searchSelectRowPropName + caption #> = v as <#= GetInterfaceName(Model) #>;
+    <#= afterObjSelPropName + caption #>(e:{v: any, i: number}) {
+        if(typeof e === 'undefined') return;
+        if(e === null) return;
+        if(e.v) {
+            this.<#= searchSelectRowPropName + caption #> = e.v as <#= GetInterfaceName(Model) #>;
         } else {
             this.<#= searchSelectRowPropName + caption #> = null;
         }
@@ -3541,11 +3727,10 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         error = "";
         return true;
     }
+////////////////////////////////////////////////////////
     ModelViewPropertyOfVwSerializable GetScalarPropByOriginaPropName(string origPropName, ModelViewSerializable model) { 
         if (string.IsNullOrEmpty(origPropName) || (model == null)) return null;
         if ((model.AllProperties == null) || (model.ScalarProperties == null)) return null;
-        ModelViewEntityPropertySerializable aprop = model.AllProperties.Where(p => p.OriginalPropertyName == origPropName).FirstOrDefault();
-        if(aprop == null) return null;
         ModelViewPropertyOfVwSerializable sprop = model.ScalarProperties.Where(p => 
                 (p.OriginalPropertyName == origPropName) && 
                 string.IsNullOrEmpty(p.ForeignKeyName)).FirstOrDefault();
@@ -3568,12 +3753,21 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         }
         return null;
     }
-    bool IsForeigKeyMapedToPrimKey(ModelViewForeignKeySerializable fk, ModelViewSerializable model) {
+    bool IsTableMatchesIndex(ModelViewSerializable model) {
+        if (model == null)  return false;
+        if ((model.ScalarProperties == null) || (model.PrimaryKeyProperties == null)) return false;
+        if ((model.ScalarProperties.Count != model.PrimaryKeyProperties.Count) || (model.ScalarProperties.Count < 1)) return false;
+        foreach(ModelViewKeyPropertySerializable pkp in model.PrimaryKeyProperties) {
+             if(GetScalarPropByOriginaPropName(pkp.OriginalPropertyName, model) == null) return false;
+        }
+        return true;
+    }
+    bool IsForeigKeyMapedToTailOfPrimKey(ModelViewForeignKeySerializable fk, ModelViewSerializable model) {
         if ((model == null) || (fk == null)) return false;
         if ((model.PrimaryKeyProperties == null) || (model.ForeignKeys == null) || (fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) return false;
         if ((model.PrimaryKeyProperties.Count < 1) || (fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1) || (fk.ForeignKeyProps.Count >= model.PrimaryKeyProperties.Count) ) return false;
-        foreach(ModelViewKeyPropertySerializable fkp in fk.ForeignKeyProps) {
-            if( !model.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == fkp.OriginalPropertyName) ) return false;
+        for(int i = 0; i < fk.ForeignKeyProps.Count; i++) {
+            if (fk.ForeignKeyProps[fk.ForeignKeyProps.Count - (1 + i)].OriginalPropertyName != model.PrimaryKeyProperties[model.PrimaryKeyProperties.Count - (1 + i)].OriginalPropertyName) return false;
         }
         return true;
     }
@@ -3586,25 +3780,60 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         }
         return true;
     }
-    bool IsForeigKeyMapedToScalarsEx(ModelViewForeignKeySerializable searchFk, ModelViewSerializable searchModel, ModelViewSerializable model) {
-        if ((searchModel == null) || (searchFk == null) || (model == null)) return false;
-        if ((searchModel.ScalarProperties == null) || (searchFk.ForeignKeyProps == null) || (model.ScalarProperties == null)) return false;
-        if ((searchFk.ForeignKeyProps.Count < 1) || (model.ScalarProperties.Count < 1)) return false;
-        foreach(ModelViewKeyPropertySerializable ukp in searchFk.ForeignKeyProps) {
-             ModelViewPropertyOfVwSerializable sprp = GetScalarPropByOriginaPropName(ukp.OriginalPropertyName, searchModel);
-             if(sprp == null) return false;
-             if(!model.ScalarProperties.Any(p => p.ViewPropertyName == sprp.ViewPropertyName)) return false;
+    bool IsForeigKeyMapedToScalarsEx(ModelViewForeignKeySerializable detailFk, ModelViewSerializable detailModel, ModelViewSerializable model) {
+        if ((detailModel == null) || (detailFk == null) || (model == null)) return false;
+        if ((detailModel.ScalarProperties == null) || (detailFk.ForeignKeyProps == null) || (model.ScalarProperties == null) || (detailFk.PrincipalKeyProps == null) || (model.PrimaryKeyProperties == null)) return false;
+        if ((detailFk.ForeignKeyProps.Count < 1) || (model.ScalarProperties.Count < 1) || (model.PrimaryKeyProperties.Count != detailFk.ForeignKeyProps.Count) || (detailFk.PrincipalKeyProps.Count != detailFk.ForeignKeyProps.Count) || (model.PrimaryKeyProperties.Count != detailFk.ForeignKeyProps.Count)) return false;
+        for(int i = 0; i < detailFk.ForeignKeyProps.Count; i++) {
+             ModelViewPropertyOfVwSerializable detailsprp = GetScalarPropByOriginaPropName(detailFk.ForeignKeyProps[i].OriginalPropertyName, detailModel);
+             if(detailsprp == null) return false;
+             ModelViewPropertyOfVwSerializable modelsprp = GetScalarPropByOriginaPropName(detailFk.PrincipalKeyProps[i].OriginalPropertyName, model);
+             if(modelsprp == null) return false;
+             if(modelsprp.ViewPropertyName != detailsprp.ViewPropertyName) return false;
         }
         return true;
     }
-
-    bool IsUniqKeyMapedToScalars(ModelViewUniqueKeySerializable searchUk, ModelViewSerializable searchModel) {
-        if ((searchModel == null) || (searchUk == null)) return false;
-        if ((searchModel.ScalarProperties == null) || (searchUk.UniqueKeyProperties == null)) return false;
-        if (searchUk.UniqueKeyProperties.Count < 1) return false;
-        foreach(ModelViewKeyPropertySerializable ukp in searchUk.UniqueKeyProperties) {
-             if(GetScalarPropByOriginaPropName(ukp.OriginalPropertyName, searchModel) == null) return false;
+    bool IsForeigKeyMapedToScalarsExEx(ModelViewForeignKeySerializable detailFk, ModelViewSerializable detailModel, ModelViewSerializable model) {
+        if ((detailModel == null) || (detailFk == null) || (model == null)) return false;
+        if ((detailModel.ScalarProperties == null) || (detailFk.ForeignKeyProps == null) || (model.ScalarProperties == null) || (detailFk.PrincipalKeyProps == null) || (model.ForeignKeys == null)) return false;
+        if ((detailFk.ForeignKeyProps.Count < 1) || (model.ScalarProperties.Count < 1) || (detailFk.PrincipalKeyProps.Count != detailFk.ForeignKeyProps.Count)) return false;
+        List<ModelViewForeignKeySerializable> modelFks =  model.ForeignKeys.Where(f => f.ViewName == detailFk.ViewName).ToList();
+        if(modelFks.Count < 1) return false;
+        for(int i = 0; i < detailFk.ForeignKeyProps.Count; i++) {
+             ModelViewPropertyOfVwSerializable detailsprp = GetScalarPropByOriginaPropName(detailFk.ForeignKeyProps[i].OriginalPropertyName, detailModel);
+             if(detailsprp == null) return false;
         }
+        foreach(ModelViewForeignKeySerializable modelFk in modelFks) {
+            if(modelFk.ForeignKeyProps == null) continue;
+            if(modelFk.ForeignKeyProps.Count != detailFk.ForeignKeyProps.Count) continue;
+            bool passed = false;
+            for(int i = 0; i < detailFk.ForeignKeyProps.Count; i++) {
+                 ModelViewPropertyOfVwSerializable detailsprp = GetScalarPropByOriginaPropName(detailFk.ForeignKeyProps[i].OriginalPropertyName, detailModel);
+                 ModelViewPropertyOfVwSerializable modelsprp = GetScalarPropByOriginaPropName(modelFk.ForeignKeyProps[i].OriginalPropertyName, model);
+                 passed = modelsprp != null;
+                 if(!passed) break;
+                 passed = modelsprp.ViewPropertyName == detailsprp.ViewPropertyName;
+                 if(!passed) break;
+            }
+            if (passed) return true;
+        }
+        return false;
+    }
+    bool IsOnePropForeigKey(ModelViewForeignKeySerializable searchFk) {
+        if(searchFk == null) return false;
+        if((searchFk.PrincipalKeyProps == null) || (searchFk.ForeignKeyProps == null )) return false;
+        if((searchFk.PrincipalKeyProps.Count == searchFk.ForeignKeyProps.Count) && (searchFk.ForeignKeyProps.Count == 1)) return true;
+        return false;
+    }
+    bool IsLookUpTable(ModelViewSerializable searchMdl) {
+        if (searchMdl == null) return false;
+        if ((searchMdl.ScalarProperties == null) || (searchMdl.PrimaryKeyProperties == null) || (searchMdl.UniqueKeys == null)) return false;
+        if ((searchMdl.ScalarProperties.Count != 2) || (searchMdl.PrimaryKeyProperties.Count != 1) || (searchMdl.UniqueKeys.Count != 1)) return false;
+        if (searchMdl.UniqueKeys[0].UniqueKeyProperties == null) return false;
+        if (searchMdl.UniqueKeys[0].UniqueKeyProperties.Count != 1) return false;
+        if (searchMdl.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName == searchMdl.PrimaryKeyProperties[0].OriginalPropertyName) return false;
+        if ((GetScalarPropByOriginaPropName(searchMdl.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName, searchMdl) == null) ||
+            (GetScalarPropByOriginaPropName(searchMdl.PrimaryKeyProperties[0].OriginalPropertyName, searchMdl) == null)) return false;
         return true;
     }
     bool IsUniqKeyMapedToScalarsEx(ModelViewUniqueKeySerializable searchUk, ModelViewSerializable searchModel, ModelViewSerializable model) {
@@ -3618,103 +3847,174 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         }
         return true;
     }
-    bool IsForeigKeyMapedToHeaderOfPrimKey(ModelViewForeignKeySerializable fk, ModelViewSerializable model) {
+    bool IsForeigKeyMapedToPrimKey(ModelViewForeignKeySerializable fk, ModelViewSerializable model) {
         if ((model == null) || (fk == null)) return false;
         if ((model.PrimaryKeyProperties == null) || (model.ForeignKeys == null) || (fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) return false;
         if ((model.PrimaryKeyProperties.Count < 1) || (fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1) || (fk.ForeignKeyProps.Count >= model.PrimaryKeyProperties.Count) ) return false;
-        for(int i = 0; i < fk.ForeignKeyProps.Count; i++) {
-            if (fk.ForeignKeyProps[i].OriginalPropertyName != model.PrimaryKeyProperties[i].OriginalPropertyName) return false;
+        foreach(ModelViewKeyPropertySerializable fkp in fk.ForeignKeyProps) {
+            if( !model.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == fkp.OriginalPropertyName) ) return false;
         }
         return true;
     }
-    bool IsForeigKeyMapedToTailOfPrimKey(ModelViewForeignKeySerializable fk, ModelViewSerializable model) {
-        if ((model == null) || (fk == null)) return false;
-        if ((model.PrimaryKeyProperties == null) || (model.ForeignKeys == null) || (fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) return false;
-        if ((model.PrimaryKeyProperties.Count < 1) || (fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1) || (fk.ForeignKeyProps.Count >= model.PrimaryKeyProperties.Count) ) return false;
-        for(int i = 0; i < fk.ForeignKeyProps.Count; i++) {
-            if (fk.ForeignKeyProps[fk.ForeignKeyProps.Count - (1 + i)].OriginalPropertyName != model.PrimaryKeyProperties[model.PrimaryKeyProperties.Count - (1 + i)].OriginalPropertyName) return false;
+    bool IsForeigKeyWithCorrectPropsOrder(ModelViewForeignKeySerializable otherFk, ModelViewSerializable m2mMdl) {
+        if ((m2mMdl == null) || (otherFk == null)) return false;
+        if ((m2mMdl.PrimaryKeyProperties == null) || (otherFk.ForeignKeyProps == null)) return false;
+        if ((m2mMdl.PrimaryKeyProperties.Count < 1) || (otherFk.ForeignKeyProps.Count < 1)) return false;
+        List<int> positions = new List<int>();
+        foreach(ModelViewKeyPropertySerializable fkp in otherFk.ForeignKeyProps) {
+            int index = m2mMdl.PrimaryKeyProperties.FindIndex(delegate(ModelViewKeyPropertySerializable pkp) { return pkp.OriginalPropertyName == fkp.OriginalPropertyName; });
+            if(index < 0) return false;
+            positions.Add(index);
+        }
+        positions.Sort();
+        for(int i = 0; i < positions.Count-1; i++) {
+            if(positions[i] + 1 != positions[i+1]) return false;
         }
         return true;
     }
-    bool IsForeigKeyMapedToMidleOfPrimKey(ModelViewForeignKeySerializable fk, ModelViewSerializable model) {
-        if ((model == null) || (fk == null)) return false;
-        if ((model.PrimaryKeyProperties == null) || (model.ForeignKeys == null) || (fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) return false;
-        if ((model.PrimaryKeyProperties.Count < 1) || (fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1) || (fk.ForeignKeyProps.Count >= model.PrimaryKeyProperties.Count) ) return false;
-        int k  = -1;
-        // from 1 till fk.PrimaryKeyProperties.Count-2
-        for(int i = 1; i < model.PrimaryKeyProperties.Count-1; i++) {
-            if(model.PrimaryKeyProperties[i].OriginalPropertyName == fk.ForeignKeyProps[0].OriginalPropertyName) {
-                k = i;
-                break;
-            }
+    int GetForeigKeyMaxPropsPosition(ModelViewForeignKeySerializable otherFk, ModelViewSerializable m2mMdl) {
+        if ((m2mMdl == null) || (otherFk == null)) return -1;
+        if ((m2mMdl.PrimaryKeyProperties == null) || (otherFk.ForeignKeyProps == null)) return -1;
+        if ((m2mMdl.PrimaryKeyProperties.Count < 1) || (otherFk.ForeignKeyProps.Count < 1)) return -1;
+        int rslt = 0;
+        foreach(ModelViewKeyPropertySerializable fkp in otherFk.ForeignKeyProps) {
+            int index = m2mMdl.PrimaryKeyProperties.FindIndex(delegate(ModelViewKeyPropertySerializable pkp) { return pkp.OriginalPropertyName == fkp.OriginalPropertyName; });
+            if(index < 0) return -1;
+            if(rslt < index) rslt = index;
         }
-        if (k < 0) return false;
-        if ((k + fk.ForeignKeyProps.Count) >= model.PrimaryKeyProperties.Count) return false;
-        for(int i = k; i < fk.ForeignKeyProps.Count; i++) {
-            if (fk.ForeignKeyProps[i].OriginalPropertyName != model.PrimaryKeyProperties[i].OriginalPropertyName) return false;
-        }
-        return true;
+        return rslt;
     }
-    List<Tuple<ModelViewSerializable,ModelViewForeignKeySerializable,List<Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>>,ModelViewSerializable,ModelViewForeignKeySerializable,ModelViewUniqueKeySerializable>> GetSearchResources(ModelViewSerializable model, DbContextSerializable context) {
+    List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> GetSearchResources(ModelViewSerializable model, DbContextSerializable context) {
         if ((context == null) || (model == null)) return null;
         if ((context.ModelViews == null) || (model.PrimaryKeyProperties == null) || (model.ScalarProperties == null) ) return null;
         if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1)) return null;
         List<ModelViewSerializable> m2mMdls = context.ModelViews.Where(p => (p.ForeignKeys.Any(f => f.ViewName == model.ViewName) && (p.ForeignKeys.Count > 1))).ToList();
-        if(m2mMdls.Count < 1) return null;
-        // m2mModel, m2mForeignKey, List<Tuple< model.ForeignKey, m2mModel.additionalForeignKey >>, searchModel, searchFk, searchUk
-        List<Tuple<ModelViewSerializable,ModelViewForeignKeySerializable,List<Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>>,ModelViewSerializable,ModelViewForeignKeySerializable,ModelViewUniqueKeySerializable>> result = null;
-        // return new List<Tuple<ModelViewSerializable,ModelViewForeignKeySerializable,List<Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>>,ModelViewSerializable,ModelViewForeignKeySerializable,ModelViewUniqueKeySerializable>>();
+        if(m2mMdls.Count < 1) {
+            return null;
+        }
+        // m2mModel, m2mForeignKey, List<Tuple< model.ForeignKey, m2mModel.additionalForeignKey >>, searchModel, searchFk, searchUk, ukpropsMpt, ukpropsToFrgn
+        List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> result = null;
         foreach(ModelViewSerializable m2mMdl in m2mMdls) {
-            if(m2mMdl.PrimaryKeyProperties == null) continue;
-            if(m2mMdl.PrimaryKeyProperties.Count < 1) continue;
+            if (!IsTableMatchesIndex(m2mMdl)) {
+                continue;
+            }
             List<ModelViewForeignKeySerializable> m2mFks = m2mMdl.ForeignKeys.Where(f => f.ViewName == model.ViewName).ToList();
             foreach(ModelViewForeignKeySerializable m2mFk in m2mFks) {
                 if(!IsForeigKeyMapedToTailOfPrimKey(m2mFk, m2mMdl)) continue;
-                if(!IsForeigKeyMapedToScalars(m2mFk, m2mMdl)) continue;
+                if(!IsForeigKeyMapedToScalarsEx(m2mFk, m2mMdl, model)) continue;
                 // m2mMdl - m2mModel, m2mFk - m2mForeignKey,
+                List<KeyValuePair<ModelViewForeignKeySerializable,int>> searchFks = null;
+                List<int> searchFkPosition = null;
                 foreach(ModelViewForeignKeySerializable searchFk in m2mMdl.ForeignKeys) {
-                    if(searchFk == m2mFk) continue;
+                    if (m2mFk == searchFk) continue;
+                    if (!IsOnePropForeigKey(searchFk)) continue;
                     ModelViewSerializable searchMdl = context.ModelViews.Where(mv => (mv.ViewName == searchFk.ViewName)).FirstOrDefault();
-                    if(searchMdl == null) continue;
-                    if(searchMdl.UniqueKeys == null) continue;
-                    if(searchMdl.UniqueKeys.Count < 1) continue;
-                    if(!IsForeigKeyMapedToHeaderOfPrimKey(searchFk, m2mMdl)) continue;
-                    if(!IsForeigKeyMapedToScalars(searchFk, m2mMdl)) continue;
-                    foreach(ModelViewUniqueKeySerializable searchUk in searchMdl.UniqueKeys) {
-                        if(!IsUniqKeyMapedToScalarsEx(searchUk, searchMdl, model)) continue;
-                        // searchMdl, searchFk, searchUk
-                        List<Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>> fkpairs = null;
-                        if(model.ForeignKeys != null) {
-                            foreach(ModelViewForeignKeySerializable modelFk in model.ForeignKeys) {
-                                if(!IsForeigKeyMapedToScalars(modelFk, model)) continue;
-                                List<ModelViewForeignKeySerializable> additionalM2mFks = m2mMdl.ForeignKeys.Where(f => f.ViewName == modelFk.ViewName).ToList();
-                                foreach(ModelViewForeignKeySerializable additionalM2mFk in additionalM2mFks) {
-                                    if(!IsForeigKeyMapedToScalarsEx(additionalM2mFk, m2mMdl, model)) continue;
-                                    if(fkpairs == null) {
-                                        fkpairs = new List<Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>>();
-                                    }
-                                    fkpairs.Add( new Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>(modelFk,additionalM2mFk)  );
-                                }
-                            }
-                        }
-                        if(result == null) {
-                            result = new List<Tuple<ModelViewSerializable,ModelViewForeignKeySerializable,List<Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>>,ModelViewSerializable,ModelViewForeignKeySerializable,ModelViewUniqueKeySerializable>>();
-                        }
-                        result.Add(
-                          new Tuple<ModelViewSerializable,ModelViewForeignKeySerializable,List<Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>>,ModelViewSerializable,ModelViewForeignKeySerializable,ModelViewUniqueKeySerializable>(
-                            m2mMdl, m2mFk, fkpairs, searchMdl, searchFk, searchUk
-                          ));
-                    }
+                    if (searchMdl == null) continue;
+                    if (!IsLookUpTable(searchMdl)) continue;
+                    if (!IsUniqKeyMapedToScalarsEx(searchMdl.UniqueKeys[0], searchMdl, model)) continue;
+                    if (searchFks == null) searchFks = new List<KeyValuePair<ModelViewForeignKeySerializable,int>>();
+                    searchFks.Add(new KeyValuePair<ModelViewForeignKeySerializable,int>( searchFk, GetForeigKeyMaxPropsPosition(searchFk, m2mMdl) ));
                 }
+                if(searchFks == null) {
+                    continue;
+                }
+                int lastValidPosition = m2mMdl.PrimaryKeyProperties.Count - model.PrimaryKeyProperties.Count - 1;
+                if(searchFks != null) {
+                    if(searchFks.Any(p => p.Value < 0)) continue;
+                    searchFks = searchFks.OrderBy(p => p.Value).ToList();
+                    bool IsCorrect = true;
+                    for(int i = 0; i < searchFks.Count-1; i++) {
+                        IsCorrect = searchFks[i].Value == searchFks[i+1].Value - 1;
+                        if(!IsCorrect) break;
+                    }
+                    if(!IsCorrect) {
+                        continue;
+                    }
+                    if(searchFks[searchFks.Count-1].Value != lastValidPosition) { 
+                        continue;
+                    }
+                    lastValidPosition = searchFks[0].Value - 1;
+                }
+                
+
+                List<KeyValuePair<ModelViewForeignKeySerializable,int>> otherFks = null;
+                foreach(ModelViewForeignKeySerializable otherFk in m2mMdl.ForeignKeys) {
+                    if (m2mFk == otherFk) continue;
+                    if (searchFks != null) {
+                        if(searchFks.Any(p => p.Key == otherFk)) continue;
+                    }
+                    if(!IsForeigKeyMapedToPrimKey(otherFk, m2mMdl)) continue;
+                    if(!IsForeigKeyMapedToScalarsExEx(otherFk, m2mMdl, model)) continue;
+                    if(!IsForeigKeyWithCorrectPropsOrder(otherFk, m2mMdl)) continue;
+                    int mxPs = GetForeigKeyMaxPropsPosition(otherFk, m2mMdl);
+                    if((mxPs < 0) || (mxPs > lastValidPosition)) continue;
+                    if(otherFks == null) otherFks = new List<KeyValuePair<ModelViewForeignKeySerializable,int>>();
+                    otherFks.Add(new KeyValuePair<ModelViewForeignKeySerializable,int>(otherFk, mxPs));
+                }
+                if(otherFks != null) {
+                    otherFks = otherFks.OrderBy(p => p.Value).ToList();
+                    bool IsCorrect = true;
+                    for(int i = 0; i < otherFks.Count-1; i++) {
+                        IsCorrect = otherFks[i].Value == otherFks[i+1].Value - otherFks[i].Key.ForeignKeyProps.Count;
+                        if(!IsCorrect) break;
+                    }
+                    if(!IsCorrect) continue;
+                    if(otherFks[otherFks.Count-1].Value != lastValidPosition) 
+                        continue;
+                    lastValidPosition = otherFks[0].Value - otherFks[0].Key.ForeignKeyProps.Count;
+                }
+                
+
+                List<KeyValuePair<ModelViewForeignKeySerializable,int>> externalFks = null;
+                foreach(ModelViewForeignKeySerializable externalFk in m2mMdl.ForeignKeys) {
+                    if (externalFk == m2mFk) continue;
+                    if (searchFks != null) {
+                        if(searchFks.Any(p => p.Key == externalFk)) continue;
+                    }
+                    if (otherFks != null) {
+                        if(otherFks.Any(p => p.Key == externalFk)) continue;
+                    }
+                    if(!IsForeigKeyMapedToPrimKey(externalFk, m2mMdl)) continue;
+                    if(!IsForeigKeyMapedToScalars(externalFk, m2mMdl)) continue;
+                    if(!IsForeigKeyWithCorrectPropsOrder(externalFk, m2mMdl)) continue;
+                    int mxPs = GetForeigKeyMaxPropsPosition(externalFk, m2mMdl);
+                    if((mxPs < 0) || (mxPs > lastValidPosition)) continue;
+                    if(externalFks == null) externalFks = new List<KeyValuePair<ModelViewForeignKeySerializable,int>>();
+                    externalFks.Add(new KeyValuePair<ModelViewForeignKeySerializable,int>(externalFk, mxPs));
+                }
+                if(externalFks != null) {
+                    externalFks = externalFks.OrderBy(p => p.Value).ToList();
+                    bool IsCorrect = true;
+                    for(int i = 0; i < externalFks.Count-1; i++) {
+                        IsCorrect = externalFks[i].Value == externalFks[i+1].Value - externalFks[i].Key.ForeignKeyProps.Count;
+                        if(!IsCorrect) break;
+                    }
+                    if(!IsCorrect) continue;
+                    if(externalFks[externalFks.Count-1].Value != lastValidPosition) continue;
+                    lastValidPosition = externalFks[0].Value - externalFks[0].Key.ForeignKeyProps.Count;
+                }
+                if(lastValidPosition != -1) continue;
+                int AllFkCount = (searchFks == null ? 0 : searchFks.Count) +
+                                (otherFks == null ? 0 : otherFks.Count) +
+                                (externalFks == null ? 0 : externalFks.Count);
+                if (AllFkCount != (m2mMdl.ForeignKeys.Count - 1)) continue;
+                if(result == null) {
+                    result = new List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>>();
+                }
+                result.Add(new Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>(
+                    m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                ));
             }
         }
         return result;
     }
-
     ModelViewPropertyOfVwSerializable GetModelScalarPropByKeyProp(ModelViewSerializable model, ModelViewKeyPropertySerializable pk) {
         ModelViewPropertyOfVwSerializable rslt = null;
         if ((model == null) || (pk == null)) return null;
         if (model.ScalarProperties == null) return null;
+        if (model.AllProperties == null) return null;
+        ModelViewEntityPropertySerializable aprop = model.AllProperties.Where(p => p.OriginalPropertyName == pk.OriginalPropertyName).FirstOrDefault();
+        if(aprop == null) return null;
         ModelViewPropertyOfVwSerializable scProp = 
             model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
         if (scProp != null) return scProp;
@@ -3742,6 +4042,17 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         }
         return null;
     }
-
+    ModelViewSerializable GetViewByName(DbContextSerializable context, string viewName) {
+        if(context == null) return null;
+        return context.ModelViews.Where(p => p.ViewName == viewName).FirstOrDefault();
+    }
+    ModelViewPropertyOfVwSerializable GetFirstPropOfFirstUniqueKey(ModelViewSerializable model) {
+        if(model == null) return null;
+        if(model.UniqueKeys == null) return null;
+        if(model.UniqueKeys.Count < 1) return null;
+        if(model.UniqueKeys[0].UniqueKeyProperties == null) return null;
+        if(model.UniqueKeys[0].UniqueKeyProperties.Count < 1) return null;
+        return GetScalarPropByOriginaPropName(model.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName, model);
+    }
 
 #>
