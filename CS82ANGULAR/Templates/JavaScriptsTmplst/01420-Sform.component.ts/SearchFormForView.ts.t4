@@ -311,7 +311,7 @@ import { <#= GetInterfaceFilterName(searchModel) #> } from '<#=  GetCrossCompone
                     }
                 }
                 if(!mdls.Any(p => p == m2mModel)) {
-                mdls.Add(m2mModel);
+                    mdls.Add(m2mModel);
 #>
 import { <#= GetServiceClassName(m2mModel, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, m2mModel.ViewName, viewServiceFolder) #>';
 import { <#= GetInterfaceName(m2mModel) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, m2mModel.ViewName, viewInterfaceFolder) #>';
@@ -644,11 +644,18 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                 this.curIndexMenuItemsData = this.tableIndexMenuItemsData[0];
             }
           } else this.curIndexMenuItemsData = this.tableIndexMenuItemsData[0];
-        }
+        } else this.curIndexMenuItemsData = undefined;
     }
     defineTableIndexMenuItemsData(): Array<<#= menuItemDataModelClassName #>> {
         let rslt: Array<<#= menuItemDataModelClassName #>> = [];
-        
+        let extHiddflt: Array<string> = [];
+        for (let fld in this.mdlMptProps) { 
+            if (!(this.<#= HiddenFilterExPropName #>.some((f: <#= filterResultModelClassName #>) => { return f.fltrName === this.mdlMptProps[fld]}))) {
+                extHiddflt.push(this.mdlMptProps[fld]);
+                
+            }
+        }
+        let hasNtExternal: boolean = extHiddflt.length === 0;
 <#
     { 
         // m2mMdl, m2mFk, searchFks, otherFks, externalFks
@@ -671,9 +678,14 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         if(doIns) {
             doIns = (this.reqHiddenProps['<#= m2mModel.ViewName #>'].filter(s => crrMDFP.includes(s))).length === crrMDFP.length;
             if(doIns) {
-                for (let fld in this.extHiddenProps['<#= m2mModel.ViewName #>']) { 
-                    doIns = this.<#= HiddenFilterExPropName #>.some((f: <#= filterResultModelClassName #>) => { return f.fltrName === this.extHiddenProps['<#= m2mModel.ViewName #>'][fld]});
-                    if(!doIns) break;
+                if(hasNtExternal) {
+                    for (let fld in this.extHiddenProps['<#= m2mModel.ViewName #>']) { 
+                        doIns = this.<#= HiddenFilterExPropName #>.some((f: <#= filterResultModelClassName #>) => { return f.fltrName === this.extHiddenProps['<#= m2mModel.ViewName #>'][fld]});
+                        if(!doIns) break;
+                    }
+                } else {
+                    doIns = extHiddflt.length === extHiddflt.length;
+                    if(doIns) doIns = extHiddflt.filter(s => this.extHiddenProps['<#= m2mModel.ViewName #>'].includes(s)).length === extHiddflt.length;
                 }
             }
         }
@@ -732,8 +744,9 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                     caption = uniqueKeys[i].UniqueKeyName;
                 }
 #>
-        rslt.push(
-        {id: '<#= scannByMode + caption #>', caption: this.<#= menuCaptionsPropName #>['<#= scannByMode + caption #>'], iconName: 'search', iconColor: 'primary', enabled: true, data: [
+        if(hasNtExternal) {
+          rslt.push(
+            {id: '<#= scannByMode + caption #>', caption: this.<#= menuCaptionsPropName #>['<#= scannByMode + caption #>'], iconName: 'search', iconColor: 'primary', enabled: true, data: [
 <#
                 int ukrows = uniqueKeys[i].UniqueKeyProperties.Count / 4;
                 ukrows *= 4;
@@ -746,7 +759,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                     cnt++;
                     if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
 #>
-           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100, fltrSrv: this.<#= formRootService #>},
+            {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100, fltrSrv: this.<#= formRootService #>},
 <#
                     }
                 }
@@ -756,28 +769,31 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                     cnt++;
                     if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
 #>
-           {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd: (100 / <#= theRest #>) - 1, fltrSm: (100 / <#= theHRest #>) - 1, fltrXs: 100, fltrSrv: this.<#= formRootService #>},
+            {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd: (100 / <#= theRest #>) - 1, fltrSm: (100 / <#= theHRest #>) - 1, fltrXs: 100, fltrSrv: this.<#= formRootService #>},
 <#
                     }
                 }
 #>
-        ]});
+            ]});
+        }
 <#
             } // if (!indIsCorrect) { ... } else { ... }
         } // for(int i = 0; i < uniqueKeys.Count; i++) { ... }
 #>
-        rslt.push(
-        {id: 'fullscann', caption: this.<#= menuCaptionsPropName #>['fullscann'], iconName: 'search', iconColor: 'primary', enabled: true, data: [
+        if(hasNtExternal) {
+          rslt.push(
+            {id: 'fullscann', caption: this.<#= menuCaptionsPropName #>['fullscann'], iconName: 'search', iconColor: 'primary', enabled: true, data: [
 <#
         foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in Model.ScalarProperties) {
             if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
 #>
-            {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100, fltrSrv: this.<#= formRootService #> },
+              {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100, fltrSrv: this.<#= formRootService #> },
 <#
             }
         }
 #>
-        ]});
+          ]});
+        }
 <#
     } //
 #>
@@ -788,7 +804,18 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         // m2mMdl, m2mFk, searchFks, otherFks, externalFks
         if(searchSchemas!= null) {
             if(searchSchemas.Count > 0) {
-                string mdlFldLst = "";
+                string mdlPrpsLst = "";
+                string mdlMptLst = "";
+                if(Model.ScalarProperties != null) {
+                    foreach(ModelViewPropertyOfVwSerializable msprp in Model.ScalarProperties) {
+                        if(msprp.IsUsedByfilter) {
+                            if(mdlPrpsLst == "")
+                                mdlPrpsLst = " \'" + GetTypeScriptPropertyName(msprp, Model) + "\'";
+                            else 
+                                mdlPrpsLst = mdlPrpsLst + ", \'" + GetTypeScriptPropertyName(msprp, Model) + "\'";
+                        }
+                    }
+                }
                 if(Model.ForeignKeys != null) {
                     List<ModelViewPropertyOfVwSerializable> addedSclPrp = new List<ModelViewPropertyOfVwSerializable>();
                     foreach(ModelViewForeignKeySerializable mdlFk in Model.ForeignKeys) {
@@ -797,16 +824,17 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                             ModelViewPropertyOfVwSerializable sclPrp = GetScalarPropByOriginaPropName(fkp.OriginalPropertyName, Model);
                             if(addedSclPrp.Any(p => p == sclPrp)) continue;
                             addedSclPrp.Add(sclPrp);
-                            if(mdlFldLst == "")
-                                mdlFldLst = " \'" + GetTypeScriptPropertyName(sclPrp, Model) + "\'";
+                            if(mdlPrpsLst == "")
+                                mdlPrpsLst = " \'" + GetTypeScriptPropertyName(sclPrp, Model) + "\'";
                             else 
-                                mdlFldLst = mdlFldLst + ", \'" + GetTypeScriptPropertyName(sclPrp, Model) + "\'";
+                                mdlPrpsLst = mdlPrpsLst + ", \'" + GetTypeScriptPropertyName(sclPrp, Model) + "\'";
                         }  // foreach(var fkp in mdlFk.ForeignKeyProps) { ... }
                     } // foreach(ModelViewForeignKeySerializable mdlFk in Model.ForeignKeys) { ... }
                 } // if(Model.ForeignKeys != null) { ... }
     
 #>
-    mdlDrctFkProps: Array<string> = [<#= mdlFldLst #>];
+    mdlDrctFkProps: Array<string> = [<#= mdlPrpsLst #>];
+    mdlMptProps: Array<string> = [<#= mdlPrpsLst #>];
     reqHiddenProps: {[key: string]: Array<string>} = {
 <#
                 foreach(var sch in searchSchemas) {
@@ -1062,6 +1090,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
     }
     
     <#= onBeforeSqueryPropName #>(flt: <#= GetInterfaceFilterName(Model) #>|any) {
+        if(typeof this.curIndexMenuItemsData === 'undefined') return;
+        if(this.curIndexMenuItemsData === null) return;
         let r: {id: string; f: {[key: string]: string}|any; csc: string; pgi: number; pgsz: number} = {id: this.curIndexMenuItemsData.id, f: undefined, csc:this.<#= currentSortColumnPropName #>, pgi: this.currentPageIndex, pgsz: this.currentPageSize};
         let kyvl: {[key: string]: string} = {};
         switch (r.id) {
@@ -1160,6 +1190,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 
     inQuery: boolean = false;
     onFilter() {
+        if(typeof this.curIndexMenuItemsData === 'undefined') return;
+        if(this.curIndexMenuItemsData === null) return;
 <#
         if(searchSchemas!= null) {
             if(searchSchemas.Count > 0) {

@@ -100,13 +100,13 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     if(localize) {
 #>
     <#= frasesPropName #>: {[key:string]: string}  = {
-        '<#= TitlePropName #>': $localize`:No title@@<#= componentClassName #>.No-title:No title`,
+        '<#= TitlePropName #>': $localize`:Delete <#= Model.Title #>@@<#= componentClassName #>.<#= "Delete" + Model.ViewName #>:Delete <#= Model.Title #>`,
     };
 <# 
     } else {
 #>
     <#= frasesPropName #>: {[key:string]: string}  = {
-        '<#= TitlePropName #>': 'No title',
+        '<#= TitlePropName #>': 'Delete <#= Model.Title #>',
     };
 <# 
     } 

@@ -31,7 +31,8 @@
     string searchDlgComponentClassName = GetComponentClassName(Model, sdlgComponentFolder);
     string searchModuleClassName = GetModuleClassName(Model, searchModuleFolder);
 
-    List<Tuple<ModelViewSerializable,ModelViewForeignKeySerializable,List<Tuple<ModelViewForeignKeySerializable, ModelViewForeignKeySerializable>>,ModelViewSerializable,ModelViewForeignKeySerializable,ModelViewUniqueKeySerializable>> searchSchemas =
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
         GetSearchResources(Model, Context);
 
 #>
@@ -47,7 +48,9 @@ import { <#=  searchDlgComponentClassName #> } from '<#= GetFolderName(Model, sd
 <#
         if(searchSchemas !=null) {
             foreach(var sch in searchSchemas) {
-                ModelViewSerializable searchModel = sch.Item4;
+                continue; // this is correct
+                var m2mFk = sch.Item2;
+                ModelViewSerializable searchModel = GetViewByName(Context, m2mFk.ViewName);
 #>
 import { <#= GetModuleClassName(searchModel, searchModuleFolder) #> } from '<#=  GetCrossComponentFolderName(Model, searchModuleFolder, Context, searchModel.ViewName, searchModuleFolder) #>';
 <#
@@ -69,7 +72,9 @@ import { <#= GetModuleClassName(searchModel, searchModuleFolder) #> } from '<#= 
 <#
         if(searchSchemas !=null) {
             foreach(var sch in searchSchemas) {
-                ModelViewSerializable searchModel = sch.Item4;
+                continue; // this is correct
+                var m2mFk = sch.Item2;
+                ModelViewSerializable searchModel = GetViewByName(Context, m2mFk.ViewName);
 #>
         <#= GetModuleClassName(searchModel, searchModuleFolder) #>,
 <#
