@@ -60,9 +60,9 @@
     List<string> viewNames = GetDetailViews(Model, Context, null);
     List<string> detailViewNames = new List<string>();
     foreach(string viewName in viewNames) {
-        ModelViewSerializable detail = GetViewByName(Context, viewName);
+        ModelViewSerializable detailView = GetViewByName(Context, viewName);
         string newPath = OutletNameValue + "2" + viewName + "/:" + HiddenFilterPrefix + "102";
-        List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detail, null);
+        List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
         detailViewNames.Clear();
         bool isM2m = false;
         if(IsTableMatchesIndex(detailView)) {
@@ -83,7 +83,7 @@
                     if(tmpSearchSchema.Item4 != null) continue;
                     if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
                     ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
-                    string newPath = OutletNameValue + "2" + viewToNavigate.ViewName + "/:" + HiddenFilterPrefix + "102";
+                    string newPathEx = OutletNameValue + "2" + viewToNavigate.ViewName + "/:" + HiddenFilterPrefix + "102";
                     if (!detailViewNames.Any(v => v == viewToNavigate.ViewName)) {
                         nodes.Add(new Tuple<ModelViewSerializable, string, int>(viewToNavigate, newPathEx, 2));
                         detailViewNames.Add(viewToNavigate.ViewName);
@@ -92,9 +92,9 @@
                 }
             }
 
-            if (!detailViewNames.Any(v => v == detail.ViewName)) {
-                nodes.Add(new Tuple<ModelViewSerializable, string, int>(detail, newPath, 2));
-                detailViewNames.Add(detail.ViewName);
+            if (!detailViewNames.Any(v => v == detailView.ViewName)) {
+                nodes.Add(new Tuple<ModelViewSerializable, string, int>(detailView, newPath, 2));
+                detailViewNames.Add(detailView.ViewName);
             }
         }
     }

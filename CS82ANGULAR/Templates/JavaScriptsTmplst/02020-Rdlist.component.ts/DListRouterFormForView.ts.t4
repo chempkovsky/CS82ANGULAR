@@ -232,7 +232,7 @@ import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Mode
 import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Model, Context, eventEmitterPubModelFolder, rdlistComponentFolder)#>';
 import { <#= itemHeightDataModelClassName #> } from '<#= GetCommonFolderName(Model, Context, itemHeightDataModelFolder, rdlistComponentFolder)#>';
 import { <#= GetInterfaceName(Model) #> } from '<#=  GetFolderName(Model, viewInterfaceFolder, rdlistComponentFolder) #>';
-import { <#= GetInterfaceFilterName(Model) #> } from '<#= GetCrossComponentFolderName(Model, rdlistComponentFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
+// import { <#= GetInterfaceFilterName(Model) #> } from '<#= GetCrossComponentFolderName(Model, rdlistComponentFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
 import { <#= messageDialogInterfaceName #> } from '<#=  GetCommonFolderName(Model, Context,  messageDialogInterfaceFolder, rdlistComponentFolder)#>';
 import { <#= messageDialogComponentClassName #> } from '<#=  GetCommonFolderName(Model, Context,  messageDialogComponentFolder, rdlistComponentFolder)#>';
 <#

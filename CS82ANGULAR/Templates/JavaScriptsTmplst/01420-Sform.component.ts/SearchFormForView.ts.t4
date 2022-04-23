@@ -631,6 +631,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
     filterDefs: Array<<#= uniqFilterDefModelClassName #>> = [];
     tableMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [];
     curIndexMenuItemsData: <#= menuItemDataModelClassName #>|any;
+    crIMIDid: string|any;
     tableIndexMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [];
     redefTableIndexMenuItemsData(): void {
         this.tableIndexMenuItemsData = this.defineTableIndexMenuItemsData();
@@ -645,21 +646,24 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
             }
           } else this.curIndexMenuItemsData = this.tableIndexMenuItemsData[0];
         } else this.curIndexMenuItemsData = undefined;
+        if(this.curIndexMenuItemsData) {
+            this.crIMIDid = this.curIndexMenuItemsData.id;
+        } else {
+            this.crIMIDid = undefined;
+        }
     }
     defineTableIndexMenuItemsData(): Array<<#= menuItemDataModelClassName #>> {
         let rslt: Array<<#= menuItemDataModelClassName #>> = [];
-        let extHiddflt: Array<string> = [];
-        for (let fld in this.mdlMptProps) { 
-            if (!(this.<#= HiddenFilterExPropName #>.some((f: <#= filterResultModelClassName #>) => { return f.fltrName === this.mdlMptProps[fld]}))) {
-                extHiddflt.push(this.mdlMptProps[fld]);
-                
-            }
-        }
-        let hasNtExternal: boolean = extHiddflt.length === 0;
+        let hasNtExternal: boolean = true;
 <#
     { 
         // m2mMdl, m2mFk, searchFks, otherFks, externalFks
         if(searchSchemas!= null) { 
+#>
+        let extHiddflt: Array<string> = [];
+        this.<#= HiddenFilterExPropName #>.forEach((f: <#= filterResultModelClassName #>) => {if(!this.mdlMptProps.some((s:string) => s === f.fltrName)){extHiddflt.push(f.fltrName);}});
+        hasNtExternal = extHiddflt.length === 0;
+<#
           if(searchSchemas.Count > 0) {
 #>
         let crrMDFP: Array<string> = [];
@@ -809,10 +813,10 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                 if(Model.ScalarProperties != null) {
                     foreach(ModelViewPropertyOfVwSerializable msprp in Model.ScalarProperties) {
                         if(msprp.IsUsedByfilter) {
-                            if(mdlPrpsLst == "")
-                                mdlPrpsLst = " \'" + GetTypeScriptPropertyName(msprp, Model) + "\'";
+                            if(mdlMptLst == "")
+                                mdlMptLst = " \'" + GetTypeScriptPropertyName(msprp, Model) + "\'";
                             else 
-                                mdlPrpsLst = mdlPrpsLst + ", \'" + GetTypeScriptPropertyName(msprp, Model) + "\'";
+                                mdlMptLst = mdlMptLst + ", \'" + GetTypeScriptPropertyName(msprp, Model) + "\'";
                         }
                     }
                 }
@@ -834,7 +838,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
     
 #>
     mdlDrctFkProps: Array<string> = [<#= mdlPrpsLst #>];
-    mdlMptProps: Array<string> = [<#= mdlPrpsLst #>];
+    mdlMptProps: Array<string> = [<#= mdlMptLst #>];
     reqHiddenProps: {[key: string]: Array<string>} = {
 <#
                 foreach(var sch in searchSchemas) {
@@ -1496,7 +1500,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         }
         // by requirements all common foreignkey props have the same names for <#= m2mModel.ViewName #> and <#= Model.ViewName #>
         for (let fld in this.reqHiddenProps['<#= m2mModel.ViewName #>']) { 
-            let hf: <#= filterResultModelClassName #>|any = this.<#= HiddenFilterExPropName #>.find((f: <#= filterResultModelClassName #>) => { return f.fltrName === fld});
+            let hf: <#= filterResultModelClassName #>|any = this.<#= HiddenFilterExPropName #>.find((f: <#= filterResultModelClassName #>) => { return f.fltrName === this.reqHiddenProps['<#= m2mModel.ViewName #>'][fld]});
             if(hf) {
                 if(typeof dtlflt[hf.fltrName] === 'undefined') {
                     dtlflt[hf.fltrName] = [];
@@ -1504,6 +1508,16 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                 dtlflt[hf.fltrName].push(hf.fltrValue);
             }
         }
+        for (let fld in this.extHiddenProps['<#= m2mModel.ViewName #>']) { 
+            let hf: <#= filterResultModelClassName #>|any = this.<#= HiddenFilterExPropName #>.find((f: <#= filterResultModelClassName #>) => { return f.fltrName === this.extHiddenProps['<#= m2mModel.ViewName #>'][fld]});
+            if(hf) {
+                if(typeof dtlflt[hf.fltrName] === 'undefined') {
+                    dtlflt[hf.fltrName] = [];
+                }
+                dtlflt[hf.fltrName].push(hf.fltrValue);
+            }
+        }
+        
         this.inQuery = true;
         this.<#= onBeforeSqueryPropName #>(null);
         this.<#= formServicePrefix + m2mModel.ViewName #>.<#= GetManyByRepPrimMethodNamePrefix #>(dtlflt).subscribe({

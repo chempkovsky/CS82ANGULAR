@@ -49,6 +49,7 @@
     string ActionParamViewMode          = "view";
     string ViewNameParamName            = "view";
     string NavigationParamName          = "nav";
+    string NavigationAddOnName          = "addon";
 
     // WebApi service's method names
 
@@ -69,6 +70,7 @@
 
     string AppSettingServicePropName    = "appGlblSettings";
     string formRootService              = "frmRootSrv";
+    string formServicePrefix            = "frmSrv";
 
     
     string RowCommandsSelector          = "row-commands";
@@ -201,7 +203,7 @@ import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Mode
 import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Model, Context, eventEmitterPubModelFolder, rlistComponentFolder)#>';
 import { <#= itemHeightDataModelClassName #> } from '<#= GetCommonFolderName(Model, Context, itemHeightDataModelFolder, rlistComponentFolder)#>';
 import { <#= GetInterfaceName(Model) #> } from '<#=  GetFolderName(Model, viewInterfaceFolder, rlistComponentFolder) #>';
-import { <#= GetInterfaceFilterName(Model) #> } from '<#= GetCrossComponentFolderName(Model, rlistComponentFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
+// import { <#= GetInterfaceFilterName(Model) #> } from '<#= GetCrossComponentFolderName(Model, rlistComponentFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
 import { <#= messageDialogInterfaceName #> } from '<#=  GetCommonFolderName(Model, Context,  messageDialogInterfaceFolder, rlistComponentFolder)#>';
 import { <#= messageDialogComponentClassName #> } from '<#=  GetCommonFolderName(Model, Context,  messageDialogComponentFolder, rlistComponentFolder)#>';
 
@@ -252,8 +254,6 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                     }
                 }
             }
-
-            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
                 if(isM2m) {
                     // m2mMdl, m2mFk, searchFks, otherFks, externalFks
@@ -392,6 +392,17 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
          {id: '<#= ActionParamDeleteSelMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'], iconName: 'delete_forever', iconColor: 'warn', enabled: true},
       ];
     constructor(protected route: ActivatedRoute, protected router: Router, protected  <#= formRootService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
+<#
+        if(searchSchemas!= null) {
+            List<ModelViewSerializable> smds = new List<ModelViewSerializable>();
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+#>
+                public  <#= formServicePrefix + m2mModel.ViewName #>: <#= GetServiceClassName(m2mModel, viewServiceFolder) #>,
+<#
+            }
+        } // if(searchSchemas!= null) {...}
+#>    
         public dialog: MatDialog, 
         protected cd: ChangeDetectorRef) {
     }
@@ -437,8 +448,8 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         if(this.<#= DepthParamName #> > 1) {
             let lhf: Array<<#= filterResultModelClassName #>> = [];
             if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
-                lhf = this.<#= formRootService #>.get<#= HiddenFilterAsFltRsltSuffix #>(JSON.parse(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]));
-            }
+                let phf: {[key: string]: {[key: string]: {[key: string]: any}}} | any =  JSON.parse(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
+                lhf = this.<#= formRootService #>.get<#= HiddenFilterAsFltRsltSuffix #>(phf);
 <#
     if (searchSchemas != null) {
         if(searchSchemas.Count > 0) {
@@ -457,6 +468,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         }
     }
 #>
+            }
             if(Array.isArray(lhf)) {
                 lhf.forEach((v:{fltrName: string, fltrValue: any}) => {
                     luid = luid + ':' + v.fltrName + ':' + v.fltrValue
@@ -582,8 +594,8 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     {
         foreach(string detailVwnm in detailViewNames) {
             if(detailViewNamesToExclude.Any(s => s == detailVwnm)) continue;
-            ModelViewSerializable detail = GetViewByName(Context, detailVwnm);
-            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detail, null);
+            ModelViewSerializable detailView = GetViewByName(Context, detailVwnm);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
             bool isM2m = false;
             if(IsTableMatchesIndex(detailView)) {
                 if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
@@ -611,7 +623,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 }
 
 #>
-        {caption: this.<#= frasesPropName #>['<#= detail.ViewName + foreignKey.NavigationName #>'], vw: '<#= detailVwnm #>', nv: '<#= foreignKey.NavigationName #>', addon: '<#= detailVwnm #>'},
+        {caption: this.<#= frasesPropName #>['<#= detailView.ViewName + foreignKey.NavigationName #>'], vw: '<#= detailVwnm #>', nv: '<#= foreignKey.NavigationName #>', addon: '<#= detailVwnm #>'},
 <#
             }
             

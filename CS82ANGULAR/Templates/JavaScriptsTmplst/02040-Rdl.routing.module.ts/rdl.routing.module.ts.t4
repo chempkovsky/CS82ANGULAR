@@ -118,7 +118,7 @@ const <#= rdllzFrases #>: {[key:string]: string} = {
             Tuple<ModelViewSerializable, string, int> node = nodes[k];
             ModelViewSerializable aModel = node.Item1;
             if(frviewNames.Any(p => p == aModel.ViewName)) continue;
-            frviewNames.Add(aModel.ViewName)
+            frviewNames.Add(aModel.ViewName);
 #>
         '<#= "List" + aModel.ViewName #>': $localize`:<#= aModel.PluralTitle #>@@<#= rdllzFrases #>.<#= aModel.ViewName #>:<#= aModel.PluralTitle#>`,
 <#
@@ -128,7 +128,7 @@ const <#= rdllzFrases #>: {[key:string]: string} = {
             Tuple<ModelViewSerializable, string, int> node = nodes[k];
             ModelViewSerializable aModel = node.Item1;
             if(frviewNames.Any(p => p == aModel.ViewName)) continue;
-            frviewNames.Add(aModel.ViewName)
+            frviewNames.Add(aModel.ViewName);
 #>
         '<#= "List" + aModel.ViewName #>': '<#= aModel.PluralTitle #>',
 <#

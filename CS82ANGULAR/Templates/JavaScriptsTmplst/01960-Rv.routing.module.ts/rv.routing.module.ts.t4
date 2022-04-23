@@ -94,7 +94,7 @@ const <#= rvlzFrases #>: {[key:string]: string} = {
             Tuple<ModelViewSerializable, string, int> node = nodes[k];
             ModelViewSerializable aModel = node.Item1;
             if(frviewNames.Any(p => p == aModel.ViewName)) continue;
-            frviewNames.Add(aModel.ViewName)
+            frviewNames.Add(aModel.ViewName);
 #>
         '<#= "View" + aModel.ViewName #>': $localize`:View <#= aModel.PluralTitle #>@@<#= rvlzFrases #>.<#= "View" +aModel.ViewName #>:View <#= aModel.Title#>`,
         '<#= "Add" + aModel.ViewName #>': $localize`:Add <#= aModel.Title #>  @@<#= rvlzFrases #>.<#= "Add" + aModel.ViewName #>:Add <#= aModel.Title#>`,
@@ -108,7 +108,7 @@ const <#= rvlzFrases #>: {[key:string]: string} = {
             Tuple<ModelViewSerializable, string, int> node = nodes[k];
             ModelViewSerializable aModel = node.Item1;
             if(frviewNames.Any(p => p == aModel.ViewName)) continue;
-            frviewNames.Add(aModel.ViewName)
+            frviewNames.Add(aModel.ViewName);
 #>
         '<#= "View" + aModel.ViewName #>': 'View <#= aModel.PluralTitle #>',
         '<#= "Add" + aModel.ViewName #>': 'Add <#= aModel.Title #>',

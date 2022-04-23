@@ -91,11 +91,8 @@
     string serviceClassName = GetServiceClassName(Model, viewServiceFolder);
     string filterResultModelClassName = GetModelClassName(Context, filterResultModelFolder);
     List<ModelViewPropertyOfVwSerializable> primKeys= GetModelPrimaryKeyProps(Model);
-
-
-    
     List<string> detailViewNames = GetDetailViews(Model, Context, null);
-    List<string> detailViewNamesToExclude = new List<string>(); // { "aspnetuserrolesView", "Bob", "Sam" };
+    List<string> detailViewNamesToExclude = new List<string>(); 
 
     // m2mMdl, m2mFk, searchFks, otherFks, externalFks
     Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
@@ -139,8 +136,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     {
         foreach(string detailVwnm in detailViewNames) {
             if(detailViewNamesToExclude.Any(s => s == detailVwnm)) continue;
-            ModelViewSerializable detail = GetViewByName(Context, detailVwnm);
-            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detail, null);
+            ModelViewSerializable detailView = GetViewByName(Context, detailVwnm);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
             bool isM2m = false;
             if(IsTableMatchesIndex(detailView)) {
                 if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
@@ -168,7 +165,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 }
 
 #>
-        '<#= detail.ViewName + foreignKey.NavigationName #>': $localize`:<#= detail.PluralTitle + "(" + foreignKey.NavigationName + ")" #>@@<#= componentClassName #>.<#= detail.PluralTitle + foreignKey.NavigationName  #>:<#= detail.PluralTitle + "(" + foreignKey.NavigationName + ")" #>`,
+        '<#= detailView.ViewName + foreignKey.NavigationName #>': $localize`:<#= detailView.PluralTitle + "(" + foreignKey.NavigationName + ")" #>@@<#= componentClassName #>.<#= detailView.PluralTitle + foreignKey.NavigationName  #>:<#= detailView.PluralTitle + "(" + foreignKey.NavigationName + ")" #>`,
 <#
             }
             
@@ -187,8 +184,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     {
         foreach(string detailVwnm in detailViewNames) {
             if(detailViewNamesToExclude.Any(s => s == detailVwnm)) continue;
-            ModelViewSerializable detail = GetViewByName(Context, detailVwnm);
-            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detail, null);
+            ModelViewSerializable detailView = GetViewByName(Context, detailVwnm);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
             bool isM2m = false;
             if(IsTableMatchesIndex(detailView)) {
                 if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
@@ -215,7 +212,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                     }
                 }
 #>
-        '<#= detail.ViewName + foreignKey.NavigationName #>': '<#= detail.PluralTitle + "(" + foreignKey.NavigationName + ")" #>',
+        '<#= detailView.ViewName + foreignKey.NavigationName #>': '<#= detailView.PluralTitle + "(" + foreignKey.NavigationName + ")" #>',
 <#
             }
             
@@ -347,8 +344,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     {
         foreach(string detailVwnm in detailViewNames) {
             if(detailViewNamesToExclude.Any(s => s == detailVwnm)) continue;
-            ModelViewSerializable detail = GetViewByName(Context, detailVwnm);
-            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detail, null);
+            ModelViewSerializable detailView = GetViewByName(Context, detailVwnm);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
             bool isM2m = false;
             if(IsTableMatchesIndex(detailView)) {
                 if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
@@ -357,7 +354,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                     }
                 }
             }
-            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
                 if(isM2m) {
                     // m2mMdl, m2mFk, searchFks, otherFks, externalFks
@@ -376,7 +372,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                     }
                 }
 #>
-        {caption:this.<#= frasesPropName #>['<#= detail.ViewName + foreignKey.NavigationName #>'], vw: '<#= detailVwnm #>', nv: '<#= foreignKey.NavigationName #>', addon: '<#= detailVwnm #>'},
+        {caption:this.<#= frasesPropName #>['<#= detailView.ViewName + foreignKey.NavigationName #>'], vw: '<#= detailVwnm #>', nv: '<#= foreignKey.NavigationName #>', addon: '<#= detailVwnm #>'},
 <#
             }
             
@@ -793,12 +789,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             return null;
         }
         return foreignKey.ScalarProperties.Where(p => (p.OriginalPropertyName == principalKeyProp.OriginalPropertyName) && (p.ForeignKeyNameChain == foreignKey.NavigationName)).FirstOrDefault();
-    }
-    ModelViewSerializable GetViewByName(DbContextSerializable context, string ViewName) {
-        if ( (context == null) || (string.IsNullOrEmpty(ViewName)) ) {
-            return null;
-        }
-        return context.ModelViews.Where(v => v.ViewName == ViewName).FirstOrDefault();
     }
     ModelViewPropertyOfVwSerializable GetScalarPropByOriginalPropertyNameAndForeignKeyNameChain(ModelViewSerializable model, string originalPropertyName, string foreignKeyNameChain) {
         if ( (model == null) || (string.IsNullOrEmpty(originalPropertyName)) ) {

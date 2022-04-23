@@ -159,7 +159,7 @@
         ModelViewSerializable m2mModel = sch.Item1;
 
 #>
-<app-<#= uniqFilterComponentSelectorCommonPart #> *ngIf="curIndexMenuItemsData.id === '<#= m2mModel.ViewName #>'"
+<app-<#= uniqFilterComponentSelectorCommonPart #> *ngIf="crIMIDid === '<#= m2mModel.ViewName #>'"
     [<#= captionSelector #>]="<#= captionPropName #>" 
     (<#= OnBackBtnSelector #>)="<#= OnBackBtnMethodName #>($event)"
     [<#= showBackBtnSelector #>]="<#= showBackBtnPropName #>"
@@ -200,7 +200,7 @@
             }
 
 #>
-<app-<#= uniqFilterComponentSelectorCommonPart #> *ngIf="curIndexMenuItemsData.id === '<#= scannByMode + caption #>'"
+<app-<#= uniqFilterComponentSelectorCommonPart #> *ngIf="crIMIDid === '<#= scannByMode + caption #>'"
     [<#= captionSelector #>]="<#= captionPropName #>" 
     (<#= OnBackBtnSelector #>)="<#= OnBackBtnMethodName #>($event)"
     [<#= showBackBtnSelector #>]="<#= showBackBtnPropName #>"
@@ -222,7 +222,7 @@
     } // for(int i = 0; i < uniqueKeys.Count; i++) {} else {}
 #>
 
-<app-<#= filterComponentSelectorCommonPart #> *ngIf="curIndexMenuItemsData.id === 'fullscann'"
+<app-<#= filterComponentSelectorCommonPart #> *ngIf="crIMIDid === 'fullscann'"
     [<#= captionSelector #>]="<#= captionPropName #>" 
     (<#= OnBackBtnSelector #>)="<#= OnBackBtnMethodName #>($event)"
     [<#= showBackBtnSelector #>]="<#= showBackBtnPropName #>"
