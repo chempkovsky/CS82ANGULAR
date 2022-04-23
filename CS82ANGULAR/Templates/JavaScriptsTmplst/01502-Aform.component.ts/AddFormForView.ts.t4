@@ -13,6 +13,9 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
     bool localize = Context.Localize;
+    string frasesPropName           = "frases";
+    string DisplayLabelProperty     = "Name";
+    string DisplayHintProperty      = "Prompt";
 
     string OperatorSufix        = "Oprtr";
     string EqualOperator        = "eq";
@@ -122,7 +125,6 @@
     
     string captionPropName                      = "caption";
     string captionSelector                      = "caption";
-    string frasesPropName                       = "frases";
 
 
     int CurrentInputTypeId = 1;
@@ -325,6 +327,16 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         '<#= captionPropName #>': $localize`:Review <#= Model.Title #>@@<#= componentClassName #>.Review-Item:Review <#= Model.Title #>`,
         '<#= TitlePropName #>': $localize`:<#= TitleCaptionVal #>@@<#= componentClassName #>.SelItem:<#= TitleCaptionVal #>`,
         'Not-all-masters': $localize`:Not all masters have been set@@<#= componentClassName #>.Not-all-masters:Not all masters have been set`,
+<#
+        for(int i = 0; i < Model.UIFormProperties.Count; i++) {
+            ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable = Model.UIFormProperties[i];
+#>
+        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label': $localize`:<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>@@<#= componentClassName #>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label:<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>`,
+        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint': $localize`:<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#>@@<#= componentClassName #>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint:<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#>`,
+        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder': $localize`:<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>@@<#= componentClassName #>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder:<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>`,
+<#
+        }
+#>
     }
 <# 
     } else {
@@ -334,6 +346,16 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         '<#= captionPropName #>': 'Add <#= Model.Title #>',
         '<#= TitlePropName #>': '<#= TitleCaptionVal #>'
         'Not-all-masters': 'Not all masters have been set',
+<#
+        for(int i = 0; i < Model.UIFormProperties.Count; i++) {
+            ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable = Model.UIFormProperties[i];
+#>
+        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label': '<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>',
+        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint': '<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#>'
+        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder': '<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>',
+<#
+        }
+#>
     }
 <# 
     }

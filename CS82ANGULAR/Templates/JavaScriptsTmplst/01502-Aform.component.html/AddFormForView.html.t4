@@ -14,6 +14,7 @@
 
 <#
     bool localize = Context.Localize;
+    string frasesPropName                       = "frases";
 
     string OperatorSufix = "Oprtr";
     string EqualOperator = "eq";
@@ -133,33 +134,13 @@
 
                 <input type="hidden"  formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
                 <mat-form-field  [appearance]="<#= AppearancePropName #>" fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#= GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#= GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#= percentEq100.ToString() #>">
-<# 
-    if(localize) {
-#>
-                    <mat-label i18n="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>@@<#= componentClassName#>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label"><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#></mat-label>
-<# 
-    } else {
-#>
-                    <mat-label><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#></mat-label>
-<# 
-    }
-#>
+                    <mat-label>{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</mat-label>
                     <mat-select [formControl]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">
                         <mat-option *ngFor="let aVal of <#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>;" [value]="aVal">{{ aVal.<#= GetComboControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #> }}</mat-option>
                     </mat-select>
                     <!-- <mat-error *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">{{getErrorMessage(<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>)}}</mat-error> -->
                     <mat-error *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</mat-error>
-<# 
-    if(localize) {
-#>
-                    <mat-hint align="end" i18n="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#>@@<#= componentClassName#>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint"><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#></mat-hint>
-<# 
-    } else {
-#>
-                    <mat-hint align="end"><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#></mat-hint>
-<# 
-    }
-#>
+                    <mat-hint align="end">{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint']}}</mat-hint>
                 </mat-form-field>
 <#
                     } /// if(modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Combo) {}
@@ -168,36 +149,14 @@
 
                 <input type="hidden"  formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
                 <mat-form-field  [appearance]="<#= AppearancePropName #>" fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#= GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#= GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#= percentEq100.ToString() #>">
-<# 
-    if(localize) {
-#>
-                    <mat-label i18n="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>@@<#= componentClassName#>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label"><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#></mat-label>
-                    <input type="text" i18n-placeholder="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>@@<#= componentClassName #>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder"
-                        placeholder="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>" matInput [formControl]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>" [matAutocomplete]="typeAhead<#= typeAheadNo #>">
-<# 
-    } else {
-#>
-                    <mat-label><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#></mat-label>
-                    <input type="text" placeholder="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>" matInput [formControl]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>" [matAutocomplete]="typeAhead<#= typeAheadNo #>">
-<# 
-    }
-#>
-                        <mat-autocomplete autoActiveFirstOption #typeAhead<#= typeAheadNo #>="matAutocomplete" [displayWith]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadDisplaySufix)#>">
+                    <mat-label>{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</mat-label>
+                    <input type="text" [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" matInput [formControl]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>" [matAutocomplete]="typeAhead<#= typeAheadNo #>">
+                    <mat-autocomplete autoActiveFirstOption #typeAhead<#= typeAheadNo #>="matAutocomplete" [displayWith]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadDisplaySufix)#>">
                         <mat-option *ngFor="let aVal of (<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> | async);" [value]="aVal">{{ aVal.<#= GetTypeaheadControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #> }}</mat-option>
                     </mat-autocomplete>
                     <!-- <mat-error *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>">{{getErrorMessage(<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>)}}</mat-error> -->
                     <mat-error *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</mat-error>
-<# 
-    if(localize) {
-#>
-                    <mat-hint align="end" i18n="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#>@@<#= componentClassName#>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint"><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#></mat-hint>
-<# 
-    } else {
-#>
-                    <mat-hint align="end"><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#></mat-hint>
-<# 
-    }
-#>
+                    <mat-hint align="end">{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint']}}</mat-hint>
                 </mat-form-field>
 <#
 
@@ -217,15 +176,9 @@
 <#
                             }
                             if(!IsBooleanInput(modelViewUIFormPropertySerializable, Model)) {
-    if(localize) {
 #>
-                    <mat-label i18n="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>@@<#= componentClassName#>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label"><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#></mat-label>
-<# 
-    } else {
-#>
-                    <mat-label><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#></mat-label>
-<# 
-    }
+                        <mat-label>{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</mat-label>
+<#
                             }
                             if (IsDateInput(modelViewUIFormPropertySerializable, Model)) {
                                 if (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.ReadOnly) {
@@ -247,13 +200,11 @@
                                 if(IsMemoInput(modelViewUIFormPropertySerializable, Model)) {
                                     if (hasButton || (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.ReadOnly)) {
 #>
-                        <textarea  matInput <# if(localize) { #> i18n-placeholder="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>@@<#= componentClassName #>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder" <# } #>
-                          placeholder="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>" formControlName="<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true"></textarea>
+                        <textarea  matInput [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true"></textarea>
 <#
                                     } else {
 #>
-                        <textarea  matInput <# if(localize) { #> i18n-placeholder="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>@@<#= componentClassName #>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder" <# } #>
-                          placeholder="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>" formControlName="<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"></textarea>
+                        <textarea  matInput [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"></textarea>
 <#
                                     }
                                 } else {
@@ -262,34 +213,20 @@
                         <input matInput style="display: none" >
 <#
                                         if (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.ReadOnly) { 
-    if(localize) {
 #>
-                    <mat-checkbox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"  [disableRipple]="true" i18n="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>@@<#= componentClassName#>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-checkbox"> <#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty) #> </mat-checkbox>
+                        <mat-checkbox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"  [disableRipple]="true" >{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</mat-checkbox>
 <#
-    } else {
-#>
-                    <mat-checkbox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"  [disableRipple]="true" > <#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty) #> </mat-checkbox>
-<#
-    }
                                         } else {
-    if(localize) {
 #>
-                    <mat-checkbox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" i18n="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>@@<#= componentClassName#>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-checkbox"> <#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty) #> </mat-checkbox>
+                        <mat-checkbox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" >{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</mat-checkbox>
 <#
-    } else {
-#>
-                    <mat-checkbox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" > <#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty) #> </mat-checkbox>
-<#
-    }
                                         }
                                     }
                                     else
 				                    {
                                         if (hasButton || (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.ReadOnly)) { 
 #>
-                        <input <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #> matInput 
-                            <# if(localize) { #> i18n-placeholder="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>@@<#= componentClassName #>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder" <# } #>
-                            placeholder="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true">
+                        <input <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #> matInput [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true">
 <#
                                             if (hasButton) {                           
 #>
@@ -300,9 +237,7 @@
                                             }
                                         } else {
 #>
-                        <input <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #> matInput 
-                            <# if(localize) { #> i18n-placeholder="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>@@<#= componentClassName #>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder" <# } #>
-                            placeholder="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+                        <input <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #> matInput [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
 <#
                                         }
                                     }
@@ -311,17 +246,7 @@
                             }
 #>
                         <mat-error *ngIf="<#=  GetExpressionForInvalid(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</mat-error>
-<# 
-    if(localize) {
-#>
-                    <mat-hint align="end" i18n="<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#>@@<#= componentClassName#>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint"><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#></mat-hint>
-<# 
-    } else {
-#>
-                    <mat-hint align="end"><#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#></mat-hint>
-<# 
-    }
-#>
+                        <mat-hint align="end">{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint']}}</mat-hint>
                     </mat-form-field>
 <#
                             if (hasButton && false) {
