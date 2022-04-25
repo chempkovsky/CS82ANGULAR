@@ -2258,7 +2258,31 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         }
         return GetViewNameByForeignNameChain(context, fk.ViewName, string.Join(".", foreignKeys, 1, foreignKeys.Length - 1));
     }
-
+    ModelViewPropertyOfVwSerializable GetScalarPropByOriginaPropName(string origPropName, ModelViewSerializable model) { 
+        if (string.IsNullOrEmpty(origPropName) || (model == null)) return null;
+        if ((model.AllProperties == null) || (model.ScalarProperties == null)) return null;
+        ModelViewPropertyOfVwSerializable sprop = model.ScalarProperties.Where(p => 
+                (p.OriginalPropertyName == origPropName) && 
+                string.IsNullOrEmpty(p.ForeignKeyName)).FirstOrDefault();
+        if(sprop != null) return sprop;
+        if(model.ForeignKeys == null) return null;
+        if(model.ForeignKeys.Count < 1) return null;
+        foreach(ModelViewForeignKeySerializable fk in model.ForeignKeys) {
+            if ((fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) continue;
+            if ((fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1)) continue;
+            for(int i = 0; i < fk.ForeignKeyProps.Count; i++) {
+                if(fk.ForeignKeyProps[i].OriginalPropertyName == origPropName) {
+                    sprop = model.ScalarProperties.Where(p => 
+                        (p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && 
+                        (p.ForeignKeyName == fk.NavigationName) && 
+                        (p.ForeignKeyName == p.ForeignKeyNameChain)
+                    ).FirstOrDefault();
+                    if(sprop != null) return sprop;
+                }
+            }
+        }
+        return null;
+    }
     string GetPrimKeyFilterForFindIndexMethod(DbContextSerializable context, string ViewName, string srcPrefix, string destPrefix) {
         if ( (context == null) || (string.IsNullOrEmpty(ViewName)) ) {
             return "false";
@@ -2274,8 +2298,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         }
         string result = "";
         foreach(ModelViewKeyPropertySerializable keyProp in model.PrimaryKeyProperties) {
-            ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable =
-                model.ScalarProperties.Where(p => p.ViewPropertyName == keyProp.ViewPropertyName).FirstOrDefault();
+            ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable = GetScalarPropByOriginaPropName(keyProp.OriginalPropertyName, model);
             if (modelViewPropertyOfVwSerializable != null) {
                 string proName = GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, model);
                 if(result != "") {
@@ -2369,7 +2392,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         }
         foreach(ModelViewKeyPropertySerializable modelViewKeyPropertySerializable in model.PrimaryKeyProperties) {
             ModelViewPropertyOfVwSerializable prop =
-                model.ScalarProperties.Where(p => p.ViewPropertyName == modelViewKeyPropertySerializable.ViewPropertyName).FirstOrDefault();
+                model.ScalarProperties.Where(p => (p.OriginalPropertyName == modelViewKeyPropertySerializable.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyName))).FirstOrDefault();
             if(prop != null) {
                 result.Add(prop);
             } else {
@@ -2457,99 +2480,6 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         }
         return GetModelPrimaryKeyProps( context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault() );
     }
-
-    List<ModelViewPropertyOfVwSerializable> GetForeignKeyProps(DbContextSerializable context, ModelViewSerializable model,
-                                            ModelViewUIFormPropertySerializable masterProp, ModelViewUIFormPropertySerializable detailProp, int inputType) {
-        List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
-        if ((context == null) || (masterProp == null) || (detailProp == null) || (model == null)) {
-            return result;
-        }
-        string masterForeignKeyNameChain = masterProp.ForeignKeyNameChain;
-        if(string.IsNullOrEmpty(masterForeignKeyNameChain)) {
-            return result;
-        }
-        string detailForeignKeyNameChain = detailProp.ForeignKeyNameChain;
-        if( ! string.IsNullOrEmpty(detailProp.ForeignKeyNameChain) ) {
-            masterForeignKeyNameChain = masterForeignKeyNameChain.Replace(detailProp.ForeignKeyNameChain + ".", "");
-        }
-        string[] fKchain = masterForeignKeyNameChain.Split(new string[] {"."}, StringSplitOptions.None);
-        if (fKchain.Length < 1) {
-            return result;
-        }
-        ModelViewSerializable detailModel =
-            GetViewForControlList(detailProp, model, context, inputType);
-        if(detailModel == null) {
-            return result;
-        }
-        if(detailModel.ForeignKeys == null) {
-            return result;
-        }
-        ModelViewForeignKeySerializable foreignKey =
-            detailModel.ForeignKeys.Where(f => f.NavigationName == fKchain[0]).FirstOrDefault();
-        if(foreignKey == null){
-            return result;
-        }
-        if(foreignKey.ForeignKeyProps == null) {
-            return result;
-        }
-        foreach(ModelViewKeyPropertySerializable fkProp in foreignKey.ForeignKeyProps) {
-            ModelViewPropertyOfVwSerializable scProp = 
-                detailModel.ScalarProperties.Where(p => p.ViewPropertyName == fkProp.ViewPropertyName).FirstOrDefault();
-            if (scProp != null) {
-                result.Add(scProp);
-            }
-        }
-        return result;
-    }
-
-    List<ModelViewPropertyOfVwSerializable> GetForeignKeyPropsBase(DbContextSerializable context, ModelViewSerializable model,
-                                            ModelViewUIFormPropertySerializable masterProp) {
-        List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
-        if ((context == null) || (masterProp == null) ||  (model == null)) {
-            return result;
-        }
-        string masterForeignKeyNameChain = masterProp.ForeignKeyNameChain;
-        if(string.IsNullOrEmpty(masterForeignKeyNameChain)) {
-            return GetModelPrimaryKeyProps(model);
-        } else {
-                if(model.ForeignKeys == null) {
-                    return result;
-                }
-                string[] fKchain = masterForeignKeyNameChain.Split(new string[] {"."}, StringSplitOptions.None);
-                if (fKchain.Length != 1) {
-                    return result;
-                }
-                ModelViewForeignKeySerializable foreignKey =
-                    model.ForeignKeys.Where(f => f.NavigationName == fKchain[0]).FirstOrDefault();
-                if(foreignKey == null) {
-                    return result;
-                }
-                if ((foreignKey.ForeignKeyProps == null) || (foreignKey.PrincipalKeyProps == null)) {
-                    return result;
-                }
-                if (foreignKey.ForeignKeyProps.Count !=  foreignKey.PrincipalKeyProps.Count) {
-                    return result;
-                }
-                for(int i = 0; i < foreignKey.ForeignKeyProps.Count; i++) {
-                    ModelViewKeyPropertySerializable fkProp = foreignKey.ForeignKeyProps[i];
-                    ModelViewPropertyOfVwSerializable scProp = 
-                        model.ScalarProperties.Where(p => (p.OriginalPropertyName == fkProp.OriginalPropertyName) && (string.IsNullOrEmpty( p.ForeignKeyName )) ).FirstOrDefault();
-                    if (scProp != null) {
-                        result.Add(scProp);
-                    } else {
-                        ModelViewKeyPropertySerializable pkProp = foreignKey.PrincipalKeyProps[i];
-                        scProp = 
-                            model.ScalarProperties.Where(p => (p.OriginalPropertyName == pkProp.OriginalPropertyName) && (p.ForeignKeyName == foreignKey.NavigationName) ).FirstOrDefault();
-                        if (scProp != null) {
-                            result.Add(scProp);
-                        }
-                    }
-                }
-        }
-        return result;
-    }
-
-
 
 
     List<ModelViewUIFormPropertySerializable> 
@@ -2730,29 +2660,6 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         return "pkp" + pkpModelViewUIFormPropertySerializable.ViewPropertyName;
     }
 
-    List<ModelViewPropertyOfVwSerializable> GetAllForeignKeyProps(ModelViewSerializable model) {
-        List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
-        if(model == null) {
-            return result;
-        }
-        if ((model.ForeignKeys == null) || (model.ScalarProperties == null)) {
-            return result;
-        }
-        foreach(ModelViewForeignKeySerializable fk in model.ForeignKeys) {
-            if (!string.IsNullOrEmpty(fk.ViewName)) {
-                if (fk.ForeignKeyProps != null) {
-                    foreach(ModelViewKeyPropertySerializable fkProp in fk.ForeignKeyProps) {
-                        ModelViewPropertyOfVwSerializable sclrProp =
-                            model.ScalarProperties.Where(p => p.ViewPropertyName == fkProp.ViewPropertyName).FirstOrDefault();
-                        if(sclrProp != null) {
-                            result.Add(sclrProp);
-                        }
-                    }
-                }
-            }
-        }
-        return result;
-    }
     ModelViewPropertyOfVwSerializable GetOnValChangeViewPropName(DbContextSerializable context, ModelViewSerializable model,
                                 ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable, ModelViewUIFormPropertySerializable dependentScalarProp, int inputType) {
         if((dependentScalarProp == null) || (modelViewUIFormPropertySerializable == null)) {
@@ -2797,206 +2704,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         }
         return result;
     }
-    ModelViewPropertyOfVwSerializable GetTypeAheadMasterProp(ModelViewSerializable model, ModelViewPropertyOfVwSerializable dependentScalarProp, ModelViewSerializable master) {
-        if ( (dependentScalarProp == null) || (model == null) || (master == null) ) {
-            return null;
-        }
-        //string masterForeignKeyNameChain = "";
-        //if(!string.IsNullOrEmpty( dependentScalarProp.ForeignKeyName )) {
-            //if (dependentScalarProp.ForeignKeyName != dependentScalarProp.ForeignKeyNameChain) {
-                //masterForeignKeyNameChain = dependentScalarProp.ForeignKeyNameChain.Replace(dependentScalarProp.ForeignKeyName + ".", "");
-            //}
-        //}
-        //if (string.IsNullOrEmpty(masterForeignKeyNameChain)) {
-            return
-                master.ScalarProperties.Where(p => (p.OriginalPropertyName == dependentScalarProp.OriginalPropertyName) && string.IsNullOrEmpty(p.ForeignKeyNameChain)).FirstOrDefault();
-        //}
-        //return
-            //master.ScalarProperties.Where(p => (p.OriginalPropertyName == dependentScalarProp.OriginalPropertyName) && (p.ForeignKeyNameChain == masterForeignKeyNameChain)).FirstOrDefault();
-    }
-    ModelViewPropertyOfVwSerializable GetTypeAheadMasterPropEx(ModelViewSerializable model, ModelViewUIFormPropertySerializable dependentScalarProp, ModelViewSerializable master) {
-        if ( (dependentScalarProp == null) || (model == null) || (master == null) ) {
-            return null;
-        }
-        ModelViewPropertyOfVwSerializable prop =
-            model.ScalarProperties.Where(p => p.ViewPropertyName == dependentScalarProp.ViewPropertyName).FirstOrDefault();
-        return GetTypeAheadMasterProp(model, prop, master);
-    }
 
-    List<ModelViewPropertyOfVwSerializable> GetForeignKeyPropByIndirectPrimaryKeyProp(ModelViewSerializable model, string foreignKeyNameChain, ModelViewSerializable master, DbContextSerializable context, ModelViewPropertyOfVwSerializable masterProp)
-        {
-            if ((model == null) || (master == null) || (context == null) || (masterProp == null))
-            {
-                return null;
-            }
-            if ((master.ScalarProperties == null) || (master.PrimaryKeyProperties == null) || (model.ScalarProperties == null) || (model.PrimaryKeyProperties == null) || (model.ForeignKeys == null))
-            {
-                return null;
-            }
-            if (string.IsNullOrEmpty(foreignKeyNameChain))
-            {
-                return null;
-            }
-            string[] fKchain = foreignKeyNameChain.Split(new string[] { "." }, StringSplitOptions.None);
-            if (fKchain.Length < 1)
-            {
-                return null;
-            }
 
-            List<ModelViewSerializable> modelChain = new List<ModelViewSerializable>();
-            ModelViewSerializable currModel = model;
-            ModelViewForeignKeySerializable fk = null;
-            modelChain.Add(currModel);
-            for (int i = 0; i < fKchain.Length; i++)
-            {
-                if ((currModel.ForeignKeys == null) || (currModel.ScalarProperties == null))
-                {
-                    return null;
-                }
-                fk = currModel.ForeignKeys.Where(f => f.NavigationName == fKchain[i]).FirstOrDefault();
-                if (fk == null)
-                {
-                    return null;
-                }
-                if (string.IsNullOrEmpty(fk.ViewName))
-                {
-                    return null;
-                }
-                currModel = context.ModelViews.Where(m => m.ViewName == fk.ViewName).FirstOrDefault();
-                if (currModel == null)
-                {
-                    return null;
-                }
-                modelChain.Add(currModel);
-            }
-            if (currModel != master)
-            {
-                if ((currModel.RootEntityFullClassName != master.RootEntityFullClassName) || (currModel.RootEntityUniqueProjectName != master.RootEntityUniqueProjectName))
-                {
-                    return null;
-                }
-                masterProp = currModel.ScalarProperties.Where(p => (p.OriginalPropertyName == masterProp.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyName))).FirstOrDefault();
-            }
-
-            List<ModelViewPropertyOfVwSerializable> currProps = new List<ModelViewPropertyOfVwSerializable>();
-            List<ModelViewPropertyOfVwSerializable> destProps = new List<ModelViewPropertyOfVwSerializable>();
-            currProps.Add(masterProp);
-            for (int i = fKchain.Length - 1; i >= 0; i--)
-            {
-                destProps.Clear();
-                fk = modelChain[i].ForeignKeys.Where(f => f.NavigationName == fKchain[i]).FirstOrDefault();
-                if (fk == null)
-                {
-                    return null;
-                }
-                foreach (ModelViewPropertyOfVwSerializable currProp in currProps)
-                {
-                    ModelViewPropertyOfVwSerializable destProp = null;
-                    if ((fk.PrincipalKeyProps != null) && (fk.ForeignKeyProps != null))
-                    {
-                        ModelViewKeyPropertySerializable primKey = fk.PrincipalKeyProps.Where(p => p.ViewPropertyName == currProp.ViewPropertyName).FirstOrDefault();
-                        if (primKey != null)
-                        {
-                            int ind = fk.PrincipalKeyProps.IndexOf(primKey);
-                            if ((ind > -1) && (ind < fk.ForeignKeyProps.Count))
-                            {
-                                destProp =
-                                    modelChain[i].ScalarProperties.Where(p => p.ViewPropertyName == fk.ForeignKeyProps[ind].ViewPropertyName).FirstOrDefault();
-                                if (destProp != null)
-                                {
-                                    if (!destProps.Contains(destProp))
-                                    {
-                                        destProps.Add(destProp);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    destProp =
-                        modelChain[i].ScalarProperties.Where(p => (p.OriginalPropertyName == currProp.OriginalPropertyName) && (p.ForeignKeyName == fKchain[i])).FirstOrDefault();
-                    if (destProp != null)
-                    {
-                        if (!destProps.Contains(destProp))
-                        {
-                            destProps.Add(destProp);
-                        }
-                    }
-                }
-                if (destProps.Count < 1)
-                {
-                    return null;
-                }
-                else
-                {
-                    List<ModelViewPropertyOfVwSerializable> tmp = destProps;
-                    destProps = currProps;
-                    currProps = tmp;
-                }
-            }
-            return currProps;
-        }
-    List<ModelViewPropertyOfVwSerializable> GetForeignKeyPropByIndirectPrimaryKeyPropEx(ModelViewSerializable model, ModelViewUIFormPropertySerializable uiProp, ModelViewSerializable master, DbContextSerializable context, ModelViewPropertyOfVwSerializable masterProp)
-        {
-            if ((uiProp == null) || (model == null) || (master == null) || (context == null) || (masterProp == null))
-            {
-                return null;
-            }
-            if (model.ScalarProperties == null)
-            {
-                return null;
-            }
-            ModelViewPropertyOfVwSerializable sUiProp = model.ScalarProperties.Where(p => p.ViewPropertyName == uiProp.ViewPropertyName).FirstOrDefault();
-            return GetForeignKeyPropByIndirectPrimaryKeyProp(model, sUiProp.ForeignKeyNameChain, master, context, masterProp);
-        }
-
-     List<string> GetHiddenFilterDisablingFields(ModelViewSerializable model, DbContextSerializable context, string foreignKeyNameChain, List<string> result)
-        {
-            if (result == null)
-            {
-                result = new List<string>();
-            }
-            if( string.IsNullOrEmpty(foreignKeyNameChain) || (model == null) || (context == null))
-            {
-                return result;
-            }
-            string masterNm = GetViewNameByForeignNameChain(context, model.ViewName, foreignKeyNameChain);
-            if (string.IsNullOrEmpty(masterNm))
-            {
-                return result;
-            }
-            ModelViewSerializable master = context.ModelViews.Where(m => m.ViewName == masterNm).FirstOrDefault();
-            if (master == null)
-            {
-                return result;
-            }
-            if ((master.PrimaryKeyProperties != null) && (master.ScalarProperties != null))
-            {
-                foreach(ModelViewKeyPropertySerializable pkProp in master.PrimaryKeyProperties)
-                {
-                    ModelViewPropertyOfVwSerializable masterProp = master.ScalarProperties.Where(s => s.ViewPropertyName == pkProp.ViewPropertyName).FirstOrDefault();
-                    List<ModelViewPropertyOfVwSerializable> props =
-                        GetForeignKeyPropByIndirectPrimaryKeyProp(model, foreignKeyNameChain, master, context, masterProp);
-                    if(props != null)
-                    {
-                        foreach(ModelViewPropertyOfVwSerializable prop in props)
-                        {
-                            string propName =  GetTypeScriptPropertyName(prop, model);
-                            if(!result.Contains(propName))
-                            {
-                                result.Add(propName);
-                            }
-                        }
-                    }
-                }
-            }
-            string[] fKchain = foreignKeyNameChain.Split(new string[] { "." }, StringSplitOptions.None);
-            if (fKchain.Length < 2)
-            {
-                return result;
-            }
-            string newChain = string.Join(".", fKchain, 0, fKchain.Length - 1);
-            return GetHiddenFilterDisablingFields(model, context, newChain, result);
-        }
     bool IsBooleanInput(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model) {
         if((prop == null) || (model == null)) return false;
         ModelViewPropertyOfVwSerializable sclrProp = model.ScalarProperties.Where(p => p.ViewPropertyName == prop.ViewPropertyName).FirstOrDefault();

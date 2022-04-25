@@ -238,7 +238,7 @@
         }
         foreach(ModelViewKeyPropertySerializable modelViewKeyPropertySerializable in model.PrimaryKeyProperties) {
             ModelViewPropertyOfVwSerializable prop =
-                model.ScalarProperties.Where(p => p.ViewPropertyName == modelViewKeyPropertySerializable.ViewPropertyName).FirstOrDefault();
+                model.ScalarProperties.Where(p => (p.OriginalPropertyName == modelViewKeyPropertySerializable.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyName))).FirstOrDefault();
             if(prop != null) {
                 result.Add(prop);
             } else {
