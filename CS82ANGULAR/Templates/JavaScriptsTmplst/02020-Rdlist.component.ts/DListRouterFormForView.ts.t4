@@ -459,12 +459,11 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         protected cd: ChangeDetectorRef) {
     }
     permMask: number = 0;
+    extfltrOn: boolean = false;
     ngOnInit() {
         this.<#= AppearancePropName #> = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
         let luid = '<#= componentClassName #>';
         this.permMask = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= Model.ViewName #>');
-        this.tableMenuItemsData[0].enabled = ((this.permMask & 8) === 8) <# if (!Model.IsWebApiAdd) { #> && false <# } #>;
-        this.tableMenuItemsData[1].enabled = ((this.permMask & 2) === 2) <# if (!Model.IsWebApiDelete) { #> && false <# } #>;
         this.isPostNavApplied = false;
         if (!(typeof this.route.snapshot.data === 'undefined')) {
             if (!(this.route.snapshot.data === null)) {
@@ -515,6 +514,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
 #>
                 if(lhf.length === 0) {
                     lhf = lhf.concat(this.<#= formServicePrefix + m2mModel.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(phf));
+                    this.extfltrOn = this.extfltrOn || (lhf.length > 0);
                 }
 <#
             }
@@ -540,10 +540,12 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
             }
         }
         
+        this.tableMenuItemsData[0].enabled = ((this.permMask & 8) === 8) && (!this.extfltrOn) <# if (!Model.IsWebApiAdd) { #> && false <# } #>;
+        this.tableMenuItemsData[1].enabled = ((this.permMask & 2) === 2) && (!this.extfltrOn) <# if (!Model.IsWebApiDelete) { #> && false <# } #>;
 
-        this.rowMenuItemsData[0].enabled = this.rowMenuItemsData[0].enabled && ((this.permMask & 4) === 4) <# if (!Model.IsWebApiUpdate) { #> && false <# } #>; // modify
-        this.rowMenuItemsData[1].enabled = this.rowMenuItemsData[1].enabled && ((this.permMask & 2) === 2) <# if (!Model.IsWebApiDelete) { #> && false <# } #>; // delete
-        this.rowMenuItemsData[2].enabled = this.rowMenuItemsData[2].enabled <# if (!Model.IsWebApiSelectOneByPrimarykey) { #> && false <# } #>; // view
+        this.rowMenuItemsData[0].enabled = this.rowMenuItemsData[0].enabled && (!this.extfltrOn) && ((this.permMask & 4) === 4) <# if (!Model.IsWebApiUpdate) { #> && false <# } #>; // modify
+        this.rowMenuItemsData[1].enabled = this.rowMenuItemsData[1].enabled && (!this.extfltrOn) && ((this.permMask & 2) === 2) <# if (!Model.IsWebApiDelete) { #> && false <# } #>; // delete
+        this.rowMenuItemsData[2].enabled = this.rowMenuItemsData[2].enabled && (!this.extfltrOn) <# if (!Model.IsWebApiSelectOneByPrimarykey) { #> && false <# } #>; // view
 <#
     {
         if (detailViewNames.Count > 0)  {
