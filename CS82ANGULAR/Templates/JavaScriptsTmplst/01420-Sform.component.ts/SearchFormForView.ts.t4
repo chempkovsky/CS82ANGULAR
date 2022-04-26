@@ -756,11 +756,22 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                         }
                     }
                 }
-                if(UkPropsUsedByFltrCount > 0) {
+                string requiredForeigKeyPropList = GetRequiredForeignKeyProps(uniqueKeys[i], Model);
+                if ((UkPropsUsedByFltrCount > 0) && (requiredForeigKeyPropList != null)) {
 #>
         if(hasNtExternal) {
-          rslt.push(
-            {id: '<#= scannByMode + caption #>', caption: this.<#= menuCaptionsPropName #>['<#= scannByMode + caption #>'], iconName: 'search', iconColor: 'primary', enabled: true, data: [
+          let reqFkPrps: Array<string> = <#= requiredForeigKeyPropList #>;
+          if(this.<#= HiddenFilterExPropName #>.length === reqFkPrps.length) {
+              let insmi: boolean = true;
+              for(let vmfn of reqFkPrps) {
+                if(! this.<#= HiddenFilterExPropName #>.some((hfp: <#= filterResultModelClassName #>) => vmfn === hfp.fltrName)) {
+                    insmi = false;
+                    break;
+                }
+              }
+              if(insmi) {
+                rslt.push(
+                  {id: '<#= scannByMode + caption #>', caption: this.<#= menuCaptionsPropName #>['<#= scannByMode + caption #>'], iconName: 'search', iconColor: 'primary', enabled: true, data: [
 <#
                 int ukrows = UkPropsUsedByFltrCount / 4;
                 ukrows *= 4;
@@ -776,7 +787,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                     if(cnt >= ukrows) break;
                     cnt++;
 #>
-            {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100, fltrSrv: this.<#= formRootService #>},
+                  {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100, fltrSrv: this.<#= formRootService #>},
 <#
                 }
                 cnt = 0;
@@ -788,11 +799,13 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                     if(cnt < ukrows) continue;
                     cnt++;
 #>
-            {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd: (100 / <#= theRest #>) - 1, fltrSm: (100 / <#= theHRest #>) - 1, fltrXs: 100, fltrSrv: this.<#= formRootService #>},
+                  {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd: (100 / <#= theRest #>) - 1, fltrSm: (100 / <#= theHRest #>) - 1, fltrXs: 100, fltrSrv: this.<#= formRootService #>},
 <#
                 }
 #>
-            ]});
+                ]});
+              }
+            }
         }
 <#
                 } // if(UkPropsUsedByFltrCount > 0) { ... }
@@ -4001,6 +4014,54 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         if (model.ForeignKeys == null) return false;
         if (!string.IsNullOrEmpty(sclProp.ForeignKeyName)) return true;
         return model.ForeignKeys.Any(f => f.ForeignKeyProps.Any(p => p.OriginalPropertyName == sclProp.OriginalPropertyName) );
+    }
+
+    string GetRequiredForeignKeyProps(ModelViewUniqueKeyOfVwSerializable ukofVm, ModelViewSerializable model) {
+        if ((model == null) || (ukofVm == null)) return null;
+        if (ukofVm.UniqueKeyProperties == null)    return null;
+        if (model.ForeignKeys == null) return "[]";
+        if(ukofVm.IsPrimary) {
+            if(model.PrimaryKeyProperties == null) return null;
+        } else {
+            if(model.UniqueKeys.Where(u => u.UniqueKeyName == ukofVm.UniqueKeyName).FirstOrDefault() == null) return null;
+        }
+
+        int k = -1;
+        List<ModelViewForeignKeySerializable>  tmpfklst = null;
+        List<ModelViewForeignKeySerializable>  fklst = new List<ModelViewForeignKeySerializable>();
+        for(int i = 0; i < ukofVm.UniqueKeyProperties.Count; i++) {
+            ModelViewPropertyOfVwSerializable scPrp = ukofVm.UniqueKeyProperties[i];
+            if(string.IsNullOrEmpty( scPrp.ForeignKeyName )) {
+                tmpfklst = model.ForeignKeys.Where(f => f.ForeignKeyProps.Any(p => (p.OriginalPropertyName == scPrp.OriginalPropertyName))).ToList();
+            } else {
+                if(scPrp.ForeignKeyNameChain != scPrp.ForeignKeyName) return null; // this is incorrect data
+                tmpfklst = model.ForeignKeys.Where(f => f.NavigationName == scPrp.ForeignKeyName).ToList();
+            }
+            if(tmpfklst.Count < 1) {
+                if (fklst.Count < 1) k = i;
+            } else {
+                foreach(ModelViewForeignKeySerializable fk in tmpfklst) {
+                    if(!fklst.Any(f=>f==fk)) fklst.Add(fk);
+                }
+            }
+        }
+        if(k == -1) return null;
+        string result = "";
+        foreach(ModelViewForeignKeySerializable fk in fklst) {
+            foreach(ModelViewKeyPropertySerializable fkp in fk.ForeignKeyProps) {
+                ModelViewPropertyOfVwSerializable sp = GetScalarPropByOriginaPropName(fkp.OriginalPropertyName, model);
+                if(sp == null) return null;
+                int ui = ukofVm.UniqueKeyProperties.IndexOf(sp);
+                if(ui < 0) return null;
+                if(ui > k) return null;
+                if(result == "") {
+                   result = sp.ViewPropertyName;
+                } else {
+                   result = result + "," + sp.ViewPropertyName;
+                }
+            }
+        }
+        return "["+ result + "]";
     }
 
 #>
