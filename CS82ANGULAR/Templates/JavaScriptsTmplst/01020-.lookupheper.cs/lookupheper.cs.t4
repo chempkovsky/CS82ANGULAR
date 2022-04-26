@@ -690,65 +690,6 @@ namespace <#= destinationNameSpace #> {
             return FirstLetterToLower(prop.ViewPropertyName) + operatorSufix;
         }
     }
-    ModelViewPropertyOfVwSerializable GetModelScalarPropByKeyProp(ModelViewSerializable model, ModelViewKeyPropertySerializable pk) {
-        ModelViewPropertyOfVwSerializable rslt = null;
-        if ((model == null) || (pk == null)) return null;
-        if (model.ScalarProperties == null) return null;
-        ModelViewPropertyOfVwSerializable scProp = 
-            model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
-        if (scProp != null) return scProp;
-        if (model.ForeignKeys != null) {
-            foreach(ModelViewForeignKeySerializable fk in model.ForeignKeys) {
-                scProp = null;
-                if ((fk.ForeignKeyProps != null) && (fk.PrincipalKeyProps != null)) {
-                    int cnt = fk.ForeignKeyProps.Count;
-                    if (cnt < fk.PrincipalKeyProps.Count)
-                    {
-                        cnt = fk.PrincipalKeyProps.Count;
-                    }
-                    for(int i = 0; i < cnt; i++)
-                    {
-                        if(fk.ForeignKeyProps[i].OriginalPropertyName == pk.OriginalPropertyName)
-                        {
-                            scProp=
-                                model.ScalarProperties.Where(p =>
-                                ((p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (p.ForeignKeyNameChain == fk.NavigationName))).FirstOrDefault();
-                        }
-                        if(scProp != null) return scProp;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-    List<ModelViewUniqueKeyOfVwSerializable> GetModelUniqueKeys(ModelViewSerializable model, List<ModelViewUniqueKeyOfVwSerializable> rsltKeys) {
-        if((model == null) || (rsltKeys == null)) return rsltKeys;
-        if ((model.UniqueKeys == null) || (model.ScalarProperties == null)) return rsltKeys;
-        foreach(ModelViewUniqueKeySerializable uk in model.UniqueKeys) {
-            if(uk.UniqueKeyProperties == null) continue;
-            if(uk.UniqueKeyProperties.Count < 1) continue;
-            ModelViewUniqueKeyOfVwSerializable rslt = null; 
-            foreach(ModelViewKeyPropertySerializable pk in uk.UniqueKeyProperties) {
-                ModelViewPropertyOfVwSerializable scProp = 
-                    model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
-                if(scProp == null) {
-                    scProp = GetModelScalarPropByKeyProp(model, pk);
-                }
-                if(scProp != null) {
-                    if(rslt == null) rslt = new ModelViewUniqueKeyOfVwSerializable() {
-                        UniqueKeyName = uk.UniqueKeyName,
-                        IsPrimary = false,
-                        UniqueKeyProperties = new List<ModelViewPropertyOfVwSerializable>()
-                    };
-                    rslt.UniqueKeyProperties.Add(scProp);
-                }
-            }
-            if(rslt != null) {
-                rsltKeys.Add(rslt);
-            }
-        }
-        return rsltKeys;
-    }
     ModelViewUniqueKeyOfVwSerializable GetModelPrimKeyFromList(List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys) {
         if(uniqueKeys == null) return null;
         return uniqueKeys.Where(u => u.IsPrimary).FirstOrDefault();
@@ -821,34 +762,9 @@ namespace <#= destinationNameSpace #> {
             return result;
         }
         foreach(ModelViewKeyPropertySerializable modelViewKeyPropertySerializable in model.PrimaryKeyProperties) {
-            ModelViewPropertyOfVwSerializable prop =
-                model.ScalarProperties.Where(p => (p.OriginalPropertyName == modelViewKeyPropertySerializable.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyName))).FirstOrDefault();
+            ModelViewPropertyOfVwSerializable prop = GetScalarPropByOriginaPropName(modelViewKeyPropertySerializable.OriginalPropertyName, model);
             if(prop != null) {
                 result.Add(prop);
-            } else {
-                if(model.ForeignKeys != null) {
-                    foreach(ModelViewForeignKeySerializable modelViewForeignKeySerializable in model.ForeignKeys) {
-                        if ((modelViewForeignKeySerializable.PrincipalKeyProps != null) && (modelViewForeignKeySerializable.ForeignKeyProps != null)) {
-                            for(int i = 0; i < modelViewForeignKeySerializable.ForeignKeyProps.Count; i++) {
-                                if(modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName == modelViewKeyPropertySerializable.OriginalPropertyName ) {
-                                    if(i < modelViewForeignKeySerializable.PrincipalKeyProps.Count) {
-                                        prop =
-                                        model.ScalarProperties.Where(p => 
-                                            (p.OriginalPropertyName == modelViewForeignKeySerializable.PrincipalKeyProps[i].OriginalPropertyName)
-                                            &&
-                                            (p.ForeignKeyName == modelViewForeignKeySerializable.NavigationName)
-                                        ).FirstOrDefault();
-                                    }
-                                }
-                                if(prop != null) break;
-                            }
-                        }
-                        if(prop != null) break;
-                    }
-                    if(prop != null) {
-                        result.Add(prop);
-                    }
-                }
             }
         }
         return result;

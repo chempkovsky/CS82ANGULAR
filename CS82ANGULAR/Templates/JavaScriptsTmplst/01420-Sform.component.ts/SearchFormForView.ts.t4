@@ -3197,34 +3197,9 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
             return result;
         }
         foreach(ModelViewKeyPropertySerializable modelViewKeyPropertySerializable in model.PrimaryKeyProperties) {
-            ModelViewPropertyOfVwSerializable prop =
-                model.ScalarProperties.Where(p => (p.OriginalPropertyName == modelViewKeyPropertySerializable.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyName))).FirstOrDefault();
+            ModelViewPropertyOfVwSerializable prop = GetScalarPropByOriginaPropName(modelViewKeyPropertySerializable.OriginalPropertyName, model);
             if(prop != null) {
                 result.Add(prop);
-            } else {
-                if(model.ForeignKeys != null) {
-                    foreach(ModelViewForeignKeySerializable modelViewForeignKeySerializable in model.ForeignKeys) {
-                        if ((modelViewForeignKeySerializable.PrincipalKeyProps != null) && (modelViewForeignKeySerializable.ForeignKeyProps != null)) {
-                            for(int i = 0; i < modelViewForeignKeySerializable.ForeignKeyProps.Count; i++) {
-                                if(modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName == modelViewKeyPropertySerializable.OriginalPropertyName ) {
-                                    if(i < modelViewForeignKeySerializable.PrincipalKeyProps.Count) {
-                                        prop =
-                                        model.ScalarProperties.Where(p => 
-                                            (p.OriginalPropertyName == modelViewForeignKeySerializable.PrincipalKeyProps[i].OriginalPropertyName)
-                                            &&
-                                            (p.ForeignKeyName == modelViewForeignKeySerializable.NavigationName)
-                                        ).FirstOrDefault();
-                                    }
-                                }
-                                if(prop != null) break;
-                            }
-                        }
-                        if(prop != null) break;
-                    }
-                    if(prop != null) {
-                        result.Add(prop);
-                    }
-                }
             }
         }
         return result;
@@ -3606,33 +3581,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
             ModelViewPropertyOfVwSerializable prop = GetScalarPropByOriginaPropName(modelViewKeyPropertySerializable.OriginalPropertyName, model);
             if(prop != null) {
                 result.Add(prop);
-            } else {
-                if(model.ForeignKeys != null) {
-                    foreach(ModelViewForeignKeySerializable modelViewForeignKeySerializable in model.ForeignKeys) {
-                        if ((modelViewForeignKeySerializable.PrincipalKeyProps != null) && (modelViewForeignKeySerializable.ForeignKeyProps != null)) {
-                            if(modelViewForeignKeySerializable.PrincipalKeyProps.Count == modelViewForeignKeySerializable.ForeignKeyProps.Count) {
-                                for(int i = 0; i < modelViewForeignKeySerializable.ForeignKeyProps.Count; i++) {
-                                    if(modelViewForeignKeySerializable.ForeignKeyProps[i].OriginalPropertyName == modelViewKeyPropertySerializable.OriginalPropertyName ) {
-                                        if(i < modelViewForeignKeySerializable.PrincipalKeyProps.Count) {
-                                            prop =
-                                            model.ScalarProperties.Where(p => 
-                                                (p.OriginalPropertyName == modelViewForeignKeySerializable.PrincipalKeyProps[i].OriginalPropertyName)
-                                                &&
-                                                // next line is correct: we do not look for deeper
-                                                (p.ForeignKeyNameChain == modelViewForeignKeySerializable.NavigationName)
-                                            ).FirstOrDefault();
-                                        }
-                                    }
-                                    if(prop != null) break;
-                                }
-                            }
-                        }
-                        if(prop != null) break;
-                    }
-                    if(prop != null) {
-                        if (!result.Any(p => p == prop)) result.Add(prop);
-                    }
-                }
             }
         }
         return result;
