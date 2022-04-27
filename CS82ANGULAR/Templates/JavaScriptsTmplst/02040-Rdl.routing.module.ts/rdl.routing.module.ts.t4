@@ -38,6 +38,7 @@
     string OutletNamePrefix             = "oltnm";
     string DlgLstDetailPrefix           = "DLDT";
     string OutletParent                 = "oltParent";
+    string IsDetailPropName             = "isdtl";
 
     string MaxHeightPropSelector        = "max-height";
     string MaxHeightPropName            = "maxHeight";
@@ -163,10 +164,10 @@ const routes: Routes = [
             if(!string.IsNullOrEmpty(fileNm_rdl) && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rdlLazyModuleFolder)))) {
 #>
     { 
-        outlet: '<#=  OutletNameValue #>',
+//        outlet: '<#=  OutletNameValue #>',
         path: '<#= node.Item2 #>', 
         loadChildren: () => import('<#= fileNm_rdl #>').then(m => m.<#= GetModuleClassName(aModel, rdlLazyModuleFolder) #>),
-        data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: <#= rdllzFrases #>['<#= "List" + aModel.ViewName #>'], <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
+        data: { <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: <#= rdllzFrases #>['<#= "List" + aModel.ViewName #>'], <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
         canActivate: [<#= appSettingServiceClassName + "Activator" #>],
     },
 
@@ -185,15 +186,9 @@ const routes: Routes = [
 //
 <#
         } // if(aModel.IsWebApiSelectManyWithPagination) { } else { ... }
-
-
-
-
     } // for(int k = nodes.Count-1; k > -1; k--) {
 }
 #>
-
-
 
     ]
   }

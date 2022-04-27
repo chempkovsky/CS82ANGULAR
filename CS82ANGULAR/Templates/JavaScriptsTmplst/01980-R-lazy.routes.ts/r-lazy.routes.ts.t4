@@ -92,7 +92,7 @@
                             if(tmpSearchSchema.Item4 != null) continue;
                             if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
                             ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
-                            string newPathEx = CurrPath + "/" + viewName;
+                            string newPathEx = CurrPath + "/" + viewToNavigate.ViewName;
                             if (CurrDepth > 1) {
                                 newPathEx = newPathEx +"/:" + HiddenFilterPrefix + CurrDepth.ToString();
                             }

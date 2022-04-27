@@ -957,6 +957,10 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
           this.redefTableIndexMenuItemsData();
           this.onHiddenFilter();
           this.reset<#= externalFilterPropName #>();
+          if(this.isOnInitCalled) {
+            this.resetCurFltr();
+            this.onFilter();
+          }
         } 
 
     public <#= externalFilterRsltPropName #>: Array<<#= filterResultModelClassName #>> = [];
@@ -993,6 +997,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         let mi: <#= menuItemDataModelClassName #>|any = this.tableIndexMenuItemsData.find((e: <#= menuItemDataModelClassName #>) => e.id === ef.id);
         if(mi) {
             this.curIndexMenuItemsData = mi;
+            this.crIMIDid = this.curIndexMenuItemsData.id;
             this.onHiddenFilter();
         } else {
             return;
@@ -1408,6 +1413,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 #>
                 this.<#= externalFilterRsltPropName #> = [];
                 this.curIndexMenuItemsData = mi;
+                this.crIMIDid = this.curIndexMenuItemsData.id;
                 this.onHiddenFilter();
             }
             return;

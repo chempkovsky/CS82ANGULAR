@@ -23,6 +23,7 @@
 
     string NavPrefix                    = "NavPrefix";
     string OutletNmPropName             = "outletNm";
+    string IsDetailPropName             = "isdtl";
 
     string HiddenFilterAsFltRsltSuffix  = "HiddenFilterAsFltRslt";
     string DepthParamName               = "depth"; 
@@ -56,6 +57,7 @@
     string formRootService              = "frmRootSrv";
     string TitlePropName                = "title";
     string ShowDetailsPropName          = "showDetails";
+    string NavBackToMasterPropName      = "NavBackToMaster";
 
     string containerMenuItemsPropName           = "contMenuItems";
     string containerMenuItemsSelector           = "cont-menu-items";
@@ -131,6 +133,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 #>
     <#= frasesPropName #>: {[key:string]: string}  = {
         '<#= TitlePropName #>': $localize`:View <#= Model.Title #>@@<#= componentClassName #>.<#= "View" + Model.ViewName #>:View <#= Model.Title #>`,
+        '<#= NavBackToMasterPropName #>': $localize`:Navigate back to master@@<#= componentClassName #>.<#= NavBackToMasterPropName #>:Navigate back to master`,
         'Hide-details': $localize`:Hide details@@<#= componentClassName #>.Hide-details:Hide details`,
 <#
     {
@@ -179,6 +182,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 #>
     <#= frasesPropName #>: {[key:string]: string}  = {
         '<#= TitlePropName #>': 'View <#= Model.Title #>',
+        '<#= NavBackToMasterPropName #>': 'Navigate back to master',
         'Hide-details': 'Hide details',
 <#
     {
@@ -242,6 +246,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     <#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
     <#= FormControlModelPropName #>: <#= GetInterfaceName(Model) #> | null = null;
     constructor(protected route: ActivatedRoute, protected router: Router, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, protected <#= formRootService #>: <#= serviceClassName #>) { }
+    <#= IsDetailPropName #>: boolean = false;
     ngOnInit() {
         this.<#= AppearancePropName #> = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
         if (!(typeof this.route.snapshot.data === 'undefined')) {
@@ -261,8 +266,13 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 if (!(typeof this.route.snapshot.data['<#= NavPrefix #>'] === 'undefined')) {
                     this.<#= NavPrefix #> = this.route.snapshot.data['<#= NavPrefix #>'];
                 }
+/*
                 if (!(typeof this.route.snapshot.data['<#= OutletNmPropName #>'] === 'undefined')) {
                     this.<#= OutletNmPropName #> = this.route.snapshot.data['<#= OutletNmPropName #>'];
+                }
+*/
+                if (!(typeof this.route.snapshot.data['<#= IsDetailPropName #>'] === 'undefined')) {
+                    this.<#= IsDetailPropName #> = this.route.snapshot.data['<#= IsDetailPropName #>'];
                 }
                 if (!(typeof this.route.snapshot.data['<#= OutletParent #>'] === 'undefined')) {
                     this.<#= OutletParent #> = this.route.snapshot.data['<#= OutletParent #>'];
@@ -275,11 +285,12 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         if (!(typeof this.route.snapshot.params[this.<#= IdPrefix #>] === 'undefined')) {
             this.<#= FormControlModelPropName #> =  JSON.parse(this.route.snapshot.params[this.<#= IdPrefix #>]);
         }
-        this.<#= ShowDetailsPropName #> = (this.<#= OutletNmPropName #> === 'primary');
+        this.<#= ShowDetailsPropName #> = !this.<#= IsDetailPropName #>;
         this.<#= SelectedDetailPropName #> = this.<#= DetailViewsPropName #>[0];
     }
     <#= OnAfterSubmitMethodName #>(newVal: <#= GetInterfaceName(Model) #>) {
-        // this.router.navigate(['../../../'], {relativeTo: this.route});
+        this.router.navigate(['../../../'], {relativeTo: this.route});
+/*
         if(this.<#= OutletNmPropName #> === 'primary') {
             this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route}).then(
                 ()=> {
@@ -303,10 +314,12 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 }
             );
         }
+*/
     }
 
     onCancel() {
-        // this.router.navigate(['../../../'], {relativeTo: this.route});
+        this.router.navigate(['../../../'], {relativeTo: this.route});
+/*
         if(this.<#= OutletNmPropName #> === 'primary') {
             this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route}).then(
                 ()=> {
@@ -327,6 +340,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 }
             );
         }
+*/
     }
     onOk() {
         if (typeof this.childForm === 'undefined') return;
@@ -397,6 +411,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     public <#= ToDetailMethodName #>() {
         let isNtDef: boolean = this.<#= SelectedDetailPropName #> === null;
         isNtDef = isNtDef ? isNtDef : ((this.<#= SelectedDetailPropName #>!.vw === null) || (this.<#= SelectedDetailPropName #>!.nv === null))
+/*
         if(isNtDef) {
             this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route});
         } else {
@@ -409,6 +424,16 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 }
             );
         }
+*/
+        if(isNtDef) {
+            this.router.navigate(['./'], {relativeTo: this.route});
+        } else {
+            let qp: string[] = [];
+            qp.push( '<#= OutletNameValue +"2" #>' + this.<#= SelectedDetailPropName #>!.vw );
+            qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>( this.childForm.<#= RootDataSource #>.<#= Values2InterfaceMethodName #>(), this.<#= SelectedDetailPropName #>!.nv)));
+            this.router.navigate(qp, {relativeTo: this.route});
+        }
+
     }
 }
 

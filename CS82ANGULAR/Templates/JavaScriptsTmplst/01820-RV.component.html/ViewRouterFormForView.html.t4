@@ -31,6 +31,8 @@
     string DetailViewsPropName          = "detailViews";
     string OnDetailChangedMethodName    = "onDetailChanged";
     string ShowDetailsPropName          = "showDetails";
+    string NavBackToMasterPropName      = "NavBackToMaster";
+    string frasesPropName               = "frases";
 
     string captionPropName              = "caption";
     string captionSelector              = "caption";
@@ -53,17 +55,7 @@
     <!-- <mat-card-subtitle>{{<#= TitlePropName #>}}</mat-card-subtitle> -->
     <mat-card-subtitle>
         <div fxLayout>
-<# 
-    if(localize) {
-#>
-            <button mat-icon-button color="primary" (click)="onCancel()" fxFlex="19%" i18n-matTooltip="Navigate back to master@@<#= rvcomponentClassName #>.NavBack-Tooltip">Cancel   matTooltip="Navigate back to master"> 
-<# 
-    } else {
-#>
-            <button mat-icon-button color="primary" (click)="onCancel()" fxFlex="19%" matTooltip="Navigate back to master"> 
-<#
-    }
-#>
+            <button mat-icon-button color="primary" (click)="onCancel()" fxFlex="19%" [matTooltip]="<#= frasesPropName #>['<#= NavBackToMasterPropName #>']"> 
                 <mat-icon>arrow_back</mat-icon>
             </button>    
             <mat-form-field [appearance]="<#= AppearancePropName #>" fxFlex="79%" *ngIf="<#= ShowDetailsPropName #>">
@@ -90,7 +82,8 @@
       <button mat-button (click)="onOk()">Ok</button>
     </mat-card-actions> -->
 </mat-card>
-<router-outlet name='<#=  OutletNamePrefix + Model.ViewName #>'></router-outlet>
+ <!-- <router-outlet name='<#=  OutletNamePrefix + Model.ViewName #>'></router-outlet>   -->
+ <router-outlet></router-outlet>
 
 <#+
     string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType) {

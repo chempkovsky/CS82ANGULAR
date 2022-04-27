@@ -122,7 +122,8 @@
   </mat-form-field>
 </div>
 
- <router-outlet name='<#=  DlOutletNamePrefix + Model.ViewName #>'></router-outlet>
+ <!-- <router-outlet name='<#=  DlOutletNamePrefix + Model.ViewName #>'></router-outlet>  -->
+ <router-outlet></router-outlet>
 
 <#+
 

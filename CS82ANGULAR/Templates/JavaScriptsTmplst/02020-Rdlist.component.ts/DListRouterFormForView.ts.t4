@@ -29,6 +29,7 @@
 
     string NavPrefix                    = "NavPrefix";
     string OutletNmPropName             = "outletNm";
+    string IsDetailPropName             = "isdtl";
 
 
     string getStorageItemMethodName     = "getStorageItem";
@@ -460,6 +461,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     }
     permMask: number = 0;
     extfltrOn: boolean = false;
+    <#= IsDetailPropName #>: boolean = false;
     ngOnInit() {
         this.<#= AppearancePropName #> = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
         let luid = '<#= componentClassName #>';
@@ -488,9 +490,16 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 if (!(typeof this.route.snapshot.data['<#= NavPrefix #>'] === 'undefined')) {
                     this.<#= NavPrefix #> = this.route.snapshot.data['<#= NavPrefix #>'];
                 }
+                // for the named router-outlet uncomment the lines below
+/*
                 if (!(typeof this.route.snapshot.data['<#= OutletNmPropName #>'] === 'undefined')) {
                     this.<#= OutletNmPropName #> = this.route.snapshot.data['<#= OutletNmPropName #>'];
                 }
+*/
+                if (!(typeof this.route.snapshot.data['<#= IsDetailPropName #>'] === 'undefined')) {
+                    this.<#= IsDetailPropName #> = this.route.snapshot.data['<#= IsDetailPropName #>'];
+                }
+
                 if (!(typeof this.route.snapshot.data['<#= showMultiSelectPropName #>'] === 'undefined')) {
                     this.<#= showMultiSelectedRowPropName #> = this.route.snapshot.data['<#= showMultiSelectPropName #>'];
                 }
@@ -498,6 +507,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         }
         luid = luid + ':' +this.<#= DepthParamName #>;
         if(this.<#= DepthParamName #> > 1) {
+          this.route.paramMap.subscribe(prms => {
             let lhf: Array<<#= filterResultModelClassName #>> = [];
             if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
                 let phf: {[key: string]: {[key: string]: {[key: string]: any}}} | any =  JSON.parse(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
@@ -528,7 +538,8 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 });
             }
             this.<#= HiddenFilterPropName #> = lhf;
-            this.<#= showBackBtnPropName #> = true;
+            this.<#= showBackBtnPropName #> = !this.<#= IsDetailPropName #>;
+          });
         } else {
             this.<#= showBackBtnPropName #> = false;
         }
@@ -550,7 +561,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     {
         if (detailViewNames.Count > 0)  {
 #>
-        if(this.<#= OutletNmPropName #> === 'primary') {
+        if(!this.<#= IsDetailPropName #>) {
             let msk: number = 0;
 <#
         }
@@ -629,7 +640,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     if(detailViewNames.Count > 0) {
 #>
         this.<#= SelectedDetailPropName #> = this.<#= DetailViewsPropName #>[0];
-        this.<#= ShowDetailsPropName #> = (this.<#= OutletNmPropName #> === 'primary');
+        this.<#= ShowDetailsPropName #> = !this.<#= IsDetailPropName #>;
 <#
     }
 #>
@@ -697,6 +708,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         if(!this.<#= ShowDetailsPropName #>) return;
         let isNtDef: boolean = (this.<#= SelectedDetailPropName #> === null) || (typeof this.childForm.<#= selectedRowPropName #> == 'undefined');
         isNtDef = isNtDef ? isNtDef : ((this.<#= SelectedDetailPropName #>!.vw === null) || (this.<#= SelectedDetailPropName #>!.nv === null) || (this.childForm.<#= selectedRowPropName #> == null))
+/*
         if(isNtDef) {
             this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(()=>{
                 this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route});
@@ -711,13 +723,26 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 }
             );
         }
+*/
+        // for the named router-outlet uncomment the lines above and comment the lines below. Do not forget about html-file.
+        if(isNtDef) {
+            this.router.navigate(['./'], {relativeTo: this.route});
+        } else {
+            let qp: string[] = [];
+            qp.push( '<#= OutletNameValue +"2" #>' + this.<#= SelectedDetailPropName #>!.vw ); 
+            qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(this.childForm.<#= currentRowPropName #>, this.<#= SelectedDetailPropName #>!.nv)));
+            this.router.navigate(qp, {relativeTo: this.route});
+        }
     }
 
 
     onBackBtn(e?: any) {
         if (this.<#= DepthParamName #> > 1) {
             this.<#= AppSettingServicePropName #>.<#= removeStorageItemMethodName #>(this.<#= uidParamName #> as string);
-            // this.router.navigate(['../../'], {relativeTo: this.route});
+
+            this.router.navigate(['../../'], {relativeTo: this.route}); 
+            // for the named router-outlet comment the line above and uncomment the lines below. Do not forget about html-file.
+/*
             if(this.<#= OutletNmPropName #> === 'primary') {
                 this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route}).then(
                     ()=> {
@@ -728,7 +753,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 // there is no parant, so do just hide detail component
                 this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: null }}], {relativeTo: this.route.parent!.parent});
             }
-
+*/
         }
     }
 
@@ -986,7 +1011,10 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 let qp: string[] = [];
                 qp.push( this.<#= NavPrefix #> + mnItm.data.<#= ViewNameParamName #> );
                 qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(v.value, mnItm.data.<#= NavigationParamName #>)));
-                // this.router.navigate(qp, {relativeTo: this.route});
+
+                this.router.navigate(qp, {relativeTo: this.route});
+                // for the named router-outlet comment the line above and uncomment the lines below. Do not forget about html-file.
+/*
                 if(this.<#= OutletNmPropName #> === 'primary') {
                     this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route}).then(
                         ()=> {
@@ -996,6 +1024,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 } else {
                     this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('navigation', {message: this.<#= frasesPropName #>['<#= ActionParamNavM2mNotAllwd #>']});
                 }
+*/
             } else {
                 this.onRowCommand.emit(v);
                 return;
