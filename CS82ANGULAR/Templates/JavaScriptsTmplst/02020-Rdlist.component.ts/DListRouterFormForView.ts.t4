@@ -216,11 +216,11 @@
 
 
 #>
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute, Router, ParamMap, UrlSegment, ActivatedRouteSnapshot } from '@angular/router';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router, ParamMap, UrlSegment, ActivatedRouteSnapshot, NavigationStart } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSelectChange } from '@angular/material/select';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, takeWhile } from 'rxjs';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
 
 
@@ -283,7 +283,7 @@ import { <#=  ddlgComponentClassName #> } from '<#= GetFolderName(Model, ddlgCom
   templateUrl: '<#= GetFolderName(Model, rdlistHtmlFolder, rdlistComponentFolder)#>.html',
   styleUrls: ['<#=  GetFolderName(Model, rdlistCssFolder, rdlistComponentFolder)#>.css']
 })
-export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
+export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
 <# 
     if(localize) {
 #>
@@ -462,7 +462,22 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     permMask: number = 0;
     extfltrOn: boolean = false;
     <#= IsDetailPropName #>: boolean = false;
+    currPath: string = '';
+    isNtDstrd: boolean = true;
+    ngOnDestroy(): void {
+        this.isNtDstrd = false;
+    }
     ngOnInit() {
+        this.router.events.pipe(
+            takeWhile(v => this.isNtDstrd)
+        ).subscribe(event =>{
+            if (event instanceof NavigationStart){
+                if(!event.url.includes(this.currPath)) {
+                    if(this.uid) this.<#= AppSettingServicePropName #>.<#= removeStorageItemMethodName #>(this.<#= uidParamName #> as string);
+                }
+            }
+        });
+        this.currPath = this.router.url;
         this.<#= AppearancePropName #> = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
         let luid = '<#= componentClassName #>';
         this.permMask = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= Model.ViewName #>');
@@ -738,7 +753,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
 
     onBackBtn(e?: any) {
         if (this.<#= DepthParamName #> > 1) {
-            this.<#= AppSettingServicePropName #>.<#= removeStorageItemMethodName #>(this.<#= uidParamName #> as string);
+//            this.<#= AppSettingServicePropName #>.<#= removeStorageItemMethodName #>(this.<#= uidParamName #> as string);
 
             this.router.navigate(['../../'], {relativeTo: this.route}); 
             // for the named router-outlet comment the line above and uncomment the lines below. Do not forget about html-file.
