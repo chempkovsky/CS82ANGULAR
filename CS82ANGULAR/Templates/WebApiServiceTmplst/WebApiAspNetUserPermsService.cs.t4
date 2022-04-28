@@ -97,13 +97,14 @@ namespace <#= webApiServiceNameSpace #> {
                     Mask2 = g.Sum(g => g.Mask2 ? 1 : 0) > 0,
                     Mask3 = g.Sum(g => g.Mask3 ? 1 : 0) > 0,
                     Mask4 = g.Sum(g => g.Mask4 ? 1 : 0) > 0
+                    Mask5 = g.Sum(g => g.Mask5 ? 1 : 0) > 0
                 }).Join(db.aspnetmodellDbSet,
                  o => o.ModelPkRef,
                  i => i.ModelPk,
                   (o, i) => new <#= Model.ViewName #>
                   {
                       ModelName = i.ModelName,
-                      UserPerms = (o.Mask1 ? 1 : 0) + (o.Mask2 ? 2 : 0) + (o.Mask3 ? 4 : 0) + (o.Mask4 ? 8 : 0)
+                      UserPerms = (o.Mask1 ? 1 : 0) + (o.Mask2 ? 2 : 0) + (o.Mask3 ? 4 : 0) + (o.Mask4 ? 8 : 0) + (o.Mask4 ? 16 : 0)
                   })
                 .ToListAsync();
         } // the end of GetWithFilter()-method

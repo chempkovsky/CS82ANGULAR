@@ -54,6 +54,10 @@ namespace <#= GetNameSpaceName(Model, aspnetrolemaskFolder, DefaultProjectNameSp
         [Required]
         public bool Mask4 { get; set; }
 
+        [Display(Description = "Full scan permission", Name = "Full scan permission", Prompt = "Enter Full scan permission", ShortName = "FullScan")]
+        [Required]
+        public bool Mask5 { get; set; }
+
         [Required]
         [Display(Description = "Model Id", Name = "Model Id", Prompt = "Enter Model Id", ShortName = "Id")]
         public int ModelPkRef { get; set; }

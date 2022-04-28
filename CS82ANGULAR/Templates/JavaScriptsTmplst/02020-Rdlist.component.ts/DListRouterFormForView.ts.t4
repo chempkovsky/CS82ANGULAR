@@ -26,10 +26,14 @@
     string HiddenFilterByRowSuffix      = "HiddenFilterByRow";
     string uidParamName                 = "uid"; 
     string RDLPrefix                    = "RDL";
+    string routeFilterMaxHeightPropName = "fh";
 
-    string NavPrefix                    = "NavPrefix";
+    string NavPrefix                    = "np";
     string OutletNmPropName             = "outletNm";
     string IsDetailPropName             = "isdtl";
+    string routeShowFilterPropName      = "sf";
+    string routeDepthParamName          = "dp"; 
+    string routeMaxHeightPropName       = "mh";
 
 
     string getStorageItemMethodName     = "getStorageItem";
@@ -111,7 +115,7 @@
 
     string currentRowPropName        = "currentRow";
     string OnSelectRowMethodName     = "onSelectRow";
-    string showMultiSelectPropName   = "showMultiSelect";
+    string showMultiSelectPropName   = "ms";
     string frasesPropName            = "frases";
 
     string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
@@ -484,20 +488,20 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         this.isPostNavApplied = false;
         if (!(typeof this.route.snapshot.data === 'undefined')) {
             if (!(this.route.snapshot.data === null)) {
-                if (!(typeof this.route.snapshot.data['<#= ShowFilterPropName #>'] === 'undefined')) {
-                    this.<#= ShowFilterPropName #> = this.route.snapshot.data['<#= ShowFilterPropName #>'];
+                if (!(typeof this.route.snapshot.data['<#= routeShowFilterPropName #>'] === 'undefined')) {
+                    this.<#= ShowFilterPropName #> = this.route.snapshot.data['<#= routeShowFilterPropName #>'];
                 }
-                if (!(typeof this.route.snapshot.data['<#= MaxHeightPropName #>'] === 'undefined')) {
-                    this.<#= MaxHeightPropName #> = this.route.snapshot.data['<#= MaxHeightPropName #>'];
+                if (!(typeof this.route.snapshot.data['<#= routeMaxHeightPropName #>'] === 'undefined')) {
+                    this.<#= MaxHeightPropName #> = this.route.snapshot.data['<#= routeMaxHeightPropName #>'];
                 }
-                if (!(typeof this.route.snapshot.data['<#= FilterMaxHeightPropName #>'] === 'undefined')) {
-                    this.<#= FilterMaxHeightPropName #> = this.route.snapshot.data['<#= FilterMaxHeightPropName #>'];
+                if (!(typeof this.route.snapshot.data['<#= routeFilterMaxHeightPropName #>'] === 'undefined')) {
+                    this.<#= FilterMaxHeightPropName #> = this.route.snapshot.data['<#= routeFilterMaxHeightPropName #>'];
                 }
                 if (!(typeof this.route.snapshot.data['<#= HiddenFilterPrefix #>'] === 'undefined')) {
                     this.<#= HiddenFilterPrefix #> = this.route.snapshot.data['<#= HiddenFilterPrefix #>'];
                 }
-                if (!(typeof this.route.snapshot.data['<#= DepthParamName #>'] === 'undefined')) {
-                    this.<#= DepthParamName #> = this.route.snapshot.data['<#= DepthParamName #>'];
+                if (!(typeof this.route.snapshot.data['<#= routeDepthParamName #>'] === 'undefined')) {
+                    this.<#= DepthParamName #> = this.route.snapshot.data['<#= routeDepthParamName #>'];
                 }
                 if (!(typeof this.route.snapshot.data['<#= uidParamName #>'] === 'undefined')) {
                     luid = this.route.snapshot.data['<#= uidParamName #>'];

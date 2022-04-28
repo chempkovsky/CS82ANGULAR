@@ -51,6 +51,10 @@ namespace <#= GetNameSpaceName(Model, aspnetusermaskFolder, DefaultProjectNameSp
         [Required]
         public bool Mask4 { get; set; }
         
+        [Display(Description = "Full scan permission", Name = "Full scan permission", Prompt = "Enter Full scan permission", ShortName = "FullScan")]
+        [Required]
+        public bool Mask5 { get; set; }
+
 //-------------------------------------------
 // begin code to remove
 

@@ -22,10 +22,12 @@
     string DelPrefix                    = "Del";
     string DPrefix                      = "Del";
 
-    string NavPrefix                    = "NavPrefix";
+    string NavPrefix                    = "np";
     string OutletNmPropName             = "outletNm";
     string OutletParent                 = "oltParent";
     string IsDetailPropName             = "isdtl";
+    string routeShowFilterPropName      = "sf";
+    string routeDepthParamName          = "dp"; 
 
     string HiddenFilterAsFltRsltSuffix  = "HiddenFilterAsFltRslt";
     string DepthParamName               = "depth"; 
@@ -135,8 +137,8 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
                 if (!(typeof this.route.snapshot.data['<#= TitlePropName #>'] === 'undefined')) {
                     this.<#= TitlePropName #> = this.route.snapshot.data['<#= TitlePropName #>'];
                 }
-                if (!(typeof this.route.snapshot.data['<#= DepthParamName #>'] === 'undefined')) {
-                    this.<#= DepthParamName #> = this.route.snapshot.data['<#= DepthParamName #>'];
+                if (!(typeof this.route.snapshot.data['<#= routeDepthParamName #>'] === 'undefined')) {
+                    this.<#= DepthParamName #> = this.route.snapshot.data['<#= routeDepthParamName #>'];
                 }
                 if (!(typeof this.route.snapshot.data['<#= HiddenFilterPrefix #>'] === 'undefined')) {
                     this.<#= HiddenFilterPrefix #> = this.route.snapshot.data['<#= HiddenFilterPrefix #>'];

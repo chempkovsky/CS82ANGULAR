@@ -46,12 +46,16 @@
     string FilterMaxHeightPropName      = "filterMaxHeight";
     string ShowFilterPropName           = "showFilter";
     string TitlePropName                = "title";
-    string NavPrefix                    = "NavPrefix";
+    string NavPrefix                    = "np";
     string DlOutletNamePrefix           = "dloltnm";
+    string routeDepthParamName          = "dp"; 
+    string routeMaxHeightPropName       = "mh";
+    string routeFilterMaxHeightPropName = "fh";
 
+    string routeShowFilterPropName          = "sf";
     string routeDataViewNamePropName        = "vn";
     string routeDataViewActionPropName      = "va";
-    string routeDataShowMultiSelectPropName = "showMultiSelect";
+    string routeDataShowMultiSelectPropName = "ms";
     string rdllzFrases                      = "rdllz" + Model.ViewName;
 
     Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
@@ -167,7 +171,7 @@ const routes: Routes = [
 //        outlet: '<#=  OutletNameValue #>',
         path: '<#= node.Item2 #>', 
         loadChildren: () => import('<#= fileNm_rdl #>').then(m => m.<#= GetModuleClassName(aModel, rdlLazyModuleFolder) #>),
-        data: { <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, <#= TitlePropName #>: <#= rdllzFrases #>['<#= "List" + aModel.ViewName #>'], <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
+        data: { <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, <#= TitlePropName #>: <#= rdllzFrases #>['<#= "List" + aModel.ViewName #>'], <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
         canActivate: [<#= appSettingServiceClassName + "Activator" #>],
     },
 
