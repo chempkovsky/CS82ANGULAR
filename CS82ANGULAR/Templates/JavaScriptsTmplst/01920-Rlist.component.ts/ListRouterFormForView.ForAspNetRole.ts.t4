@@ -33,6 +33,7 @@
     string routeShowFilterPropName      = "sf";
     string routeDepthParamName          = "dp"; 
     string routeMaxHeightPropName       = "mh";
+    string routeOutletNmPropName        = "oltn";
 
     string getStorageItemMethodName     = "getStorageItem";
     string setStorageItemMethodName     = "setStorageItem";
@@ -460,8 +461,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                     this.<#= NavPrefix #> = this.route.snapshot.data['<#= NavPrefix #>'];
                 }
 /*
-                if (!(typeof this.route.snapshot.data['<#= OutletNmPropName #>'] === 'undefined')) {
-                    this.<#= OutletNmPropName #> = this.route.snapshot.data['<#= OutletNmPropName #>'];
+                if (!(typeof this.route.snapshot.data['<#= routeOutletNmPropName #>'] === 'undefined')) {
+                    this.<#= OutletNmPropName #> = this.route.snapshot.data['<#= routeOutletNmPropName #>'];
                 }
 */
                 if (!(typeof this.route.snapshot.data['<#= IsDetailPropName #>'] === 'undefined')) {

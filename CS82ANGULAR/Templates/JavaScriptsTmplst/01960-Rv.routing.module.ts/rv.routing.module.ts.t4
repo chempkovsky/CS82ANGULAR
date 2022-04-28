@@ -41,6 +41,7 @@
     string OutletNamePrefix             = "oltnm";
     string OutletParent                 = "oltParent";
     string IsDetailPropName             = "isdtl";
+    string routeOutletNmPropName        = "oltn";
 
     string MaxHeightPropSelector        = "max-height";
     string MaxHeightPropName            = "maxHeight";
@@ -51,6 +52,7 @@
     string RDLMPrefix                   = "RDLM";
     string NavPrefix                    = "np";
     string routeDepthParamName          = "dp"; 
+    string routeOutletParent            = "oltp";
 
     string routeDataViewNamePropName        = "vn";
     string routeDataViewActionPropName      = "va";
@@ -196,7 +198,7 @@ const routes: Routes = [
         // path: '<#= OutletNameValue + "2" + VPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + (CurrDepth+100).ToString() + "/:" + IdPrefix + (CurrDepth+100).ToString() #>', 
         path: '<#= node.Item2 + "/" + VPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + (CurrDepth+100).ToString() + "/:" + IdPrefix + (CurrDepth+100).ToString() #>', 
         loadChildren: () => import('<#= fileNm_rv #>').then(m => m.<#= GetModuleClassName(aModel, rvLazyModuleFolder) #>),
-        data: { <#= IsDetailPropName #>: true, <#= routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'v', <#= OutletParent #>: '<#= OutletNameValue + "2" + aModel.ViewName #>', <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', /* <#= routeShowFilterPropName #>: true, */ <#= TitlePropName #>: <#= rvlzFrases #>['<#= "View" + aModel.ViewName #>'], <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + (CurrDepth+100).ToString() #>', <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>},
+        data: { <#= IsDetailPropName #>: true, <#= routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'v', /* <#= routeOutletParent #>: '<#= OutletNameValue + "2" + aModel.ViewName #>',  <#= routeOutletNmPropName #>: '<#=  OutletNameValue #>', */ <#= NavPrefix #>: '', /* <#= routeShowFilterPropName #>: true, */ <#= TitlePropName #>: <#= rvlzFrases #>['<#= "View" + aModel.ViewName #>'], <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + (CurrDepth+100).ToString() #>', <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>},
         canActivate: [<#= appSettingServiceClassName + "Activator" #>],
     },
 
@@ -227,7 +229,7 @@ const routes: Routes = [
         // path: '<#= OutletNameValue + "2" + APrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + (CurrDepth+100).ToString() #>', 
         path: '<#= node.Item2 + "/" + APrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + (CurrDepth+100).ToString() #>', 
         loadChildren: () => import('<#= fileNm_ra #>').then(m => m.<#= GetModuleClassName(aModel, raLazyModuleFolder) #>),
-        data: {  <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'a', <#= OutletParent#>: '<#= OutletNameValue + "2" + aModel.ViewName #>', <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', /* <#= routeShowFilterPropName #>: true, */ <#= TitlePropName #>: <#= rvlzFrases #>['<#= "Add" + aModel.ViewName #>'], <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>},
+        data: {  <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'a', /* <#= routeOutletParent#>: '<#= OutletNameValue + "2" + aModel.ViewName #>',  <#= routeOutletNmPropName #>: '<#=  OutletNameValue #>', */ <#= NavPrefix #>: '', /* <#= routeShowFilterPropName #>: true, */ <#= TitlePropName #>: <#= rvlzFrases #>['<#= "Add" + aModel.ViewName #>'], <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>},
         canActivate: [<#= appSettingServiceClassName + "Activator" #>],
     },
 
@@ -258,7 +260,7 @@ const routes: Routes = [
         // path: '<#= OutletNameValue + "2" + UPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + (CurrDepth+100).ToString() + "/:" + IdPrefix + (CurrDepth+100).ToString() #>', 
         path: '<#= node.Item2 + "/" + UPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + (CurrDepth+100).ToString() + "/:" + IdPrefix + (CurrDepth+100).ToString() #>', 
         loadChildren: () => import('<#= fileNm_ru #>').then(m => m.<#= GetModuleClassName(aModel, ruLazyModuleFolder) #>),
-        data: {  <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'u', <#= OutletParent#>: '<#= OutletNameValue + "2" + aModel.ViewName #>', <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', /* <#= routeShowFilterPropName #>: true, */ <#= TitlePropName #>: <#= rvlzFrases #>['<#= "Update" + aModel.ViewName #>'], <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + (CurrDepth+100).ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>},
+        data: {  <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'u', /* <#= routeOutletParent#>: '<#= OutletNameValue + "2" + aModel.ViewName #>',  <#= routeOutletNmPropName #>: '<#=  OutletNameValue #>', */ <#= NavPrefix #>: '', /* <#= routeShowFilterPropName #>: true, */ <#= TitlePropName #>: <#= rvlzFrases #>['<#= "Update" + aModel.ViewName #>'], <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + (CurrDepth+100).ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>},
         canActivate: [<#= appSettingServiceClassName + "Activator" #>],
     },
 
@@ -289,7 +291,7 @@ const routes: Routes = [
         // path: '<#= OutletNameValue + "2" + DPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + (CurrDepth+100).ToString() + "/:" + IdPrefix + (CurrDepth+100).ToString() #>', 
         path: '<#= node.Item2 + "/" + DPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + (CurrDepth+100).ToString() + "/:" + IdPrefix + (CurrDepth+100).ToString() #>', 
         loadChildren: () => import('<#= fileNm_rd #>').then(m => m.<#= GetModuleClassName(aModel, rdLazyModuleFolder) #>),
-        data: {  <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'd', <#= OutletParent#>: '<#= OutletNameValue + "2" + aModel.ViewName #>', <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', /* <#= routeShowFilterPropName #>: true, */ <#= TitlePropName #>: <#= rvlzFrases #>['<#= "Delete" + aModel.ViewName #>'], <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + (CurrDepth+100).ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>},
+        data: {  <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'd', /* <#= routeOutletParent#>: '<#= OutletNameValue + "2" + aModel.ViewName #>', <#= routeOutletNmPropName #>: '<#=  OutletNameValue #>', */ <#= NavPrefix #>: '', /* <#= routeShowFilterPropName #>: true, */ <#= TitlePropName #>: <#= rvlzFrases #>['<#= "Delete" + aModel.ViewName #>'], <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (CurrDepth+100).ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + (CurrDepth+100).ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>},
         canActivate: [<#= appSettingServiceClassName + "Activator" #>],
     },
 
@@ -314,7 +316,7 @@ const routes: Routes = [
         // outlet: '<#=  OutletNameValue #>',
         path: '<#= node.Item2 #>', 
         loadChildren: () => import('<#= fileNm_rl #>').then(m => m.<#= GetModuleClassName(aModel, rlLazyModuleFolder) #>),
-        data: {  <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true,  <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, <#= TitlePropName #>: <#= rvlzFrases #>['<#= "List" + aModel.ViewName #>'], <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
+        data: {  <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true,  /* <#= routeOutletNmPropName #>: '<#=  OutletNameValue #>', */ <#= NavPrefix #>: '', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, <#= TitlePropName #>: <#= rvlzFrases #>['<#= "List" + aModel.ViewName #>'], <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
         canActivate: [<#= appSettingServiceClassName + "Activator" #>],
     },
 

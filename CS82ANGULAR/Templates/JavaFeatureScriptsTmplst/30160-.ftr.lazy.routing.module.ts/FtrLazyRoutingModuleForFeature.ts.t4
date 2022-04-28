@@ -15,14 +15,17 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
 
+    string routeDataViewNamePropName        = "vn";
+    string routeDataViewActionPropName      = "va";
 
 
-
+    string ftrFeatureComponentFolder            = "30100-.ftr.component.ts";
     string ftrFeatureRoutingModuleFolder        = "30130-.ftr.routing.module.ts";
     string ftrFeatureModuleFolder               = "30150-.ftr.module.ts";
     string ftrFeatureLazyRoutingModuleFolder    = "30160-.ftr.lazy.routing.module.ts";
 
 
+    string featureClassName                     = GetFeatureComponentClassName(Feature, ftrFeatureComponentFolder);
     string featureRoutingModuleClassName        = GetFeatureModuleClassName(Feature, ftrFeatureRoutingModuleFolder);
     string featureModuleClassName               = GetFeatureModuleClassName(Feature, ftrFeatureModuleFolder);
     string featureLazyRoutingModuleClassName    = GetFeatureModuleClassName(Feature, ftrFeatureLazyRoutingModuleFolder);
@@ -38,8 +41,10 @@ import { <#=  featureRoutingModuleClassName #> } from '<#=  GetFeatureComponentF
 
 //
 // Hint: 
-// add the following line
-// { path: '<#= Feature.FeatureName.ToLower() #>', loadChildren: () => import('<#= GetFeatureModuleFileName(Feature, ftrFeatureLazyRoutingModuleFolder) #>').then(m => m.<#= featureLazyRoutingModuleClassName #>) }, 
+// add the following two lines
+//
+// {  path: '<#= Feature.FeatureName.ToLower() #>', loadChildren: () => import('<#= GetFeatureModuleFileName(Feature, ftrFeatureLazyRoutingModuleFolder) #>').then(m => m.<#= featureLazyRoutingModuleClassName #>), 
+//    data: { <#= routeDataViewNamePropName #>: '<#= featureClassName #>', <#= routeDataViewActionPropName #>: 'l'} }, 
 //
 // to the array
 // const routes: Routes = [ ... ]

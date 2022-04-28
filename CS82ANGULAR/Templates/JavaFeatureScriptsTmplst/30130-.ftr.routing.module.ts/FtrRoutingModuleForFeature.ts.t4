@@ -76,6 +76,7 @@
     string DepthParamName                   = "depth"; 
     string routeMaxHeightPropName           = "mh";
     string routeFilterMaxHeightPropName     = "fh";
+    string routeOutletParent                = "oltp";
 
     bool isRist = false;
     bool isRDlist = false;
@@ -171,8 +172,8 @@
 
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import { <#= appSettingServiceClassName #> } from '<#=  GetFeatureCommonFolderName(Feature, Context,  appSettingServiceFolder, ftrFeatureRoutingModuleFolder) #>';
+import { <#= appSettingServiceClassName + "Activator" #> } from '<#=  GetFeatureCommonFolderName(Feature, Context,  appSettingServiceFolder, ftrFeatureRoutingModuleFolder) #>';
 import { <#= featureClassName #> } from '<#= GetFeatureComponentFolderName(Feature, ftrFeatureRoutingModuleFolder, ftrFeatureComponentFolder) #>';
 
 const routes: Routes = [
@@ -186,7 +187,7 @@ const routes: Routes = [
     {
         path: '',
         component: <#= featureClassName #>,
-        canActivate: [<#= appSettingServiceClassName #>],
+        canActivate: [<#= appSettingServiceClassName + "Activator" #>],
 <#
     if (Model != null) {
 #>
@@ -275,7 +276,7 @@ if(isRist) {
 #>
     { path: '<#= node.Item2 + "/" + UPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
         loadChildren: () => import('<#= fileNm_ru #>').then(m => m.<#= GetModuleClassName(aModel, ruLazyModuleFolder) #>),
-        data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'u', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'Update <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
+        data: { <#= routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'u', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'Update <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
                     } else {

@@ -39,6 +39,7 @@
     string DlgLstDetailPrefix           = "DLDT";
     string OutletParent                 = "oltParent";
     string IsDetailPropName             = "isdtl";
+    string routeOutletNmPropName        = "oltn";
 
     string MaxHeightPropSelector        = "max-height";
     string MaxHeightPropName            = "maxHeight";
@@ -51,6 +52,7 @@
     string routeDepthParamName          = "dp"; 
     string routeMaxHeightPropName       = "mh";
     string routeFilterMaxHeightPropName = "fh";
+    string routeOutletParent            = "oltp";
 
     string routeShowFilterPropName          = "sf";
     string routeDataViewNamePropName        = "vn";
@@ -171,7 +173,7 @@ const routes: Routes = [
 //        outlet: '<#=  OutletNameValue #>',
         path: '<#= node.Item2 #>', 
         loadChildren: () => import('<#= fileNm_rdl #>').then(m => m.<#= GetModuleClassName(aModel, rdlLazyModuleFolder) #>),
-        data: { <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, <#= OutletNmPropName #>: '<#=  OutletNameValue #>', <#= NavPrefix #>: '', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, <#= TitlePropName #>: <#= rdllzFrases #>['<#= "List" + aModel.ViewName #>'], <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
+        data: { <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, /* <#= routeOutletNmPropName #>: '<#=  OutletNameValue #>', */ <#= NavPrefix #>: '', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, <#= TitlePropName #>: <#= rdllzFrases #>['<#= "List" + aModel.ViewName #>'], <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
         canActivate: [<#= appSettingServiceClassName + "Activator" #>],
     },
 

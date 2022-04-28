@@ -27,6 +27,8 @@
     string routeShowFilterPropName      = "sf";
     string DepthParamName               = "depth"; 
     string routeDepthParamName          = "dp"; 
+    string routeOutletParent            = "oltp";
+    string routeOutletNmPropName        = "oltn";
 
     string HiddenFilterAsFltRsltSuffix  = "HiddenFilterAsFltRslt";
     string ActionParamName              = "mode";  
@@ -269,16 +271,18 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                     this.<#= NavPrefix #> = this.route.snapshot.data['<#= NavPrefix #>'];
                 }
 /*
-                if (!(typeof this.route.snapshot.data['<#= OutletNmPropName #>'] === 'undefined')) {
-                    this.<#= OutletNmPropName #> = this.route.snapshot.data['<#= OutletNmPropName #>'];
+                if (!(typeof this.route.snapshot.data['<#= routeOutletNmPropName #>'] === 'undefined')) {
+                    this.<#= OutletNmPropName #> = this.route.snapshot.data['<#= routeOutletNmPropName #>'];
                 }
 */
                 if (!(typeof this.route.snapshot.data['<#= IsDetailPropName #>'] === 'undefined')) {
                     this.<#= IsDetailPropName #> = this.route.snapshot.data['<#= IsDetailPropName #>'];
                 }
-                if (!(typeof this.route.snapshot.data['<#= OutletParent #>'] === 'undefined')) {
-                    this.<#= OutletParent #> = this.route.snapshot.data['<#= OutletParent #>'];
+/*
+                if (!(typeof this.route.snapshot.data['<#= routeOutletParent #>'] === 'undefined')) {
+                    this.<#= OutletParent #> = this.route.snapshot.data['<#= routeOutletParent #>'];
                 }
+*/
             }
         }
         if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
