@@ -9,49 +9,101 @@
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
-<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureSerializable" name="Feature" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    string ActionParamName              = "mode";  // there exists one copy per url for Add/Update/Delete. it should be the last item
+    string ActionParamAddMode           = "add";
+    string ActionParamUpdateMode        = "update";
+    string ActionParamDeleteMode        = "delete";
+    string ActionParamCancelMode        = "cancel";
+
+    string GetAllMethodName             = "getall";
+    string GetWithFilterMethodName      = "getwithfilter";
+    string GetOneMethodName             = "getone";
+    string UpdateOneMethodName          = "updateone";
+    string AddOneMethodName             = "addone";
+    string DeleteOneMethodName          = "deleteone";
+
+
+    string HiddenFilterSelector         = "hidden-filter";
+    string HiddenFilterPropName         = "hiddenFilter";
+
+    string ShowErrorMethodName          = "showError";
+    string OnAfterSubmitMethodName      = "onAfterSubmit";
+    string ShowFilterPropName           = "showFilter";
+    string TitlePropName                = "title";
     
-
-
-    string HiddenFilterPrefix           = "hf";
-    string IdPrefix                     = "id";
-    string DepthParamName               = "depth"; 
-    string uidParamName                 = "uid"; 
-
-    string VPrefix                      = "View";
-    string APrefix                      = "Add";
-    string UPrefix                      = "Upd";
-    string DPrefix                      = "Del";
-
     string MaxHeightPropSelector        = "max-height";
     string MaxHeightPropName            = "maxHeight";
     string FilterMaxHeightPropSelector  = "filter-max-height";
     string FilterMaxHeightPropName      = "filterMaxHeight";
-    string ShowFilterPropName           = "showFilter";
-    string TitlePropName                = "title";
-    string RDLPrefix                    = "RDL";
-    string NavPrefix                    = "NavPrefix";
 
+
+    string appSettingServiceFolder          = "00015-app-glbl-settings.service.ts";
+
+
+    string rlistComponentFolder             = "01920-Rlist.component.ts";
+    string rdlistComponentFolder            = "02020-Rdlist.component.ts";
+    string rdlLazyModuleFolder              = "02050-Rdl-lazy.routing.module.ts";
+
+    string ftrFeatureComponentFolder        = "30100-.ftr.component.ts";
+    string ftrFeatureRoutingModuleFolder    = "30130-.ftr.routing.module.ts";
+
+    string featureClassName                 = GetFeatureComponentClassName(Feature, ftrFeatureComponentFolder);
+    string featureRoutingModuleClassName    = GetFeatureModuleClassName(Feature, ftrFeatureRoutingModuleFolder);
+    string appSettingServiceClassName       = GetCommonServiceClassName(Context, appSettingServiceFolder);
+
+    string HiddenFilterPrefix           = "hf";
+    string VPrefix                      = "View";
+    string APrefix                      = "Add";
+    string UPrefix                      = "Upd";
+    string DPrefix                      = "Del";
+    string DepthParamName               = "depth"; 
+    string uidParamName                 = "uid"; 
+    string OutletNamePrefix             = "loltnm";
+    string OutletParent                 = "oltParent";
+    string IsDetailPropName             = "isdtl";
+    string IdPrefix                     = "id";
     string routeDataViewNamePropName        = "vn";
     string routeDataViewActionPropName      = "va";
     string routeDataShowMultiSelectPropName = "showMultiSelect";
+    string NavPrefix                    = "NavPrefix";
+    string RDLPrefix                    = "RDL";
 
+    bool isRist = false;
+    bool isRDlist = false;
+    ModelViewSerializable Model = null;
+    if(Feature.FeatureItems!=null) {
+        foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
+            if(isRoutedItem(AllowedFileTypes, featureItemSerializable.FileType)) {
+                Model = GetViewByName(Context, featureItemSerializable.ViewName);
+                isRist = featureItemSerializable.FileType == rlistComponentFolder;
+                isRDlist = featureItemSerializable.FileType == rdlistComponentFolder;
+                break;
+            }
+        }
+    }
 
-                                           
-    string rdLazyModuleFolder            = "01976-Rd-lazy.routing.module.ts";
-    string rdlLazyModuleFolder           = "02050-Rdl-lazy.routing.module.ts";
+    string rvLazyModuleFolder           = "01970-Rv-lazy.routing.module.ts";
+    string raLazyModuleFolder           = "01972-Ra-lazy.routing.module.ts";
+    string ruLazyModuleFolder           = "01974-Ru-lazy.routing.module.ts";
+    string rdLazyModuleFolder           = "01976-Rd-lazy.routing.module.ts";
+    string rlLazyModuleFolder           = "01978-Rl-lazy.routing.module.ts";
 
     Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
     List<Tuple<ModelViewSerializable, string, int>> nodes = new List<Tuple<ModelViewSerializable, string, int>>();
-    List<string> allViewNames= new List<string>();
-    // Model, url, depth
-    nodes.Add(new Tuple<ModelViewSerializable, string, int>( Model, RDLPrefix + Model.ViewName, 1));
     List<string> detailViewNames = new List<string>();
-    allViewNames.Add(Model.ViewName);
+    List<string> allViewNames= new List<string>();
 
+    if(isRist || isRDlist)
     {
+        // Model, url, depth
+        nodes.Add(new Tuple<ModelViewSerializable, string, int>( Model, Model.ViewName, 1));
+        allViewNames.Add(Model.ViewName);
+
         int currId= 0;
         while(currId < nodes.Count) {
             Tuple<ModelViewSerializable, string, int> masterNode = nodes[currId];
@@ -62,13 +114,13 @@
             List<string> viewNames = GetDetailViews(masterView, Context, null);
             foreach(string viewName in viewNames) {
                 ModelViewSerializable detailView = GetViewByName(Context, viewName);
-                if(nodes.Count(p => p.Item1 == detailView) > 2) continue;
-
-                string newPath = CurrPath + "/" + RDLPrefix + viewName;
+                if(nodes.Count(p => p.Item1 == detailView) > 2) {
+                    continue;
+                }
+                string newPath = CurrPath + "/" + viewName;
                 if (CurrDepth > 1) {
                     newPath = newPath +"/:" + HiddenFilterPrefix + CurrDepth.ToString();
                 }
-
                 List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(masterView, detailView, null);
                 detailViewNames.Clear();
                 bool isM2m = false;
@@ -90,7 +142,7 @@
                             if(tmpSearchSchema.Item4 != null) continue;
                             if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
                             ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
-                            string newPathEx = CurrPath + "/" + RDLPrefix + viewToNavigate.ViewName;
+                            string newPathEx = CurrPath + "/" + viewToNavigate.ViewName;
                             if (CurrDepth > 1) {
                                 newPathEx = newPathEx +"/:" + HiddenFilterPrefix + CurrDepth.ToString();
                             }
@@ -101,7 +153,6 @@
                             continue;
                         }
                     }
-
                     if (!detailViewNames.Any(v => v == detailView.ViewName)) {
                         nodes.Add(new Tuple<ModelViewSerializable, string, int>(detailView, newPath, CurrDepth));
                         detailViewNames.Add(detailView.ViewName);
@@ -114,34 +165,203 @@
 
 #>
 
-<# {
-        Tuple<ModelViewSerializable, string, int> node = nodes[0];
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { <#= appSettingServiceClassName #> } from '<#=  GetFeatureCommonFolderName(Feature, Context,  appSettingServiceFolder, ftrFeatureRoutingModuleFolder) #>';
+import { <#= featureClassName #> } from '<#= GetFeatureComponentFolderName(Feature, ftrFeatureRoutingModuleFolder, ftrFeatureComponentFolder) #>';
+
+const routes: Routes = [
+<#
+    if ((Model != null) && (nodes.Count > 0)) {
 #>
-//
-// How to use:
-//
-//  <li [ngbNavItem] > <a ngbNavLink [routerLink]="['<#= node.Item2 #>']" routerLinkActive="active">List of <#= Model.ViewName #></a>/li>                  
-//
-//  <a mat-list-item [routerLink]="['<#= node.Item2 #>']" routerLinkActive="active">List of <#= Model.ViewName #></a>
-//
+    { path: '',   redirectTo: '<#= nodes[0].Item2 #>', pathMatch: 'full' },
 <#
     }
 #>
-//
-// 2. Do not save this file.
-//
-// Copy generated paths and insert into "const routes: Routes = [...] "-array
-// const routes: Routes = [
-//  ...
-/*
-
+    {
+        path: '',
+        component: <#= featureClassName #>,
+        canActivate: [<#= appSettingServiceClassName #>],
 <#
+    if (Model != null) {
+#>
+        canActivateChild: [<#= appSettingServiceClassName #>],
+        children: [
+// r-routing
+<#
+if(isRist) {
     for(int k = nodes.Count-1; k > -1; k--) {
         Tuple<ModelViewSerializable, string, int> node = nodes[k];
         ModelViewSerializable aModel = node.Item1;
         int CurrDepth = node.Item3 + 1;
         List<ModelViewPropertyOfVwSerializable> aModelPrincipals = GetModelPrimaryKeyProps(aModel);
-        string fileNm_rdl = GeFileNameWithoutExt(aModel, rdlLazyModuleFolder);
+        string fileNm_rl  = GetFeatureCrossComponentFolderName(Feature, ftrFeatureRoutingModuleFolder, Context, aModel.ViewName, rlLazyModuleFolder);
+        string fileNm_rv  = GetFeatureCrossComponentFolderName(Feature, ftrFeatureRoutingModuleFolder, Context, aModel.ViewName, rvLazyModuleFolder);
+        string fileNm_ra  = GetFeatureCrossComponentFolderName(Feature, ftrFeatureRoutingModuleFolder, Context, aModel.ViewName, raLazyModuleFolder);
+        string fileNm_ru  = GetFeatureCrossComponentFolderName(Feature, ftrFeatureRoutingModuleFolder, Context, aModel.ViewName, ruLazyModuleFolder);
+        string fileNm_rd  = GetFeatureCrossComponentFolderName(Feature, ftrFeatureRoutingModuleFolder, Context, aModel.ViewName, rdLazyModuleFolder);
+#>
+
+//
+// Info: Root Master View  [<#= Model.ViewName #>] 
+// Info: Detail View  [<#= aModel.ViewName #>] 
+//
+<#
+
+        if(aModel.IsWebApiSelectManyWithPagination) {
+            if(!string.IsNullOrEmpty(fileNm_rl)  && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rlLazyModuleFolder)))) {
+
+
+
+                if(aModel.IsWebApiSelectOneByPrimarykey) {
+                    if(!string.IsNullOrEmpty(fileNm_rv) && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rvLazyModuleFolder)))) {
+#>
+    { path: '<#= node.Item2 + "/" + VPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
+        loadChildren: () => import('<#= fileNm_rv #>').then(m => m.<#= GetModuleClassName(aModel, rvLazyModuleFolder) #>),
+        data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'v', <#= ShowFilterPropName #>: true, /* <#= TitlePropName #>: 'View <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>', <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
+
+<#
+                    } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= rvLazyModuleFolder #>] has not been generated yet
+//
+<#
+                    } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
+                } else { // if(aModel.IsWebApiSelectOneByPrimarykey) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] SelectOneByPrimarykey is set to false
+//
+<#
+                } // if(aModel.IsWebApiSelectOneByPrimarykey) { ... } else { ... }
+
+
+
+
+                if(aModel.IsWebApiAdd) {
+                    if(!string.IsNullOrEmpty(fileNm_ra)  && (!string.IsNullOrEmpty( GetModuleClassName(aModel, raLazyModuleFolder)))) {
+#>
+    { path: '<#= node.Item2 + "/" + APrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() #>', 
+        loadChildren: () => import('<#= fileNm_ra #>').then(m => m.<#= GetModuleClassName(aModel, raLazyModuleFolder) #>),
+        data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'a', <#= ShowFilterPropName #>: true, /* <#= TitlePropName #>: 'Add <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
+
+<#
+                    } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= raLazyModuleFolder #>] has not been generated yet
+//
+<#
+                    } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
+                } else { // if(aModel.IsWebApiAdd) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] WebApiAdd is set to false
+//
+<#
+                } // if(aModel.IsWebApiAdd) { ... } else { ... }
+
+
+
+
+                if(aModel.IsWebApiUpdate) {
+                    if(!string.IsNullOrEmpty(fileNm_ru)  && (!string.IsNullOrEmpty( GetModuleClassName(aModel, ruLazyModuleFolder)))) {
+#>
+    { path: '<#= node.Item2 + "/" + UPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
+        loadChildren: () => import('<#= fileNm_ru #>').then(m => m.<#= GetModuleClassName(aModel, ruLazyModuleFolder) #>),
+        data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'u', <#= ShowFilterPropName #>: true, /* <#= TitlePropName #>: 'Update <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
+
+<#
+                    } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= ruLazyModuleFolder #>] has not been generated yet
+//
+<#
+                    } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
+                } else { // if(aModel.IsWebApiUpdate) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] WebApiUpdate is set to false
+//
+<#
+                } // if(aModel.IsWebApiUpdate) { ... } else { ... }
+
+
+
+
+                if(aModel.IsWebApiDelete) {
+                    if(!string.IsNullOrEmpty(fileNm_rd)  && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rdLazyModuleFolder)))) {
+#>
+    { path: '<#= node.Item2 + "/" + DPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
+        loadChildren: () => import('<#= fileNm_rd #>').then(m => m.<#= GetModuleClassName(aModel, rdLazyModuleFolder) #>),
+        data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'd', <#= ShowFilterPropName #>: true, /* <#= TitlePropName #>: 'Delete <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= DepthParamName #>: <#= CurrDepth.ToString() #>}},
+
+<#
+                    } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= rdLazyModuleFolder #>] has not been generated yet
+//
+<#
+                    } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
+                } else { // if(aModel.IsWebApiDelete) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] WebApiDelete is set to false
+//
+<#
+                } // if(aModel.IsWebApiDelete) { ... } else { ... }
+
+
+                if(node.Item3 > 1) {
+#>
+    { path: '<#= node.Item2 #>', 
+        loadChildren: () => import('<#= fileNm_rl #>').then(m => m.<#= GetModuleClassName(aModel, rlLazyModuleFolder) #>),
+        data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true,  <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, /*  <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + node.Item3.ToString() #>',  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+
+<#
+
+                } else {
+#>
+    { path: '<#= node.Item2 #>', 
+        loadChildren: () => import('<#= fileNm_rl #>').then(m => m.<#= GetModuleClassName(aModel, rlLazyModuleFolder) #>),
+        data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true,  <#= FilterMaxHeightPropName #>: 2, <#= MaxHeightPropName #>: 10, <#= ShowFilterPropName #>: true, /* <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */  <#= DepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+
+<#
+                } // if(node.Item3 > 1) { ... } else { ... }
+
+
+
+            } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= rlLazyModuleFolder #>] has not been generated yet
+//
+<#
+            }
+        } else { // if(aModel.IsWebApiSelectManyWithPagination) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] SelectManyWithPagination is set to false
+//
+<#
+        } // if(aModel.IsWebApiSelectManyWithPagination) { } else { ... }
+    }
+} ///// if(!isRist) { ... }
+#>
+
+// rd-routing
+<#
+if(isRDlist) {
+    for(int k = nodes.Count-1; k > -1; k--) {
+        Tuple<ModelViewSerializable, string, int> node = nodes[k];
+        ModelViewSerializable aModel = node.Item1;
+        int CurrDepth = node.Item3 + 1;
+        List<ModelViewPropertyOfVwSerializable> aModelPrincipals = GetModelPrimaryKeyProps(aModel);
+        string fileNm_rdl = GetFeatureCrossComponentFolderName(Feature, ftrFeatureRoutingModuleFolder, Context, aModel.ViewName, rdlLazyModuleFolder);
         
 #>
 
@@ -191,72 +411,168 @@
 <#
         } // if(aModel.IsWebApiSelectManyWithPagination) { } else { ... }
     }
+} ///// if(isRDlist) {...}
 #>
-*/
-//
-//    ...
-//];
-//
+        ] // children: [...]
+<#
+    }
+#>
+
+    },
+]; // const routes: Routes = [...]
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class <#= featureRoutingModuleClassName #> { }
 
 
 <#+
-
-
-    string GeFileNameWithoutExt(ModelViewSerializable model, string fileType) {
-        string result= "";
-        if ((model == null) || string.IsNullOrEmpty(fileType)) return result;
-        if(model.CommonStaffs == null) return result;
+    string GetFeatureModuleClassName(FeatureSerializable feature, string fileType) {
+        string result="";
+        if ((feature == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (feature.CommonStaffs == null) {
+            return result;
+        }
         CommonStaffSerializable refItem= 
-            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            feature.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }  
+        string fn = refItem.FileName.Replace(".module","Module").Replace(".routing","Routing").Replace(".","-");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+    string GetFeatureComponentClassName(FeatureSerializable feature, string fileType) {
+        string result="";
+        if ((feature == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (feature.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            feature.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
         if (refItem == null) {
             return result;
         }
         if(string.IsNullOrEmpty(refItem.FileName)) {
             return result;
         }
-        if(string.IsNullOrEmpty(refItem.FileFolder)) {
-            result = "./";
-        } else {
-            result = refItem.FileFolder.Replace("\\","/").Replace("src/","").Replace("app/","./");
-        }
-        if(! result.EndsWith("/")) {
-            result += "/";
-            
-        }
-        return result + refItem.FileName;
-    }
-
-
-    List<ModelViewPropertyOfVwSerializable> GetModelPrimaryKeyProps(ModelViewSerializable model) {
-        List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
-        if (model == null)
+        string fn = refItem.FileName.Replace(".component","Component").Replace(".","-");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
         {
-            return result;
-        }
-        if ((model.PrimaryKeyProperties == null) || (model.ScalarProperties == null)) {
-            return result;
-        }
-        foreach(ModelViewKeyPropertySerializable modelViewKeyPropertySerializable in model.PrimaryKeyProperties) {
-            ModelViewPropertyOfVwSerializable prop = GetScalarPropByOriginaPropName(modelViewKeyPropertySerializable.OriginalPropertyName, model);
-            if(prop != null) {
-                result.Add(prop);
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
             }
         }
-        return result;
+        return sb.ToString();
     }
-
-    string GetCommonFolderName(ModelViewSerializable model, DbContextSerializable context,  string refFolder, string currFolder) {
-        string result="./";
-        if ((model == null) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+    string GetCommonServiceClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
             return result;
         }
-        if ((model.CommonStaffs == null) || (context.CommonStaffs == null)) {
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".service","Service");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString();
+    }
+    bool isRoutedItem(AllowedFileTypesSerializable allowedFileTypes, string fileType) {
+        if( (allowedFileTypes == null) || string.IsNullOrEmpty(fileType)) {
+            return false;
+        }
+        if(allowedFileTypes.Items == null) {
+            return false;
+        }
+        AllowedFileTypeSerializable rslt= allowedFileTypes.Items.Where(i => i.FileType == fileType).FirstOrDefault();
+        if(rslt == null) {
+            return false;
+        }
+        return rslt.IsRouted;
+    }
+    string GetFeatureCommonFolderName(FeatureSerializable  feature, DbContextSerializable context,  string refFolder, string currFolder) {
+        string result="./";
+        if ((feature == null) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if ((feature.CommonStaffs == null) || (context.CommonStaffs == null)) {
             return result;
         }
         CommonStaffSerializable refItem= 
             context.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
         CommonStaffSerializable curItem= 
-            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            feature.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
         if ((refItem == null) || (curItem == null)) {
             return result;
         }
@@ -285,96 +601,65 @@
         result += refItem.FileName;
         return result;
     }
-    string GetComponentClassName(ModelViewSerializable model, string fileType) {
-        string result="";
-        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
-            return result;
-        }
-        if (model.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-        if (refItem == null) {
-            return result;
-        }
-        if(string.IsNullOrEmpty(refItem.FileName)) {
-            return result;
-        }
-        string fn = refItem.FileName.Replace(".component","Component");
-        StringBuilder sb = new StringBuilder();
-        bool toUpper = true;
-        foreach (char c in fn)
-        {
-            if( c == '-' )
-            {
-                toUpper = true;
-            } else
-            {
-                if (toUpper)
-                {
-                    sb.Append(Char.ToUpper(c));
-                    toUpper = false;
-                }
-                else
-                {
-                    sb.Append(c);
-                }
-            }
-        }
-        return sb.ToString();
-    }
-    string GetModuleClassName(ModelViewSerializable model, string fileType) {
-        string result="";
-        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
-            return result;
-        }
-        if (model.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-        if (refItem == null) {
-            return result;
-        }
-        if(string.IsNullOrEmpty(refItem.FileName)) {
-            return result;
-        }
-        string fn = refItem.FileName.Replace(".module","Module").Replace(".routing","Routing");
-        StringBuilder sb = new StringBuilder();
-        bool toUpper = true;
-        foreach (char c in fn)
-        {
-            if( c == '-' )
-            {
-                toUpper = true;
-            } else
-            {
-                if (toUpper)
-                {
-                    sb.Append(Char.ToUpper(c));
-                    toUpper = false;
-                }
-                else
-                {
-                    sb.Append(c);
-                }
-            }
-        }
-        return sb.ToString();
-    }
-    string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
+    string GetFeatureComponentFolderName(FeatureSerializable feature, string currFolder, string refFolder) {
         string result="./";
-        if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+        if ((feature == null) || string.IsNullOrEmpty(currFolder) || string.IsNullOrEmpty(refFolder) ) {
             return result;
         }
-        if (model.CommonStaffs == null) {
+        if (feature.CommonStaffs == null) {
             return result;
         }
         CommonStaffSerializable refItem= 
-            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+            feature.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
         CommonStaffSerializable curItem= 
-            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            feature.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetFeatureCrossComponentFolderName(FeatureSerializable feature, string currFolder, DbContextSerializable context, string refViewName, string refFolder) {
+        string result="./";
+        if ((feature == null) || string.IsNullOrEmpty(currFolder) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(refViewName)) {
+            return result;
+        }
+        if ((feature.CommonStaffs == null) || (context.ModelViews == null)) {
+            return result;
+        }
+        ModelViewSerializable refModel = context.ModelViews.Where(v => v.ViewName == refViewName).FirstOrDefault();
+        if (refModel == null) {
+            return result;
+        }
+        if (refModel.CommonStaffs == null)  {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            refModel.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            feature.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
         if ((refItem == null) || (curItem == null)) {
             return result;
         }
@@ -404,163 +689,9 @@
         return result;
     }
 
-    
-    List<string> GetDetailViews(ModelViewSerializable model, DbContextSerializable context, List<string> result)
-        {
-            if (result == null)
-            {
-                result = new List<string>();
-            }
-            if ((model == null) || (context == null))
-            {
-                return result;
-            }
-            if ((model.ScalarProperties == null) || (model.PrimaryKeyProperties == null) || (context.ModelViews == null)) {
-                return result;
-            }
-            if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1))
-            {
-                return result;
-            }
-            List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(model);
-            if(primKeys == null)
-            {
-                return result;
-            }
-            if (primKeys.Count != model.PrimaryKeyProperties.Count)
-            {
-                return result;
-            }
-            string RootEntityFullClassName = model.RootEntityFullClassName;
-            string RootEntityUniqueProjectName = model.RootEntityUniqueProjectName;
-            List<ModelViewSerializable> details =
-                context.ModelViews.Where(m => m.ForeignKeys.Any(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName))).ToList();
-            if(details.Count < 1)
-            {
-                return result;
-            }
-            foreach(ModelViewSerializable detail in details)
-            {
-                if (detail.ScalarProperties == null) continue;
-                if (detail.ForeignKeys == null) continue;
-                if (detail.ForeignKeys.Count < 1) continue;
-                List<ModelViewForeignKeySerializable> ForeignKeys =
-                    detail.ForeignKeys.Where(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName)).ToList();
-                if (ForeignKeys.Count < 1) continue;
-                bool canBeUsed = false;
-                foreach(ModelViewForeignKeySerializable ForeignKey in ForeignKeys)
-                {
-                    bool hasForeignKeyProps = true;
-                    if (ForeignKey.ForeignKeyProps != null)
-                    {
-                        for(int i = 0; i < ForeignKey.ForeignKeyProps.Count; i++)
-                        {
-                            ModelViewKeyPropertySerializable ForeignKeyProp = ForeignKey.ForeignKeyProps[i];
-                            if (!(detail.ScalarProperties.Any(s => (s.OriginalPropertyName == ForeignKeyProp.OriginalPropertyName) && (string.IsNullOrEmpty(s.ForeignKeyNameChain)))))
-                            {
-                                hasForeignKeyProps = false;
-                            }
-                            if(!hasForeignKeyProps)
-                            {
-                                ModelViewKeyPropertySerializable PrincipalKeyProp = ForeignKey.PrincipalKeyProps[i];
-                                if (detail.ScalarProperties.Any(s => (s.OriginalPropertyName == PrincipalKeyProp.OriginalPropertyName) && (s.ForeignKeyNameChain == ForeignKey.NavigationName)))
-                                {
-                                    hasForeignKeyProps = true;
-                                } else
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                    } else
-                    {
-                        hasForeignKeyProps = false;
-                    }
-                    if (hasForeignKeyProps)
-                    {
-                        canBeUsed = true;
-                        break;
-                    }
-                }
-                if(canBeUsed)
-                {
-                    if(!result.Contains(detail.ViewName))
-                    {
-                        result.Add(detail.ViewName);
-                    }
-                }
-            }
-            return result;
-    }
-    List<ModelViewForeignKeySerializable> GetDetailViewForeignKeys(ModelViewSerializable model, ModelViewSerializable detail, List<ModelViewForeignKeySerializable> result)
-    {
-            if (result == null) result = new List<ModelViewForeignKeySerializable>();
-            if ((model == null) || (detail == null))
-            {
-                return result;
-            }
-            if ((model.PrimaryKeyProperties == null) || (detail.ScalarProperties == null) || (detail.ForeignKeys == null))
-            {
-                return result;
-            }
-            if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1))
-            {
-                return result;
-            }
-            List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(model);
-            if (primKeys == null)
-            {
-                return result;
-            }
-            if (primKeys.Count != model.PrimaryKeyProperties.Count)
-            {
-                return result;
-            }
-            string RootEntityFullClassName = model.RootEntityFullClassName;
-            string RootEntityUniqueProjectName = model.RootEntityUniqueProjectName;
-            List<ModelViewForeignKeySerializable> ForeignKeys =
-                detail.ForeignKeys.Where(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName)).ToList();
-            if (ForeignKeys.Count < 1)
-            {
-                return result;
-            }
-            foreach (ModelViewForeignKeySerializable ForeignKey in ForeignKeys)
-            {
-                bool hasForeignKeyProps = true;
-                if (ForeignKey.ForeignKeyProps != null)
-                {
-                    for (int i = 0; i < ForeignKey.ForeignKeyProps.Count; i++)
-                    {
-                        ModelViewKeyPropertySerializable ForeignKeyProp = ForeignKey.ForeignKeyProps[i];
-                        hasForeignKeyProps =
-                            detail.ScalarProperties.Any(s => (s.OriginalPropertyName == ForeignKeyProp.OriginalPropertyName) && (string.IsNullOrEmpty(s.ForeignKeyNameChain)));
-                        if (!hasForeignKeyProps)
-                        {
-                            ModelViewKeyPropertySerializable PrincipalKeyProp = ForeignKey.PrincipalKeyProps[i];
-                            hasForeignKeyProps = detail.ScalarProperties.Any(s => (s.OriginalPropertyName == PrincipalKeyProp.OriginalPropertyName) && (s.ForeignKeyNameChain == ForeignKey.NavigationName));
-                            {
-                                hasForeignKeyProps = true;
-                            }
-                            if(!hasForeignKeyProps)
-                            {
-                                break;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    hasForeignKeyProps = false;
-                }
-                if (hasForeignKeyProps)
-                {
-                    result.Add(ForeignKey);
-                    break;
-                }
-            }
-            return result;
-    }
+
 ////////////////////////////////////////////////////////
+
     ModelViewPropertyOfVwSerializable GetScalarPropByOriginaPropName(string origPropName, ModelViewSerializable model) { 
         if (string.IsNullOrEmpty(origPropName) || (model == null)) return null;
         if ((model.AllProperties == null) || (model.ScalarProperties == null)) return null;
@@ -1071,5 +1202,281 @@
         if(model.UniqueKeys[0].UniqueKeyProperties.Count < 1) return null;
         return GetScalarPropByOriginaPropName(model.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName, model);
     }
+    List<ModelViewPropertyOfVwSerializable> GetModelPrimaryKeyProps(ModelViewSerializable model) {
+        List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
+        if (model == null)
+        {
+            return result;
+        }
+        if ((model.PrimaryKeyProperties == null) || (model.ScalarProperties == null)) {
+            return result;
+        }
+        foreach(ModelViewKeyPropertySerializable modelViewKeyPropertySerializable in model.PrimaryKeyProperties) {
+            ModelViewPropertyOfVwSerializable prop = GetScalarPropByOriginaPropName(modelViewKeyPropertySerializable.OriginalPropertyName, model);
+            if(prop != null) {
+                result.Add(prop);
+            }
+        }
+        return result;
+    }
+    List<ModelViewForeignKeySerializable> GetDetailViewForeignKeys(ModelViewSerializable model, ModelViewSerializable detail, List<ModelViewForeignKeySerializable> result)
+    {
+            if (result == null) result = new List<ModelViewForeignKeySerializable>();
+            if ((model == null) || (detail == null))
+            {
+                return result;
+            }
+            if ((model.PrimaryKeyProperties == null) || (detail.ScalarProperties == null) || (detail.ForeignKeys == null))
+            {
+                return result;
+            }
+            if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1))
+            {
+                return result;
+            }
+            List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(model);
+            if (primKeys == null)
+            {
+                return result;
+            }
+            if (primKeys.Count != model.PrimaryKeyProperties.Count)
+            {
+                return result;
+            }
+            string RootEntityFullClassName = model.RootEntityFullClassName;
+            string RootEntityUniqueProjectName = model.RootEntityUniqueProjectName;
+            List<ModelViewForeignKeySerializable> ForeignKeys =
+                detail.ForeignKeys.Where(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName)).ToList();
+            if (ForeignKeys.Count < 1)
+            {
+                return result;
+            }
+            foreach (ModelViewForeignKeySerializable ForeignKey in ForeignKeys)
+            {
+                bool hasForeignKeyProps = true;
+                if (ForeignKey.ForeignKeyProps != null)
+                {
+                    for (int i = 0; i < ForeignKey.ForeignKeyProps.Count; i++)
+                    {
+                        ModelViewKeyPropertySerializable ForeignKeyProp = ForeignKey.ForeignKeyProps[i];
+                        hasForeignKeyProps =
+                            detail.ScalarProperties.Any(s => (s.OriginalPropertyName == ForeignKeyProp.OriginalPropertyName) && (string.IsNullOrEmpty(s.ForeignKeyNameChain)));
+                        if (!hasForeignKeyProps)
+                        {
+                            ModelViewKeyPropertySerializable PrincipalKeyProp = ForeignKey.PrincipalKeyProps[i];
+                            hasForeignKeyProps = detail.ScalarProperties.Any(s => (s.OriginalPropertyName == PrincipalKeyProp.OriginalPropertyName) && (s.ForeignKeyNameChain == ForeignKey.NavigationName));
+                            {
+                                hasForeignKeyProps = true;
+                            }
+                            if(!hasForeignKeyProps)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    hasForeignKeyProps = false;
+                }
+                if (hasForeignKeyProps)
+                {
+                    result.Add(ForeignKey);
+                    break;
+                }
+            }
+            return result;
+    }
+    List<string> GetDetailViews(ModelViewSerializable model, DbContextSerializable context, List<string> result)
+        {
+            if (result == null)
+            {
+                result = new List<string>();
+            }
+            if ((model == null) || (context == null))
+            {
+                return result;
+            }
+            if ((model.ScalarProperties == null) || (model.PrimaryKeyProperties == null) || (context.ModelViews == null)) {
+                return result;
+            }
+            if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1))
+            {
+                return result;
+            }
+            List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(model);
+            if(primKeys == null)
+            {
+                return result;
+            }
+            if (primKeys.Count != model.PrimaryKeyProperties.Count)
+            {
+                return result;
+            }
+            string RootEntityFullClassName = model.RootEntityFullClassName;
+            string RootEntityUniqueProjectName = model.RootEntityUniqueProjectName;
+            List<ModelViewSerializable> details =
+                context.ModelViews.Where(m => m.ForeignKeys.Any(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName))).ToList();
+            if(details.Count < 1)
+            {
+                return result;
+            }
+            foreach(ModelViewSerializable detail in details)
+            {
+                if (detail.ScalarProperties == null) continue;
+                if (detail.ForeignKeys == null) continue;
+                if (detail.ForeignKeys.Count < 1) continue;
+                List<ModelViewForeignKeySerializable> ForeignKeys =
+                    detail.ForeignKeys.Where(f => (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName)).ToList();
+                if (ForeignKeys.Count < 1) continue;
+                bool canBeUsed = false;
+                foreach(ModelViewForeignKeySerializable ForeignKey in ForeignKeys)
+                {
+                    bool hasForeignKeyProps = true;
+                    if (ForeignKey.ForeignKeyProps != null)
+                    {
+                        for(int i = 0; i < ForeignKey.ForeignKeyProps.Count; i++)
+                        {
+                            ModelViewKeyPropertySerializable ForeignKeyProp = ForeignKey.ForeignKeyProps[i];
+                            if (!(detail.ScalarProperties.Any(s => (s.OriginalPropertyName == ForeignKeyProp.OriginalPropertyName) && (string.IsNullOrEmpty(s.ForeignKeyNameChain)))))
+                            {
+                                hasForeignKeyProps = false;
+                            }
+                            if(!hasForeignKeyProps)
+                            {
+                                ModelViewKeyPropertySerializable PrincipalKeyProp = ForeignKey.PrincipalKeyProps[i];
+                                if (detail.ScalarProperties.Any(s => (s.OriginalPropertyName == PrincipalKeyProp.OriginalPropertyName) && (s.ForeignKeyNameChain == ForeignKey.NavigationName)))
+                                {
+                                    hasForeignKeyProps = true;
+                                } else
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    } else
+                    {
+                        hasForeignKeyProps = false;
+                    }
+                    if (hasForeignKeyProps)
+                    {
+                        canBeUsed = true;
+                        break;
+                    }
+                }
+                if(canBeUsed)
+                {
+                    if(!result.Contains(detail.ViewName))
+                    {
+                        result.Add(detail.ViewName);
+                    }
+                }
+            }
+            return result;
+    }
+
+    string GetModuleClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".module","Module").Replace(".routing","Routing");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetServiceClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".service","Service");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GeFileNameWithoutExt(ModelViewSerializable model, string fileType) {
+        string result= "";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) return result;
+        if(model.CommonStaffs == null) return result= "";
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileFolder)) {
+            result = "./";
+        } else {
+            result = refItem.FileFolder.Replace("\\","/").Replace("src/","").Replace("app/","./");
+        }
+        if(! result.EndsWith("/")) {
+            result += "/";
+            
+        }
+        return result + refItem.FileName;
+    }
+
+    
 
 #>

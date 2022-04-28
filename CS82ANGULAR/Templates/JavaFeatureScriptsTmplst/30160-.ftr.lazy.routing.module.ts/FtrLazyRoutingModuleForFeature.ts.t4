@@ -1,0 +1,213 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureSerializable" name="Feature" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+
+
+
+    string ftrFeatureRoutingModuleFolder        = "30130-.ftr.routing.module.ts";
+    string ftrFeatureModuleFolder               = "30150-.ftr.module.ts";
+    string ftrFeatureLazyRoutingModuleFolder    = "30160-.ftr.lazy.routing.module.ts";
+
+
+    string featureRoutingModuleClassName        = GetFeatureModuleClassName(Feature, ftrFeatureRoutingModuleFolder);
+    string featureModuleClassName               = GetFeatureModuleClassName(Feature, ftrFeatureModuleFolder);
+    string featureLazyRoutingModuleClassName    = GetFeatureModuleClassName(Feature, ftrFeatureLazyRoutingModuleFolder);
+
+
+
+#>
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { <#=  featureModuleClassName #> } from '<#=  GetFeatureComponentFolderName(Feature, ftrFeatureLazyRoutingModuleFolder, ftrFeatureModuleFolder ) #>';
+import { <#=  featureRoutingModuleClassName #> } from '<#=  GetFeatureComponentFolderName(Feature, ftrFeatureLazyRoutingModuleFolder, ftrFeatureRoutingModuleFolder) #>';
+
+
+//
+// Hint: 
+// add the following line
+// { path: '<#= Feature.FeatureName.ToLower() #>', loadChildren: () => import('<#= GetFeatureModuleFileName(Feature, ftrFeatureLazyRoutingModuleFolder) #>').then(m => m.<#= featureLazyRoutingModuleClassName #>) }, 
+//
+// to the array
+// const routes: Routes = [ ... ]
+//
+// of the "app-routing.module.ts"-file
+// 
+// In the app.component.html-file add the following line
+// <mat-nav-list>
+//  ...
+//    <a mat-list-item [routerLink]="['/<#= Feature.FeatureName.ToLower() #>']" routerLinkActive="active">Title for <#= Feature.FeatureName #> </a> 
+//  ...
+// </mat-nav-list>
+//
+// 
+//
+
+
+@NgModule({
+    declarations: [
+    ],
+
+    imports: [
+        <#=  featureModuleClassName #>,
+        <#=  featureRoutingModuleClassName #>,
+    ],
+    exports: [
+    ],
+    entryComponents: [
+    ]
+})
+export class <#= featureLazyRoutingModuleClassName #> { }
+
+
+<#+
+
+    string GetFeatureModuleFileName(FeatureSerializable feature, string fileType) {
+        string result="./";
+        if ((feature == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        CommonStaffSerializable curItem = feature.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (curItem == null) {
+            return result;
+        }
+        return result + curItem.FileFolder.Replace("\\","/").Replace("app/","").Replace("src/","") + "/" + GetFeatureComponentFolderName(feature, fileType, fileType).Replace("./","");
+    }
+
+    string GetFeatureComponentClassName(FeatureSerializable feature, string fileType) {
+        string result="";
+        if ((feature == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (feature.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            feature.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component").Replace(".","-");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+    string GetFeatureComponentFolderName(FeatureSerializable feature, string currFolder, string refFolder) {
+        string result="./";
+        if ((feature == null) || string.IsNullOrEmpty(currFolder) || string.IsNullOrEmpty(refFolder) ) {
+            return result;
+        }
+        if (feature.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            feature.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            feature.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+
+
+
+    string GetFeatureModuleClassName(FeatureSerializable feature, string fileType) {
+        string result="";
+        if ((feature == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (feature.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            feature.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }  
+        string fn = refItem.FileName.Replace(".module","Module").Replace(".routing","Routing").Replace(".","-");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+#>

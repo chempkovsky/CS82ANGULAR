@@ -1,0 +1,141 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureSerializable" name="Feature" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+    string MaxHeightPropSelector                = "max-height";
+    string MaxHeightPropName                    = "maxHeight";
+    string FilterMaxHeightPropSelector          = "filter-max-height";
+    string FilterMaxHeightPropName              = "filterMaxHeight";
+    string colspanPropName                      = "colSpan";
+    string rowspanPropName                      = "rowSpan";
+    string onActivateMethodName                 = "onActivate";
+    string onDeActivateMethodName               = "onDeActivate";
+
+
+#>
+
+<div class="dashboard-grid-container">
+  <h4>Dashboard for <#= Feature.FeatureName #></h4>
+  <div class="gridlistcls">
+<#
+    {
+        int curItem = -1;
+        bool rotedInserted = false;
+        foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
+            curItem++;
+            ModelViewSerializable modelViewSerializable = GetModelViewByName(Context, featureItemSerializable.ViewName);
+            if(modelViewSerializable == null) {
+#>
+<!-- Error: Could not find <#= featureItemSerializable.ViewName #> Model-View  by name-->
+<#
+                continue;
+            }
+            bool isRouted = isRoutedItem(AllowedFileTypes, featureItemSerializable.FileType);
+            if (isRouted && rotedInserted) {
+#>
+<!-- Error: Only first Routed Item can be added:  <#=  featureItemSerializable.ViewName #> Model-View is a second one -->
+<#
+                continue;
+            }
+            string selectorCommonPart = GetComponentSelectorCommonPart(modelViewSerializable, featureItemSerializable.FileType);
+
+            if (isRouted) {
+#>
+    <div [style.grid-column-end]="'span '+ colSpan[<#= curItem #>][0]"   [style.grid-row-end]="'span '+ rowSpan[<#= curItem #>][0]"  [hidden]="colSpan[<#= curItem #>][0] === 0"  *ngIf="isVisible[<#= curItem #>]">
+        <mat-card>
+            <router-outlet (activate)="<#= onActivateMethodName #>($event)"  (deactivate)= "<#= onDeActivateMethodName #>($event)" ></router-outlet>
+        </mat-card>
+    </div>
+
+<#
+                rotedInserted = true;
+            } else {
+#>
+
+    <div [style.grid-column-end]="'span '+ colSpan[<#= curItem #>][0]"   [style.grid-row-end]="'span '+ rowSpan[<#= curItem #>][0]"  [hidden]="colSpan[<#= curItem #>][0] === 0"  *ngIf="isVisible[<#= curItem #>]">
+        <mat-card>
+            <app-<#= selectorCommonPart #>
+                [<#= containerMenuItemsSelector #>]="<#= containerMenuItemsPropName #>[<#= curItem #>]"
+                (<#= onContainerMenuItemClickSelector #>)="<#= onContainerMenuItemClickMethodName #>($event)"
+                [<#= MaxHeightPropSelector #>]="<#= MaxHeightPropName #>[<#= curItem #>][0]"  
+                [<#= FilterMaxHeightPropSelector #>]="<#= FilterMaxHeightPropName #>[<#= curItem #>][0]"></app-<#= selectorCommonPart #>>
+        </mat-card>
+    </div>
+
+<#
+            }
+        }
+    }
+#>
+
+  </div>
+</div>
+
+<#+
+
+        ModelViewSerializable GetModelViewByName(DbContextSerializable context, string viewName) {
+            if ((context == null) || (string.IsNullOrEmpty(viewName))) {
+                return null;
+            }
+            if (context.ModelViews == null) {
+                return null;
+            }
+            return context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+        }
+
+        string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType)
+        {
+            string result = "";
+            if ((model == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            if (refItem == null)
+            {
+                return result;
+            }
+            if (string.IsNullOrEmpty(refItem.FileName))
+            {
+                return result;
+            }
+            return refItem.FileName.Replace(".component", "");
+        }
+
+        bool isRoutedItem(AllowedFileTypesSerializable allowedFileTypes, string fileType) {
+            if( (allowedFileTypes == null) || string.IsNullOrEmpty(fileType)) {
+                return false;
+            }
+            if(allowedFileTypes.Items == null) {
+                return false;
+            }
+            AllowedFileTypeSerializable rslt= allowedFileTypes.Items.Where(i => i.FileType == fileType).FirstOrDefault();
+            if(rslt == null) {
+                return false;
+            }
+            return rslt.IsRouted;
+        }
+#>

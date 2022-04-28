@@ -263,6 +263,29 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30100-.ftr.component.css\Readme.html">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30100-.ftr.component.html\Readme.html">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30100-.ftr.component.ts\Readme.html">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30130-.ftr.routing.module.ts\Readme.html">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30160-.ftr.lazy.routing.module.ts\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30150-.ftr.module.ts\Readme.html">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Templates\JavaScriptsTmplst\00001-app-config.json\Readme.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -2099,6 +2122,45 @@
     <Content Include="Templates\WebApiServiceTmplst\DefaultWebApiServiceWithLookUp.Core.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30100-.ftr.component.css\ftr.component.css.t4">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30100-.ftr.component.css\ftr.component.ngb.css.t4">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30100-.ftr.component.html\ftr.component.html.t4">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30100-.ftr.component.html\ftr.component.ngb.html.t4">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30100-.ftr.component.ts\ftr.component.ngb-awesome.ts.t4">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30100-.ftr.component.ts\ftr.component.ts.t4">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30130-.ftr.routing.module.ts\FtrRoutingModuleForFeature.ts.t4">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30150-.ftr.module.ts\FtrModuleForFeature.ngb.ts.t4">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30150-.ftr.module.ts\FtrModuleForFeature.ts.t4">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30160-.ftr.lazy.routing.module.ts\FtrLazyRoutingModuleForFeature.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
