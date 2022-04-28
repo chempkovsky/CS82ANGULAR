@@ -178,6 +178,7 @@
 <#
     }
   }
+  if (Model.IsWebApiSelectOneByPrimarykey) {
     for(int i = 0; i < uniqueKeys.Count; i++) { 
         string indErrrorText = "";
         bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
@@ -220,6 +221,7 @@
 
         } // if (!indIsCorrect) {} else {}
     } // for(int i = 0; i < uniqueKeys.Count; i++) {} else {}
+}
 #>
 
 <app-<#= filterComponentSelectorCommonPart #> *ngIf="crIMIDid === 'fullscann'"

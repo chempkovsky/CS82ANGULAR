@@ -355,7 +355,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable = Model.UIFormProperties[i];
 #>
         '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label': '<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>',
-        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint': '<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#>'
+        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint': '<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#>',
         '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder': '<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>',
 <#
         }

@@ -341,8 +341,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
     firstPageLabel = $localize`First page@@<#= componentClassName #>.firstPageLabel:First page`;
     itemsPerPageLabel = $localize`Items per page@@<#= componentClassName #>.itemsPerPageLabel:Items per page`;
     lastPageLabel = $localize`Last page@@<#= componentClassName #>.lastPageLabel:Last page`;
-    nextPageLabel = 'Next page@@<#= componentClassName #>.nextPageLabel:Next page';
-    previousPageLabel = 'Previous page@@<#= componentClassName #>.previousPageLabel:Previous page';
+    nextPageLabel = $localize`Next page@@<#= componentClassName #>.nextPageLabel:Next page`;
+    previousPageLabel = $localize`Previous page@@<#= componentClassName #>.previousPageLabel:Previous page`;
     getRangeLabel(page: number, pageSize: number, length: number): string {
         const amountPages = Math.ceil(length / pageSize);
         return $localize`Page ${page + 1} of ${amountPages}@@<#= componentClassName #>.getRangeLabel:Page ${page + 1} of ${amountPages}`;
@@ -352,6 +352,19 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 <# 
     } else {
 #>
+// begin: internationalization of the mat-paginator
+    changes = new Subject<void>();
+    firstPageLabel = 'First page';
+    itemsPerPageLabel = 'Items per page';
+    lastPageLabel = 'Last page';
+    nextPageLabel = 'Next page';
+    previousPageLabel = 'Previous page';
+    getRangeLabel(page: number, pageSize: number, length: number): string {
+        const amountPages = Math.ceil(length / pageSize);
+        return 'Page ${page + 1} of ${amountPages}';
+    }
+// end: internationalization of the mat-paginator
+
     @Input('<#= captionSelector #>') <#= captionPropName #>: string = '<#= Model.PluralTitle #>';
 <# 
     }
@@ -422,10 +435,11 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         'fullscann': 'full scann',
 <# 
         }
-        for(int i = 0; i < uniqueKeys.Count; i++) { 
-            string indErrrorText = "";
-            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
-            if (!indIsCorrect) {
+        if (Model.IsWebApiSelectOneByPrimarykey) {
+            for(int i = 0; i < uniqueKeys.Count; i++) { 
+                string indErrrorText = "";
+                bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
+                if (!indIsCorrect) {
 #>
 
 //
@@ -435,21 +449,22 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 //
 
 <#
-            } else {
+                } else {
             
-                string caption = "Primary";
-                if(!uniqueKeys[i].IsPrimary) {
-                    caption = uniqueKeys[i].UniqueKeyName;
-                }
-                if(localize) {
+                    string caption = "Primary";
+                    if(!uniqueKeys[i].IsPrimary) {
+                        caption = uniqueKeys[i].UniqueKeyName;
+                    }
+                    if(localize) {
 #>
         '<#= scannByMode + caption #>': $localize`:filter by <#= caption #>@@<#= componentClassName #>.<#= scannByMode + caption #>-menu:filter by <#= caption #>`,
 <# 
-                } else {
+                    } else {
 #>
         '<#= scannByMode + caption #>': 'filter by <#= caption #>',
 <# 
-                } 
+                    } 
+                }
             }
         }
         if(searchSchemas!= null) {
@@ -727,11 +742,11 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
             } // foreach(var sch in searchSchemas) { ... }
           } // if(searchSchemas.Count > 0) {...}
         } // if(searchSchemas!= null) { ... }
-
-        for(int i = 0; i < uniqueKeys.Count; i++) { 
-            string indErrrorText = "";
-            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
-            if (!indIsCorrect) {
+        if (Model.IsWebApiSelectOneByPrimarykey) {
+            for(int i = 0; i < uniqueKeys.Count; i++) { 
+                string indErrrorText = "";
+                bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
+                if (!indIsCorrect) {
 #>
 
 //
@@ -741,23 +756,23 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 //
 
 <#
-            } else {
-                string caption = "Primary";
-                if(!uniqueKeys[i].IsPrimary) {
-                    caption = uniqueKeys[i].UniqueKeyName;
-                }
-                int UkPropsUsedByFltrCount = 0;
-                foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
-                    if(uniqueKeys[i].IsPrimary) {
-                        UkPropsUsedByFltrCount++;
-                    } else {
-                        if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
-                            if(!IsUsebByForeignKey(Model, modelViewPropertyOfVwSerializable)) UkPropsUsedByFltrCount++;
+                } else {
+                    string caption = "Primary";
+                    if(!uniqueKeys[i].IsPrimary) {
+                        caption = uniqueKeys[i].UniqueKeyName;
+                    }
+                    int UkPropsUsedByFltrCount = 0;
+                    foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
+                        if(uniqueKeys[i].IsPrimary) {
+                            UkPropsUsedByFltrCount++;
+                        } else {
+                            if (modelViewPropertyOfVwSerializable.IsUsedByfilter) {
+                                if(!IsUsebByForeignKey(Model, modelViewPropertyOfVwSerializable)) UkPropsUsedByFltrCount++;
+                            }
                         }
                     }
-                }
-                string requiredForeigKeyPropList = GetRequiredForeignKeyProps(uniqueKeys[i], Model);
-                if ((UkPropsUsedByFltrCount > 0) && (requiredForeigKeyPropList != null)) {
+                    string requiredForeigKeyPropList = GetRequiredForeignKeyProps(uniqueKeys[i], Model);
+                    if ((UkPropsUsedByFltrCount > 0) && (requiredForeigKeyPropList != null)) {
 #>
         if(hasNtExternal) {
           let reqFkPrps: Array<string> = <#= requiredForeigKeyPropList #>;
@@ -773,44 +788,45 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                 rslt.push(
                   {id: '<#= scannByMode + caption #>', caption: this.<#= menuCaptionsPropName #>['<#= scannByMode + caption #>'], iconName: 'search', iconColor: 'primary', enabled: true, data: [
 <#
-                int ukrows = UkPropsUsedByFltrCount / 4;
-                ukrows *= 4;
-                int theRest = UkPropsUsedByFltrCount % 4;
-                int theHRest = theRest / 2; 
-                if(theHRest < 1) theHRest = 1;
-                int cnt = 0;
-                foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
-                    if(!uniqueKeys[i].IsPrimary) {
-                        if (!modelViewPropertyOfVwSerializable.IsUsedByfilter)  continue;
-                        if(IsUsebByForeignKey(Model, modelViewPropertyOfVwSerializable)) continue;
-                    }
-                    if(cnt >= ukrows) break;
-                    cnt++;
+                    int ukrows = UkPropsUsedByFltrCount / 4;
+                    ukrows *= 4;
+                    int theRest = UkPropsUsedByFltrCount % 4;
+                    int theHRest = theRest / 2; 
+                    if(theHRest < 1) theHRest = 1;
+                    int cnt = 0;
+                    foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
+                        if(!uniqueKeys[i].IsPrimary) {
+                            if (!modelViewPropertyOfVwSerializable.IsUsedByfilter)  continue;
+                            if(IsUsebByForeignKey(Model, modelViewPropertyOfVwSerializable)) continue;
+                        }
+                        if(cnt >= ukrows) break;
+                        cnt++;
 #>
                   {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd:24, fltrSm:49, fltrXs: 100, fltrSrv: this.<#= formRootService #>},
 <#
                 }
                 cnt = 0;
-                foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
-                    if(!uniqueKeys[i].IsPrimary) {
-                        if (!modelViewPropertyOfVwSerializable.IsUsedByfilter)  continue;
-                        if(IsUsebByForeignKey(Model, modelViewPropertyOfVwSerializable)) continue;
-                    }
-                    if(cnt < ukrows) continue;
-                    cnt++;
+                    foreach(ModelViewPropertyOfVwSerializable modelViewPropertyOfVwSerializable in uniqueKeys[i].UniqueKeyProperties) {
+                        if(!uniqueKeys[i].IsPrimary) {
+                            if (!modelViewPropertyOfVwSerializable.IsUsedByfilter)  continue;
+                            if(IsUsebByForeignKey(Model, modelViewPropertyOfVwSerializable)) continue;
+                        }
+                        if(cnt < ukrows) continue;
+                        cnt++;
 #>
                   {fltrName: '<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>', fltrCaption: this.<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#>'], fltrDataType: '<#= GetCCharpDatatype(modelViewPropertyOfVwSerializable, Model) #>', fltrMaxLen: <#= GetMaxLen(modelViewPropertyOfVwSerializable, Model) #>, fltrMin: <#= GetMinVal(modelViewPropertyOfVwSerializable, Model) #>, fltrMax: <#= GetMaxVal(modelViewPropertyOfVwSerializable, Model) #>, fltrFlx:100, fltrMd: (100 / <#= theRest #>) - 1, fltrSm: (100 / <#= theHRest #>) - 1, fltrXs: 100, fltrSrv: this.<#= formRootService #>},
 <#
-                }
+                    }
 #>
                 ]});
               }
             }
         }
 <#
-                } // if(UkPropsUsedByFltrCount > 0) { ... }
-            } // if (!indIsCorrect) { ... } else { ... }
-        } // for(int i = 0; i < uniqueKeys.Count; i++) { ... }
+                    } // if(UkPropsUsedByFltrCount > 0) { ... }
+                } // if (!indIsCorrect) { ... } else { ... }
+            } // for(int i = 0; i < uniqueKeys.Count; i++) { ... }
+        } // if (Model.IsWebApiSelectOneByPrimarykey) { ... }
 #>
         if(hasNtExternal) {
           rslt.push(
@@ -1156,10 +1172,11 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                 }
             }
         }
-        for(int i = 0; i < uniqueKeys.Count; i++) { 
-            string indErrrorText = "";
-            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
-            if (!indIsCorrect) {
+        if (Model.IsWebApiSelectOneByPrimarykey) {
+            for(int i = 0; i < uniqueKeys.Count; i++) { 
+                string indErrrorText = "";
+                bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
+                if (!indIsCorrect) {
 #>
 
 //
@@ -1169,11 +1186,11 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 //
 
 <#
-            } else {
-                string caption = "Primary";
-                if(!uniqueKeys[i].IsPrimary) {
-                    caption = uniqueKeys[i].UniqueKeyName;
-                }
+                } else {
+                    string caption = "Primary";
+                    if(!uniqueKeys[i].IsPrimary) {
+                        caption = uniqueKeys[i].UniqueKeyName;
+                    }
 #>
             case '<#= caption #>':  
                 if(flt) {
@@ -1182,6 +1199,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                 }
                 break;           
 <#
+                }
             }
         }
 #>
@@ -1284,10 +1302,11 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 
 
 <#
-        for(int i = 0; i < uniqueKeys.Count; i++) { 
-            string indErrrorText = "";
-            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
-            if (!indIsCorrect) {
+        if (Model.IsWebApiSelectOneByPrimarykey) {
+            for(int i = 0; i < uniqueKeys.Count; i++) { 
+                string indErrrorText = "";
+                bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
+                if (!indIsCorrect) {
 #>
 
 //
@@ -1297,20 +1316,21 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 //
 
 <#
-            } else {
-                string caption = "Primary";
-                string localRouteManyName = GetManyByRepPrimMethodNamePrefix;
-                if(!uniqueKeys[i].IsPrimary) {
-                    caption = uniqueKeys[i].UniqueKeyName;
-                }
-                if(!uniqueKeys[i].IsPrimary) {
-                    localRouteManyName = GetManyByRepUnqMethodNamePrefix + caption;
-                }
+                } else {
+                    string caption = "Primary";
+                    string localRouteManyName = GetManyByRepPrimMethodNamePrefix;
+                    if(!uniqueKeys[i].IsPrimary) {
+                        caption = uniqueKeys[i].UniqueKeyName;
+                    }
+                    if(!uniqueKeys[i].IsPrimary) {
+                        localRouteManyName = GetManyByRepUnqMethodNamePrefix + caption;
+                    }
 #>
             case '<#= scannByMode + caption #>':  
                 mc = this.<#= formRootService #>.<#= localRouteManyName #>(flt);
                 break;
 <#
+                }
             }
         }
 #>
@@ -1370,7 +1390,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
     }
     tableCommand(id: string) {
 <#
-    {
+if (Model.IsWebApiSelectOneByPrimarykey) {
     if(uniqueKeys.Count > 0) {
 #>
         if(
@@ -1420,7 +1440,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         }
 <#
     }
-    }
+}
 #>
         let v: <#= eventEmitterDataModelClassName #> = {
             id: id,
@@ -1728,6 +1748,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 
 
 <#
+    if (Model.IsWebApiSelectOneByPrimarykey) {
         for(int i = 0; i < uniqueKeys.Count; i++) { 
             string indErrrorText = "";
             bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
@@ -1850,6 +1871,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 <#
             }
         }
+    }
 #>
 /////////////////////////////////////////
 

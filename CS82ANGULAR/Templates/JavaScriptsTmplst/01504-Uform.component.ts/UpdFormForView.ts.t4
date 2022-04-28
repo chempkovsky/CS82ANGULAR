@@ -347,14 +347,14 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     <#= frasesPropName #>: {[key:string]: string}  = {
         'Not-all-props': 'Not all properties are set',
         '<#= captionPropName #>': 'Update <#= Model.Title #>',
-        '<#= TitlePropName #>': '<#= TitleCaptionVal #>'
+        '<#= TitlePropName #>': '<#= TitleCaptionVal #>',
         'Not-all-masters': 'Not all masters have been set',
 <#
         for(int i = 0; i < Model.UIFormProperties.Count; i++) {
             ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable = Model.UIFormProperties[i];
 #>
         '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label': '<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>',
-        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint': '<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#>'
+        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint': '<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#>',
         '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder': '<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>',
 <#
         }
