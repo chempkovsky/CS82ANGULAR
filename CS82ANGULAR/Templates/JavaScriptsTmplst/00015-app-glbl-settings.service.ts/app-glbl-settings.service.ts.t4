@@ -52,11 +52,30 @@ import { AbstractControl, ValidationErrors } from '@angular/forms';
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot, CanActivateChild, Route } from '@angular/router';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
 import { <#= appConfigServiceClassName #> } from '<#= GetFolderName(Model, appConfigServiceFolder, appSettingServiceFolder)#>';
+import { HttpParameterCodec } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
-export class <#= appSettingServiceClassName #> implements CanActivate, CanActivateChild {
+export class <#= appSettingServiceClassName #> implements CanActivate, CanActivateChild, HttpParameterCodec {
+//
+// begin HttpParameterCodec: https://github.com/angular/angular/issues/20376
+//
+    encodeKey(key: string): string {
+      return encodeURIComponent(key);
+    }
+    encodeValue(value: string): string {
+      return encodeURIComponent(value);
+    }
+    decodeKey(key: string): string {
+      return decodeURIComponent(key);
+    }
+    decodeValue(value: string): string {
+      return decodeURIComponent(value);
+    }
+//
+// end HttpParameterCodec: https://github.com/angular/angular/issues/20376
+//
     public <#= AppearancePropName #>: MatFormFieldAppearance = 'outline';
     public filterHeightAddition: number = 0.5;
     public filterHeightFactor: number = 5;

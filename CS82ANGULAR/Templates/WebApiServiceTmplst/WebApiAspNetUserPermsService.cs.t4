@@ -96,7 +96,7 @@ namespace <#= webApiServiceNameSpace #> {
                     Mask1 = g.Sum(g => g.Mask1 ? 1 : 0) > 0,
                     Mask2 = g.Sum(g => g.Mask2 ? 1 : 0) > 0,
                     Mask3 = g.Sum(g => g.Mask3 ? 1 : 0) > 0,
-                    Mask4 = g.Sum(g => g.Mask4 ? 1 : 0) > 0
+                    Mask4 = g.Sum(g => g.Mask4 ? 1 : 0) > 0,
                     Mask5 = g.Sum(g => g.Mask5 ? 1 : 0) > 0
                 }).Join(db.aspnetmodellDbSet,
                  o => o.ModelPkRef,

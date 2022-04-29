@@ -25,6 +25,7 @@
     string HiddenFilterAsFltRsltSuffix  = "HiddenFilterAsFltRslt";
     string HiddenFilterByRowSuffix      = "HiddenFilterByRow";
     string uidParamName                 = "uid"; 
+    string RDLPrefix                    = "RDL";
     string routeFilterMaxHeightPropName = "fh";
 
     string NavPrefix                    = "np";
@@ -34,6 +35,7 @@
     string routeDepthParamName          = "dp"; 
     string routeMaxHeightPropName       = "mh";
     string routeOutletNmPropName        = "oltn";
+
 
     string getStorageItemMethodName     = "getStorageItem";
     string setStorageItemMethodName     = "setStorageItem";
@@ -50,9 +52,9 @@
     string ActionParamAddMode           = "add";
     string ActionParamUpdateMode        = "update";
     string ActionParamDeleteMode        = "delete";
+    string ActionParamViewMode          = "view";
     string ActionParamDeleteSelMode     = "deletesel";
     string ActionParamNavM2mNotAllwd    = "nvm2mntallwd";
-    string ActionParamViewMode          = "view";
     string ViewNameParamName            = "view";
     string NavigationParamName          = "nav";
     string NavigationAddOnName          = "addon";
@@ -105,8 +107,17 @@
     string MaxHeightPropName            = "maxHeight";
     string FilterMaxHeightPropSelector  = "filter-max-height";
     string FilterMaxHeightPropName      = "filterMaxHeight";
-    string frasesPropName               = "frases";
 
+
+    string FormControlModelSelector     = "eform-control-model";
+    string FormControlModelPropName     = "eformControlModel";
+    string FormControlNewModelPropName  = "eformNewControlModel";
+    string src2destMethodName           = "src2dest";
+
+    string currentRowPropName        = "currentRow";
+    string OnSelectRowMethodName     = "onSelectRow";
+    string showMultiSelectPropName   = "ms";
+    string frasesPropName            = "frases";
 
     string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
     string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
@@ -126,10 +137,22 @@
     string sformComponentFolder         = "01420-Sform.component.ts";
 
 
-    string rlistCssFolder               = "01920-Rlist.component.css";
-    string rlistHtmlFolder              = "01920-Rlist.component.html";
-    string rlistComponentFolder         = "01920-Rlist.component.ts";
+    string rdlistCssFolder              = "02020-Rdlist.component.css";
+    string rdlistHtmlFolder             = "02020-Rdlist.component.html";
+    string rdlistComponentFolder        = "02020-Rdlist.component.ts";
 
+
+    string viewInterfaceVDlgFolder      = "01510-Vdlg.interface.ts";
+    string vdlgComponentFolder          = "01520-Vdlg.component.ts";
+
+    string viewInterfaceADlgFolder      = "01512-Adlg.interface.ts";
+    string adlgComponentFolder          = "01522-Adlg.component.ts";
+
+    string viewInterfaceUDlgFolder      = "01514-Udlg.interface.ts";
+    string udlgComponentFolder          = "01524-Udlg.component.ts";
+
+    string viewInterfaceDDlgFolder      = "01516-Ddlg.interface.ts";
+    string ddlgComponentFolder          = "01526-Ddlg.component.ts";
 
 
     string ActionColumnDefProperty      = "menuAction";
@@ -138,10 +161,17 @@
     string MatPaginatorPageSize         = "10";
     string MatPaginatorPageSizeOptions  = "[10, 25, 50, 100]";
 
+
+    string vdlgComponentClassName = GetComponentClassName(Model, vdlgComponentFolder);
+    string adlgComponentClassName = GetComponentClassName(Model, adlgComponentFolder);
+    string udlgComponentClassName = GetComponentClassName(Model, udlgComponentFolder);
+    string ddlgComponentClassName = GetComponentClassName(Model, ddlgComponentFolder);
+
+
     string serviceClassName = GetServiceClassName(Model, viewServiceFolder);
     string appSettingServiceClassName = GetCommonServiceClassName(Context, appSettingServiceFolder);
-    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, rlistComponentFolder);
-    string componentClassName = GetComponentClassName(Model, rlistComponentFolder);
+    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, rdlistComponentFolder);
+    string componentClassName = GetComponentClassName(Model, rdlistComponentFolder);
     string searchComponentClassName = GetComponentClassName(Model, sformComponentFolder);
     string filterResultModelClassName = GetModelClassName(Context, filterResultModelFolder);
     string eventEmitterDataModelClassName   = GetModelClassName(Context, eventEmitterDataModelFolder);
@@ -153,16 +183,18 @@
     string messageDialogInterfaceName = GetModelClassName(Context, messageDialogInterfaceFolder);
 
     List<ModelViewPropertyOfVwSerializable> primKeys= GetModelPrimaryKeyProps(Model);
+
     List<string> detailViewNames =  GetDetailViews(Model, Context, null);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// the current script differs from the default one in only one line: List<string> detailViewNamesToExclude = new List<string>() { "aspnetuserrolesView"}; 
+// the current script differs from the default one in only one line: List<string> detailViewNamesToExclude = new List<string>() { "aspnetuserView"}; 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    List<string> detailViewNamesToExclude = new List<string>() { "aspnetuserrolesView"}; 
+    List<string> detailViewNamesToExclude = new List<string>() { "aspnetuserView"}; 
     // m2mMdl, m2mFk, searchFks, otherFks, externalFks
     Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
     // m2mMdl, m2mFk, searchFks, otherFks, externalFks
     List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
         GetSearchResources(Model, Context);
+
 
     string OnBackBtnMethodName          = "onBackBtnMd";
     string OnBackBtnPropName            = "onBackBtn";
@@ -172,16 +204,13 @@
     string captionPropName              = "caption";
     string captionSelector              = "caption";
 
-    string currentRowPropName           = "currentRow";
-    string OnSelectRowMethodName        = "onSelectRow";
-    string showMultiSelectPropName      = "showMultiSelect";
     string showMultiSelectedRowSelector = "show-multi-selected-row";
     string showMultiSelectedRowPropName = "showMultiSelectedRow";
     string multiSelectedRowSelector     = "multi-selected-row";
     string multiSelectedRowPropName     = "multiSelectedRow";
     string onMultiSelectedRowPropName   = "onMultiSelectedRow";
     string currentMultiRowPropName      = "currentMultiRow";
-    string LOutletNamePrefix            = "loltnm"; //
+    string DlOutletNamePrefix           = "dloltnm";
     string OnDetailChangedMethodName    = "onDetailChanged";
     string ToDetailMethodName           = "toDetail";
     string SelectedDetailPropName       = "selectedDetail";
@@ -191,31 +220,30 @@
     string selectedRowSelector          = "selected-row";
     string selectedRowPropName          = "selectedRow";
 
-    string OutletNameValue = LOutletNamePrefix + Model.ViewName;
+    string OutletNameValue = DlOutletNamePrefix + Model.ViewName;
+
 
 #>
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap, UrlSegment, ActivatedRouteSnapshot, NavigationStart } from '@angular/router';
-
-import { MatSelectChange } from '@angular/material/select';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSelectChange } from '@angular/material/select';
 import { firstValueFrom, takeWhile } from 'rxjs';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
 
 
-import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, rlistComponentFolder)#>';
-import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, rlistComponentFolder, Context, Model.ViewName, viewServiceFolder) #>';
-import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, rlistComponentFolder)#>';
-import { <#= searchComponentClassName #> } from '<#=  GetFolderName(Model, sformComponentFolder, rlistComponentFolder) #>';
-import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, rlistComponentFolder)#>';
-import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  menuItemDataModelFolder, rlistComponentFolder)#>';
-import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Model, Context, eventEmitterPubModelFolder, rlistComponentFolder)#>';
-import { <#= itemHeightDataModelClassName #> } from '<#= GetCommonFolderName(Model, Context, itemHeightDataModelFolder, rlistComponentFolder)#>';
-import { <#= GetInterfaceName(Model) #> } from '<#=  GetFolderName(Model, viewInterfaceFolder, rlistComponentFolder) #>';
-// import { <#= GetInterfaceFilterName(Model) #> } from '<#= GetCrossComponentFolderName(Model, rlistComponentFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
-import { <#= messageDialogInterfaceName #> } from '<#=  GetCommonFolderName(Model, Context,  messageDialogInterfaceFolder, rlistComponentFolder)#>';
-import { <#= messageDialogComponentClassName #> } from '<#=  GetCommonFolderName(Model, Context,  messageDialogComponentFolder, rlistComponentFolder)#>';
-
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, rdlistComponentFolder)#>';
+import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, rdlistComponentFolder, Context, Model.ViewName, viewServiceFolder) #>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, rdlistComponentFolder)#>';
+import { <#= searchComponentClassName #> } from '<#=  GetFolderName(Model, sformComponentFolder, rdlistComponentFolder) #>';
+import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, rdlistComponentFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  menuItemDataModelFolder, rdlistComponentFolder)#>';
+import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Model, Context, eventEmitterPubModelFolder, rdlistComponentFolder)#>';
+import { <#= itemHeightDataModelClassName #> } from '<#= GetCommonFolderName(Model, Context, itemHeightDataModelFolder, rdlistComponentFolder)#>';
+import { <#= GetInterfaceName(Model) #> } from '<#=  GetFolderName(Model, viewInterfaceFolder, rdlistComponentFolder) #>';
+// import { <#= GetInterfaceFilterName(Model) #> } from '<#= GetCrossComponentFolderName(Model, rdlistComponentFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
+import { <#= messageDialogInterfaceName #> } from '<#=  GetCommonFolderName(Model, Context,  messageDialogInterfaceFolder, rdlistComponentFolder)#>';
+import { <#= messageDialogComponentClassName #> } from '<#=  GetCommonFolderName(Model, Context,  messageDialogComponentFolder, rdlistComponentFolder)#>';
 <#
         if(searchSchemas!= null) {
             List<ModelViewSerializable> mdls = new List<ModelViewSerializable>();
@@ -230,11 +258,38 @@ import { <#= GetServiceClassName(m2mModel, viewServiceFolder) #> } from '<#=  Ge
         }
 #>
 
+<#
+    if(Model.IsWebApiSelectOneByPrimarykey) {
+#>
+import { <#=  GetInterfaceVDlgName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceVDlgFolder, rdlistComponentFolder)#>';
+import { <#=  vdlgComponentClassName #> } from '<#= GetFolderName(Model, vdlgComponentFolder, rdlistComponentFolder) #>';
+<#
+    }
+    if(Model.IsWebApiAdd) {
+#>
+import { <#=  GetInterfaceADlgName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceADlgFolder, rdlistComponentFolder)#>';
+import { <#=  adlgComponentClassName #> } from '<#= GetFolderName(Model, adlgComponentFolder, rdlistComponentFolder) #>';
+<#
+    }
+    if(Model.IsWebApiUpdate) {
+#>
+import { <#=  GetInterfaceUDlgName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceUDlgFolder, rdlistComponentFolder)#>';
+import { <#=  udlgComponentClassName #> } from '<#= GetFolderName(Model, udlgComponentFolder, rdlistComponentFolder) #>';
+<#
+    }
+    if(Model.IsWebApiDelete) {
+#>
+import { <#=  GetInterfaceDDlgName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceDDlgFolder, rdlistComponentFolder)#>';
+import { <#=  ddlgComponentClassName #> } from '<#= GetFolderName(Model, ddlgComponentFolder, rdlistComponentFolder) #>';
+<#
+    }
+#>
+
 
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
-  templateUrl: '<#= GetFolderName(Model, rlistHtmlFolder, rlistComponentFolder)#>.html',
-  styleUrls: ['<#=  GetFolderName(Model, rlistCssFolder, rlistComponentFolder)#>.css']
+  templateUrl: '<#= GetFolderName(Model, rdlistHtmlFolder, rdlistComponentFolder)#>.html',
+  styleUrls: ['<#=  GetFolderName(Model, rdlistCssFolder, rdlistComponentFolder)#>.css']
 })
 export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
 <# 
@@ -280,7 +335,6 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                         continue;
                     }
                 }
-
 #>
         '<#= detailView.ViewName + foreignKey.NavigationName #>': $localize`:<#= detailView.PluralTitle #>(<#= foreignKey.NavigationName #>)@@<#= componentClassName #>.<#=detailView.ViewName + foreignKey.NavigationName #>:<#= detailView.PluralTitle #>(<#= foreignKey.NavigationName #>)`,
 <#
@@ -315,7 +369,6 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                     }
                 }
             }
-
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
                 if(isM2m) {
                     // m2mMdl, m2mFk, searchFks, otherFks, externalFks
@@ -333,6 +386,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                         continue;
                     }
                 }
+
 #>
         '<#= detailView.ViewName + foreignKey.NavigationName #>': '<#= detailView.PluralTitle #>(<#= foreignKey.NavigationName #>)',
 <#
@@ -344,8 +398,6 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     } 
 #>
 
-
-
     public <#= ShowDetailsPropName #>: boolean = false;
     @Input('<#= showMultiSelectedRowSelector #>') <#= showMultiSelectedRowPropName #>: boolean = true;
     public <#= AppearancePropName #>: MatFormFieldAppearance = 'outline';
@@ -354,7 +406,6 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     <#= onMultiSelectedRowPropName #>(e: Array<<#= GetInterfaceName(Model) #>>): void {
         this.<#= multiSelectedRowPropName #>.emit(e);
     }
-
 
     @Input('<#= captionSelector #>') <#= captionPropName #>: string = this.<#= frasesPropName #>['<#= captionPropName #>'];
     <#= NavPrefix #>: string|any = '';
@@ -394,11 +445,11 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     rowMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
          {id: '<#= ActionParamUpdateMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'], iconName: 'edit', iconColor: 'primary', enabled: true},
          {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'delete_forever', iconColor: 'warn', enabled: true},
-         {id: '<#= ActionParamViewMode #>',   caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'preview', iconColor: 'primary', enabled: true},
+         {id: '<#= ActionParamViewMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'preview', iconColor: 'primary', enabled: true},
       ];
     tableMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
          {id: '<#= ActionParamAddMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'], iconName: 'create', iconColor: 'primary', enabled: true},
-         {id: '<#= ActionParamDeleteSelMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'], iconName: 'delete_forever', iconColor: 'warn', enabled: true},
+         {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'], iconName: 'delete_forever', iconColor: 'warn', enabled: true},
       ];
     constructor(protected route: ActivatedRoute, protected router: Router, protected  <#= formRootService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
 <#
@@ -412,6 +463,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             }
         } // if(searchSchemas!= null) {...}
 #>    
+
         public dialog: MatDialog, 
         protected cd: ChangeDetectorRef) {
     }
@@ -434,6 +486,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             }
         });
         this.currPath = this.router.url;
+        this.<#= AppearancePropName #> = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
         let luid = '<#= componentClassName #>';
         this.permMask = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= Model.ViewName #>');
         this.isPostNavApplied = false;
@@ -460,6 +513,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 if (!(typeof this.route.snapshot.data['<#= NavPrefix #>'] === 'undefined')) {
                     this.<#= NavPrefix #> = this.route.snapshot.data['<#= NavPrefix #>'];
                 }
+                // for the named router-outlet uncomment the lines below
 /*
                 if (!(typeof this.route.snapshot.data['<#= routeOutletNmPropName #>'] === 'undefined')) {
                     this.<#= OutletNmPropName #> = this.route.snapshot.data['<#= routeOutletNmPropName #>'];
@@ -468,6 +522,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 if (!(typeof this.route.snapshot.data['<#= IsDetailPropName #>'] === 'undefined')) {
                     this.<#= IsDetailPropName #> = this.route.snapshot.data['<#= IsDetailPropName #>'];
                 }
+
                 if (!(typeof this.route.snapshot.data['<#= showMultiSelectPropName #>'] === 'undefined')) {
                     this.<#= showMultiSelectedRowPropName #> = this.route.snapshot.data['<#= showMultiSelectPropName #>'];
                 }
@@ -527,7 +582,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         this.rowMenuItemsData[2].enabled = this.rowMenuItemsData[2].enabled && (!this.extfltrOn) <# if (!Model.IsWebApiSelectOneByPrimarykey) { #> && false <# } #>; // view
 <#
     {
-        if (detailViewNames.Count > 0) {
+        if (detailViewNames.Count > 0)  {
 #>
         if(!this.<#= IsDetailPropName #>) {
             let msk: number = 0;
@@ -585,10 +640,11 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             msk = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= detailViewName #>');
             if((msk & 1) === 1) {
                 this.rowMenuItemsData.push(
-                 { id: '<#= id #>', caption: this.<#= frasesPropName #>['<#=detailView.ViewName + foreignKey.NavigationName #>'], iconName: 'arrow_forward', iconColor: 'primary', enabled: true, 
+                 { id: '<#= id #>', caption: this.<#= frasesPropName #>['<#= detailView.ViewName + foreignKey.NavigationName #>'], iconName: 'arrow_forward', iconColor: 'primary', enabled: true, 
                     data: {
                         <#= ViewNameParamName #>: '<#= detailViewName #>',
                         <#= NavigationParamName #>: '<#= foreignKey.NavigationName #>',
+                        <#= NavigationAddOnName #>: '<#= detailViewName #>'
                     }
                  }
                 );
@@ -613,8 +669,6 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 #>
         this.isOnInitCalled = true;
     }
-    @Output('on-row-command') onRowCommand: EventEmitter<<#= eventEmitterDataModelClassName #>> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
-    @Output('on-table-command') onTableCommand: EventEmitter<<#= eventEmitterDataModelClassName #>> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
     @Output('<#= selectedRowSelector #>') <#= selectedRowPropName #>: EventEmitter<<#= GetInterfaceName(Model) #>> = new EventEmitter<<#= GetInterfaceName(Model) #>>();
     <#= OnSelectRowMethodName #>(e: <#= GetInterfaceName(Model) #>|any) {
         this.<#= ToDetailMethodName #>();
@@ -638,6 +692,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                     }
                 }
             }
+
             foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
                 if(isM2m) {
                     // m2mMdl, m2mFk, searchFks, otherFks, externalFks
@@ -655,9 +710,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                         continue;
                     }
                 }
-
 #>
-        {caption: this.<#= frasesPropName #>['<#= detailView.ViewName + foreignKey.NavigationName #>'], vw: '<#= detailVwnm #>', nv: '<#= foreignKey.NavigationName #>', addon: '<#= detailVwnm #>'},
+        {caption: this.<#= frasesPropName #>['<#=detailView.ViewName + foreignKey.NavigationName #>'], vw: '<#= detailVwnm #>', nv: '<#= foreignKey.NavigationName #>', addon: '<#= detailVwnm #>'},
 <#
             }
             
@@ -675,8 +729,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     }
     public <#= ToDetailMethodName #>() {
         if(!this.<#= ShowDetailsPropName #>) return;
-        let isNtDef: boolean = (this.<#= SelectedDetailPropName #> === null) || (typeof this.childForm.<#= currentRowPropName #> === 'undefined');
-        isNtDef = isNtDef ? isNtDef : ((this.<#= SelectedDetailPropName #>!.vw === null) || (this.<#= SelectedDetailPropName #>!.nv === null) || (this.childForm.<#= currentRowPropName #> === null));
+        let isNtDef: boolean = (this.<#= SelectedDetailPropName #> === null) || (typeof this.childForm.<#= selectedRowPropName #> == 'undefined');
+        isNtDef = isNtDef ? isNtDef : ((this.<#= SelectedDetailPropName #>!.vw === null) || (this.<#= SelectedDetailPropName #>!.nv === null) || (this.childForm.<#= selectedRowPropName #> == null))
 /*
         if(isNtDef) {
             this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(()=>{
@@ -686,7 +740,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(
                 () => {
                     let qp: string[] = [];
-                    qp.push( '<#= OutletNameValue +"2" #>' + this.<#= SelectedDetailPropName #>!.vw );
+                    qp.push( '<#= OutletNameValue +"2" #>' + this.<#= SelectedDetailPropName #>!.vw ); 
                     qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(this.childForm.<#= currentRowPropName #>, this.<#= SelectedDetailPropName #>!.nv)));
                     this.router.navigate([{ outlets: { '<#=  OutletNameValue #>' : qp } }], {relativeTo: this.route});
                 }
@@ -698,12 +752,204 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             this.router.navigate(['./'], {relativeTo: this.route});
         } else {
             let qp: string[] = [];
-            qp.push( '<#= OutletNameValue +"2" #>' + this.<#= SelectedDetailPropName #>!.vw );
+            qp.push( '<#= OutletNameValue +"2" #>' + this.<#= SelectedDetailPropName #>!.vw ); 
             qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(this.childForm.<#= currentRowPropName #>, this.<#= SelectedDetailPropName #>!.nv)));
             this.router.navigate(qp, {relativeTo: this.route});
         }
-
     }
+
+
+    onBackBtn(e?: any) {
+        if (this.<#= DepthParamName #> > 1) {
+//            this.<#= AppSettingServicePropName #>.<#= removeStorageItemMethodName #>(this.<#= uidParamName #> as string);
+
+            this.router.navigate(['../../'], {relativeTo: this.route}); 
+            // for the named router-outlet comment the line above and uncomment the lines below. Do not forget about html-file.
+/*
+            if(this.<#= OutletNmPropName #> === 'primary') {
+                this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route}).then(
+                    ()=> {
+                        this.router.navigate(['../../'], {relativeTo: this.route});
+                    }
+                );
+            } else {
+                // there is no parant, so do just hide detail component
+                this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: null }}], {relativeTo: this.route.parent!.parent});
+            }
+*/
+        }
+    }
+
+    public <#= externalFilterPropName #>: string | any;
+
+    <#= OnBeforeSqueryMethodName #>(cf: string | any): void {
+        if (this.<#= uidParamName #> === null) return;
+        let cfs: string = '';
+        if(!(typeof cf === 'undefined')) {
+            if(!(cf === null)) {
+                cfs = cf;
+            }
+        }
+        this.<#= AppSettingServicePropName #>.<#= setStorageItemMethodName #>(this.<#= uidParamName #> as string, cfs);
+    }
+
+
+    onView(e: <#= GetInterfaceName(Model) #>) {
+<#
+    if(Model.IsWebApiSelectOneByPrimarykey) {
+#>
+        let locdata: <#=  GetInterfaceVDlgName(Model) #> = {
+            title: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'],
+            <#= HiddenFilterPropName #>: this.<#= HiddenFilterPropName #>,
+            <#= FormControlModelPropName #>: e,
+            <#= FormControlNewModelPropName #>: null
+        };
+        let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
+        let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
+        let dialogRef = this.dialog.open(<#=  vdlgComponentClassName #>, {
+              data: locdata,
+              maxWidth: mw,
+              width: w,
+            });
+        dialogRef.afterClosed().subscribe(rslt => {
+        });
+<#
+    }
+#>
+    }
+
+    onAdd(sender: <#= searchComponentClassName #>) {
+<#
+    if(Model.IsWebApiAdd) {
+#>
+        let locdata: <#=  GetInterfaceADlgName(Model) #> = {
+            title: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'],
+            <#= HiddenFilterPropName #>: this.<#= HiddenFilterPropName #>,
+            <#= FormControlModelPropName #>: null,
+            <#= FormControlNewModelPropName #>: null
+        };
+        let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
+        let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
+        let dialogRef = this.dialog.open(<#=  adlgComponentClassName #>, {
+              data: locdata,
+              maxWidth: mw,
+              width: w,
+            });
+        dialogRef.afterClosed().subscribe(rslt => {
+            if (!(typeof rslt === 'undefined')) {
+                if (!(rslt === null)) {
+                    if (!( typeof rslt.<#= FormControlNewModelPropName #> === 'undefined') ) {
+                        if (!( rslt.<#= FormControlNewModelPropName #> === null) ) {
+                            if (!Array.isArray(sender.dataSource)) {
+                                sender.dataSource = [];
+                            }
+                            sender.dataSource.splice(0, 0, rslt.eformNewControlModel);
+                            sender.dataSource = sender.dataSource.slice(0);
+                            let isNDef = true;
+                            if (!(typeof sender.currentRow === 'undefined')) {
+                                if (!(sender.currentRow === null)) {
+                                    isNDef = false;
+                                }
+                            }
+                            if(isNDef) {
+                                sender.onSelectRow(rslt.eformNewControlModel);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+<#
+    }
+#>
+    }
+
+    onEdit(e: <#= GetInterfaceName(Model) #>) {
+<#
+    if(Model.IsWebApiUpdate) {
+#>
+        let locdata: <#=  GetInterfaceUDlgName(Model) #> = {
+            title: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'],
+            <#= HiddenFilterPropName #>: this.<#= HiddenFilterPropName #>,
+            <#= FormControlModelPropName #>: e,
+            <#= FormControlNewModelPropName #>: null
+        };
+        let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
+        let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
+        let dialogRef = this.dialog.open(<#=  udlgComponentClassName #>, {
+              data: locdata,
+              maxWidth: mw,
+              width: w,
+            });
+        dialogRef.afterClosed().subscribe(rslt => {
+            if (!(typeof rslt === 'undefined')) {
+                if (!(rslt === null)) {
+                    if (!((typeof rslt.<#= FormControlModelPropName #> === 'undefined') || (typeof rslt.<#= FormControlNewModelPropName #> === 'undefined'))) {
+                        if (!((rslt.<#= FormControlModelPropName #> === null) || (rslt.<#= FormControlNewModelPropName #> === null))) {
+                            this.<#= formRootService #>.<#= src2destMethodName #>(rslt.<#= FormControlNewModelPropName #>, rslt.<#= FormControlModelPropName #>);
+                        }
+                    }
+                }
+            }
+        });
+<#
+    }
+#>
+    }
+
+    onDelete(e: <#= GetInterfaceName(Model) #> , sender: <#= searchComponentClassName #> ) {
+<#
+    if(Model.IsWebApiDelete) {
+#>
+        let locdata: <#=  GetInterfaceDDlgName(Model) #> = {
+            title: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'],
+            <#= HiddenFilterPropName #>: this.<#= HiddenFilterPropName #>,
+            <#= FormControlModelPropName #>: e,
+            <#= FormControlNewModelPropName #>: null
+        };
+        let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
+        let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
+        let dialogRef = this.dialog.open(<#=  ddlgComponentClassName #>, {
+              data: locdata,
+              maxWidth: mw,
+              width: w,
+            });
+        dialogRef.afterClosed().subscribe(rslt => {
+            if (!(typeof rslt === 'undefined')) {
+                if (!(rslt === null)) {
+                    if (!((typeof rslt.<#= FormControlModelPropName #> === 'undefined') || (typeof rslt.<#= FormControlNewModelPropName #> === 'undefined'))) {
+                        if (!((rslt.<#= FormControlModelPropName #> === null) || (rslt.<#= FormControlNewModelPropName #> === null))) {
+                            if (!Array.isArray(sender.dataSource)) {
+                                sender.dataSource = [];
+                            }
+                            let i: number = sender.dataSource.indexOf(rslt.<#= FormControlModelPropName #>);
+                            if (i > -1) {
+                                if (!(sender.currentRow === null)) {
+                                    if (sender.currentRow === rslt.eformControlModel) {
+                                        if (i > 0) {
+                                            sender.onSelectRow(sender.dataSource[i-1]);
+                                        } else if (i < sender.dataSource.length-1) {
+                                            sender.onSelectRow(sender.dataSource[i+1]);
+                                        } else {
+                                            sender.onSelectRow(null);
+                                        }
+                                    }
+                                }
+                                sender.dataSource.splice(i, 1);
+                                sender.dataSource = sender.dataSource.slice(0);
+                            } 
+                        }
+                    }
+                }
+            }
+        });
+<#
+    }
+#>
+    }
+
+    @Output('on-row-command') onRowCommand: EventEmitter<<#= eventEmitterDataModelClassName #>> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
+    @Output('on-table-command') onTableCommand: EventEmitter<<#= eventEmitterDataModelClassName #>> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
 
     onDeleteMultiple(sender: <#= searchComponentClassName #>) {
 <#
@@ -746,7 +992,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 if(i > -1) sender.dataSource.splice(i, 1);
             });
             sender.dataSource = sender.dataSource.slice(0);
-            if ((deletedRows.indexOf( sender.<#= currentRowPropName #>  as <#= GetInterfaceName(Model) #>) > -1) && (sender.dataSource.length > 0)) sender.<#= OnSelectRowMethodName #>(sender.dataSource[0]);
+            if ((deletedRows.indexOf( sender.<#= currentRowPropName #> as <#= GetInterfaceName(Model) #>) > -1) && (sender.dataSource.length > 0)) sender.<#= OnSelectRowMethodName #>(sender.dataSource[0]);
         });
 <#
     }
@@ -754,7 +1000,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     }
 
     rowCommand(v: <#= eventEmitterDataModelClassName #>) {
-        let qp: string[] = [];
+        
 <#
         if(primKeys != null) {
 #>      
@@ -774,222 +1020,48 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#
         }
 #>
-        if(v.id === '<#= ActionParamViewMode #>') {
-            qp.push( '<#= VPrefix #>' + '<#= Model.ViewName #>' );
-            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
-                qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
-            } else {
-                qp.push(JSON.stringify({}));
-            }
-            qp.push(JSON.stringify(flt));
-        } else if(v.id === '<#= ActionParamUpdateMode #>') {
-            qp.push( '<#= UPrefix #>' + '<#= Model.ViewName #>' );
-            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
-                qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
-            } else {
-                qp.push(JSON.stringify({}));
-            }
-            qp.push(JSON.stringify(flt));
+        if(v.id === '<#= ActionParamUpdateMode #>') {
+            this.onEdit(flt);
         } else if(v.id === '<#= ActionParamDeleteMode #>') {
-            qp.push( '<#= DPrefix #>' + '<#= Model.ViewName #>' );
-            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
-                qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
-            } else {
-                qp.push(JSON.stringify({}));
-            }
-            qp.push(JSON.stringify(flt));
+            this.onDelete(flt, v.sender);
+        } else if(v.id === '<#= ActionParamViewMode #>') {
+            this.onView(flt);
         } else {
             let id = this.rowMenuItemsData.findIndex(e => { return e.id === v.id; })
             if(id < 0) return;
             let mnItm: IMenuItemData = this.rowMenuItemsData[id];
             if (!(typeof mnItm.data === 'undefined')) {
+                let qp: string[] = [];
+                qp.push( this.<#= NavPrefix #> + mnItm.data.<#= ViewNameParamName #> );
+                qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(v.value, mnItm.data.<#= NavigationParamName #>)));
+
+                this.router.navigate(qp, {relativeTo: this.route});
+                // for the named router-outlet comment the line above and uncomment the lines below. Do not forget about html-file.
+/*
                 if(this.<#= OutletNmPropName #> === 'primary') {
-                    qp.push( this.<#= NavPrefix #> +  mnItm.data.view );
-                    qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(v.value, mnItm.data.nav)));
+                    this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route}).then(
+                        ()=> {
+                            this.router.navigate(qp, {relativeTo: this.route});
+                        }
+                    );
                 } else {
                     this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('navigation', {message: this.<#= frasesPropName #>['<#= ActionParamNavM2mNotAllwd #>']});
-                    return;
                 }
+*/
             } else {
                 this.onRowCommand.emit(v);
                 return;
             }
         }
-
-        this.router.navigate(qp, {relativeTo: this.route});
-        // for the named router-outlet uncomment the lines above and comment the lines below. Do not forget about html-file.
-/*
-        if(this.<#= OutletNmPropName #> === 'primary') {
-            this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(()=>{
-                this.router.navigate(qp, {relativeTo: this.route})
-            });
-        } else {
-            qp[0] = this.<#= OutletNmPropName #> + '2' + qp[0];
-            this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route.parent!.parent}).then(
-                ()=> {
-                    this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: qp }}], {relativeTo: this.route.parent!.parent});
-                }
-            );
-        }
-*/
     }
     tableCommand(v: <#= eventEmitterDataModelClassName #>) {
         if(v.id === '<#= ActionParamDeleteMode #>') {
             this.onDeleteMultiple( v.sender );
         } else if(v.id === '<#= ActionParamAddMode #>') {
-            let qp: string[] = [];
-            qp.push( '<#= APrefix #>' + '<#= Model.ViewName #>' );
-            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
-                qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
-            } else {
-                qp.push(JSON.stringify({}));
-            }
-
-             this.router.navigate(qp, {relativeTo: this.route});
-            // for the named router-outlet comment the line above and uncomment the lines below. Do not forget about html-file.
-/*
-            if(this.<#= OutletNmPropName #> === 'primary') {
-                this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(()=>{
-                    this.router.navigate(qp, {relativeTo: this.route});
-                });
-            } else {
-                qp[0] = this.<#= OutletNmPropName #> + '2' + qp[0];
-                this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route.parent!.parent}).then(
-                    ()=> {
-                        this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: qp }}], {relativeTo: this.route.parent!.parent});
-                    }
-                );
-            }
-*/
+           this.onAdd( v.sender );
         } else {
             this.onTableCommand.emit(v);
-            return;
         }
-    }
-    <#= applyFilterPropName #>(frm: <#= searchComponentClassName #> | any) {
-        if(this.isPostNavApplied) {
-            return;
-        }
-        this.isPostNavApplied = true;
-
-        
-        let act: string | any = undefined;
-        if (!(typeof this.route.snapshot.queryParams['<#= ActionParamName #>'] === 'undefined')) {
-            act = this.route.snapshot.queryParams['<#= ActionParamName #>'];
-        }
-        if(typeof act === 'undefined') return;
-        if(act === null) return;
-
-        let flt: <#= GetInterfaceName(Model) #> | any = JSON.parse(this.route.snapshot.queryParams['<#= ItemParamName #>']);
-        if(typeof flt === 'undefined') return;
-        if(flt === null) return;
-
-<#
-    if (Model.IsWebApiSelectOneByPrimarykey) {
-#>
-        if ((act === '<#= APrefix #>') ||
-            (act === '<#= UPrefix #>')) {
-<#
-    for(int i = 0 ; i < primKeys.Count; i++) {
-#>
-            if(typeof flt['<#= GetTypeScriptPropertyName(primKeys[i], Model) #>'] === 'undefined') {
-                return;
-            }
-            let <#= GetPrimKeyVarName(primKeys[i]) #>: any = flt['<#= GetTypeScriptPropertyName(primKeys[i], Model) #>'];
-<#
-    }
-#>
-            this.<#= formRootService #>.<#= GetOneMethodName #>(
-<# {
-            int k = 0;
-            foreach(ModelViewPropertyOfVwSerializable primKey in primKeys) { 
-                if (k > 0)  {
-#>
-                , <#= GetPrimKeyVarName(primKey) #>
-<#
-                } else {
-                    k++;
-#>
-                  <#= GetPrimKeyVarName(primKey) #>
-<#
-                }
-            }
-   }
-#> 
-            ).subscribe({
-                   next: (data: <#= GetInterfaceName(Model) #> ) => { // success path
-                        if (typeof data === 'undefined') return;
-                        if (data === null) return;
-                        if(typeof frm.dataSource === 'undefined') return;
-                        if(!Array.isArray(frm.dataSource)) return;
-                        let i: number = frm.dataSource.findIndex((e:any) => {
-                            return <# {int k = 0;
-                                    foreach(ModelViewPropertyOfVwSerializable primKey in primKeys) { if (k > 0)  { #> && <# } 
-                                    #> (e.<#= GetTypeScriptPropertyName(primKeys[k], Model) #> === data.<#= GetTypeScriptPropertyName(primKeys[k], Model) #>)<#
-                                    k++;
-                                }} #>
-                        });
-                        if(i < 0) {
-                            frm.dataSource.splice(0, 0, data);
-                            frm.dataSource = frm.dataSource.slice(0);
-                            let isNDef = true;
-                            if (!(typeof frm.currentRow === 'undefined')) {
-                                if (!(frm.currentRow === null)) {
-                                    isNDef = false;
-                                }
-                            }
-                            if(isNDef) {
-                                frm.<#= OnSelectRowMethodName #>(data);
-                            }
-                        } else { 
-                            frm.<#= OnSelectRowMethodName #>(frm.dataSource[i]); 
-                        }
-                   },
-                   error: (error) => { // error path
-                        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
-                        this.onBackBtn(); // navigation is correct: onBackBtn is correct method here
-                   } 
-                });
-            return;
-        }
-<#
-    } else {
-#>
-// IsSelectOne is not set for given view
-<#
-    }
-#>
-    }
-    onBackBtn(e?: any) {
-        if (this.<#= DepthParamName #> > 1) {
-//            this.<#= AppSettingServicePropName #>.<#= removeStorageItemMethodName #>(this.<#= uidParamName #> as string);
-
-            this.router.navigate(['../../'], {relativeTo: this.route});
-            // for the named router-outlet comment the line above and uncomment the lines below. Do not forget about html-file.
-/*
-            if(this.<#= OutletNmPropName #> === 'primary') {
-                this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(()=>{
-                    this.router.navigate(['../../'], {relativeTo: this.route});
-                });
-            } else {
-                // there is no parant, so do just hide detail component
-                this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: null }}], {relativeTo: this.route.parent!.parent});
-            }
-*/
-        }
-    }
-
-    public <#= externalFilterPropName #>: string | any;
-
-    <#= OnBeforeSqueryMethodName #>(cf: string | any): void {
-        if (this.<#= uidParamName #> === null) return;
-        let cfs: string = '';
-        if(!(typeof cf === 'undefined')) {
-            if(!(cf === null)) {
-                cfs = cf;
-            }
-        }
-        this.<#= AppSettingServicePropName #>.<#= setStorageItemMethodName #>(this.<#= uidParamName #>, cfs);
     }
 
 }
@@ -1521,6 +1593,18 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     }
     string GetInterfaceFilterName(ModelViewSerializable model) {
         return "I"+model.ViewName + "Filter";
+    }
+    string GetInterfaceVDlgName(ModelViewSerializable model) {
+        return "I"+model.ViewName+"Vdlg";
+    }
+    string GetInterfaceADlgName(ModelViewSerializable model) {
+        return "I"+model.ViewName+"Adlg";
+    }
+    string GetInterfaceDDlgName(ModelViewSerializable model) {
+        return "I"+model.ViewName+"Ddlg";
+    }
+    string GetInterfaceUDlgName(ModelViewSerializable model) {
+        return "I"+model.ViewName+"Udlg";
     }
     string GetContextComponentClassName(DbContextSerializable context, string fileType) {
         string result="";

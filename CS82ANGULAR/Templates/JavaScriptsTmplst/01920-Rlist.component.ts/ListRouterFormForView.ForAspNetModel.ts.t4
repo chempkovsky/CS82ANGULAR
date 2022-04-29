@@ -155,9 +155,9 @@
     List<ModelViewPropertyOfVwSerializable> primKeys= GetModelPrimaryKeyProps(Model);
     List<string> detailViewNames =  GetDetailViews(Model, Context, null);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// the current script differs from the default one in only one line: List<string> detailViewNamesToExclude = new List<string>() { "aspnetuserrolesView"}; 
+// the current script differs from the default one in only one line: List<string> detailViewNamesToExclude = new List<string>() { "aspnetuserView"}; 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    List<string> detailViewNamesToExclude = new List<string>() { "aspnetuserrolesView"}; 
+    List<string> detailViewNamesToExclude = new List<string>() { "aspnetuserView"}; 
     // m2mMdl, m2mFk, searchFks, otherFks, externalFks
     Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
     // m2mMdl, m2mFk, searchFks, otherFks, externalFks

@@ -726,8 +726,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     }
     public <#= ToDetailMethodName #>() {
         if(!this.<#= ShowDetailsPropName #>) return;
-        let isNtDef: boolean = (this.<#= SelectedDetailPropName #> === null) || (typeof this.childForm.<#= selectedRowPropName #> == 'undefined');
-        isNtDef = isNtDef ? isNtDef : ((this.<#= SelectedDetailPropName #>!.vw === null) || (this.<#= SelectedDetailPropName #>!.nv === null) || (this.childForm.<#= selectedRowPropName #> == null))
+        let isNtDef: boolean = (this.<#= SelectedDetailPropName #> === null) || (typeof this.childForm.<#= currentRowPropName #> === 'undefined');
+        isNtDef = isNtDef ? isNtDef : ((this.<#= SelectedDetailPropName #>!.vw === null) || (this.<#= SelectedDetailPropName #>!.nv === null) || (this.childForm.<#= currentRowPropName #> === null))
 /*
         if(isNtDef) {
             this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(()=>{

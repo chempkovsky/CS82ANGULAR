@@ -468,7 +468,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
     // });
     // 
     <#= GetWithFilterMethodName #>(filter: <#=GetInterfaceFilterName(Model)#>): Observable<<#= GetInterfacePageName(Model) #>> {
-        let params: HttpParams  = new HttpParams();
+        let params: HttpParams  = new HttpParams({encoder: this.<#= AppSettingServicePropName #>});
         let hasFilter: boolean = false;
         if (!(typeof filter === 'undefined')) {
             if (!(filter === null )) {
@@ -624,7 +624,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
                 }
 #>
         ): Observable<<#= GetInterfaceName(Model) #>> {
-        let params: HttpParams  = new HttpParams();
+        let params: HttpParams  = new HttpParams({encoder: this.<#= AppSettingServicePropName #>});
         let hasFilter: boolean = false;
 <#
                 foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
@@ -649,7 +649,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
     }
 
     <#= localRouteManyName #>(filter: <#=GetInterfaceFilterName(Model)#>): Observable<<#= GetInterfacePageName(Model) #>> {
-        let params: HttpParams  = new HttpParams();
+        let params: HttpParams  = new HttpParams({encoder: this.<#= AppSettingServicePropName #>});
         let hasFilter: boolean = false;
         if (!(typeof filter === 'undefined')) {
             if (!(filter === null )) {
@@ -883,7 +883,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
             }
         }
         #>): Observable<<#= GetInterfaceName(Model) #>> {
-        let params: HttpParams  = new HttpParams();
+        let params: HttpParams  = new HttpParams({encoder: this.<#= AppSettingServicePropName #>});
         let hasFilter: boolean = false;
 <#
         foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {

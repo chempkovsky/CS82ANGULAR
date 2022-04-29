@@ -2162,6 +2162,18 @@
     <Content Include="Templates\JavaFeatureScriptsTmplst\30160-.ftr.lazy.routing.module.ts\FtrLazyRoutingModuleForFeature.ts.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01920-Rlist.component.ts\ListRouterFormForView.ForAspNetModel.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\02020-Rdlist.component.ts\DListRouterFormForView.ForAspNetModel.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01820-RV.component.ts\ViewRouterFormForView.ForAspNetModel.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
