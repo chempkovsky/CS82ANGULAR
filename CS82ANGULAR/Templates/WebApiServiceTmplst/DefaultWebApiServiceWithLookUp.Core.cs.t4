@@ -64,18 +64,12 @@ using LinqKit;
     // m2mMdl, m2mFk, searchFks, otherFks, externalFks
     List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
         GetSearchResources(Model, Context);
-    List<string> m2mMethodNames = new List<string>();
+    string m2mMethodName = ""; 
     {
-        if(searchSchemas!= null) {
-            string prfx  = "";
-            if(! string.IsNullOrEmpty(staticM2mClassNameSpace)) prfx  = staticM2mClassNameSpace + ".";
-            if(! string.IsNullOrEmpty(staticM2mClassName)) prfx  = prfx + staticM2mClassName + "." ;
-            foreach(var sch in searchSchemas) {
-                ModelViewSerializable m2mModel = sch.Item1;
-                string staticM2mUpdateMethodName = GetM2mStaticUpdateMethodName(m2mModel);
-                m2mMethodNames.Add(prfx + staticM2mUpdateMethodName);
-            }
-        }
+        string prfx  = "";
+        if(! string.IsNullOrEmpty(staticM2mClassNameSpace)) prfx  = staticM2mClassNameSpace + ".";
+        if(! string.IsNullOrEmpty(staticM2mClassName)) prfx  = prfx + staticM2mClassName + "." ;
+        m2mMethodName = prfx + GetM2mStaticUpdateMethodName(Model);
     }
     String GetM2mStaticUpdateMethodName(ModelViewSerializable model) {
         string result = "UpdateFor";
@@ -810,13 +804,7 @@ namespace <#= webApiServiceNameSpace #> {
             // 
             // Please define additional props of the <#= extendedMdlClass #> newcln object before  UpdateForXXX-method calls 
             //
-<#
-        foreach(string mthdNm in m2mMethodNames) {
-#>
-            await <#= mthdNm #>(db, 2, oldcln, newcln);
-<#
-        }
-#>            
+            await <#= m2mMethodName #>(db, 2, oldcln, newcln);
             return Ok(result);
         }
 <#
@@ -901,15 +889,7 @@ namespace <#= webApiServiceNameSpace #> {
             // 
             // Please define additional props of the <#= extendedMdlClass #> cln object before  UpdateForXXX-method calls 
             //
-<#
-        foreach(string mthdNm in m2mMethodNames) {
-#>
-            await <#= mthdNm #>(db, 1, null, cln);
-<#
-        }
-#>            
-
-
+            await <#= m2mMethodName #>(db, 1, null, cln);
             return Ok(result);
         }
 <#
@@ -1008,16 +988,8 @@ namespace <#= webApiServiceNameSpace #> {
             // 
             // Please define additional props of the <#= extendedMdlClass #> cln object before  UpdateForXXX-method calls 
             //
-<#
-        foreach(string mthdNm in m2mMethodNames) {
-#>
-            await <#= mthdNm #>(db, 3, cln, null);
-<#
-        }
-#>            
-
-
-                return Ok(result);
+            await <#= m2mMethodName #>(db, 3, cln, null);
+            return Ok(result);
         }
 <#
         } // the end of: if(!indIsCorrect) {} else {}

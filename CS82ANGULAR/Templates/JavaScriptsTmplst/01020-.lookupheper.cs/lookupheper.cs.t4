@@ -171,7 +171,9 @@ namespace <#= destinationNameSpace #> {
 <#
                 } // foreach(ModelViewPropertyOfVwSerializable slrPrp in searchVM.ScalarProperties) { ... }
 #>
-            return await query.FirstOrDefaultAsync();
+            <#= searchVM.RootEntityClassName #> rslt = await query.FirstOrDefaultAsync();
+            db.Entry(rslt).State = EntityState.Detached;
+            return rslt;
         }
         public static async Task<<#= searchVM.RootEntityClassName #>> <#= staticM2mInsDictItemMethodName #>(<#= Context.DbContextClassName #> db, <#= extendedMdlClass #> vm) {
             <#= searchVM.RootEntityClassName #> entityToAdd = new <#= searchVM.RootEntityClassName#>();
@@ -206,6 +208,7 @@ namespace <#= destinationNameSpace #> {
 
             db.<#= searchVM.RootEntityDbContextPropertyName #>.Add(entityToAdd);
             await db.SaveChangesAsync();
+            db.Entry(entityToAdd).State = EntityState.Detached;
             return entityToAdd;
         }
 <#
@@ -224,8 +227,62 @@ namespace <#= destinationNameSpace #> {
             if ( (<#= actionInputParamName #> < 1)   || (<#= actionInputParamName #> > 3)) return; // or throw exception
             if ( ((<#= actionInputParamName #> == 2) || (<#= actionInputParamName #> == 3)) && (<#= oldObjInputParamName #> == null) ) return; // or throw exception
             if ( ((<#= actionInputParamName #> == 1) || (<#= actionInputParamName #> == 2)) && (<#= newObjInputParamName #> == null) ) return; // or throw exception
-            // 1 - insert
-            if(<#= actionInputParamName #> == 1) {
+            // 2 - update; 3 - delete
+            if ((<#= actionInputParamName #> == 2) || (<#= actionInputParamName #> == 3)) {
+                bool readyToDel = true;
+
+                <#= m2mModel.RootEntityClassName #> <#= m2mModel.ViewName + "updDelTmp" #> = new <#= m2mModel.RootEntityClassName #>() {
+<#
+                List<string> updDelDefs = GetCodeToDefineM2mEntityProps(sch, Model, oldObjInputParamName);
+                foreach(string str in updDelDefs) {
+#>
+                    <#= str #>
+<#
+                }
+#>
+                }; // <#= m2mModel.ViewName + "updDelTmp" #>
+<#
+                foreach(var searchFkPair in searchFkPairs) {
+                    ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
+                    if(searchVM == null) continue;
+                    string staticM2mSelDictItemMethodName = GetM2mStaticSelDictItemMethodName(searchVM);
+                    string staticM2mInsDictItemMethodName = GetM2mStaticInsDictItemMethodName(searchVM);
+#>
+                if(readyToDel) {
+                    <#= searchVM.RootEntityClassName #> <#= searchVM.ViewName + "updDelTmp" #> = await <#= staticM2mSelDictItemMethodName #>(db, <#= oldObjInputParamName #>);
+                    readyToDel = <#= searchVM.ViewName + "updDelTmp" #> == null;
+                    if(readyToDel) {
+<#
+                    for(int i = 0; i < searchFkPair.Key.ForeignKeyProps.Count; i++) {
+#>
+                    <#= m2mModel.ViewName + "updDelTmp" #>.<#= searchFkPair.Key.ForeignKeyProps[i].OriginalPropertyName #> = <#= searchVM.ViewName + "updDelTmp" #>.<#= searchFkPair.Key.PrincipalKeyProps[i].OriginalPropertyName #>;
+<#
+                    }
+#>
+                    }
+                }
+<#
+                } // foreach(var searchFkPair in searchFkPairs) { ... }
+#>
+                if(readyToDel) {
+                    IQueryable<<#= m2mModel.RootEntityClassName #>> m2mDelQuery = db.<#= m2mModel.RootEntityDbContextPropertyName #>;
+<#
+                foreach(var entityProp in m2mModel.AllProperties) {
+#>
+                    m2mDelQuery = m2mDelQuery.Where(p=> p.<#=  entityProp.OriginalPropertyName #> == <#= m2mModel.ViewName + "updDelTmp" #>.<#= entityProp.OriginalPropertyName #>);
+<#
+                }
+#>                
+                    var delM2mRslt = await m2mDelQuery.FirstOrDefaultAsync();
+                    if(delM2mRslt != null) {
+                        db.<#= m2mModel.RootEntityDbContextPropertyName #>.Remove(delM2mRslt);
+                        db.SaveChanges();
+                        db.Entry(delM2mRslt).State = EntityState.Detached;
+                    }
+                }
+            }
+            // 1 - insert; 2 - update;
+            if ((<#= actionInputParamName #> == 1) || (<#= actionInputParamName #> == 2)) {
                 <#= m2mModel.RootEntityClassName #> <#= m2mModel.ViewName + "InsTmp" #> = new <#= m2mModel.RootEntityClassName #>() {
 <#
                 List<string> insDefs = GetCodeToDefineM2mEntityProps(sch, Model, newObjInputParamName);
@@ -267,54 +324,32 @@ namespace <#= destinationNameSpace #> {
                 if(insM2mRslt != null) return;
                 db.<#= m2mModel.RootEntityDbContextPropertyName #>.Add(<#= m2mModel.ViewName + "InsTmp" #>);
                 await db.SaveChangesAsync();
+                db.Entry(<#= m2mModel.ViewName + "InsTmp" #>).State = EntityState.Detached;
                 return;
             }
-            // 3 - delete
-            if(<#= actionInputParamName #> == 3) {
-                <#= m2mModel.RootEntityClassName #> <#= m2mModel.ViewName + "delTmp" #> = new <#= m2mModel.RootEntityClassName #>() {
+        }
 <#
-                List<string> delDefs = GetCodeToDefineM2mEntityProps(sch, Model, oldObjInputParamName);
-                foreach(string str in delDefs) {
+            } // foreach(var sch in searchSchemas) { ... }
+            string staticM2mUpdateAllMethodName = GetM2mStaticUpdateMethodName(Model);
 #>
-                    <#= str #>
-<#
-                }
-#>
-                }; // <#= m2mModel.ViewName + "delTmp" #>
-<#
-                foreach(var searchFkPair in searchFkPairs) {
-                    ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
-                    if(searchVM == null) continue;
-                    string staticM2mSelDictItemMethodName = GetM2mStaticSelDictItemMethodName(searchVM);
-                    string staticM2mInsDictItemMethodName = GetM2mStaticInsDictItemMethodName(searchVM);
-#>
-                <#= searchVM.RootEntityClassName #> <#= searchVM.ViewName + "delTmp" #> = await <#= staticM2mSelDictItemMethodName #>(db, <#= newObjInputParamName #>);
-                if(<#= searchVM.ViewName + "delTmp" #> == null) return;
-<#
-                    for(int i = 0; i < searchFkPair.Key.ForeignKeyProps.Count; i++) {
-#>
-                <#= m2mModel.ViewName + "delTmp" #>.<#= searchFkPair.Key.ForeignKeyProps[i].OriginalPropertyName #> = <#= searchVM.ViewName + "delTmp" #>.<#= searchFkPair.Key.PrincipalKeyProps[i].OriginalPropertyName #>;
-<#
-                    }
-                } // foreach(var searchFkPair in searchFkPairs) { ... }
-#>
-                IQueryable<<#= m2mModel.RootEntityClassName #>> m2mDelQuery = db.<#= m2mModel.RootEntityDbContextPropertyName #>;
-<#
-                foreach(var entityProp in m2mModel.AllProperties) {
-#>
-                m2mDelQuery = m2mDelQuery.Where(p=> p.<#=  entityProp.OriginalPropertyName #> == <#= m2mModel.ViewName + "delTmp" #>.<#= entityProp.OriginalPropertyName #>);
-<#
-                }
-#>                
-                var delM2mRslt = await m2mDelQuery.FirstOrDefaultAsync();
-                if(delM2mRslt == null) return;
-                db.<#= m2mModel.RootEntityDbContextPropertyName #>.Remove(delM2mRslt);
-                db.SaveChanges();
-            }
-            // 2 - update
-            if(<#= actionInputParamName #> == 2) {
+        // <#= actionInputParamName #>: 1 - insert; 2 - update; 3 - delete
+        public static async Task <#= staticM2mUpdateAllMethodName #>(<#= Context.DbContextClassName #> db, int <#= actionInputParamName #>, <#= extendedMdlClass #> <#= oldObjInputParamName #>, <#= extendedMdlClass #> <#= newObjInputParamName #>) {
+            if ( (<#= actionInputParamName #> < 1)   || (<#= actionInputParamName #> > 3)) return; // or throw exception
+            if ( ((<#= actionInputParamName #> == 2) || (<#= actionInputParamName #> == 3)) && (<#= oldObjInputParamName #> == null) ) return; // or throw exception
+            if ( ((<#= actionInputParamName #> == 1) || (<#= actionInputParamName #> == 2)) && (<#= newObjInputParamName #> == null) ) return; // or throw exception
+            // 3 - delete; 2 - update
+            if ((<#= actionInputParamName #> == 3) || (<#= actionInputParamName #> == 2)) {
                 bool readyToDel = true;
-
+<#
+        if(searchSchemas != null) {
+            List<ModelViewSerializable> searchModels = new List<ModelViewSerializable>();
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+                ModelViewForeignKeySerializable m2mForeignKey = sch.Item2;
+                List<KeyValuePair<ModelViewForeignKeySerializable,int>> externalFks = sch.Item5;
+                List<KeyValuePair<ModelViewForeignKeySerializable,int>> otherFks = sch.Item4;
+                List<KeyValuePair<ModelViewForeignKeySerializable,int>> searchFkPairs = sch.Item3;
+#>
                 <#= m2mModel.RootEntityClassName #> <#= m2mModel.ViewName + "updDelTmp" #> = new <#= m2mModel.RootEntityClassName #>() {
 <#
                 List<string> updDelDefs = GetCodeToDefineM2mEntityProps(sch, Model, oldObjInputParamName);
@@ -329,86 +364,122 @@ namespace <#= destinationNameSpace #> {
                 foreach(var searchFkPair in searchFkPairs) {
                     ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
                     if(searchVM == null) continue;
+                    if(searchModels.Any(p => p == searchVM)) continue;
+                    searchModels.Add(searchVM);
                     string staticM2mSelDictItemMethodName = GetM2mStaticSelDictItemMethodName(searchVM);
-                    string staticM2mInsDictItemMethodName = GetM2mStaticInsDictItemMethodName(searchVM);
 #>
-                if(readyToDel) {
-                    <#= searchVM.RootEntityClassName #> <#= searchVM.ViewName + "updDelTmp" #> = await <#= staticM2mSelDictItemMethodName #>(db, <#= newObjInputParamName #>);
-                    readyToDel = <#= searchVM.ViewName + "updDelTmp" #> == null;
-                    if(readyToDel) {
-<#
-                    for(int i = 0; i < searchFkPair.Key.ForeignKeyProps.Count; i++) {
-#>
-                    <#= m2mModel.ViewName + "updDelTmp" #>.<#= searchFkPair.Key.ForeignKeyProps[i].OriginalPropertyName #> = <#= searchVM.ViewName + "updDelTmp" #>.<#= searchFkPair.Key.PrincipalKeyProps[i].OriginalPropertyName #>;
-<#
-                    }
-#>
-                    }
-                }
+                <#= searchVM.RootEntityClassName #> <#= searchVM.ViewName + "delTmp" #> = await <#= staticM2mSelDictItemMethodName #>(db, <#= oldObjInputParamName #>);
 <#
                 } // foreach(var searchFkPair in searchFkPairs) { ... }
 #>
-                if(readyToDel) {
-                    IQueryable<<#= m2mModel.RootEntityClassName #>> m2mDelQuery = db.<#= m2mModel.RootEntityDbContextPropertyName #>;
-<#
-                foreach(var entityProp in m2mModel.AllProperties) {
-#>
-                    m2mDelQuery = m2mDelQuery.Where(p=> p.<#=  entityProp.OriginalPropertyName #> == <#= m2mModel.ViewName + "updDelTmp" #>.<#= entityProp.OriginalPropertyName #>);
-<#
-                }
-#>                
-                    var delM2mRslt = await m2mDelQuery.FirstOrDefaultAsync();
-                    if(delM2mRslt == null) return;
-                    db.<#= m2mModel.RootEntityDbContextPropertyName #>.Remove(delM2mRslt);
-                    db.SaveChanges();
-                }
-
-                <#= m2mModel.RootEntityClassName #> <#= m2mModel.ViewName + "UpdInsTmp" #> = new <#= m2mModel.RootEntityClassName #>() {
-<#
-                List<string> updInsDefs = GetCodeToDefineM2mEntityProps(sch, Model, newObjInputParamName);
-                foreach(string str in updInsDefs) {
-#>
-                    <#= str #>
-<#
-                }
-#>
-                }; // <#= m2mModel.ViewName + "UpdInsTmp" #>
+                readyToDel = true;
 <#
                 foreach(var searchFkPair in searchFkPairs) {
                     ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
                     if(searchVM == null) continue;
                     string staticM2mSelDictItemMethodName = GetM2mStaticSelDictItemMethodName(searchVM);
+#>
+                if (readyToDel) {
+                    readyToDel = <#= searchVM.ViewName + "delTmp" #> != null;
+
+                    if(readyToDel) {
+<#
+                    for(int i = 0; i < searchFkPair.Key.ForeignKeyProps.Count; i++) {
+#>
+                        <#= m2mModel.ViewName + "updDelTmp" #>.<#= searchFkPair.Key.ForeignKeyProps[i].OriginalPropertyName #> = <#= searchVM.ViewName + "delTmp" #>.<#= searchFkPair.Key.PrincipalKeyProps[i].OriginalPropertyName #>;
+<#
+                    }
+#>
+                    }
+                }
+<#
+                } // foreach(var searchFkPair in searchFkPairs) { ... }
+#>
+                if(readyToDel) {
+                    IQueryable<<#= m2mModel.RootEntityClassName #>> <#= m2mModel.ViewName + "DelQuery" #> = db.<#= m2mModel.RootEntityDbContextPropertyName #>;
+<#
+                foreach(var entityProp in m2mModel.AllProperties) {
+#>
+                    <#= m2mModel.ViewName + "DelQuery" #> = <#= m2mModel.ViewName + "DelQuery" #>.Where(p=> p.<#=  entityProp.OriginalPropertyName #> == <#= m2mModel.ViewName + "updDelTmp" #>.<#= entityProp.OriginalPropertyName #>);
+<#
+                }
+#>                
+                    var <#= m2mModel.ViewName + "DelRslt" #> = await <#= m2mModel.ViewName + "DelQuery" #>.FirstOrDefaultAsync();
+                    if(<#= m2mModel.ViewName + "DelRslt" #> != null) {
+                        db.<#= m2mModel.RootEntityDbContextPropertyName #>.Remove(<#= m2mModel.ViewName + "DelRslt" #>);
+                        db.SaveChanges();
+                        db.Entry(<#= m2mModel.ViewName + "DelRslt" #>).State = EntityState.Detached;
+                    }
+                }
+<#
+            }
+        }
+#>
+            }
+            // 1 - insert; 2 - update
+            if ((<#= actionInputParamName #> == 1) || (<#= actionInputParamName #> == 2)) {
+<#
+        if(searchSchemas != null) {
+            List<ModelViewSerializable> searchModels = new List<ModelViewSerializable>();
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+                ModelViewForeignKeySerializable m2mForeignKey = sch.Item2;
+                List<KeyValuePair<ModelViewForeignKeySerializable,int>> externalFks = sch.Item5;
+                List<KeyValuePair<ModelViewForeignKeySerializable,int>> otherFks = sch.Item4;
+                List<KeyValuePair<ModelViewForeignKeySerializable,int>> searchFkPairs = sch.Item3;
+#>
+                <#= m2mModel.RootEntityClassName #> <#= m2mModel.ViewName + "InsTmp" #> = new <#= m2mModel.RootEntityClassName #>() {
+<#
+                List<string> insDefs = GetCodeToDefineM2mEntityProps(sch, Model, newObjInputParamName);
+                foreach(string str in insDefs) {
+#>
+                    <#= str #>
+<#
+                }
+#>
+                }; // <#= m2mModel.ViewName + "InsTmp" #>
+<#
+                foreach(var searchFkPair in searchFkPairs) {
+                    ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
+                    if(searchVM == null) continue;
+                    if(searchModels.Any(p => p == searchVM)) continue;
+                    searchModels.Add(searchVM);
+                    string staticM2mSelDictItemMethodName = GetM2mStaticSelDictItemMethodName(searchVM);
                     string staticM2mInsDictItemMethodName = GetM2mStaticInsDictItemMethodName(searchVM);
 #>
-                <#= searchVM.RootEntityClassName #> <#= searchVM.ViewName + "UpdInsTmp" #> = await <#= staticM2mSelDictItemMethodName #>(db, <#= newObjInputParamName #>);
-                if(<#= searchVM.ViewName + "UpdInsTmp" #> == null) {
-                    <#= searchVM.ViewName + "UpdInsTmp" #> = await <#= staticM2mInsDictItemMethodName #>(db, <#= newObjInputParamName #>);
+                <#= searchVM.RootEntityClassName #> <#= searchVM.ViewName + "InsTmp" #> = await <#= staticM2mSelDictItemMethodName #>(db, <#= newObjInputParamName #>);
+                if(<#= searchVM.ViewName + "InsTmp" #> == null) {
+                    <#= searchVM.ViewName + "InsTmp" #> = await <#= staticM2mInsDictItemMethodName #>(db, <#= newObjInputParamName #>);
                 }
 <#
                     for(int i = 0; i < searchFkPair.Key.ForeignKeyProps.Count; i++) {
 #>
-                <#= m2mModel.ViewName + "UpdInsTmp" #>.<#= searchFkPair.Key.ForeignKeyProps[i].OriginalPropertyName #> = <#= searchVM.ViewName + "UpdInsTmp" #>.<#= searchFkPair.Key.PrincipalKeyProps[i].OriginalPropertyName #>;
+                <#= m2mModel.ViewName + "InsTmp" #>.<#= searchFkPair.Key.ForeignKeyProps[i].OriginalPropertyName #> = <#= searchVM.ViewName + "InsTmp" #>.<#= searchFkPair.Key.PrincipalKeyProps[i].OriginalPropertyName #>;
 <#
                     }
                 } // foreach(var searchFkPair in searchFkPairs) { ... }
 #>
-                IQueryable<<#= m2mModel.RootEntityClassName #>> m2mInsQuery = db.<#= m2mModel.RootEntityDbContextPropertyName #>;
+                IQueryable<<#= m2mModel.RootEntityClassName #>>  <#= m2mModel.ViewName + "InsQuery" #> = db.<#= m2mModel.RootEntityDbContextPropertyName #>;
 <#
                 foreach(var entityProp in m2mModel.AllProperties) {
 #>
-                m2mInsQuery = m2mInsQuery.Where(p=> p.<#=  entityProp.OriginalPropertyName #> == <#= m2mModel.ViewName + "UpdInsTmp" #>.<#= entityProp.OriginalPropertyName #>);
+                <#= m2mModel.ViewName + "InsQuery" #> = <#= m2mModel.ViewName + "InsQuery" #>.Where(p=> p.<#=  entityProp.OriginalPropertyName #> == <#= m2mModel.ViewName + "InsTmp" #>.<#= entityProp.OriginalPropertyName #>);
 <#
                 }
 #>                
-                var insM2mRslt = await m2mInsQuery.FirstOrDefaultAsync();
-                if(insM2mRslt != null) return;
-                db.<#= m2mModel.RootEntityDbContextPropertyName #>.Add(<#= m2mModel.ViewName + "UpdInsTmp" #>);
-                await db.SaveChangesAsync();
-                return;
+                var <#= m2mModel.ViewName + "insRslt" #> = await <#= m2mModel.ViewName + "InsQuery" #>.FirstOrDefaultAsync();
+                if(<#= m2mModel.ViewName + "insRslt" #> == null) {
+                    db.<#= m2mModel.RootEntityDbContextPropertyName #>.Add(<#= m2mModel.ViewName + "InsTmp" #>);
+                    await db.SaveChangesAsync();
+                    db.Entry(<#= m2mModel.ViewName + "InsTmp" #>).State = EntityState.Detached;
+                }
+<#
+            } // foreach(var sch in searchSchemas) { ... }
+        } // if(searchSchemas != null) { ... }
+#>
             }
         }
 <#
-            } // foreach(var sch in searchSchemas) { ... }
         } // if(searchSchemas!= null) { ... }
 #>
     }
