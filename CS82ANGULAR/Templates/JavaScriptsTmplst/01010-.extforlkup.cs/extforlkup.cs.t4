@@ -32,7 +32,37 @@ using System.ComponentModel.DataAnnotations;
     // m2mMdl, m2mFk, searchFks, otherFks, externalFks
     List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
         GetSearchResources(Model, Context);
-    List<ModelViewPropertyOfVwSerializable> externalFlds = new List<ModelViewPropertyOfVwSerializable>();
+    List<ModelViewPropertyOfVwSerializable> mappedFlds = new List<ModelViewPropertyOfVwSerializable>();
+    List<ModelViewPropertyOfVwSerializable> extFlds = new List<ModelViewPropertyOfVwSerializable>();
+    if(searchSchemas != null) {
+        foreach(var sch in searchSchemas) {
+            ModelViewSerializable m2mModel = sch.Item1;
+            ModelViewForeignKeySerializable m2mForeignKey = sch.Item2;
+            List<KeyValuePair<ModelViewForeignKeySerializable,int>> searchFkPairs = sch.Item3;
+            List<KeyValuePair<ModelViewForeignKeySerializable,int>> otherFks = sch.Item4;
+            List<KeyValuePair<ModelViewForeignKeySerializable,int>> externalFks = sch.Item5;
+            for(int i = 0; i < m2mForeignKey.ForeignKeyProps.Count; i++) {
+                ModelViewPropertyOfVwSerializable slrPrp = GetScalarPropByOriginaPropName(m2mForeignKey.PrincipalKeyProps[i].OriginalPropertyName, Model);
+                if(mappedFlds.Any(p => p.ViewPropertyName == slrPrp.ViewPropertyName)) continue;
+                mappedFlds.Add(slrPrp);
+            }
+            foreach(var searchFkPair in searchFkPairs) {
+                ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
+                ModelViewPropertyOfVwSerializable slrPrp = Model.ScalarProperties.Where(p => p.ViewPropertyName == GetScalarPropByOriginaPropName(searchVM.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName, searchVM).ViewPropertyName).FirstOrDefault();
+                if(mappedFlds.Any(p => p.ViewPropertyName == slrPrp.ViewPropertyName)) continue;
+                mappedFlds.Add(slrPrp);
+            }
+            if(otherFks != null) {
+                for(int i = 0; i < otherFks.Count; i++) {
+                    for(int j = 0; j < otherFks[i].Key.ForeignKeyProps.Count; j++) {
+                        ModelViewPropertyOfVwSerializable slrPrp = Model.ScalarProperties.Where(p => p.ViewPropertyName == GetScalarPropByOriginaPropName(otherFks[i].Key.ForeignKeyProps[j].OriginalPropertyName, m2mModel).ViewPropertyName).FirstOrDefault();
+                        if(mappedFlds.Any(p => p.ViewPropertyName == slrPrp.ViewPropertyName)) continue;
+                        mappedFlds.Add(slrPrp);
+                    }
+                }
+            }
+        }
+    }
 
 #>
 
@@ -44,8 +74,63 @@ using <#= viewModelNameSpace #>;
 
 namespace <#= destinationNameSpace #> {
 
-    public class <#= extendedMdlClass #>: <#= Model.ViewName #> {
+    public class <#= extendedMdlClass #> {
 <#
+        foreach(ModelViewPropertyOfVwSerializable slrPrp in mappedFlds) {
+            if(Model.GenerateJSonAttribute) { 
+#>
+        [JsonPropertyName("<#= slrPrp.JsonPropertyName #>")]
+<# 
+            } 
+            if (slrPrp.IsRequiredInView) {
+#>
+        [Required]
+<# 
+            }
+            if(slrPrp.Attributes != null) {
+                foreach(ModelViewAttributeSerializable a in slrPrp.Attributes) {
+                    if ("Required".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+                    if ("DatabaseGenerated".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+                    if ("Key".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+                    if ("ForeignKey".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+                    if ("Column".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+                    if ("Index".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+                    if ("NotMapped".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+                    if ("InverseProperty".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+#>
+        <#= AttribToString(a) #>
+<#
+                } // foreach(ModelViewAttributeSerializable a in slrPrp.Attributes) { ... }
+            } // if(slrPrp.Attributes != null) {...}
+            if((!slrPrp.IsNullable) && IsStringPropertyTypeName(slrPrp)) {
+#>
+        public <#= GetPropertyTypeName(slrPrp) #>  <#= GetTypeScriptPropertyName(slrPrp, Model) #> { get; set; } = null!;
+
+<# 
+            } else {
+#>
+        public <#= GetPropertyTypeName(slrPrp) #>  <#= GetTypeScriptPropertyName(slrPrp, Model) #> { get; set; }
+
+<# 
+            } // if((!slrPrp.IsNullable) && IsStringPropertyTypeName(slrPrp)) { ... } else { ... }
+        }
+
         if(searchSchemas!= null) {
             foreach(var sch in searchSchemas) {
                 ModelViewSerializable m2mModel = sch.Item1;
@@ -54,8 +139,9 @@ namespace <#= destinationNameSpace #> {
                     foreach(KeyValuePair<ModelViewForeignKeySerializable,int> externalFk in externalFks) {
                         foreach(ModelViewKeyPropertySerializable fkprop in externalFk.Key.ForeignKeyProps) {
                             ModelViewPropertyOfVwSerializable slrPrp = GetScalarPropByOriginaPropName(fkprop.OriginalPropertyName, m2mModel);
-                            if(externalFlds.Any(p => p.ViewPropertyName == slrPrp.ViewPropertyName)) continue;
-                            externalFlds.Add(slrPrp);
+                            if(mappedFlds.Any(p => p.ViewPropertyName == slrPrp.ViewPropertyName)) continue;
+                            if(extFlds.Any(p => p.ViewPropertyName == slrPrp.ViewPropertyName)) continue;
+                            extFlds.Add(slrPrp);
                             if(m2mModel.GenerateJSonAttribute) { 
 #>
         [JsonPropertyName("<#= slrPrp.JsonPropertyName #>")]
@@ -122,14 +208,26 @@ namespace <#= destinationNameSpace #> {
             if(src != null) {
 <#
     if(Model.ScalarProperties != null) {
-        foreach(ModelViewPropertyOfVwSerializable sp in Model.ScalarProperties) {
+        foreach(ModelViewPropertyOfVwSerializable sp in mappedFlds) {
 #>
-            dest.<#= sp.ViewPropertyName #> = src.<#= sp.ViewPropertyName #>;
+                dest.<#= sp.ViewPropertyName #> = src.<#= sp.ViewPropertyName #>;
 <#
         }
     }
 #>
             }
+<#
+    if(extFlds.Count > 0) {
+#>
+// do not forget about external foreign key props
+<#
+        foreach(ModelViewPropertyOfVwSerializable sp in extFlds) {
+#>
+    // dest.<#= sp.ViewPropertyName #> = ?????
+<#
+        }
+    }
+#>
             return dest;
         }
     }

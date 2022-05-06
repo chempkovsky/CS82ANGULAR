@@ -788,25 +788,21 @@ namespace <#= webApiServiceNameSpace #> {
 <#
         }
 #>
-                    .Select(itm => new <#= extendedMdlClass #>() {
+                    .Select(itm => new <#= Model.ViewName #>() {
 <#
                 int cnt = Model.ScalarProperties.Count-1;
                 for(int i = 0; i < cnt; i++) {
 #>
-                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetForeignKeyNameChainAndProp(Model.ScalarProperties[i], Model) #>,
+                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = itm.<#= GetForeignKeyNameChainAndProp(Model.ScalarProperties[i], Model) #>,
 <#
         } 
 #>
-                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChainAndProp(Model.ScalarProperties[cnt], Model) #>
+                            <#= GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = itm.<#= GetForeignKeyNameChainAndProp(Model.ScalarProperties[cnt], Model) #>
                     }).FirstOrDefaultAsync();
             if (result == null)
             {
                 return NotFound();
             }
-
-
-
-
 
             <#= extendedMdlClass #> newcln = <#= DoCloneMethodName #>(result);
             <#= extendedMdlClass #> oldcln = <#= DoCloneMethodName #>(oldObjVer);
