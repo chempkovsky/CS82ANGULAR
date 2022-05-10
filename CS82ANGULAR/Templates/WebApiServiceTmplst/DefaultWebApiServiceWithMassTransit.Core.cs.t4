@@ -20,6 +20,67 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LinqKit;
+using MassTransit;
+
+/*
+according to https://masstransit-project.com/usage/configuration.html#configuration
+make sure Program.cs file contains the following code:
+
+#region MassTransit config
+using MassTransit;
+#endregion
+...
+var builder = WebApplication.CreateBuilder(args);
+...
+
+
+#region MassTransit config
+builder.Services.AddMassTransit(x => {
+    x.UsingRabbitMq((context, configurator) => {
+        configurator.Host("192.168.100.4", "RabbitMq_virtual_host_name", h =>
+        {
+            h.Username("RabbitMq_admin_name");
+            h.Password("RabbitMq_admin_password");
+            // 
+            // Cluster settings
+            //
+            // h.UseCluster((configureCluster) =>
+            // {
+            //   configureCluster.Node("192.168.100.5");
+            //   configureCluster.Node("192.168.100.6");
+            //   ...
+            //   configureCluster.Node("192.168.100.10");
+            // });
+            // h.PublisherConfirmation = true;
+            //h.ConfigureBatchPublish(configure =>
+            //{
+            //});
+        });
+        // 
+        // Quorum Queue settings
+        //
+        // configurator.SetQuorumQueue(3);
+        //
+    });
+});
+builder.Services.AddOptions<MassTransitHostOptions>()
+                .Configure(options =>
+                {
+                    // if specified, waits until the bus is started before
+                    // returning from IHostedService.StartAsync
+                    // default is false
+                    options.WaitUntilStarted = true;
+
+                    // if specified, limits the wait time when starting the bus
+                    options.StartTimeout = TimeSpan.FromSeconds(10);
+
+                    // if specified, limits the wait time when stopping the bus
+                    options.StopTimeout = TimeSpan.FromSeconds(30);
+
+                });
+#endregion
+*/
+
 
 <#
 
@@ -27,11 +88,12 @@ using LinqKit;
     string extforlkupFolder             = "01010-.extforlkup.cs";
     string staticM2mClassFolder         = "01020-.lookupheper.cs";
 
+    string extendedMdlMsgInterface      = GetExtForLkUpMsgInterfaceName(Model);
     string extendedMdlInterface         = GetExtForLkUpInterfaceName(Model);
     string extendedMdlClass             = GetExtForLkUpClassName(Model);
     string staticM2mClassName           = GetM2mStaticClassName(Model);
 
-    string extforlkupInterfaceNameSpace =  GetTypeNameSpace(Model, Context, extforlkupInterfaceFolder);
+    string extforlkupInterfaceNameSpace = GetTypeNameSpace(Model, Context, extforlkupInterfaceFolder);
     string extendedMdlClassNameSpace    = GetTypeNameSpace(Model, Context, extforlkupFolder);
     string staticM2mClassNameSpace      = GetTypeNameSpace(Model, Context, staticM2mClassFolder);
     string clonerMdlClass               = Model.ViewName + "CloneForLkUp";
@@ -47,6 +109,11 @@ using LinqKit;
     string DeleteOneMethodName          = "deleteone";
     string GetManyByRepPrimMethodNamePrefix = "getmanybyrepprim";
     string GetManyByRepUnqMethodNamePrefix  = "getmanybyrepunq";
+
+    string actionInputParamName             = "action";
+    string oldObjInputParamName             = "oldObj";
+    string newObjInputParamName             = "newObj";
+
 
     string OperatorSufix = "Oprtr";
     string webApiServiceNameSpace = GetDestinationNameSpace(Model);
@@ -132,10 +199,12 @@ namespace <#= webApiServiceNameSpace #> {
         private int minPageSize = 5;
         private int maxPageSize = 150;
         private readonly <#= Context.DbContextClassName #> db;
+        private readonly IPublishEndpoint pe;
 
-        public <#= Model.WebApiServiceName #>(<#= Context.DbContextClassName #> context)
+        public <#= Model.WebApiServiceName #>(<#= Context.DbContextClassName #> context, IPublishEndpoint publishEndpoint)
         {
             db = context;
+            pe = publishEndpoint;
         }
 
 <# 
@@ -812,7 +881,14 @@ namespace <#= webApiServiceNameSpace #> {
             // 
             // Please define additional props of the <#= extendedMdlInterface #> newcln object before  UpdateForXXX-method calls 
             //
-            await <#= m2mMethodName #>(db, 2, oldcln, newcln);
+            
+            await pe.Publish<<#= extendedMdlMsgInterface #>>(new
+            {
+                <#= actionInputParamName #> = 2,
+                <#= oldObjInputParamName #> = oldcln,
+                <#= newObjInputParamName #> = newcln
+            });
+
             return Ok(result);
         }
 <#
@@ -893,11 +969,17 @@ namespace <#= webApiServiceNameSpace #> {
             }
 
 
-            <#= extendedMdlInterface #> cln = <#= DoCloneMethodName #>(result);
+            <#= extendedMdlInterface #> newcln = <#= DoCloneMethodName #>(result);
             // 
-            // Please define additional props of the <#= extendedMdlInterface #> cln object before  UpdateForXXX-method calls 
+            // Please define additional props of the <#= extendedMdlInterface #> newcln object before  UpdateForXXX-method calls 
             //
-            await <#= m2mMethodName #>(db, 1, null, cln);
+            await pe.Publish<<#= extendedMdlMsgInterface #>>(new
+            {
+                <#= actionInputParamName #> = 1,
+                // <#= oldObjInputParamName #> = null,
+                <#= newObjInputParamName #> = newcln
+            });
+
             return Ok(result);
         }
 <#
@@ -992,11 +1074,17 @@ namespace <#= webApiServiceNameSpace #> {
                 await db.SaveChangesAsync();
 
 
-            <#= extendedMdlInterface #> cln = <#= DoCloneMethodName #>(result);
+            <#= extendedMdlInterface #> oldcln = <#= DoCloneMethodName #>(result);
             // 
-            // Please define additional props of the <#= extendedMdlInterface #> cln object before  UpdateForXXX-method calls 
+            // Please define additional props of the <#= extendedMdlInterface #> oldcln object before  UpdateForXXX-method calls 
             //
-            await <#= m2mMethodName #>(db, 3, cln, null);
+
+            await pe.Publish<<#= extendedMdlMsgInterface #>>(new
+            {
+                <#= actionInputParamName #> = 3,
+                <#= oldObjInputParamName #> = oldcln
+                // <#= newObjInputParamName #> = null
+            });
             return Ok(result);
         }
 <#

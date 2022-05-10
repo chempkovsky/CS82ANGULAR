@@ -12,505 +12,115 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 #nullable disable
-using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 
 <#
 
-    
     string extforlkupInterfaceFolder    = "01005-.extforlkup.interface.cs";
-    string extforlkupFolder             = "01010-.extforlkup.cs";
-    string lookupheperFolder            = "01020-.lookupheper.cs";
-    string extendedMdlInterface         = GetExtForLkUpInterfaceName(Model);
-    string extendedMdlClass             = GetExtForLkUpClassName(Model);
-    string extforlkupInterfaceNameSpace = GetTypeNameSpace(Model, Context, extforlkupInterfaceFolder);
-    string extendedMdlClassNameSpace    = GetTypeNameSpace(Model, Context, extforlkupFolder);
+    string ExtForLkUpMsgActionPropName  = "Action";
+    string ExtForLkUpMsgOldPropName     = "OldVals";
+    string ExtForLkUpMsgNewPropName     = "NewVals";
 
-    string destinationNameSpace = GetTypeNameSpace(Model, Context, lookupheperFolder);
-    string staticM2mClassName   = GetM2mStaticClassName(Model);
-    string dbContextNameSpace   = GetDbContextNameSpace(Context);
-    string viewModelNameSpace   = GetViewModelNameSpace(Model);
+    string extendedMdlInterface         =  GetExtForLkUpInterfaceName(Model);
+    string extendedMdlMsgInterface      =  GetExtForLkUpMsgInterfaceName(Model);
+    string destinationNameSpace         =  GetTypeNameSpace(Model, Context, extforlkupInterfaceFolder);
 
-    string actionInputParamName             = "action";
-    string oldObjInputParamName             = "oldObj";
-    string newObjInputParamName             = "newObj";
+    string dbContextNameSpace = GetDbContextNameSpace(Context);
+    string viewModelNameSpace = GetViewModelNameSpace(Model);
+
 
     // m2mMdl, m2mFk, searchFks, otherFks, externalFks
     List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
         GetSearchResources(Model, Context);
-    List<ModelViewPropertyOfVwSerializable> externalFlds = new List<ModelViewPropertyOfVwSerializable>();
-    List<string> namespaces = new List<string>();
-    if (!string.IsNullOrEmpty(dbContextNameSpace)) {
-        if (!string.Equals(dbContextNameSpace, destinationNameSpace)) {
-            namespaces.Add(dbContextNameSpace);
-        }
-    }
-    if (!string.IsNullOrEmpty(viewModelNameSpace)) {
-        if (!string.Equals(viewModelNameSpace, destinationNameSpace)) {
-            if(!namespaces.Any(p => p == viewModelNameSpace)) namespaces.Add(viewModelNameSpace);
-        }
-    }
-    if (!string.IsNullOrEmpty(extendedMdlClassNameSpace)) {
-        if (!string.Equals(extendedMdlClassNameSpace, destinationNameSpace)) {
-            if(!namespaces.Any(p => p == extendedMdlClassNameSpace)) namespaces.Add(extendedMdlClassNameSpace);
-        }
-    }
-    if (!string.IsNullOrEmpty(extforlkupInterfaceNameSpace)) {
-        if (!string.Equals(extforlkupInterfaceNameSpace, destinationNameSpace)) {
-            if(!namespaces.Any(p => p == extforlkupInterfaceNameSpace)) namespaces.Add(extforlkupInterfaceNameSpace);
-        }
-    }
-
-    
-
-#>
-
-<#
-foreach(var nmsp in namespaces) {
-#>
-using <#= nmsp #>;
-<#
-}
-#>
-
-
-<#
-    {
-        if(searchSchemas!= null) {
-            List<ModelViewSerializable> searchViewModels = new List<ModelViewSerializable>();
-            namespaces.Add(destinationNameSpace);
-            if(!namespaces.Any(p => p == viewModelNameSpace)) {
-                namespaces.Add(viewModelNameSpace);
+    List<ModelViewPropertyOfVwSerializable> mappedFlds = new List<ModelViewPropertyOfVwSerializable>();
+    List<ModelViewPropertyOfVwSerializable> extFlds = new List<ModelViewPropertyOfVwSerializable>();
+    if(searchSchemas != null) {
+        foreach(var sch in searchSchemas) {
+            ModelViewSerializable m2mModel = sch.Item1;
+            ModelViewForeignKeySerializable m2mForeignKey = sch.Item2;
+            List<KeyValuePair<ModelViewForeignKeySerializable,int>> searchFkPairs = sch.Item3;
+            List<KeyValuePair<ModelViewForeignKeySerializable,int>> otherFks = sch.Item4;
+            List<KeyValuePair<ModelViewForeignKeySerializable,int>> externalFks = sch.Item5;
+            for(int i = 0; i < m2mForeignKey.ForeignKeyProps.Count; i++) {
+                ModelViewPropertyOfVwSerializable slrPrp = GetScalarPropByOriginaPropName(m2mForeignKey.PrincipalKeyProps[i].OriginalPropertyName, Model);
+                if(mappedFlds.Any(p => p.ViewPropertyName == slrPrp.ViewPropertyName)) continue;
+                mappedFlds.Add(slrPrp);
             }
-            foreach(var sch in searchSchemas) {
-                ModelViewSerializable m2mModel = sch.Item1;
-                string m2mModelClassNameSpace = GetViewModelNameSpace(m2mModel);
-                string m2mEntityClassNameSpace = GetRootEntityNameSpace(m2mModel);
-                if(!namespaces.Any(p => p == m2mModelClassNameSpace)) {
-                    namespaces.Add(m2mModelClassNameSpace);
-#>
-using <#= m2mModelClassNameSpace #>;
-<#
-                }
-                if(!namespaces.Any(p => p == m2mEntityClassNameSpace)) {
-                    namespaces.Add(m2mEntityClassNameSpace);
-#>
-using <#= m2mEntityClassNameSpace #>;
-<#
-                }
-
-                ModelViewForeignKeySerializable m2mForeignKey = sch.Item2;
-                List<KeyValuePair<ModelViewForeignKeySerializable,int>> searchFkPairs = sch.Item3;
-                foreach(var searchFkPair in searchFkPairs) {
-                    ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
-                    string searchModelClassNameSpace = GetViewModelNameSpace(searchVM);
-                    string searchEntityClassNameSpace = GetRootEntityNameSpace(m2mModel);
-                    if(!namespaces.Any(p => p == searchModelClassNameSpace)) {
-                        namespaces.Add(searchModelClassNameSpace);
-#>
-using <#= searchModelClassNameSpace #>;
-<#
-                    }
-                    if(!namespaces.Any(p => p == searchEntityClassNameSpace)) {
-                        namespaces.Add(searchEntityClassNameSpace);
-#>
-using <#= searchEntityClassNameSpace #>;
-<#
+            foreach(var searchFkPair in searchFkPairs) {
+                ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
+                ModelViewPropertyOfVwSerializable slrPrp = Model.ScalarProperties.Where(p => p.ViewPropertyName == GetScalarPropByOriginaPropName(searchVM.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName, searchVM).ViewPropertyName).FirstOrDefault();
+                if(mappedFlds.Any(p => p.ViewPropertyName == slrPrp.ViewPropertyName)) continue;
+                mappedFlds.Add(slrPrp);
+            }
+            if(otherFks != null) {
+                for(int i = 0; i < otherFks.Count; i++) {
+                    for(int j = 0; j < otherFks[i].Key.ForeignKeyProps.Count; j++) {
+                        ModelViewPropertyOfVwSerializable slrPrp = Model.ScalarProperties.Where(p => p.ViewPropertyName == GetScalarPropByOriginaPropName(otherFks[i].Key.ForeignKeyProps[j].OriginalPropertyName, m2mModel).ViewPropertyName).FirstOrDefault();
+                        if(mappedFlds.Any(p => p.ViewPropertyName == slrPrp.ViewPropertyName)) continue;
+                        mappedFlds.Add(slrPrp);
                     }
                 }
             }
         }
     }
+
 #>
+
 
 
 namespace <#= destinationNameSpace #> {
 
-
-    public static class <#= staticM2mClassName #> {
+    public interface <#= extendedMdlInterface #> {
 <#
+        foreach(ModelViewPropertyOfVwSerializable slrPrp in mappedFlds) {
+#>
+        public <#= GetPropertyTypeName(slrPrp) #>  <#= GetTypeScriptPropertyName(slrPrp, Model) #> { get; set; }
+
+<# 
+        } // foreach(ModelViewPropertyOfVwSerializable slrPrp in mappedFlds) { ... }
+
         if(searchSchemas!= null) {
-            List<ModelViewSerializable> searchViewModels = new List<ModelViewSerializable>();
-
             foreach(var sch in searchSchemas) {
                 ModelViewSerializable m2mModel = sch.Item1;
-                ModelViewForeignKeySerializable m2mForeignKey = sch.Item2;
-                List<KeyValuePair<ModelViewForeignKeySerializable,int>> searchFkPairs = sch.Item3;
-                foreach(var searchFkPair in searchFkPairs) {
-                    ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
-                    if(searchVM == null) continue;
-                    if(searchViewModels.Any(p => p == searchVM)) continue;
-                    searchViewModels.Add(searchVM);
-                    string staticM2mSelDictItemMethodName = GetM2mStaticSelDictItemMethodName(searchVM);
-                    string staticM2mInsDictItemMethodName = GetM2mStaticInsDictItemMethodName(searchVM);
-#>
-        public static async Task<<#= searchVM.RootEntityClassName #>> <#= staticM2mSelDictItemMethodName #>(<#= Context.DbContextClassName #> db, <#= extendedMdlInterface #> vm) {
-            IQueryable<<#= searchVM.RootEntityClassName #>> query = db.<#= searchVM.RootEntityDbContextPropertyName #>;
-<#
-                foreach(ModelViewPropertyOfVwSerializable slrPrp in searchVM.ScalarProperties) {
-                    ModelViewEntityPropertySerializable entityProp =  GetRootEntityProperty(slrPrp, searchVM);
-                    if(entityProp == null) { 
-#>
-// "It Skipped" Info: for scalar prop = [<#= slrPrp.ViewPropertyName #>] of searchVM = [<#= searchVM.ViewName #>] could not find mapped Entity property of the Entity = [<#= searchVM.RootEntityClassName #>]
-<#
-                        continue;
-                    }
-                    if(!searchVM.UniqueKeys.Any(u => u.UniqueKeyProperties.Any(p => p.OriginalPropertyName == entityProp.OriginalPropertyName))) {
-#>
-// "It Skipped" Info: for scalar prop = [<#= slrPrp.ViewPropertyName #>] of searchVM = [<#= searchVM.ViewName #>] could not find mapped Unique Key property of the Entity = [<#= searchVM.RootEntityClassName #>]
-<#
-                        continue;
-                    }
-                    if(searchVM.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == entityProp.OriginalPropertyName)) {
-#>
-// "It Skipped" Info: for scalar prop = [<#= slrPrp.ViewPropertyName #>] of searchVM = [<#= searchVM.ViewName #>] has found Primary Key property of the Entity = [<#= searchVM.RootEntityClassName #>]
-<#
-                        continue;
-                    }
-                    if(!Model.ScalarProperties.Any(p => p.ViewPropertyName == slrPrp.ViewPropertyName)) {
-#>
-// "It Skipped" Info: for scalar prop = [<#= slrPrp.ViewPropertyName #>] of searchVM = [<#= searchVM.ViewName #>] could not find mapped View Property of the Model = [<#= Model.ViewName #>] 
-<#
-                        continue;
-                    }
-
-#>
-            // maybe it requires additional code related to nullable values
-            query = query.Where(p => p.<#=  entityProp.OriginalPropertyName #> == vm.<#= slrPrp.ViewPropertyName #>);
-<#
-                } // foreach(ModelViewPropertyOfVwSerializable slrPrp in searchVM.ScalarProperties) { ... }
-#>
-            <#= searchVM.RootEntityClassName #> rslt = await query.FirstOrDefaultAsync();
-            db.Entry(rslt).State = EntityState.Detached;
-            return rslt;
-        }
-        public static async Task<<#= searchVM.RootEntityClassName #>> <#= staticM2mInsDictItemMethodName #>(<#= Context.DbContextClassName #> db, <#= extendedMdlInterface #> vm) {
-            <#= searchVM.RootEntityClassName #> entityToAdd = new <#= searchVM.RootEntityClassName#>();
-<#  
-                foreach(ModelViewPropertyOfVwSerializable slrPrp in searchVM.ScalarProperties) {
-                    ModelViewEntityPropertySerializable entityProp =  GetRootEntityProperty(slrPrp, searchVM);
-                    if(entityProp == null) { 
-#>
-// "It Skipped" Info: for scalar prop = [<#= slrPrp.ViewPropertyName #>] of searchVM = [<#= searchVM.ViewName #>] could not find mapped Entity property of the Entity = [<#= searchVM.RootEntityClassName #>]
-<#
-                        continue;
-                    }
-                    if(!Model.ScalarProperties.Any(p => p.ViewPropertyName == slrPrp.ViewPropertyName)) {
-                         if (searchVM.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == entityProp.OriginalPropertyName)) {
-#>
-// "It Skipped" Info: scalar prop = [<#= slrPrp.ViewPropertyName #>] of searchVM = [<#= searchVM.ViewName #>] is in primary key. Pay special attention if it should be defined with your special value. For instance, Guid.NewGuid().ToString("N");
-//         entityToAdd.<#= entityProp.OriginalPropertyName #> = // Guid.NewGuid().ToString("N");
-<#
-                         } else {
-#>
-// "It Skipped" Info: for scalar prop = [<#= slrPrp.ViewPropertyName #>] of searchVM = [<#= searchVM.ViewName #>] could not find mapped View Property of the Model = [<#= Model.ViewName #>] 
-<#
-                        }
-                        continue;
-                    }
-#>
-            entityToAdd.<#= entityProp.OriginalPropertyName #> = vm.<#= slrPrp.ViewPropertyName #>; // scalar prop names are identical
-<#
-                }
-#>
-// pay special attention to primKey values
-
-            db.<#= searchVM.RootEntityDbContextPropertyName #>.Add(entityToAdd);
-            await db.SaveChangesAsync();
-            db.Entry(entityToAdd).State = EntityState.Detached;
-            return entityToAdd;
-        }
-<#
-                } //foreach(var searchFkPair in searchFkPairs) {...} the end of Sel, Ins methods generation for LookUp resources
-            } //foreach(var sch in searchSchemas) {...}  the end of Sel, Ins methods generation for LookUp resources
-            foreach(var sch in searchSchemas) {
-                ModelViewSerializable m2mModel = sch.Item1;
-                ModelViewForeignKeySerializable m2mForeignKey = sch.Item2;
-                string staticM2mUpdateMethodName = GetM2mStaticUpdateMethodName(m2mModel);
                 List<KeyValuePair<ModelViewForeignKeySerializable,int>> externalFks = sch.Item5;
-                List<KeyValuePair<ModelViewForeignKeySerializable,int>> otherFks = sch.Item4;
-                List<KeyValuePair<ModelViewForeignKeySerializable,int>> searchFkPairs = sch.Item3;
+                if(externalFks != null) {
+                    foreach(KeyValuePair<ModelViewForeignKeySerializable,int> externalFk in externalFks) {
+                        foreach(ModelViewKeyPropertySerializable fkprop in externalFk.Key.ForeignKeyProps) {
+                            ModelViewPropertyOfVwSerializable slrPrp = GetScalarPropByOriginaPropName(fkprop.OriginalPropertyName, m2mModel);
+                            if(mappedFlds.Any(p => p.ViewPropertyName == slrPrp.ViewPropertyName)) continue;
+                            if(extFlds.Any(p => p.ViewPropertyName == slrPrp.ViewPropertyName)) continue;
+                            extFlds.Add(slrPrp);
 #>
-        // <#= actionInputParamName #>: 1 - insert; 2 - update; 3 - delete
-        public static async Task <#= staticM2mUpdateMethodName #>(<#= Context.DbContextClassName #> db, int <#= actionInputParamName #>, <#= extendedMdlInterface #> <#= oldObjInputParamName #>, <#= extendedMdlInterface #> <#= newObjInputParamName #>) {
-            if ( (<#= actionInputParamName #> < 1)   || (<#= actionInputParamName #> > 3)) return; // or throw exception
-            if ( ((<#= actionInputParamName #> == 2) || (<#= actionInputParamName #> == 3)) && (<#= oldObjInputParamName #> == null) ) return; // or throw exception
-            if ( ((<#= actionInputParamName #> == 1) || (<#= actionInputParamName #> == 2)) && (<#= newObjInputParamName #> == null) ) return; // or throw exception
-            // 2 - update; 3 - delete
-            if ((<#= actionInputParamName #> == 2) || (<#= actionInputParamName #> == 3)) {
-                bool readyToDel = true;
+        public <#= GetPropertyTypeName(slrPrp) #>  <#= GetTypeScriptPropertyName(slrPrp, m2mModel) #> { get; set; }
 
-                <#= m2mModel.RootEntityClassName #> <#= m2mModel.ViewName + "updDelTmp" #> = new <#= m2mModel.RootEntityClassName #>() {
-<#
-                List<string> updDelDefs = GetCodeToDefineM2mEntityProps(sch, Model, oldObjInputParamName);
-                foreach(string str in updDelDefs) {
-#>
-                    <#= str #>
-<#
-                }
-#>
-                }; // <#= m2mModel.ViewName + "updDelTmp" #>
-<#
-                foreach(var searchFkPair in searchFkPairs) {
-                    ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
-                    if(searchVM == null) continue;
-                    string staticM2mSelDictItemMethodName = GetM2mStaticSelDictItemMethodName(searchVM);
-                    string staticM2mInsDictItemMethodName = GetM2mStaticInsDictItemMethodName(searchVM);
-#>
-                if(readyToDel) {
-                    <#= searchVM.RootEntityClassName #> <#= searchVM.ViewName + "updDelTmp" #> = await <#= staticM2mSelDictItemMethodName #>(db, <#= oldObjInputParamName #>);
-                    readyToDel = <#= searchVM.ViewName + "updDelTmp" #> == null;
-                    if(readyToDel) {
-<#
-                    for(int i = 0; i < searchFkPair.Key.ForeignKeyProps.Count; i++) {
-#>
-                    <#= m2mModel.ViewName + "updDelTmp" #>.<#= searchFkPair.Key.ForeignKeyProps[i].OriginalPropertyName #> = <#= searchVM.ViewName + "updDelTmp" #>.<#= searchFkPair.Key.PrincipalKeyProps[i].OriginalPropertyName #>;
-<#
-                    }
-#>
-                    }
-                }
-<#
-                } // foreach(var searchFkPair in searchFkPairs) { ... }
-#>
-                if(readyToDel) {
-                    IQueryable<<#= m2mModel.RootEntityClassName #>> m2mDelQuery = db.<#= m2mModel.RootEntityDbContextPropertyName #>;
-<#
-                foreach(var entityProp in m2mModel.AllProperties) {
-#>
-                    m2mDelQuery = m2mDelQuery.Where(p=> p.<#=  entityProp.OriginalPropertyName #> == <#= m2mModel.ViewName + "updDelTmp" #>.<#= entityProp.OriginalPropertyName #>);
-<#
-                }
-#>                
-                    var delM2mRslt = await m2mDelQuery.FirstOrDefaultAsync();
-                    if(delM2mRslt != null) {
-                        db.<#= m2mModel.RootEntityDbContextPropertyName #>.Remove(delM2mRslt);
-                        db.SaveChanges();
-                        db.Entry(delM2mRslt).State = EntityState.Detached;
-                    }
-                }
-            }
-            // 1 - insert; 2 - update;
-            if ((<#= actionInputParamName #> == 1) || (<#= actionInputParamName #> == 2)) {
-                <#= m2mModel.RootEntityClassName #> <#= m2mModel.ViewName + "InsTmp" #> = new <#= m2mModel.RootEntityClassName #>() {
-<#
-                List<string> insDefs = GetCodeToDefineM2mEntityProps(sch, Model, newObjInputParamName);
-                foreach(string str in insDefs) {
-#>
-                    <#= str #>
-<#
-                }
-#>
-                }; // <#= m2mModel.ViewName + "InsTmp" #>
-<#
-                foreach(var searchFkPair in searchFkPairs) {
-                    ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
-                    if(searchVM == null) continue;
-                    string staticM2mSelDictItemMethodName = GetM2mStaticSelDictItemMethodName(searchVM);
-                    string staticM2mInsDictItemMethodName = GetM2mStaticInsDictItemMethodName(searchVM);
-#>
-                <#= searchVM.RootEntityClassName #> <#= searchVM.ViewName + "InsTmp" #> = await <#= staticM2mSelDictItemMethodName #>(db, <#= newObjInputParamName #>);
-                if(<#= searchVM.ViewName + "InsTmp" #> == null) {
-                    <#= searchVM.ViewName + "InsTmp" #> = await <#= staticM2mInsDictItemMethodName #>(db, <#= newObjInputParamName #>);
-                }
-<#
-                    for(int i = 0; i < searchFkPair.Key.ForeignKeyProps.Count; i++) {
-#>
-                <#= m2mModel.ViewName + "InsTmp" #>.<#= searchFkPair.Key.ForeignKeyProps[i].OriginalPropertyName #> = <#= searchVM.ViewName + "InsTmp" #>.<#= searchFkPair.Key.PrincipalKeyProps[i].OriginalPropertyName #>;
-<#
-                    }
-                } // foreach(var searchFkPair in searchFkPairs) { ... }
-#>
-                IQueryable<<#= m2mModel.RootEntityClassName #>> m2mInsQuery = db.<#= m2mModel.RootEntityDbContextPropertyName #>;
-<#
-                foreach(var entityProp in m2mModel.AllProperties) {
-#>
-                m2mInsQuery = m2mInsQuery.Where(p=> p.<#=  entityProp.OriginalPropertyName #> == <#= m2mModel.ViewName + "InsTmp" #>.<#= entityProp.OriginalPropertyName #>);
-<#
-                }
-#>                
-                var insM2mRslt = await m2mInsQuery.FirstOrDefaultAsync();
-                if(insM2mRslt != null) return;
-                db.<#= m2mModel.RootEntityDbContextPropertyName #>.Add(<#= m2mModel.ViewName + "InsTmp" #>);
-                await db.SaveChangesAsync();
-                db.Entry(<#= m2mModel.ViewName + "InsTmp" #>).State = EntityState.Detached;
-                return;
-            }
-        }
-<#
+<# 
+                        } // foreach(ModelViewKeyProperty fkprop in externalFk.Key.ForeignKeyProps) {...}
+                    } // foreach(var externalFk in externalFks) { ... }
+                } // if(externalFks != null) { ... }
             } // foreach(var sch in searchSchemas) { ... }
-            string staticM2mUpdateAllMethodName = GetM2mStaticUpdateMethodName(Model);
-#>
-        // <#= actionInputParamName #>: 1 - insert; 2 - update; 3 - delete
-        public static async Task <#= staticM2mUpdateAllMethodName #>(<#= Context.DbContextClassName #> db, int <#= actionInputParamName #>, <#= extendedMdlInterface #> <#= oldObjInputParamName #>, <#= extendedMdlInterface #> <#= newObjInputParamName #>) {
-            if ( (<#= actionInputParamName #> < 1)   || (<#= actionInputParamName #> > 3)) return; // or throw exception
-            if ( ((<#= actionInputParamName #> == 2) || (<#= actionInputParamName #> == 3)) && (<#= oldObjInputParamName #> == null) ) return; // or throw exception
-            if ( ((<#= actionInputParamName #> == 1) || (<#= actionInputParamName #> == 2)) && (<#= newObjInputParamName #> == null) ) return; // or throw exception
-            // 3 - delete; 2 - update
-            if ((<#= actionInputParamName #> == 3) || (<#= actionInputParamName #> == 2)) {
-                bool readyToDel = true;
-<#
-        if(searchSchemas != null) {
-            List<ModelViewSerializable> searchModels = new List<ModelViewSerializable>();
-            foreach(var sch in searchSchemas) {
-                ModelViewSerializable m2mModel = sch.Item1;
-                ModelViewForeignKeySerializable m2mForeignKey = sch.Item2;
-                List<KeyValuePair<ModelViewForeignKeySerializable,int>> externalFks = sch.Item5;
-                List<KeyValuePair<ModelViewForeignKeySerializable,int>> otherFks = sch.Item4;
-                List<KeyValuePair<ModelViewForeignKeySerializable,int>> searchFkPairs = sch.Item3;
-#>
-                <#= m2mModel.RootEntityClassName #> <#= m2mModel.ViewName + "updDelTmp" #> = new <#= m2mModel.RootEntityClassName #>() {
-<#
-                List<string> updDelDefs = GetCodeToDefineM2mEntityProps(sch, Model, oldObjInputParamName);
-                foreach(string str in updDelDefs) {
-#>
-                    <#= str #>
-<#
-                }
-#>
-                }; // <#= m2mModel.ViewName + "updDelTmp" #>
-<#
-                foreach(var searchFkPair in searchFkPairs) {
-                    ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
-                    if(searchVM == null) continue;
-                    if(searchModels.Any(p => p == searchVM)) continue;
-                    searchModels.Add(searchVM);
-                    string staticM2mSelDictItemMethodName = GetM2mStaticSelDictItemMethodName(searchVM);
-#>
-                <#= searchVM.RootEntityClassName #> <#= searchVM.ViewName + "delTmp" #> = await <#= staticM2mSelDictItemMethodName #>(db, <#= oldObjInputParamName #>);
-<#
-                } // foreach(var searchFkPair in searchFkPairs) { ... }
-#>
-                readyToDel = true;
-<#
-                foreach(var searchFkPair in searchFkPairs) {
-                    ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
-                    if(searchVM == null) continue;
-                    string staticM2mSelDictItemMethodName = GetM2mStaticSelDictItemMethodName(searchVM);
-#>
-                if (readyToDel) {
-                    readyToDel = <#= searchVM.ViewName + "delTmp" #> != null;
-
-                    if(readyToDel) {
-<#
-                    for(int i = 0; i < searchFkPair.Key.ForeignKeyProps.Count; i++) {
-#>
-                        <#= m2mModel.ViewName + "updDelTmp" #>.<#= searchFkPair.Key.ForeignKeyProps[i].OriginalPropertyName #> = <#= searchVM.ViewName + "delTmp" #>.<#= searchFkPair.Key.PrincipalKeyProps[i].OriginalPropertyName #>;
-<#
-                    }
-#>
-                    }
-                }
-<#
-                } // foreach(var searchFkPair in searchFkPairs) { ... }
-#>
-                if(readyToDel) {
-                    IQueryable<<#= m2mModel.RootEntityClassName #>> <#= m2mModel.ViewName + "DelQuery" #> = db.<#= m2mModel.RootEntityDbContextPropertyName #>;
-<#
-                foreach(var entityProp in m2mModel.AllProperties) {
-#>
-                    <#= m2mModel.ViewName + "DelQuery" #> = <#= m2mModel.ViewName + "DelQuery" #>.Where(p=> p.<#=  entityProp.OriginalPropertyName #> == <#= m2mModel.ViewName + "updDelTmp" #>.<#= entityProp.OriginalPropertyName #>);
-<#
-                }
-#>                
-                    var <#= m2mModel.ViewName + "DelRslt" #> = await <#= m2mModel.ViewName + "DelQuery" #>.FirstOrDefaultAsync();
-                    if(<#= m2mModel.ViewName + "DelRslt" #> != null) {
-                        db.<#= m2mModel.RootEntityDbContextPropertyName #>.Remove(<#= m2mModel.ViewName + "DelRslt" #>);
-                        db.SaveChanges();
-                        db.Entry(<#= m2mModel.ViewName + "DelRslt" #>).State = EntityState.Detached;
-                    }
-                }
-<#
-            }
-        }
-#>
-            }
-            // 1 - insert; 2 - update
-            if ((<#= actionInputParamName #> == 1) || (<#= actionInputParamName #> == 2)) {
-<#
-        if(searchSchemas != null) {
-            List<ModelViewSerializable> searchModels = new List<ModelViewSerializable>();
-            foreach(var sch in searchSchemas) {
-                ModelViewSerializable m2mModel = sch.Item1;
-                ModelViewForeignKeySerializable m2mForeignKey = sch.Item2;
-                List<KeyValuePair<ModelViewForeignKeySerializable,int>> externalFks = sch.Item5;
-                List<KeyValuePair<ModelViewForeignKeySerializable,int>> otherFks = sch.Item4;
-                List<KeyValuePair<ModelViewForeignKeySerializable,int>> searchFkPairs = sch.Item3;
-#>
-                <#= m2mModel.RootEntityClassName #> <#= m2mModel.ViewName + "InsTmp" #> = new <#= m2mModel.RootEntityClassName #>() {
-<#
-                List<string> insDefs = GetCodeToDefineM2mEntityProps(sch, Model, newObjInputParamName);
-                foreach(string str in insDefs) {
-#>
-                    <#= str #>
-<#
-                }
-#>
-                }; // <#= m2mModel.ViewName + "InsTmp" #>
-<#
-                foreach(var searchFkPair in searchFkPairs) {
-                    ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
-                    if(searchVM == null) continue;
-                    if(searchModels.Any(p => p == searchVM)) continue;
-                    searchModels.Add(searchVM);
-                    string staticM2mSelDictItemMethodName = GetM2mStaticSelDictItemMethodName(searchVM);
-                    string staticM2mInsDictItemMethodName = GetM2mStaticInsDictItemMethodName(searchVM);
-#>
-                <#= searchVM.RootEntityClassName #> <#= searchVM.ViewName + "InsTmp" #> = await <#= staticM2mSelDictItemMethodName #>(db, <#= newObjInputParamName #>);
-                if(<#= searchVM.ViewName + "InsTmp" #> == null) {
-                    <#= searchVM.ViewName + "InsTmp" #> = await <#= staticM2mInsDictItemMethodName #>(db, <#= newObjInputParamName #>);
-                }
-<#
-                    for(int i = 0; i < searchFkPair.Key.ForeignKeyProps.Count; i++) {
-#>
-                <#= m2mModel.ViewName + "InsTmp" #>.<#= searchFkPair.Key.ForeignKeyProps[i].OriginalPropertyName #> = <#= searchVM.ViewName + "InsTmp" #>.<#= searchFkPair.Key.PrincipalKeyProps[i].OriginalPropertyName #>;
-<#
-                    }
-                } // foreach(var searchFkPair in searchFkPairs) { ... }
-#>
-                IQueryable<<#= m2mModel.RootEntityClassName #>>  <#= m2mModel.ViewName + "InsQuery" #> = db.<#= m2mModel.RootEntityDbContextPropertyName #>;
-<#
-                foreach(var entityProp in m2mModel.AllProperties) {
-#>
-                <#= m2mModel.ViewName + "InsQuery" #> = <#= m2mModel.ViewName + "InsQuery" #>.Where(p=> p.<#=  entityProp.OriginalPropertyName #> == <#= m2mModel.ViewName + "InsTmp" #>.<#= entityProp.OriginalPropertyName #>);
-<#
-                }
-#>                
-                var <#= m2mModel.ViewName + "insRslt" #> = await <#= m2mModel.ViewName + "InsQuery" #>.FirstOrDefaultAsync();
-                if(<#= m2mModel.ViewName + "insRslt" #> == null) {
-                    db.<#= m2mModel.RootEntityDbContextPropertyName #>.Add(<#= m2mModel.ViewName + "InsTmp" #>);
-                    await db.SaveChangesAsync();
-                    db.Entry(<#= m2mModel.ViewName + "InsTmp" #>).State = EntityState.Detached;
-                }
-<#
-            } // foreach(var sch in searchSchemas) { ... }
-        } // if(searchSchemas != null) { ... }
-#>
-            }
-        }
-<#
         } // if(searchSchemas!= null) { ... }
 #>
+    }
+
+    public interface <#= extendedMdlMsgInterface #> {
+        // 1 - insert; 2 - update; 3 - delete;
+        public int <#= ExtForLkUpMsgActionPropName #> { get; set; } 
+        public <#= extendedMdlInterface #> <#= ExtForLkUpMsgOldPropName #> { get; set; } 
+        public <#= extendedMdlInterface #> <#= ExtForLkUpMsgNewPropName #> { get; set; } 
     }
 }
 
 <#+
-
     string GetExtForLkUpMsgInterfaceName(ModelViewSerializable model) {
         string result = "I";
         if(model != null) result = result + model.ViewName; 
         result = result + "ExtForLkUpMsg";
         return result;
     }
+
     string GetExtForLkUpInterfaceName(ModelViewSerializable model) {
         string result = "I";
-        if(model != null) result = result + model.ViewName; 
-        result = result + "ExtForLkUp";
-        return result;
-    }
-    string GetExtForLkUpClassName(ModelViewSerializable model) {
-        string result = "";
         if(model != null) result = result + model.ViewName; 
         result = result + "ExtForLkUp";
         return result;
@@ -537,32 +147,32 @@ namespace <#= destinationNameSpace #> {
         return result + model.ViewName;
     }
 
-    string AttribToString(ModelViewAttributeSerializable attr) {
-        if(attr == null) return "";
-        string result= "[" + attr.AttrName; 
-        if (attr.VaueProperties == null) {
-            return result + "]";
-        }
-        if (attr.VaueProperties.Count < 1) {
-            return result + "]";
-        }
-        result = result + "(";
-        bool insComma= false;
-        foreach(ModelViewAttributePropertySerializable valProp in attr.VaueProperties) {
-            if (insComma) {
-                result =  result + ",";
-            } else {
-                insComma = true;
+        string AttribToString(ModelViewAttributeSerializable attr) {
+            if(attr == null) return "";
+            string result= "[" + attr.AttrName; 
+            if (attr.VaueProperties == null) {
+                return result + "]";
             }
-            if(! string.IsNullOrEmpty(valProp.PropName) ) {
-                if (! valProp.PropName.Contains("...") ) {
-                    result =  result + valProp.PropName + "=";
+            if (attr.VaueProperties.Count < 1) {
+                return result + "]";
+            }
+            result = result + "(";
+            bool insComma= false;
+            foreach(ModelViewAttributePropertySerializable valProp in attr.VaueProperties) {
+                if (insComma) {
+                    result =  result + ",";
+                } else {
+                    insComma = true;
                 }
+                if(! string.IsNullOrEmpty(valProp.PropName) ) {
+                    if (! valProp.PropName.Contains("...") ) {
+                        result =  result + valProp.PropName + "=";
+                    }
+                }
+                result =  result + valProp.PropValue;
             }
-            result =  result + valProp.PropValue;
+            return result + ")]";
         }
-        return result + ")]";
-    }
 
     string GetPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
     {
@@ -638,6 +248,20 @@ namespace <#= destinationNameSpace #> {
         }
         return locPaths;
     }
+    string GetTypeNameSpace(ModelViewSerializable model, DbContextSerializable context, string refFolder) {
+        string result = "";
+        if ((model == null) || (context == null) || string.IsNullOrEmpty(refFolder)) {
+            return result;
+        }
+        if ((model.CommonStaffs == null) || (context.ModelViews == null)) {
+            return result;
+        }
+        CommonStaffSerializable refItem = model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        if(refItem == null) return result;
+        if(string.IsNullOrEmpty(refItem.FileFolder)) return refItem.FileDefaultProjectNameSpace;
+        return refItem.FileDefaultProjectNameSpace + "." + refItem.FileFolder.Replace(@"\",  ".").Replace(@"/",  ".");
+    }
+
     String GenerateIncludePaths(String src) {
         if (String.IsNullOrEmpty(src)) return "";
         string[] sa = src.Split(new char[] { '.' });
@@ -676,19 +300,7 @@ namespace <#= destinationNameSpace #> {
             return sProp.ForeignKeyNameChain + "." + sProp.OriginalPropertyName;
         }
     }
-    string GetTypeNameSpace(ModelViewSerializable model, DbContextSerializable context, string refFolder) {
-        string result = "";
-        if ((model == null) || (context == null) || string.IsNullOrEmpty(refFolder)) {
-            return result;
-        }
-        if ((model.CommonStaffs == null) || (context.ModelViews == null)) {
-            return result;
-        }
-        CommonStaffSerializable refItem = model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
-        if(refItem == null) return result;
-        if(string.IsNullOrEmpty(refItem.FileFolder)) return refItem.FileDefaultProjectNameSpace;
-        return refItem.FileDefaultProjectNameSpace + "." + refItem.FileFolder.Replace(@"\",  ".").Replace(@"/",  ".");
-    }
+
 
 
     String GetWebApiServicePrefix(ModelViewSerializable model) {

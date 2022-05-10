@@ -17,12 +17,16 @@ using System.ComponentModel.DataAnnotations;
 
 <#
 
-    string extforlkupFolder     = "01010-.extforlkup.cs";
+    string extforlkupInterfaceFolder    = "01005-.extforlkup.interface.cs";
+    string extforlkupFolder             = "01010-.extforlkup.cs";
 
-    string extendedMdlClass     =  Model.ViewName + "ExtForLkUp";
-    string destinationNameSpace =  GetTypeNameSpace(Model, Context, extforlkupFolder);
-    string clonerMdlClass       =  Model.ViewName + "CloneForLkUp";
-    string DoCloneMethodName    =  "DoClone";
+    string extendedMdlInterface         =  GetExtForLkUpInterfaceName(Model);
+    string extendedMdlClass             =  GetExtForLkUpClassName(Model);
+
+    string extforlkupInterfaceNameSpace =  GetTypeNameSpace(Model, Context, extforlkupInterfaceFolder);
+    string destinationNameSpace         =  GetTypeNameSpace(Model, Context, extforlkupFolder);
+    string clonerMdlClass               =  Model.ViewName + "CloneForLkUp";
+    string DoCloneMethodName            =  "DoClone";
 
     string staticM2mClassName = GetM2mStaticClassName(Model);
     string dbContextNameSpace = GetDbContextNameSpace(Context);
@@ -71,10 +75,16 @@ using System.ComponentModel.DataAnnotations;
 using <#= viewModelNameSpace #>;
 <# }} #>
 
+<# if (!string.IsNullOrEmpty(extforlkupInterfaceNameSpace)) {
+ if (!string.Equals(extforlkupInterfaceNameSpace, destinationNameSpace)) {#>
+using <#= extforlkupInterfaceNameSpace #>;
+<# }} #>
+
+
 
 namespace <#= destinationNameSpace #> {
 
-    public class <#= extendedMdlClass #> {
+    public class <#= extendedMdlClass #>: <#= extendedMdlInterface #>  {
 <#
         foreach(ModelViewPropertyOfVwSerializable slrPrp in mappedFlds) {
             if(Model.GenerateJSonAttribute) { 
@@ -203,7 +213,7 @@ namespace <#= destinationNameSpace #> {
     }
 
     public static class <#= clonerMdlClass #> {
-        public static <#= extendedMdlClass #>  <#= DoCloneMethodName #>(<#= Model.ViewName #> src) {
+        public static <#= extendedMdlInterface #>  <#= DoCloneMethodName #>(<#= Model.ViewName #> src) {
             <#= extendedMdlClass #> dest = new <#= extendedMdlClass #>();
             if(src != null) {
 <#
@@ -234,6 +244,24 @@ namespace <#= destinationNameSpace #> {
 }
 
 <#+
+    string GetExtForLkUpMsgInterfaceName(ModelViewSerializable model) {
+        string result = "I";
+        if(model != null) result = result + model.ViewName; 
+        result = result + "ExtForLkUpMsg";
+        return result;
+    }
+    string GetExtForLkUpInterfaceName(ModelViewSerializable model) {
+        string result = "I";
+        if(model != null) result = result + model.ViewName; 
+        result = result + "ExtForLkUp";
+        return result;
+    }
+    string GetExtForLkUpClassName(ModelViewSerializable model) {
+        string result = "";
+        if(model != null) result = result + model.ViewName; 
+        result = result + "ExtForLkUp";
+        return result;
+    }
 
     String GetM2mStaticClassName(ModelViewSerializable model) {
         string result = "M2mUpdater";
