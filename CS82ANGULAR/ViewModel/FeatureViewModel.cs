@@ -27,6 +27,77 @@ namespace CS82ANGULAR.ViewModel
 
         public ObservableCollection<FeatureSerializable> Features { get; set; }
         public ObservableCollection<FeatureItemSerializable> FeatureItemsList { get; set; } = new ObservableCollection<FeatureItemSerializable>();
+
+        FeatureItemSerializable _SelectedFeatureItem;
+        public FeatureItemSerializable SelectedFeatureItem
+        {
+            get { return _SelectedFeatureItem; }
+            set { 
+                if(_SelectedFeatureItem != value)
+                {
+                    _SelectedFeatureItem = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #region UiBtnCommandAdd
+        private ICommand _UiBtnCommandUp;
+        public ICommand UiBtnCommandUp
+        {
+            get
+            {
+                return _UiBtnCommandUp ?? (_UiBtnCommandUp = new CommandHandler((param) => UiBtnCommandUpAction(param), (param) => UiBtnCommandUpCanExecute(param)));
+            }
+        }
+        public bool UiBtnCommandUpCanExecute(Object param)
+        {
+            return true;
+
+        }
+        public virtual void UiBtnCommandUpAction(Object param)
+        {
+            if ((SelectedFeatureItem == null) || (_SelectedFeature == null)) return;
+            if (_SelectedFeature.FeatureItems == null) return;
+            int indx = _SelectedFeature.FeatureItems.IndexOf(SelectedFeatureItem);
+            if (indx < 1) return;
+            FeatureItemSerializable fi = _SelectedFeature.FeatureItems[indx - 1];
+            _SelectedFeature.FeatureItems[indx - 1] = _SelectedFeature.FeatureItems[indx];
+            _SelectedFeature.FeatureItems[indx] = fi;
+            FeatureItemsList.Move(indx, indx - 1);
+        }
+        #endregion
+
+        #region UiBtnCommandDown
+        private ICommand _UiBtnCommandDown;
+        public ICommand UiBtnCommandDown
+        {
+            get
+            {
+                return _UiBtnCommandDown ?? (_UiBtnCommandDown = new CommandHandler((param) => UiBtnCommandDownAction(param), (param) => UiBtnCommandDownCanExecute(param)));
+            }
+        }
+        public bool UiBtnCommandDownCanExecute(Object param)
+        {
+            return true;
+
+        }
+        public virtual void UiBtnCommandDownAction(Object param)
+        {
+            if ((SelectedFeatureItem == null) || (_SelectedFeature == null)) return;
+            if (_SelectedFeature.FeatureItems == null) return;
+            int indx = _SelectedFeature.FeatureItems.IndexOf(SelectedFeatureItem);
+            if ((indx < 0) || (indx >= _SelectedFeature.FeatureItems.Count-1)) return;
+            FeatureItemSerializable fi = _SelectedFeature.FeatureItems[indx + 1];
+            _SelectedFeature.FeatureItems[indx + 1] = _SelectedFeature.FeatureItems[indx];
+            _SelectedFeature.FeatureItems[indx] = fi;
+            FeatureItemsList.Move(indx, indx + 1);
+        }
+        #endregion
+
+
+        
+
+
         FeatureSerializable _SelectedFeature;
         public FeatureSerializable SelectedFeature
         {
@@ -41,6 +112,20 @@ namespace CS82ANGULAR.ViewModel
                     _SelectedFeature = value;
                     OnPropertyChanged();
                     OnSelectedFeaturePropertyChanged();
+                    bool sfi = true;
+                    if(_SelectedFeature != null)
+                    {
+                        if (_SelectedFeature.FeatureItems != null)
+                        {
+                            if (_SelectedFeature.FeatureItems.Count > 0)
+                            {
+                                SelectedFeatureItem = _SelectedFeature.FeatureItems[0];
+                                sfi = false;
+                            }
+                        }
+                    }
+                    if (sfi) SelectedFeatureItem = null;
+                    
                 }
             }
         }
