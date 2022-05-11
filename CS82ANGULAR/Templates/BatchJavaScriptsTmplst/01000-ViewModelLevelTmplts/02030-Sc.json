@@ -1,0 +1,38 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "1.",
+    "Please make sure that you selected src\\app\\components\\your-view-model-name folder",
+    "  where [your-view-model-name] is a name of currently selected ViewModel",
+    "",
+    "",
+    "                                After you have finished the current batch generation",
+    "Please include 'Sc.module.ts' in the import:[]-section of AppModule",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "sc",
+      "GeneratorType": "02100-Sc.component.css",
+      "GeneratorSript": "StaticContentView.css.t4"
+    },
+    {
+      "DestinationFolder": "sc",
+      "GeneratorType": "02100-Sc.component.html",
+      "GeneratorSript": "StaticContentView.html.t4"
+    },
+    {
+      "DestinationFolder": "sc",
+      "GeneratorType": "02100-Sc.component.ts",
+      "GeneratorSript": "StaticContentView.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "02150-Sc.module.ts",
+      "GeneratorSript": "StaticContentModuleForView.ts.t4"
+    }
+
+
+  ]
+}
