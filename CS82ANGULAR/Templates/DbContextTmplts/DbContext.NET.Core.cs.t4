@@ -19,10 +19,10 @@ namespace <#= DestinationNameSpace #>
         /// reset "ConfigurationManager.ConnectionStrings"
         /// optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString);
         /////////////////////////////////////////////////////////////////
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString);
-        }
+        // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        // {
+        //    optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString);
+        // }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
