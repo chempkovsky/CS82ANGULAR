@@ -428,11 +428,11 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
 <# 
         if(localize) {
 #>
-        'fullscann': $localize`:full scann@@<#= componentClassName #>.fullscann-menu:full scann`,
+        'fullscann': $localize`:full scan@@<#= componentClassName #>.fullscann-menu:full scan`,
 <# 
         } else {
 #>
-        'fullscann': 'full scann',
+        'fullscann': 'full scan',
 <# 
         }
         if (Model.IsWebApiSelectOneByPrimarykey) {
