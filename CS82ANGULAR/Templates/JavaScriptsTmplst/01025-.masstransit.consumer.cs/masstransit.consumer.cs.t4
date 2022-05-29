@@ -87,9 +87,9 @@ var builder = WebApplication.CreateBuilder(args);
 #region MassTransit config
 builder.Services.AddMassTransit(x => {
 
-    x.AddConsumer<<#= extendedMdlMsgConsumer #>>(typeof(<#= extendedMdlMsgConsumerDefinition #>))
-        .Endpoint(e =>
-        {
+    x.AddConsumer<<#= extendedMdlMsgConsumer #>>(typeof(<#= extendedMdlMsgConsumerDefinition #>));
+        //.Endpoint(e =>
+        //{
             // override the default endpoint name
             // e.Name =   <#= GetDashedName(Model.ViewName) #>;
 
@@ -107,7 +107,7 @@ builder.Services.AddMassTransit(x => {
             // set if each service instance should have its own endpoint for the consumer
             // so that messages fan out to each instance.
             e.InstanceId = "something-unique";
-        });
+        //});
 
     x.UsingRabbitMq((context, configurator) => {
         configurator.Host("192.168.100.4", "RabbitMq_virtual_host_name", h =>
@@ -135,6 +135,7 @@ builder.Services.AddMassTransit(x => {
         // configurator.SetQuorumQueue(3);
         //
 
+        configurator.ConfigureEndpoints(context);
     });
 });
 builder.Services.AddOptions<MassTransitHostOptions>()

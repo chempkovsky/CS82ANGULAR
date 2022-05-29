@@ -113,6 +113,8 @@ builder.Services.AddOptions<MassTransitHostOptions>()
     string actionInputParamName             = "action";
     string oldObjInputParamName             = "oldObj";
     string newObjInputParamName             = "newObj";
+    string ExtForLkUpMsgOldPropName         = "OldVals";
+    string ExtForLkUpMsgNewPropName         = "NewVals";
 
 
     string OperatorSufix = "Oprtr";
@@ -885,8 +887,8 @@ namespace <#= webApiServiceNameSpace #> {
             await pe.Publish<<#= extendedMdlMsgInterface #>>(new
             {
                 <#= actionInputParamName #> = 2,
-                <#= oldObjInputParamName #> = oldcln,
-                <#= newObjInputParamName #> = newcln
+                <#= ExtForLkUpMsgOldPropName #> = oldcln,
+                <#= ExtForLkUpMsgNewPropName #> = newcln
             });
 
             return Ok(result);
@@ -976,8 +978,8 @@ namespace <#= webApiServiceNameSpace #> {
             await pe.Publish<<#= extendedMdlMsgInterface #>>(new
             {
                 <#= actionInputParamName #> = 1,
-                // <#= oldObjInputParamName #> = null,
-                <#= newObjInputParamName #> = newcln
+                // <#= ExtForLkUpMsgOldPropName #> = null,
+                <#= ExtForLkUpMsgNewPropName #> = newcln
             });
 
             return Ok(result);
@@ -1082,8 +1084,8 @@ namespace <#= webApiServiceNameSpace #> {
             await pe.Publish<<#= extendedMdlMsgInterface #>>(new
             {
                 <#= actionInputParamName #> = 3,
-                <#= oldObjInputParamName #> = oldcln
-                // <#= newObjInputParamName #> = null
+                <#= ExtForLkUpMsgOldPropName #> = oldcln
+                // <#= ExtForLkUpMsgNewPropName #> = null
             });
             return Ok(result);
         }
