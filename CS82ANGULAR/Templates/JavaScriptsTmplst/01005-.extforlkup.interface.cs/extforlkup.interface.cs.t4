@@ -22,8 +22,16 @@ using System.ComponentModel.DataAnnotations;
     string ExtForLkUpMsgOldPropName     = "OldVals";
     string ExtForLkUpMsgNewPropName     = "NewVals";
 
+    string ConfNamePropName                 = "ConfName";
+    string ConfHostNamePropName             = "HostName";
+    string ConfUsernamePropName             = "Username";
+    string ConfPasswordPropName             = "Password";
+    string ConfVirtualHostNamePropName      = "VirtualHostName";
+    string ConfClusterIpAddressesPropName   = "ClusterIpAddresses";
+
     string extendedMdlInterface         =  GetExtForLkUpInterfaceName(Model);
     string extendedMdlMsgInterface      =  GetExtForLkUpMsgInterfaceName(Model);
+    string extendedMdlConf              =  GetExtForLkUpConfName(Model);
     string destinationNameSpace         =  GetTypeNameSpace(Model, Context, extforlkupInterfaceFolder);
 
     string dbContextNameSpace = GetDbContextNameSpace(Context);
@@ -109,6 +117,54 @@ namespace <#= destinationNameSpace #> {
         public <#= extendedMdlInterface #> <#= ExtForLkUpMsgOldPropName #> { get; set; } 
         public <#= extendedMdlInterface #> <#= ExtForLkUpMsgNewPropName #> { get; set; } 
     }
+
+/*
+  In appsettings.json it must be added the section like below.
+  1. If a RabbitMq cluster is present:
+
+  "<#= extendedMdlConf #>": {
+    "<#= ConfHostNamePropName #> ": "192.168.100.3",
+    "<#= ConfUsernamePropName #>": "Admin",
+    "<#= ConfPasswordPropName #>": "Admin",
+    "<#= ConfVirtualHostNamePropName #>": "phbkhost",
+    "<#= ConfClusterIpAddressesPropName #>": [
+      "192.168.100.4",
+      "192.168.100.5",
+      "192.168.100.6"
+    ]
+  }
+
+
+  2. If a RabbitMq cluster is not present:
+
+  "<#= extendedMdlConf #>": {
+    "<#= ConfHostNamePropName #> ": "192.168.100.3",
+    "<#= ConfUsernamePropName #>": "Admin",
+    "<#= ConfPasswordPropName #>": "Admin",
+    "<#= ConfVirtualHostNamePropName #>": "phbkhost",
+    "<#= ConfClusterIpAddressesPropName #>": []
+  }
+
+  3. In the Program.cs file add the code like below:
+
+  var builder = WebApplication.CreateBuilder(args);
+  ...
+  ConfigurationManager configuration = builder.Configuration;
+   ...
+  var myOptions = new <#= extendedMdlConf #>();
+  configuration.GetSection(<#= extendedMdlConf #>.<#= ConfNamePropName #>).Bind(myOptions);
+   ...
+
+*/
+
+    public class <#= extendedMdlConf #> {
+        public static string <#= ConfNamePropName #> = "<#= extendedMdlConf #>";
+        public string <#= ConfHostNamePropName #> { get; set; } = String.Empty;
+        public string <#= ConfUsernamePropName #> { get; set; } = String.Empty;
+        public string <#= ConfPasswordPropName #> { get; set; } = String.Empty;
+        public string <#= ConfVirtualHostNamePropName #> { get; set; } = String.Empty;
+        public string[] <#= ConfClusterIpAddressesPropName #> { get; set; } = null!;
+    }
 }
 
 <#+
@@ -123,6 +179,12 @@ namespace <#= destinationNameSpace #> {
         string result = "I";
         if(model != null) result = result + model.ViewName; 
         result = result + "ExtForLkUp";
+        return result;
+    }
+    string GetExtForLkUpConfName(ModelViewSerializable model) {
+        string result = "";
+        if(model != null) result = result + model.ViewName; 
+        result = result + "ExtForLkUpConf";
         return result;
     }
 
