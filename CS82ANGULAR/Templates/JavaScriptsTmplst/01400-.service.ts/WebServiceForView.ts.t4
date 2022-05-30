@@ -182,6 +182,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
                         }
                     }
                 }
+/*
                 if( Object.keys(<#= MasterToClientFieldsMapFieldName #>).indexOf(i) > -1 ) {
                     if( Object.keys(<#= MasterToClientFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
                         for(let k in <#= MasterToClientFieldsMapFieldName #>[i][j]) {
@@ -196,6 +197,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
                         }
                     }
                 }
+*/
             }
         }
         return rslt;

@@ -703,7 +703,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
                         if(!doIns) break;
                     }
                 } else {
-                    doIns = extHiddflt.length === extHiddflt.length;
+                    doIns = extHiddflt.length === this.extHiddenProps['<#= m2mModel.ViewName #>'].length;
                     if(doIns) doIns = extHiddflt.filter(s => this.extHiddenProps['<#= m2mModel.ViewName #>'].includes(s)).length === extHiddflt.length;
                 }
             }
@@ -974,6 +974,20 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
           this.onHiddenFilter();
           this.reset<#= externalFilterPropName #>();
           if(this.isOnInitCalled) {
+<#
+        if(searchSchemas != null) {
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+                foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                    ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+#>
+            this.<#= searchSelectRowPropName + m2mModel.ViewName + searchModel.ViewName  #> = null;
+<#
+                }
+            }
+        }
+#>
+
             this.resetCurFltr();
             this.onFilter();
           }
