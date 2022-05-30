@@ -182,7 +182,7 @@ namespace <#= destinationNameSpace #> {
                 } // foreach(ModelViewPropertyOfVwSerializable slrPrp in searchVM.ScalarProperties) { ... }
 #>
             <#= searchVM.RootEntityClassName #> rslt = await query.FirstOrDefaultAsync();
-            db.Entry(rslt).State = EntityState.Detached;
+            if(rslt != null) db.Entry(rslt).State = EntityState.Detached;
             return rslt;
         }
         public static async Task<<#= searchVM.RootEntityClassName #>> <#= staticM2mInsDictItemMethodName #>(<#= Context.DbContextClassName #> db, <#= extendedMdlInterface #> vm) {
@@ -452,7 +452,14 @@ namespace <#= destinationNameSpace #> {
                 foreach(var searchFkPair in searchFkPairs) {
                     ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
                     if(searchVM == null) continue;
-                    if(searchModels.Any(p => p == searchVM)) continue;
+                    if(searchModels.Any(p => p == searchVM)) {
+                        for(int i = 0; i < searchFkPair.Key.ForeignKeyProps.Count; i++) {
+#>
+                <#= m2mModel.ViewName + "InsTmp" #>.<#= searchFkPair.Key.ForeignKeyProps[i].OriginalPropertyName #> = <#= searchVM.ViewName + "InsTmp" #>.<#= searchFkPair.Key.PrincipalKeyProps[i].OriginalPropertyName #>;
+<#
+                        }
+                       continue;
+                    }
                     searchModels.Add(searchVM);
                     string staticM2mSelDictItemMethodName = GetM2mStaticSelDictItemMethodName(searchVM);
                     string staticM2mInsDictItemMethodName = GetM2mStaticInsDictItemMethodName(searchVM);
