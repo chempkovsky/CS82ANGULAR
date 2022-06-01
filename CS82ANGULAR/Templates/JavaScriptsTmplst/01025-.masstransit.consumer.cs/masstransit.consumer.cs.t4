@@ -12,11 +12,9 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 #nullable disable
-using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations;
 using MassTransit;
 using Microsoft.Extensions.Logging;
-
+using Microsoft.Extensions.DependencyInjection;
 
 <#
 
@@ -173,18 +171,24 @@ namespace <#= destinationNameSpace #> {
 
     public class <#= extendedMdlMsgConsumer #>: IConsumer<<#= extendedMdlMsgInterface #>> {
         private readonly ILogger<<#= extendedMdlMsgConsumer #>> _logger;
-        private readonly <#= Context.DbContextClassName #> db;
+        // private readonly <#= Context.DbContextClassName #> db;
+        IServiceScopeFactory _serviceScopeFactory;
 
-        public <#= extendedMdlMsgConsumer #>(<#= Context.DbContextClassName #> dbcontext, ILogger<<#= extendedMdlMsgConsumer #>> logger)
+        // public <#= extendedMdlMsgConsumer #>(<#= Context.DbContextClassName #> dbcontext, ILogger<<#= extendedMdlMsgConsumer #>> logger)
+        public <#= extendedMdlMsgConsumer #>(IServiceScopeFactory serviceScopeFactory, ILogger<<#= extendedMdlMsgConsumer #>> logger)
         {
-            db = dbcontext;
+            // db = dbcontext;
+            _serviceScopeFactory = serviceScopeFactory;
             _logger = logger;
         }
 
         public async Task Consume(ConsumeContext<<#= extendedMdlMsgInterface #>> context)
         {
             // _logger.LogInformation("Order Submitted: {OrderId}", context.Message.OrderId);
-            await <#= staticM2mClassName #>.<#= staticM2mUpdateAllMethodName #>(db, context.Message.<#= ExtForLkUpMsgActionPropName #>, context.Message.<#= ExtForLkUpMsgOldPropName #>, context.Message.<#= ExtForLkUpMsgNewPropName #>);
+            using (IServiceScope scope = _serviceScopeFactory.CreateScope()) {
+                <#= Context.DbContextClassName #> db = scope.ServiceProvider.GetRequiredService<<#= Context.DbContextClassName #>>();
+                await <#= staticM2mClassName #>.<#= staticM2mUpdateAllMethodName #>(db, context.Message.<#= ExtForLkUpMsgActionPropName #>, context.Message.<#= ExtForLkUpMsgOldPropName #>, context.Message.<#= ExtForLkUpMsgNewPropName #>);
+            }
         }
     }
 
