@@ -2018,6 +2018,7 @@
     </Content>
     <Content Include="Templates\BatchJavaScriptsTmplst\00000-ContextLevelTmplts\00040-AspNetEntitiesProd.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\BatchJavaScriptsTmplst\01000-ViewModelLevelTmplts\02040-AspNetAllInterfacesBatch.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
