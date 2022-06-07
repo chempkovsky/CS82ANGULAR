@@ -104,7 +104,7 @@ namespace <#= webApiServiceNameSpace #> {
                   (o, i) => new <#= Model.ViewName #>
                   {
                       ModelName = i.ModelName,
-                      UserPerms = (o.Mask1 ? 1 : 0) + (o.Mask2 ? 2 : 0) + (o.Mask3 ? 4 : 0) + (o.Mask4 ? 8 : 0) + (o.Mask4 ? 16 : 0)
+                      UserPerms = (o.Mask1 ? 1 : 0) + (o.Mask2 ? 2 : 0) + (o.Mask3 ? 4 : 0) + (o.Mask4 ? 8 : 0) + (o.Mask5 ? 16 : 0)
                   })
                 .ToListAsync();
         } // the end of GetWithFilter()-method

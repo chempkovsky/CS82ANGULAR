@@ -828,7 +828,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
             } // for(int i = 0; i < uniqueKeys.Count; i++) { ... }
         } // if (Model.IsWebApiSelectOneByPrimarykey) { ... }
 #>
-        if(hasNtExternal) {
+        if(hasNtExternal && this.cnFllscn) {
           rslt.push(
             {id: 'fullscann', caption: this.<#= menuCaptionsPropName #>['fullscann'], iconName: 'search', iconColor: 'primary', enabled: true, data: [
 <#
@@ -1109,7 +1109,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
     @Output('<#= selectedRowSelector #>') <#= selectedRowPropName #>: EventEmitter<<#= GetInterfaceName(Model) #>|null> = new EventEmitter<<#= GetInterfaceName(Model) #>|null>();
     @Output('<#= applyFilterSelector #>') <#= applyFilterPropName #>: EventEmitter<<#= componentClassName #>|null> = new EventEmitter<<#= componentClassName #>|null>();
 
-
+    cnFllscn: boolean = false;
     constructor(public  <#= formRootService #>: <#= serviceClassName #>, public <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
 <#
         if(searchSchemas!= null) {
@@ -1131,7 +1131,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPagi
         } // if(searchSchemas!= null) {...}
 #>    
             protected dialog: MatDialog, private cd: ChangeDetectorRef) {
-
+            this.cnFllscn = (<#= AppSettingServicePropName #>.getViewModelMask('<#= Model.ViewName #>') & 16) === 16;
         this.redefTableIndexMenuItemsData();
     }
 
