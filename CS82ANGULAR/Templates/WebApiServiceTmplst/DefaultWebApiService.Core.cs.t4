@@ -440,6 +440,7 @@ namespace <#= webApiServiceNameSpace #> {
 <#
         for(int cnt02 = 0; cnt02 < primKeys.Count; cnt02++) {
             ModelViewPropertyOfVwSerializable prop = primKeys[cnt02];
+            ModelViewEntityPropertySerializable entityProp =  GetRootEntityProperty(prop, Model);
             bool propIsString = prop.UnderlyingTypeName.Equals("System.String");
             if(cnt02 > 0) {
 #>                
@@ -476,12 +477,12 @@ namespace <#= webApiServiceNameSpace #> {
 <#
                     if(propIsString) {
 #>                       
-                    if(isLkOp) { _inner = _inner.And(p => p.<#= prop.OriginalPropertyName #>.StartsWith(_tmp<#= GetFilterPropertyName(prop, Model) #>)); }
-                    else { _inner = _inner.And(p => p.<#= prop.OriginalPropertyName #> == _tmp<#= GetFilterPropertyName(prop, Model) #>); }
+                    if(isLkOp) { _inner = _inner.And(p => p.<#= entityProp.OriginalPropertyName #>.StartsWith(_tmp<#= GetFilterPropertyName(prop, Model) #>)); }
+                    else { _inner = _inner.And(p => p.<#= entityProp.OriginalPropertyName #> == _tmp<#= GetFilterPropertyName(prop, Model) #>); }
 <#
                     } else {
 #>                        
-                    _inner = _inner.And(p => p.<#= prop.OriginalPropertyName #> == _tmp<#= GetFilterPropertyName(prop, Model) #>);
+                    _inner = _inner.And(p => p.<#= entityProp.OriginalPropertyName #> == _tmp<#= GetFilterPropertyName(prop, Model) #>);
 <#
                     }
                     if(IsUsedByForeignKey(prop, Model)) {
@@ -492,18 +493,18 @@ namespace <#= webApiServiceNameSpace #> {
             } else {
 #>                
                     if (<#= GetFilterPropertyName(prop, Model) #>[i] == null) {
-                        _inner = _inner.And(p => p.<#= prop.OriginalPropertyName #> == null);
+                        _inner = _inner.And(p => p.<#= entityProp.OriginalPropertyName #> == null);
                     } else {
                         var _tmp<#= GetFilterPropertyName(prop, Model) #> = <#= GetFilterPropertyName(prop, Model) #>[i];
 <#
                     if(propIsString) {
 #>                       
-                        if(isLkOp) { _inner = _inner.And(p => p.<#= prop.OriginalPropertyName #>.StartsWith(_tmp<#= GetFilterPropertyName(prop, Model) #>)); }
-                        else { _inner = _inner.And(p => p.<#= prop.OriginalPropertyName #> == _tmp<#= GetFilterPropertyName(prop, Model) #>); }
+                        if(isLkOp) { _inner = _inner.And(p => p.<#= entityProp.OriginalPropertyName #>.StartsWith(_tmp<#= GetFilterPropertyName(prop, Model) #>)); }
+                        else { _inner = _inner.And(p => p.<#= entityProp.OriginalPropertyName #> == _tmp<#= GetFilterPropertyName(prop, Model) #>); }
 <#
                     } else {
 #>                        
-                        _inner = _inner.And(p => p.<#= prop.OriginalPropertyName #> == _tmp<#= GetFilterPropertyName(prop, Model) #>);
+                        _inner = _inner.And(p => p.<#= entityProp.OriginalPropertyName #> == _tmp<#= GetFilterPropertyName(prop, Model) #>);
 <#
                     }
                     if(IsUsedByForeignKey(prop, Model)) {
@@ -601,14 +602,17 @@ namespace <#= webApiServiceNameSpace #> {
             if(!isForeignAdded)
 <#
         }
+        ModelViewEntityPropertySerializable entityProp0 =  GetRootEntityProperty(primKeys[0], Model);
+
 #>
             {
 
-                orderedQuery = query.OrderBy(p => p.<#= primKeys[0].OriginalPropertyName #>);
+                orderedQuery = query.OrderBy(p => p.<#= entityProp0.OriginalPropertyName #>);
 <#
         for(int i = 1; i < primKeys.Count; i++) {
+            ModelViewEntityPropertySerializable entityProp =  GetRootEntityProperty(primKeys[i], Model);
 #>                
-                orderedQuery = orderedQuery.ThenBy(p => p.<#= primKeys[i].OriginalPropertyName #>);
+                orderedQuery = orderedQuery.ThenBy(p => p.<#= entityProp.OriginalPropertyName #>);
 <#
         } 
 #>              
