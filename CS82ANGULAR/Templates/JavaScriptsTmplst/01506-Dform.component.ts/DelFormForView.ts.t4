@@ -327,7 +327,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 #>
     <#= frasesPropName #>: {[key:string]: string}  = {
         'Not-all-props': $localize`:Not all properties are set@@<#= componentClassName #>.Not-all-props:Not all properties are set`,
-        '<#= captionPropName #>': $localize`:Review <#= Model.Title #>@@<#= componentClassName #>.Review-Item:Review <#= Model.Title #>`,
+        '<#= captionPropName #>': $localize`:Delete <#= Model.Title #>@@<#= componentClassName #>.Delete-Item:Delete <#= Model.Title #>`,
         '<#= TitlePropName #>': $localize`:<#= TitleCaptionVal #>@@<#= componentClassName #>.SelItem:<#= TitleCaptionVal #>`,
         'Not-all-masters': $localize`:Not all masters have been set@@<#= componentClassName #>.Not-all-masters:Not all masters have been set`,
 <#

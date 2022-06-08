@@ -293,6 +293,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     if(localize) {
 #>
     <#= frasesPropName #>: {[key:string]: string}  = {
+        'Hide-details': $localize`:Hide details@@<#= componentClassName #>.Hide-details:Hide details`,
         '<#= ActionParamNavM2mNotAllwd #>':  $localize`:Navigating to detail form is not allowed in One-to-Many mode@@<#= componentClassName #>.<#= ActionParamNavM2mNotAllwd #>:Navigating to detail form is not allowed in One-to-Many mode`,
         '<#= captionPropName #>': $localize`:<#= Model.PluralTitle #>@@<#= componentClassName #>.<#= captionPropName #>:<#= Model.PluralTitle #>`,
         '<#= ActionParamUpdateMode #>': $localize`:Modify Item@@<#= componentClassName #>.<#= ActionParamUpdateMode #>:Modify Item`,
@@ -344,6 +345,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     } else {
 #>
     <#= frasesPropName #>: {[key:string]: string}  = {
+        'Hide-details': 'Hide details',
         '<#= ActionParamNavM2mNotAllwd #>':  'Navigating to detail form is not allowed in One-to-Many mode',
         '<#= captionPropName #>': '<#= Model.PluralTitle #>',
         '<#= ActionParamUpdateMode #>': 'Modify Item',
@@ -674,7 +676,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     @ViewChild(<#= GetComponentClassName(Model, sformComponentFolder) #>) childForm!: <#= GetComponentClassName(Model, sformComponentFolder) #>;
     public <#= SelectedDetailPropName #>: {caption: string, vw: string|null, nv: string|null, addon: string|null}|null = null;
     public <#= DetailViewsPropName #>: Array<{caption: string, vw: string|null, nv: string|null, addon: string|null}> = [
-        {caption:'Hide details', vw:null, nv:null, addon: null},
+        {caption:this.<#= frasesPropName #>['Hide-details'], vw:null, nv:null, addon: null},
 <#
     {
         foreach(string detailVwnm in detailViewNames) {

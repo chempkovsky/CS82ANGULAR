@@ -325,51 +325,60 @@ import { <#= GetInterfaceFilterName(m2mModel) #> } from '<#=  GetCrossComponentF
 #>
 
 
-
-@Component({
-  selector: 'app-<#= componentSelectorCommonPart #>',
-  templateUrl: '<#= GetFolderName(Model, sformHtmlFolder, sformComponentFolder)#>.html',
-  styleUrls: ['<#=  GetFolderName(Model, sformCssFolder, sformComponentFolder)#>.css']
-})
-export class <#= componentClassName #> implements OnInit, AfterViewInit, MatPaginatorIntl, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
-
 <# 
     if(localize) {
 #>
 // begin: internationalization of the mat-paginator
+/*
+class <#= Model.ViewName + "MtPgntrIntl" #> implements MatPaginatorIntl {
     changes = new Subject<void>();
     firstPageLabel = $localize`First page@@<#= componentClassName #>.firstPageLabel:First page`;
     itemsPerPageLabel = $localize`Items per page@@<#= componentClassName #>.itemsPerPageLabel:Items per page`;
     lastPageLabel = $localize`Last page@@<#= componentClassName #>.lastPageLabel:Last page`;
     nextPageLabel = $localize`Next page@@<#= componentClassName #>.nextPageLabel:Next page`;
     previousPageLabel = $localize`Previous page@@<#= componentClassName #>.previousPageLabel:Previous page`;
+    ofLabel = $localize`of@@<#= componentClassName #>.ofLabel:of`;
     getRangeLabel(page: number, pageSize: number, length: number): string {
-        const amountPages = Math.ceil(length / pageSize);
-        return $localize`Page ${page + 1} of ${amountPages}@@<#= componentClassName #>.getRangeLabel:Page ${page + 1} of ${amountPages}`;
-    }
+        if (length == 0 || pageSize == 0) { return `0 of ${length}`; } 
+        length = Math.max(length, 0); 
+        const startIndex = page * pageSize; 
+        const endIndex = startIndex < length ? Math.min(startIndex + pageSize, length) : startIndex + pageSize; 
+        return `${startIndex + 1} - ${endIndex} ${this.ofLabel} ${length}`; 
+    }     
+}    
+*/
 // end: internationalization of the mat-paginator
+<# 
+    } 
+#>
+
+
+
+@Component({
+  selector: 'app-<#= componentSelectorCommonPart #>',
+  templateUrl: '<#= GetFolderName(Model, sformHtmlFolder, sformComponentFolder)#>.html',
+  styleUrls: ['<#=  GetFolderName(Model, sformCssFolder, sformComponentFolder)#>.css'],
+<# 
+    if(localize) {
+#>
+//  providers: [{ provide: MatPaginatorIntl, useClass: <#= Model.ViewName + "MtPgntrIntl" #> }]
+<# 
+    } 
+#>
+})
+export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
+
+<# 
+    if(localize) {
+#>
     @Input('<#= captionSelector #>') <#= captionPropName #>: string = $localize`<#= Model.PluralTitle #>@@<#= componentClassName #>.caption:<#= Model.PluralTitle #>`;
 <# 
     } else {
 #>
-// begin: internationalization of the mat-paginator
-    changes = new Subject<void>();
-    firstPageLabel = 'First page';
-    itemsPerPageLabel = 'Items per page';
-    lastPageLabel = 'Last page';
-    nextPageLabel = 'Next page';
-    previousPageLabel = 'Previous page';
-    getRangeLabel(page: number, pageSize: number, length: number): string {
-        const amountPages = Math.ceil(length / pageSize);
-        return 'Page ${page + 1} of ${amountPages}';
-    }
-// end: internationalization of the mat-paginator
-
     @Input('<#= captionSelector #>') <#= captionPropName #>: string = '<#= Model.PluralTitle #>';
 <# 
     }
 #>
-
 
     <#= columnCaptionsPropName + Model.ViewName #>: {[key:string]: string}  = {
 <# 
