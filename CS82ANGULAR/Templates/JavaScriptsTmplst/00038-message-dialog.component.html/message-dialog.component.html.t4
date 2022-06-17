@@ -33,8 +33,8 @@
 <# 
     if(localize) {
 #>
-  <button mat-button (click)="onCancel()" cdkFocusInitial i18n="Cancel@@<#= messageDialogComponentClassName #>.Cancel">Cancel</button>
-  <button mat-button (click)="onOk()" i18n="Ok@@<#= messageDialogComponentClassName #>.Ok">Ok</button>
+  <button mat-button (click)="onCancel()" cdkFocusInitial i18n="Cancel@@Cancel.Cancel">Cancel</button>
+  <button mat-button (click)="onOk()" i18n="Ok@@Ok.Ok">Ok</button>
 <# 
     } else {
 #>

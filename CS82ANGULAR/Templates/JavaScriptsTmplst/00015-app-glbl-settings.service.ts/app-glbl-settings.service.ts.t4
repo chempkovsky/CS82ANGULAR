@@ -431,7 +431,7 @@ deprecated
     }
     getDashBrdMask(dshBrd: string): number {
       return 1; // delete this line when dshBrds is ready
-      let pk = this.dshBrds[dshBrd];
+      let pk = this.<#= vwModelsPropName #>[dshBrd];
       if(typeof pk === 'undefined') { return 0; } else { return pk; }
 /* 
 
@@ -472,7 +472,21 @@ deprecated
           rslt = ((msk & 1) === 1);
           break;
       };
+
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Icorrect format@@<#= appSettingServiceClassName #>.Icorrect-format2:Icorrect format` + '.';
+      if(!rslt) this.<#= ShowErrorMethodName #>('navigation', {message: $localize`:Access denied@@<#= appSettingServiceClassName #>.Access-denied:Access denied`});
+<# 
+    } else {
+#>
       if(!rslt) this.<#= ShowErrorMethodName #>('navigation', {message: 'Access denied'});
+<# 
+    }
+#>
+
+
       return rslt;
 /*
 

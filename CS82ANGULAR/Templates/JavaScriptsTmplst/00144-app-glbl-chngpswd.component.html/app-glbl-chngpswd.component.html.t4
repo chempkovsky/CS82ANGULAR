@@ -142,8 +142,8 @@
 <# 
     if(localize) {
 #>
-        <button mat-button (click)="onCancel()" cdkFocusInitial i18n="Canceld@@<#= appChangePasswordComponentClassName #>.Cancel">Cancel</button>
-        <button mat-button (click)="doSubmit()" i18n="Ok@@<#= appChangePasswordComponentClassName #>.Ok">Ok</button>
+        <button mat-button (click)="onCancel()" cdkFocusInitial i18n="Canceld@@Cancel.Cancel">Cancel</button>
+        <button mat-button (click)="doSubmit()" i18n="Ok@@Ok.Ok">Ok</button>
 <# 
     } else {
 #>

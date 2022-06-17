@@ -385,7 +385,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
     if(localize) {
         foreach(ModelViewPropertyOfVwSerializable dispSclProp in Model.ScalarProperties) {
 #>
-        '<#= GetTypeScriptPropertyName(dispSclProp, Model) #>': $localize`:<#=  GetDisplayAttributeValueString(dispSclProp, Model, DisplayLabelProperty) #>@@<#= componentClassName #>.<#= GetTypeScriptPropertyName(dispSclProp, Model) #>-colcapt:<#=  GetDisplayAttributeValueString(dispSclProp, Model, DisplayLabelProperty) #>`,
+        '<#= GetTypeScriptPropertyName(dispSclProp, Model) #>': $localize`:<#=  GetDisplayAttributeValueString(dispSclProp, Model, DisplayLabelProperty) #>@@<#= Model.ViewName #>.<#= GetTypeScriptPropertyName(dispSclProp, Model) #>-<#= DisplayLabelProperty #>:<#=  GetDisplayAttributeValueString(dispSclProp, Model, DisplayLabelProperty) #>`,
 <#
         }
     } else {
@@ -412,7 +412,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
                 
 #>
     <#= columnCaptionsPropName + searchModel.ViewName #>: {[key:string]: string}  = {
-        '<#= GetTypeScriptPropertyName(dispSclProp, searchModel) #>': $localize`:<#=  GetDisplayAttributeValueString(dispSclProp, searchModel, DisplayLabelProperty) #>@@<#= componentClassName #>.<#= searchModel.ViewName #>-<#= GetTypeScriptPropertyName(dispSclProp, searchModel) #>-colcapt:<#=  GetDisplayAttributeValueString(dispSclProp, searchModel, DisplayLabelProperty) #>`,
+        '<#= GetTypeScriptPropertyName(dispSclProp, searchModel) #>': $localize`:<#=  GetDisplayAttributeValueString(dispSclProp, searchModel, DisplayLabelProperty) #>@@<#= componentClassName #>.<#= searchModel.ViewName #>-<#= GetTypeScriptPropertyName(dispSclProp, searchModel) #>-<#= DisplayLabelProperty #>:<#=  GetDisplayAttributeValueString(dispSclProp, searchModel, DisplayLabelProperty) #>`,
     };
 <#
                 }

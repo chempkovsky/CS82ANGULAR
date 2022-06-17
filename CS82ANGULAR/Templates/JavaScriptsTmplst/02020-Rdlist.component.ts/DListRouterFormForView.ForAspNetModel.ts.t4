@@ -296,13 +296,13 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     if(localize) {
 #>
     <#= frasesPropName #>: {[key:string]: string}  = {
-        '<#= ActionParamNavM2mNotAllwd #>':  $localize`:Navigating to detail form is not allowed in One-to-Many mode@@<#= componentClassName #>.<#= ActionParamNavM2mNotAllwd #>:Navigating to detail form is not allowed in One-to-Many mode`,
-        '<#= captionPropName #>': $localize`:<#= Model.PluralTitle #>@@<#= componentClassName #>.<#= captionPropName #>:<#= Model.PluralTitle #>`,
-        '<#= ActionParamUpdateMode #>': $localize`:Modify Item@@<#= componentClassName #>.<#= ActionParamUpdateMode #>:Modify Item`,
-        '<#= ActionParamDeleteMode #>': $localize`:Delete Item@@<#= componentClassName #>.<#= ActionParamDeleteMode #>:Delete Item`,
-        '<#= ActionParamViewMode #>': $localize`:View Item@@<#= componentClassName #>.<#= ActionParamViewMode #>:View Item`,
-        '<#= ActionParamAddMode #>': $localize`:Add Item@@<#= componentClassName #>.<#= ActionParamAddMode #>:Add Item`,
-        '<#= ActionParamDeleteSelMode #>': $localize`:Delete Selected@@<#= componentClassName #>.<#= ActionParamDeleteSelMode #>:Delete Selected`,
+        '<#= ActionParamNavM2mNotAllwd #>':  $localize`:Navigating to detail form is not allowed in One-to-Many mode@@<#= ActionParamNavM2mNotAllwd #>.<#= ActionParamNavM2mNotAllwd #>:Navigating to detail form is not allowed in One-to-Many mode`,
+        '<#= captionPropName #>': $localize`:<#= Model.PluralTitle #>@@<#= Model.ViewName #>.<#= captionPropName #>:<#= Model.PluralTitle #>`,
+        '<#= ActionParamUpdateMode #>': $localize`:Modify Item@@<#= ActionParamUpdateMode #>.<#= ActionParamUpdateMode #>:Modify Item`,
+        '<#= ActionParamDeleteMode #>': $localize`:Delete Item@@<#= ActionParamDeleteMode #>.<#= ActionParamDeleteMode #>:Delete Item`,
+        '<#= ActionParamViewMode #>': $localize`:View Item@@<#= ActionParamViewMode #>.<#= ActionParamViewMode #>:View Item`,
+        '<#= ActionParamAddMode #>': $localize`:Add Item@@<#= ActionParamAddMode #>.<#= ActionParamAddMode #>:Add Item`,
+        '<#= ActionParamDeleteSelMode #>': $localize`:Delete Selected@@<#= ActionParamDeleteSelMode #>.<#= ActionParamDeleteSelMode #>:Delete Selected`,
 <#
         foreach(string detailViewName in detailViewNames) {
             if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;

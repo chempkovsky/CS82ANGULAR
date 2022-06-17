@@ -59,8 +59,8 @@
 <# 
     if(localize) {
 #>
-      <button mat-button (click)="onCancel()" cdkFocusInitial i18n="Cancel@@<#= rucomponentClassName #>.Cancel">Cancel</button>
-      <button mat-button (click)="onOk()" i18n="Ok@@<#= rucomponentClassName #>.Ok">Ok</button>
+      <button mat-button (click)="onCancel()" cdkFocusInitial i18n="Cancel@@Cancel.Cancel">Cancel</button>
+      <button mat-button (click)="onOk()" i18n="Ok@@Ok.Ok">Ok</button>
 <# 
     } else {
 #>
