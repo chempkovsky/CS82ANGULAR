@@ -371,7 +371,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
 <# 
     if(localize) {
 #>
-    @Input('<#= captionSelector #>') <#= captionPropName #>: string = $localize`<#= Model.PluralTitle #>@@<#= componentClassName #>.caption:<#= Model.PluralTitle #>`;
+    @Input('<#= captionSelector #>') <#= captionPropName #>: string = $localize`:<#= Model.PluralTitle #>@@<#= componentClassName #>.caption:<#= Model.PluralTitle #>`;
 <# 
     } else {
 #>
@@ -379,6 +379,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
 <# 
     }
 #>
+
 
     <#= columnCaptionsPropName + Model.ViewName #>: {[key:string]: string}  = {
 <# 
