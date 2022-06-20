@@ -1216,7 +1216,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
                         caption = uniqueKeys[i].UniqueKeyName;
                     }
 #>
-            case '<#= caption #>':  
+            case '<#= scannByMode + caption #>':  
                 if(flt) {
                     kyvl['data'] = JSON.stringify(flt);
                     r.f = kyvl;
