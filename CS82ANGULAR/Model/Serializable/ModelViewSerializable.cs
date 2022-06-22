@@ -22,6 +22,7 @@ namespace CS82ANGULAR.Model.Serializable
         public List<ModelViewForeignKeySerializable> ForeignKeys { get; set; }
         public List<ModelViewKeyPropertySerializable> PrimaryKeyProperties { get; set; }
         public List<ModelViewEntityPropertySerializable> AllProperties { get; set; }
+        public string WebApiRoutePrefix { get; set; }
         public string WebApiServiceName { get; set; }
         public string WebApiServiceProject { get; set; }
         public string WebApiServiceDefaultProjectNameSpace { get; set; }

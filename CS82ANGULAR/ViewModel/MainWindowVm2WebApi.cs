@@ -217,6 +217,7 @@ namespace CS82ANGULAR.ViewModel
             if (existedModelViewSerializable != null)
             {
                 existedModelViewSerializable.ScalarProperties = modelViewSerializable.ScalarProperties;
+                existedModelViewSerializable.WebApiRoutePrefix = modelViewSerializable.WebApiRoutePrefix;
                 existedModelViewSerializable.WebApiServiceName = modelViewSerializable.WebApiServiceName;
                 existedModelViewSerializable.IsWebApiSelectAll = modelViewSerializable.IsWebApiSelectAll;
                 existedModelViewSerializable.IsWebApiSelectManyWithPagination = modelViewSerializable.IsWebApiSelectManyWithPagination;

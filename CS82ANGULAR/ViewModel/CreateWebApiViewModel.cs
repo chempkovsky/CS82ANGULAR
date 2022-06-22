@@ -49,6 +49,7 @@ namespace CS82ANGULAR.ViewModel
         protected Visibility _UnuqieKeyVisibility = Visibility.Collapsed;
 
         protected Object _SelectedItem;
+        protected string _WebApiRoutePrefix;
         protected string _WebApiServiceName;
         protected string _WebApiSufix = "WebApiController";
         protected bool _IsWebApiDelete;
@@ -691,6 +692,22 @@ namespace CS82ANGULAR.ViewModel
                 CheckIsReady();
             }
         }
+        public string WebApiRoutePrefix
+        {
+            get
+            {
+                return _WebApiRoutePrefix;
+            }
+            set
+            {
+                if (_WebApiRoutePrefix == value) return;
+                _WebApiRoutePrefix = value;
+                OnPropertyChanged();
+                CheckIsReady();
+            }
+        }
+
+        
         public bool IsWebApiSelectAll
         {
             get
@@ -902,6 +919,7 @@ namespace CS82ANGULAR.ViewModel
         {
             if (SelectedModel == null) return null;
             ModelViewSerializable result = SelectedModel.ModelViewSerializableGetShallowCopy();
+            result.WebApiRoutePrefix = this.WebApiRoutePrefix;
             result.WebApiServiceName = this.WebApiServiceName;
             result.IsWebApiSelectAll = this.IsWebApiSelectAll;
             result.IsWebApiSelectManyWithPagination = this.IsWebApiSelectManyWithPagination;
@@ -1102,6 +1120,7 @@ namespace CS82ANGULAR.ViewModel
             {
                 WebApiServiceName = SelectedModel.WebApiServiceName;
             }
+            this.WebApiRoutePrefix = SelectedModel.WebApiRoutePrefix;
             this.IsWebApiSelectAll = SelectedModel.IsWebApiSelectAll;
             this.IsWebApiSelectManyWithPagination = SelectedModel.IsWebApiSelectManyWithPagination;
             this.IsWebApiSelectOneByPrimarykey = SelectedModel.IsWebApiSelectOneByPrimarykey;

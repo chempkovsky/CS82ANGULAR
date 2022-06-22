@@ -842,6 +842,7 @@ namespace CS82ANGULAR.Helpers
                 UIListProperties = srcModelViewSerializable.UIListProperties,
 
                 RootEntityDbContextPropertyName = srcModelViewSerializable.RootEntityDbContextPropertyName,
+                WebApiRoutePrefix = srcModelViewSerializable.WebApiRoutePrefix,
                 WebApiServiceName = srcModelViewSerializable.WebApiServiceName,
                 IsWebApiSelectAll = srcModelViewSerializable.IsWebApiSelectAll,
                 IsWebApiSelectManyWithPagination = srcModelViewSerializable.IsWebApiSelectManyWithPagination,
@@ -1548,6 +1549,7 @@ namespace CS82ANGULAR.Helpers
                 ViewFolder = destinationFolder,
                 GenerateJSonAttribute = srcModelViewSerializable.GenerateJSonAttribute,
 
+                WebApiRoutePrefix = srcModelViewSerializable.WebApiRoutePrefix,
                 WebApiServiceName = srcModelViewSerializable.WebApiServiceName,
                 WebApiServiceProject = srcModelViewSerializable.WebApiServiceProject,
                 WebApiServiceDefaultProjectNameSpace = srcModelViewSerializable.WebApiServiceDefaultProjectNameSpace,
@@ -1589,6 +1591,7 @@ namespace CS82ANGULAR.Helpers
                 ViewFolder = destinationFolder,
                 GenerateJSonAttribute = srcModelViewSerializable.GenerateJSonAttribute,
 
+                WebApiRoutePrefix = srcModelViewSerializable.WebApiRoutePrefix,
                 WebApiServiceName = srcModelViewSerializable.WebApiServiceName,
                 WebApiServiceProject = srcModelViewSerializable.WebApiServiceProject,
                 WebApiServiceDefaultProjectNameSpace = srcModelViewSerializable.WebApiServiceDefaultProjectNameSpace,

@@ -34,6 +34,7 @@ using Microsoft.AspNetCore.Http;
     string dbContextNameSpace = GetDbContextNameSpace(Context);
     string viewModelNameSpace = GetViewModelNameSpace(Model);
     string webApiServicePrefix = GetWebApiServicePrefix(Model);
+    string webApiRoutePrefix =  GetWebApiRoutePrefix(Model);
     List<String> locNavigationPaths = GetNavigationPaths(Model);
 
     List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
@@ -62,6 +63,7 @@ namespace <#= webApiServiceNameSpace #> {
 
 //    [RoutePrefix("<#= webApiServicePrefix #>")]
     [ApiController]
+    [Route("<#= webApiRoutePrefix #>")]
     public class <#= Model.WebApiServiceName #>: ControllerBase
     {
         private readonly <#= Context.DbContextClassName #> db;
@@ -219,6 +221,13 @@ namespace <#= webApiServiceNameSpace #> {
                 result = result.Substring(0, result.LastIndexOf("Controller"));
             }
             result = result.ToLower();
+        }
+        return result;
+    }
+    String GetWebApiRoutePrefix(ModelViewSerializable model) {
+        string result = model.WebApiRoutePrefix;
+        if( string.IsNullOrEmpty( result ) ) {
+            result = "";
         }
         return result;
     }
