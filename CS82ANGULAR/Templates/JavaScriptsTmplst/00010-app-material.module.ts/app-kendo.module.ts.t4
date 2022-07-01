@@ -1,0 +1,122 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+
+    string materialModuleFolder = "00010-app-material.module.ts";
+    string materialModuleClassName = GetModuleClassName(Model, materialModuleFolder);
+
+#>
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
+//import { LayoutModule } from '@angular/cdk/layout';
+
+
+import { ButtonsModule } from "@progress/kendo-angular-buttons";
+import { LayoutModule } from "@progress/kendo-angular-layout";
+import { IconsModule } from "@progress/kendo-angular-icons";
+import { InputsModule } from "@progress/kendo-angular-inputs";
+import { DropDownsModule } from "@progress/kendo-angular-dropdowns";
+import { MenusModule } from "@progress/kendo-angular-menu";
+import { ProgressBarModule } from "@progress/kendo-angular-progressbar";
+import { DialogsModule } from "@progress/kendo-angular-dialog";
+import { NotificationModule } from "@progress/kendo-angular-notification";
+import { ToolBarModule } from "@progress/kendo-angular-toolbar";
+import { TooltipsModule } from "@progress/kendo-angular-tooltip";
+import { ListViewModule } from "@progress/kendo-angular-listview";
+import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
+import { LabelModule } from '@progress/kendo-angular-label';
+import { GridModule } from "@progress/kendo-angular-grid";
+
+const MatetialComponents = [
+
+  FormsModule,
+  ReactiveFormsModule,
+
+  ButtonsModule,
+  LayoutModule,
+  IconsModule,
+  InputsModule,
+  DropDownsModule,
+  MenusModule,
+  ProgressBarModule,
+  DialogsModule,
+  NotificationModule,
+  ToolBarModule,
+  TooltipsModule,
+  ListViewModule,
+  DateInputsModule,
+  LabelModule,
+  GridModule,
+];
+
+
+
+@NgModule({
+  declarations: [],
+  imports: [
+    CommonModule,
+    MatetialComponents
+  ],
+  exports:[
+    MatetialComponents
+  ]
+})
+export class <#= materialModuleClassName #>  { }
+
+<#+
+    string GetModuleClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".module","Module").Replace(".routing","Routing");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString();
+    }
+#>

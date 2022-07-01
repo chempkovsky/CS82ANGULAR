@@ -23,7 +23,7 @@ export interface <#= menuItemDataModelClassName #> {
     id: string;
     caption: string;
     iconName: string|any;
-    iconColor: string;
+    iconColor: string|any;
     enabled: boolean;
     data?: any;
 }

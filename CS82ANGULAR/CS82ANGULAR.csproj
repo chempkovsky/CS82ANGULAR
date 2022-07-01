@@ -1037,15 +1037,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00015-app-glbl-settings.service.ts\app-glbl-settings.service.lightning.ts.t4">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00015-app-glbl-settings.service.ts\app-glbl-settings.service.nebular.ts.t4">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00015-app-glbl-settings.service.ts\app-glbl-settings.service.ngb.ts.t4">
+    <Content Include="Templates\JavaScriptsTmplst\00015-app-glbl-settings.service.ts\app-glbl-settings.service.kendo.ts.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -1093,7 +1085,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00025-web-service-filter.component.css\web-service-filter.component.ngb.css.t4">
+    <Content Include="Templates\JavaScriptsTmplst\00025-web-service-filter.component.css\web-service-filter.component.kendo.css.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -1101,27 +1093,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00025-web-service-filter.component.html\web-service-filter.component.lightning.html.t4">
+    <Content Include="Templates\JavaScriptsTmplst\00025-web-service-filter.component.html\web-service-filter.component.kendo.html.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00025-web-service-filter.component.html\web-service-filter.component.nebular.html.t4">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00025-web-service-filter.component.html\web-service-filter.component.ngb-awesome.html.t4">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00025-web-service-filter.component.html\web-service-filter.component.ngb.html.t4">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00025-web-service-filter.component.ts\web-service-filter.component.nebular.ts.t4">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00025-web-service-filter.component.ts\web-service-filter.component.ngb.ts.t4">
+    <Content Include="Templates\JavaScriptsTmplst\00025-web-service-filter.component.ts\web-service-filter.component.kendo.ts.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -2239,6 +2215,10 @@
     <Content Include="Templates\JavaScriptsTmplst\30000-AllModelViews.sql\AllModelViews.sql.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\00010-app-material.module.ts\app-kendo.module.ts.t4">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>

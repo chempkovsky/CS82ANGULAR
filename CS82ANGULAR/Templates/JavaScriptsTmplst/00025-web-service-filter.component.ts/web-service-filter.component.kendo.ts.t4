@@ -12,20 +12,13 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    bool localize = Context.Localize;
 
     string showAddFltItemSelector       = "show-add-flt-item";
     string showAddFltItemPropName       = "showAddFltItem";
 
-    string showFilterSelector           = "show-filter";
-    string showFilterPropName           = "showFilter";
-    string inputFilterDefsSelector      = "filter-defs";
-    string inputFilterDefsPropName      = "inputFilterDefs";
-    string HiddenFilterSelector         = "hidden-filter";
-    string HiddenFilterPropName         = "hiddenFilter";
     string AppSettingServicePropName    = "appGlblSettings";
     string AppearancePropName           = "appearance";
-    string MaxHeightPropSelector        = "max-height";
-    string MaxHeightPropName            = "maxHeight";
     string OverflowSelector             = "ovrflw";
     string OverflowPropName             = "ovrflw";
     string containerMenuItemsPropName           = "contMenuItems";
@@ -33,6 +26,26 @@
     string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
     string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
     string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+
+    string externalFilterSelector               = "external-filter";
+    string externalFilterPropName               = "externalFilter";
+    string externalFilterExPropName             = "externalFilterEx";
+
+    string HiddenFilterSelector                 = "hidden-filter";
+    string HiddenFilterPropName                 = "hiddenFilter";
+    string HiddenFilterExPropName               = "hiddenFilterEx";
+
+    string MaxHeightPropSelector                = "max-height";
+    string MaxHeightPropName                    = "maxHeight";
+    string MaxHeightExPropName                  = "maxHeightEx";
+
+    string showFilterSelector                   = "show-filter";
+    string showFilterPropName                   = "showFilter";
+    string showFilterExPropName                 = "showFilterEx";
+
+    string inputFilterDefsSelector              = "filter-defs";
+    string inputFilterDefsPropName              = "inputFilterDefs";
+    string inputFilterDefsExPropName            = "inputFilterDefsEx";
 
 
     Dictionary<string, string> RegExps = new Dictionary<string, string>() {
@@ -55,7 +68,6 @@
     string menuItemDataModelFolder = "00017-menu-item-data.interface.ts";
     string eventEmitterDataModelFolder = "00018-event-emitter-data.interface.ts";
     string eventEmitterPubModelFolder = "00019-event-emitter-pub.interface.ts";
-    string appNgbDateNativeAdapterFolder    = "00012-app-ngb-date-native.adapter.ts";
 
                                 
     string filterModelClassName = GetModelClassName(Model, filterModelFolder);
@@ -70,8 +82,6 @@
     string filterComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, filterComponentFolder);
     
     string appSettingServiceClassName   = GetServiceClassName(Model, appSettingServiceFolder);
-    string appNgbDateNativeAdapterClassName = GetAdapterClassName(Model, appNgbDateNativeAdapterFolder);
-
 
     string OnBackBtnMethodName          = "onBackBtnMd";
     string OnBackBtnPropName            = "onBackBtn";
@@ -85,6 +95,9 @@
 #>
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { FormControl, Validators, ValidatorFn, ValidationErrors } from '@angular/forms';
+import { DropDownFillMode } from '@progress/kendo-angular-dropdowns';
+import { InputFillMode } from '@progress/kendo-angular-inputs';
+import { DateInputFillMode } from '@progress/kendo-angular-dateinputs';
 
 import { <#= filterModelClassName #> } from '<#= GetFolderName(Model, filterModelFolder, filterComponentFolder)#>';
 import { <#= filterDefModelClassName #> } from '<#= GetFolderName(Model, filterDefModelFolder, filterComponentFolder)#>';
@@ -94,31 +107,16 @@ import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appS
 import { <#= menuItemDataModelClassName #> } from '<#= GetFolderName(Model, menuItemDataModelFolder, filterComponentFolder)#>';
 import { <#= eventEmitterDataModelClassName #> } from '<#= GetFolderName(Model, eventEmitterDataModelFolder, filterComponentFolder)#>';
 import { <#= eventEmitterPubModelClassName #> } from '<#= GetFolderName(Model, eventEmitterPubModelFolder, filterComponentFolder)#>';
-// begin reminder
-// import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
-// import { <#= appNgbDateNativeAdapterClassName #> } from '<#= GetFolderName(Model, appNgbDateNativeAdapterFolder, filterComponentFolder)#>';
-// end reminder
-
-// import { MatSelectChange } from '@angular/material/select';
-/*
-requires the following modules to be included in app.module.ts 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { FormsModule } from '@angular/forms';
-import { ReactiveFormsModule } from '@angular/forms';
-*/
 
 
 @Component({
   selector: 'app-<#= filterComponentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, filterComponentHtmlFolder, filterComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderName(Model, filterComponentCssFolder, filterComponentFolder) #>.css']
-// begin reminder
-//    , providers: [ {provide: NgbDateAdapter, useClass: AppNgbDateNativeAdapter} ]
-// end reminder
 })
-export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterPubModelClassName #> {
+export class <#= filterComponentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #> {
     protected isOnInitCalled: boolean = false;
-    public <#= AppearancePropName #>: string = 'outline';
+    public <#= AppearancePropName #>: DropDownFillMode|InputFillMode|DateInputFillMode = 'outline';
     
     @Input('<#= captionSelector #>') <#= captionPropName #>: string = '';
     @Input('<#= showBackBtnSelector #>') <#= showBackBtnPropName #>: boolean = false;
@@ -128,17 +126,17 @@ export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterP
     }
 
     public <#= OverflowPropName #>: string | null = null;   
-    public  <#= MaxHeightPropName #>X: number|null = null;
+    public  <#= MaxHeightExPropName #>: number|null = null;
     protected _<#= MaxHeightPropName #>: number|null = null;
     @Input('<#= MaxHeightPropSelector #>')
-        get <#= MaxHeightPropName #>(): number|null {
-            return this._<#= MaxHeightPropName #>;
-        }
+      get <#= MaxHeightPropName #>(): number|null {
+        return this._<#= MaxHeightPropName #>;
+      }
       set <#= MaxHeightPropName #>(inp: number|null) {
+        this._<#= MaxHeightPropName #> = inp;
         if (!(typeof inp === 'undefined')) {
           if(!(inp === null)) {
-            this.<#= MaxHeightPropName #>X = inp * this.<#= AppSettingServicePropName #>.filterHeightFactor + this.<#= AppSettingServicePropName #>.filterHeightAddition;
-            this._<#= MaxHeightPropName #> = inp;
+            this.<#= MaxHeightExPropName #> = inp * this.<#= AppSettingServicePropName #>.filterHeightFactor + this.<#= AppSettingServicePropName #>.filterHeightAddition;
             this.<#= OverflowPropName #> = 'auto';
             if(this.isOnInitCalled) {
               this.cd.detectChanges();
@@ -146,8 +144,7 @@ export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterP
             return;
           }
         }
-        this._<#= MaxHeightPropName #> = null;
-        this.<#= MaxHeightPropName #>X = null;
+        this.<#= MaxHeightExPropName #> = null;
         this.<#= OverflowPropName #> = null;
         if(this.isOnInitCalled) {
             this.cd.detectChanges();
@@ -165,15 +162,17 @@ export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterP
         this.<#= onContainerMenuItemClickEmitter #>.emit(e);
     }
 
-    protected _<#= showFilterPropName #>: boolean = true;
+    public <#= showFilterExPropName #>: boolean = true;
+    protected _<#= showFilterPropName #>: boolean|any = true;
     @Input('<#= showFilterSelector #>') 
       get <#= showFilterPropName #>(): boolean {
         return this._<#= showFilterPropName #>;
       }
-      set <#= showFilterPropName #>(inshow: boolean) {
+      set <#= showFilterPropName #>(inshow: boolean|any) {
+        this._<#= showFilterPropName #> = inshow;
         if (!(typeof inshow === 'undefined')) {
           if(!(inshow === null)) {
-            this._<#= showFilterPropName #> = inshow;
+            this.<#= showFilterExPropName #> = inshow as boolean;
             if(this.isOnInitCalled) {
               this.onFilterDefsChanged();
             }
@@ -181,38 +180,40 @@ export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterP
         }
       }
 
+    <#= HiddenFilterExPropName #>: Array<<#= filterResultModelClassName #>> = [];
     protected _<#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
-
     @Input('<#= HiddenFilterSelector #>') 
         get <#= HiddenFilterPropName #>(): Array<<#= filterResultModelClassName #>>|any {
           return this._<#= HiddenFilterPropName #>;
         }
         set <#= HiddenFilterPropName #>(inDef: Array<<#= filterResultModelClassName #>>|any) {
+          this._<#= HiddenFilterPropName #> = inDef;
           if (typeof inDef === 'undefined') {
-            this._<#= HiddenFilterPropName #> = [];
+            this.<#= HiddenFilterExPropName #> = [];
           } else if(!Array.isArray(inDef)) {
-            this._<#= HiddenFilterPropName #> = [];
+            this.<#= HiddenFilterExPropName #> = [];
           } else {
-            this._<#= HiddenFilterPropName #> =  inDef as Array<<#= filterResultModelClassName #>>;
+            this.<#= HiddenFilterExPropName #> = inDef as Array<<#= filterResultModelClassName #>>;
           }
           if(this.isOnInitCalled) {
             this.onFilterDefsChanged();
           }
         } 
 
+    <#= inputFilterDefsExPropName #>: Array<<#= filterDefModelClassName #>> = [];
     protected _<#= inputFilterDefsPropName #>: Array<<#= filterDefModelClassName #>> = [];
-
     @Input('<#= inputFilterDefsSelector #>') 
         get <#= inputFilterDefsPropName #>(): Array<<#= filterDefModelClassName #>> {
           return this._<#= inputFilterDefsPropName #>;
         }
         set <#= inputFilterDefsPropName #>(inDef: Array<<#= filterDefModelClassName #>>) {
+          this._<#= inputFilterDefsPropName #> = inDef;
           if (typeof inDef === 'undefined') {
-            this._<#= inputFilterDefsPropName #> = [];
+            this.<#= inputFilterDefsExPropName #> = [];
           } else if(!Array.isArray(inDef)) {
-            this._<#= inputFilterDefsPropName #> = [];
+            this.<#= inputFilterDefsExPropName #> = [];
           } else {
-            this._<#= inputFilterDefsPropName #> =  inDef;
+            this.<#= inputFilterDefsExPropName #> =  inDef;
           }
           if(this.isOnInitCalled) {
             this.onFilterDefsChanged();
@@ -245,20 +246,31 @@ export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterP
 
     onFilterDefsChanged(): void {
         this.webServiceFilterDefs = [{fltrName: '', fltrCaption: '--No filter--',  fltrDataType: '', fltrMaxLen: null, fltrMin: null, fltrMax: null }];
-        this.<#= inputFilterDefsPropName #>.forEach(i => {
-            if(this.<#= HiddenFilterPropName #>.findIndex((h: { fltrName: string; }) => { return (h.fltrName === i.fltrName); }) < 0) {
+        this.<#= inputFilterDefsExPropName #>.forEach(i => {
+            if(this.<#= HiddenFilterExPropName #>.findIndex((h: { fltrName: string; }) => { return (h.fltrName === i.fltrName); }) < 0) {
             this.webServiceFilterDefs.push({ fltrName: i.fltrName, fltrCaption: i.fltrCaption, fltrDataType: i.fltrDataType, fltrMaxLen: i.fltrMaxLen, fltrMin: i.fltrMin, fltrMax: i.fltrMax });
             }
         });    
         if(this.<#= showFilterPropName #>) {
-            const fltDef: <#= filterDefModelClassName #> = this.webServiceFilterDefs[0];
-            const fltOp: <#= filterOperatorModelClassName #> = this.webServiceOperators[0];
-
-            this.webServiceFilters = [
-                { fltrName: new FormControl(fltDef.fltrName), fltrDataType: fltDef.fltrDataType, 
-                fltrOperator: new FormControl(fltOp.oName), fltrValue: new FormControl({ value: null, disabled: true }), 
-                fltrMaxLen: fltDef.fltrMaxLen, fltrMin: fltDef.fltrMin, fltrMax: fltDef.fltrMax }
-            ];
+            this.webServiceFilters = [];
+            this.<#= externalFilterExPropName #>.forEach((fi: IWebServiceFilterRslt) => {
+                let i: number = this.<#= inputFilterDefsExPropName #>.findIndex((h: { fltrName: string; }) => { return (h.fltrName === fi.fltrName); });
+                if(i > -1) {
+                  let fDf: IWebServiceFilterDef = this.<#= inputFilterDefsExPropName #>[i];
+                  this.webServiceFilters.push({ fltrName: new FormControl(fDf.fltrName), fltrDataType: fDf.fltrDataType, 
+                      fltrOperator: new FormControl(fi.fltrOperator), fltrValue: new FormControl({ value: fi.fltrValue, disabled: false }), 
+                      fltrMaxLen: fDf.fltrMaxLen, fltrMin: fDf.fltrMin, fltrMax: fDf.fltrMax });
+                }
+            });
+            if(this.webServiceFilters.length < 1) {
+                const fltDef: <#= filterDefModelClassName #> = this.webServiceFilterDefs[0];
+                const fltOp: <#= filterOperatorModelClassName #> = this.webServiceOperators[0];
+                this.webServiceFilters = [
+                    { fltrName: new FormControl(fltDef.fltrName), fltrDataType: fltDef.fltrDataType, 
+                    fltrOperator: new FormControl(fltOp.oName), fltrValue: new FormControl({ value: null, disabled: true }), 
+                    fltrMaxLen: fltDef.fltrMaxLen, fltrMin: fltDef.fltrMin, fltrMax: fltDef.fltrMax }
+                ];
+            }
         } else {
             this.webServiceFilters = [];
         }
@@ -273,14 +285,13 @@ export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterP
         this.webServiceFilters.push(item);
     }
 
-    onSelectionChanged(event: any, //MatSelectChange, 
-        flt: <#= filterModelClassName #>) {
+    onSelectionChanged(event: <#= filterDefModelClassName #>, flt: <#= filterModelClassName #>) {
         if ((typeof flt === 'undefined') || (typeof event === 'undefined')) return;
-        if (typeof event.value === 'undefined')  return;
-        if ((flt === null) || (event.value === null))  return;
+        if (typeof event.fltrName === 'undefined')  return;
+        if ((flt === null) || (event.fltrName === null))  return;
 
         let itm: <#= filterDefModelClassName #> | any = this.webServiceFilterDefs.find((e,i,a) => {
-            return (e.fltrName === event.value);
+            return (e.fltrName === event.fltrName);
         });
         if(typeof itm === 'undefined') {
             itm = this.webServiceFilterDefs[0];
@@ -382,25 +393,95 @@ export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterP
         Object.keys(errs).forEach(k => {
           switch(k) {
             case 'max':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:The value must be less than@@<#= filterComponentClassName #>.The-value-must-be-less-than:The value must be less than` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
               rslt +=' The value must be less than ' + errs[k].max;
+<# 
+    }
+#>
               break;
             case 'min':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:The value must be greater than@@<#= filterComponentClassName #>.The-value-must-be-greater-than:The value must be greater than` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
               rslt +=' Value must be greater than ' + errs[k].min;
+<# 
+    }
+#>
               break;
             case 'pattern':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Icorrect format@@<#= filterComponentClassName #>.Icorrect-format:Icorrect format` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
               rslt +=' Icorrect format.' ;
+<# 
+    }
+#>
               break;
             case 'matDatepickerMin':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Value must be greater than@@<#= filterComponentClassName #>.Value-must-be-greater-than:Value must be greater than` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
               rslt +=' Value must be greater than ' + errs[k].min;
+<# 
+    }
+#>
               break;
             case 'matDatepickerMax':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Value must be less than@@<#= filterComponentClassName #>.Value-must-be-less-than:Value must be less than` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
               rslt +=' The value must be less than ' + errs[k].max;
+<# 
+    }
+#>
               break;
             case 'matDatepickerParse':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Icorrect date format@@<#= filterComponentClassName #>.Icorrect-date-format:Icorrect date format` + '.';
+<# 
+    } else {
+#>
               rslt +=' Icorrect date format.' ;
+<# 
+    }
+#>
               break;
             default:
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Icorrect format@@<#= appSettingServiceClassName #>.Icorrect-format2:Icorrect format` + '.';
+<# 
+    } else {
+#>
               rslt +=' Icorrect format.' ;
+<# 
+    }
+#>
               break;
           }
         });
@@ -409,7 +490,7 @@ export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterP
 
     onApplyFilterClicked(): void {
         let result: Array<<#= filterResultModelClassName #>> = [];
-        this.<#= HiddenFilterPropName #>.forEach((i: IWebServiceFilterRslt) => {
+        this.<#= HiddenFilterExPropName #>.forEach((i: IWebServiceFilterRslt) => {
           result.push(i);
         });
         this.webServiceFilters.forEach(i => {
@@ -421,6 +502,36 @@ export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterP
         });
         this.onApplyFilter.emit(result);
     }
+
+    <#= externalFilterExPropName #>: Array<<#= filterResultModelClassName #>> = [];
+    protected _<#= externalFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
+    @Input('<#= externalFilterSelector #>') 
+    get <#= externalFilterPropName #>(): Array<<#= filterResultModelClassName #>> {
+        return this._externalFilter;
+    }
+    set <#= externalFilterPropName #>(ef: Array<<#= filterResultModelClassName #>>|any) {
+        this._externalFilter = ef;
+        let isNDf = (typeof ef === 'undefined');
+        isNDf = isNDf ? isNDf : (ef === null);
+        isNDf = isNDf ? isNDf : (!Array.isArray(ef));
+        if(isNDf) {
+          if(this.<#= externalFilterExPropName #>.length > 0) {
+            this.<#= externalFilterExPropName #> = [];
+            if(this.isOnInitCalled) {
+              this.onFilterDefsChanged();
+            }
+          }
+        } else {
+          this.<#= externalFilterExPropName #> = [];
+          ef.forEach((fi: <#= filterResultModelClassName #>) => {
+            this.<#= externalFilterExPropName #>.push({fltrName: fi.fltrName, fltrDataType: fi.fltrDataType, fltrOperator: fi.fltrOperator, fltrValue:fi.fltrValue});
+          });
+          if(this.isOnInitCalled) {
+            this.onFilterDefsChanged();
+          }
+      }
+    }
+
 }
 
 <#+
@@ -602,45 +713,5 @@ export class <#= filterComponentClassName#> implements OnInit, <#= eventEmitterP
         }
         result += refItem.FileName;
         return result;
-    }
-    string GetAdapterClassName(ModelViewSerializable model, string fileType) {
-        string result="";
-        if ((model == null) || string.IsNullOrEmpty(fileType)) {
-            return result;
-        }
-        if (model.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-        if (refItem == null) {
-            return result;
-        }
-        if(string.IsNullOrEmpty(refItem.FileName)) {
-            return result;
-        }
-        string fn = refItem.FileName.Replace(".adapter","Adapter");
-        StringBuilder sb = new StringBuilder();
-        bool toUpper = true;
-        foreach (char c in fn)
-        {
-            if( c == '-' )
-            {
-                toUpper = true;
-            } else
-            {
-                if (toUpper)
-                {
-                    sb.Append(Char.ToUpper(c));
-                    toUpper = false;
-                }
-                else
-                {
-                    sb.Append(c);
-                }
-            }
-                
-        }
-        return sb.ToString();
     }
 #>

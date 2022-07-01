@@ -47,12 +47,15 @@
 #>
 
 import { Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { NotificationService } from "@progress/kendo-angular-notification";
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot, CanActivateChild, Route } from '@angular/router';
-import { MatFormFieldAppearance } from '@angular/material/form-field';
 import { <#= appConfigServiceClassName #> } from '<#= GetFolderName(Model, appConfigServiceFolder, appSettingServiceFolder)#>';
 import { HttpParameterCodec } from '@angular/common/http';
+import { DropDownFillMode } from '@progress/kendo-angular-dropdowns';
+import { InputFillMode } from '@progress/kendo-angular-inputs';
+import { DateInputFillMode } from '@progress/kendo-angular-dateinputs';
+
 
 @Injectable({
   providedIn: 'root'
@@ -76,15 +79,20 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
 //
 // end HttpParameterCodec: https://github.com/angular/angular/issues/20376
 //
-    public <#= AppearancePropName #>: MatFormFieldAppearance = 'outline';
+    public <#= AppearancePropName #>: DropDownFillMode|InputFillMode|DateInputFillMode = 'outline';
     public filterHeightAddition: number = 0.5;
     public filterHeightFactor: number = 5;
     public tableHeightAddition: number = 0;
     public tableHeightFactor: number = 31;
 
-    constructor(private _snackBar: MatSnackBar, private _<#= settingsPropName #>: <#= appConfigServiceClassName #>) {}
+    constructor(private notificationService: NotificationService, private _<#= settingsPropName #>: <#= appConfigServiceClassName #>) {}
     public <#= ShowMessageMethodName #>(msg: string) {
-      this._snackBar.open(msg, 'Close', { duration: 4000 });
+      this.notificationService.show({
+         content: msg,
+         hideAfter: 4000,
+         animation: { type: "fade", duration: 400 },
+         type: { style: "info", icon: true },
+      });
     }
     public <#= ShowErrorMethodName #>(errTp: string, errorStruct: any) {
 <# 
@@ -175,7 +183,13 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
                 }
             }
         }
-        this._snackBar.open(text, 'Close', { duration: 4000 });
+        this.notificationService.show({
+            content: text,
+            hideAfter: 4000,
+            animation: { type: "fade", duration: 400 },
+            type: { style: "error", icon: true },
+        });
+
     }
     public getWebApiPrefix(vwNm: string): string {
         let reslt: string = '';

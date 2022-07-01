@@ -41,18 +41,48 @@
      <div fxLayout="row" fxLayoutAlign="flex-end space-around"> 
          <label fxFlex fxLayoutAlign="flex-start space-around">{{<#= captionPropName #>}}</label>
          <button mat-icon-button color="primary" (click)="<#= OnBackBtnMethodName #>()" *ngIf="<#= showBackBtnPropName #>"
-            matTooltip="Navigate back to master"> 
+<# 
+    if(localize) {
+#>
+    i18n-matTooltip="Navigate back to master@@<#= filterComponentClassName #>.Navigate-back-to-master"  matTooltip="Navigate back to master"> 
+<# 
+    } else {
+#>
+    matTooltip="Navigate back to master"> 
+<# 
+    }
+#>
             <mat-icon>arrow_back</mat-icon>
         </button>         
         <span fxFlex="3%"></span>  
         <button mat-icon-button color="primary" (click)="addFilter()" *ngIf="<#= showFilterExPropName #> && <#= showAddFltItemPropName #>"
-            matTooltip="Add filter item "> 
+<# 
+    if(localize) {
+#>
+    i18n-matTooltip="Add filter item@@<#= filterComponentClassName #>.Add-filter-item"  matTooltip="Add filter item"> 
+<# 
+    } else {
+#>
+    matTooltip="Add filter item"> 
+<# 
+    }
+#>
             <mat-icon  >filter_9_plus</mat-icon>
         </button>        
         <span fxFlex="1%"></span>   
         <button mat-icon-button color="warn" (click)="removeAllFilters()" *ngIf="<#= showFilterExPropName #> && <#= showAddFltItemPropName #>"
-            matTooltip="Remove all filter items"> 
-            <mat-icon  >filter_none</mat-icon>
+<# 
+    if(localize) {
+#>
+    i18n-matTooltip="Remove all filter items@@<#= filterComponentClassName #>.Remove-all-filter-items"  matTooltip="Remove all filter items"> 
+<# 
+    } else {
+#>
+    matTooltip="Remove all filter items"> 
+<# 
+    }
+#>
+            <mat-icon>filter_none</mat-icon>
         </button>       
         <span fxFlex="1%"></span>  
         <button mat-icon-button color="primary" (click)="onApplyFilterClicked()" 
@@ -67,7 +97,6 @@
 <# 
     }
 #>
-
             <mat-icon   >refresh</mat-icon>
         </button>      
         <span fxFlex="2%"></span>     
@@ -153,15 +182,14 @@
 
                 <ng-template [ngIf]="flt.fltrDataType === 'datetime'">
                     <mat-form-field [appearance]="<#= AppearancePropName #>" fxFlex="72%">
-                        <mat-label>Filter value</mat-label>
 <# 
     if(localize) {
 #>
-                    <mat-label i18n="Filter value@@<#= filterComponentClassName #>.Filter-value" >Filter value</mat-label>
+                        <mat-label i18n="Filter value@@<#= filterComponentClassName #>.Filter-value" >Filter value</mat-label>
 <# 
     } else {
 #>
-                    <mat-label>Filter value</mat-label>
+                        <mat-label>Filter value</mat-label>
 <# 
     }
 #>
