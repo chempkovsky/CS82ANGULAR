@@ -117,7 +117,9 @@
 #>
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { FormControl, Validators, ValidatorFn, ValidationErrors } from '@angular/forms';
-import { MatFormFieldAppearance } from '@angular/material/form-field';
+import { DropDownFillMode } from '@progress/kendo-angular-dropdowns';
+import { InputFillMode } from '@progress/kendo-angular-inputs';
+import { DateInputFillMode } from '@progress/kendo-angular-dateinputs';
 import { debounceTime, Observable, of, switchMap } from 'rxjs';
 
 import { <#= uniqFilterModelClassName #> } from '<#= GetFolderName(Model, uniqFilterModelFolder, uniqFilterComponentFolder)#>';
@@ -139,7 +141,7 @@ import { <#= eventEmitterPubModelClassName #> } from '<#= GetFolderName(Model, e
 })
 export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #> {
     protected isOnInitCalled: boolean = false;
-    public <#= AppearancePropName #>: MatFormFieldAppearance = 'outline';
+    public <#= AppearancePropName #>: DropDownFillMode|InputFillMode|DateInputFillMode = 'outline';
     
     @Input('<#= captionSelector #>') <#= captionPropName #>: string = '';
     @Input('<#= showBackBtnSelector #>') <#= showBackBtnPropName #>: boolean = false;
@@ -524,7 +526,7 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
     <#= tpAheadClsPropName #><#= iii #>(e: any): void {
         this.<#= tpAheadOpnClsPropName #><#= iii #> = false;
     }
-    <#= tpAheadFltChngPropName #><#= iii #>(e: any): void {
+    <#= tpAheadFltChngPropName #><#= iii #>(value: any): void {
         if(this.<#= tpAheadOpnClsPropName #><#= iii #> === false) return;
         if(typeof this.<#= tpAheadFncPropName  #> === 'undefined') {
             this.<#= tpAheadVarsPropName #><#= iii #> = null;

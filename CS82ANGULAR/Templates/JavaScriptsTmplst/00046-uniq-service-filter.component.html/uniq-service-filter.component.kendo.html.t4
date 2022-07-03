@@ -44,7 +44,7 @@
     string showFilterExPropName         = "showFilterEx";
     string MaxHeightExPropName          = "maxHeightEx";
 
-    string uniqFilterComponentFolder        = "00046-uniq-service-filter.component.ts";
+    string uniqFilterComponentFolder    = "00046-uniq-service-filter.component.ts";
     string uniqFilterComponentClassName = GetComponentClassName(Model, uniqFilterComponentFolder);
 
 #>
@@ -55,7 +55,7 @@
 <# 
     if(localize) {
 #>
-    i18n-title="Navigate back to master@@<#= filterComponentClassName #>.Navigate-back-to-master"  title="Navigate back to master" > 
+    i18n-title="Navigate back to master@@<#= uniqFilterComponentClassName #>.Navigate-back-to-master"  title="Navigate back to master" > 
 <# 
     } else {
 #>
@@ -69,7 +69,7 @@
 <# 
     if(localize) {
 #>
-          i18n-title="Apply filter@@<#= filterComponentClassName #>.Apply-filter"  title="Apply filter" > 
+          i18n-title="Apply filter@@<#= uniqFilterComponentClassName #>.Apply-filter"  title="Apply filter" > 
 <# 
     } else {
 #>
@@ -95,12 +95,12 @@
     for(int iii = 0; iii < 7;iii++) {
 #>
             <ng-template [ngIf]="(flt.fltrDataType !==  'datetime') && (flt.fltrDataType !==  'bool')  && (flt.fltrDataType !==  'boolean')  && (i === <#= iii #>)">
-                <kendo-formfield  [appearance]="<#= AppearancePropName #>" fxFlex="100">
+                <kendo-formfield fxFlex="100">
                     <kendo-label>{{flt.fltrCaption}}</kendo-label>
                     <kendo-dropdownlist
-                        placeholder="{{flt.fltrCaption}}"
+                        [fillMode]="appearance"
                         valueField
-                        textField="flt.fltrName"
+                        [textField]="flt.fltrName"
                         [data]="<#= tpAheadVarsPropName #><#= iii #>" 
                         [formControl]="flt.fltrValue"
                         [filterable]="true"
@@ -116,8 +116,8 @@
 <#
     }
 #>
-            <ng-template [ngIf]="(flt.fltrDataType === 'boolean' || flt.fltrDataType === 'bool') && (i === <#= iii #>)">
-                <kendo-formfield [appearance]="<#= AppearancePropName #>" fxFlex="100">
+            <ng-template [ngIf]="flt.fltrDataType === 'boolean' || flt.fltrDataType === 'bool'">
+                <kendo-formfield fxFlex="100">
                     <div class="k-checkbox-wrap">
                       <input type="checkbox" kendoCheckBox [formControl]="flt.fltrValue" />
                       <kendo-label class="k-checkbox-label">{{flt.fltrCaption}}</kendo-label>
@@ -125,7 +125,7 @@
                 </kendo-formfield>
             </ng-template>
 
-            <ng-template [ngIf]="(flt.fltrDataType === 'datetime') && (i === <#= iii #>)">
+            <ng-template [ngIf]="flt.fltrDataType === 'datetime'">
                 <kendo-formfield fxFlex="100">
                     <kendo-label>{{flt.fltrCaption}}</kendo-label>
                     <kendo-datepicker  [fillMode]="<#= AppearancePropName #>" placeholder="{{flt.fltrCaption}}" [formControl]="flt.fltrValue" [min]="flt.fltrMin" [max]="flt.fltrMax" > 
