@@ -1117,11 +1117,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00033-column-selector.component.html\column-selector.component.ngb.html.t4">
+    <Content Include="Templates\JavaScriptsTmplst\00033-column-selector.component.html\column-selector.component.kendo.html.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00033-column-selector.component.ts\column-selector.component.ngb.ts.t4">
+    <Content Include="Templates\JavaScriptsTmplst\00033-column-selector.component.ts\column-selector.component.kendo.ts.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -1137,11 +1137,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00035-column-selector-dlg.component.html\column-selector-dlg.component.ngb.html.t4">
+    <Content Include="Templates\JavaScriptsTmplst\00035-column-selector-dlg.component.html\column-selector-dlg.component.kendo.html.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00035-column-selector-dlg.component.ts\column-selector-dlg.component.ngb.ts.t4">
+    <Content Include="Templates\JavaScriptsTmplst\00035-column-selector-dlg.component.ts\column-selector-dlg.component.kendo.ts.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -1161,15 +1161,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00038-message-dialog.component.html\message-dialog.component.ngb-awesome.html.t4">
+    <Content Include="Templates\JavaScriptsTmplst\00038-message-dialog.component.html\message-dialog.component.kendo.html.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00038-message-dialog.component.html\message-dialog.component.ngb.html.t4">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00038-message-dialog.component.ts\message-dialog.component.ngb.ts.t4">
+    <Content Include="Templates\JavaScriptsTmplst\00038-message-dialog.component.ts\message-dialog.component.kendo.ts.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -2218,6 +2214,13 @@
     </Content>
     <Content Include="Templates\JavaScriptsTmplst\00010-app-material.module.ts\app-kendo.module.ts.t4">
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\00046-uniq-service-filter.component.html\uniq-service-filter.component.kendo.html.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\00046-uniq-service-filter.component.ts\uniq-service-filter.component.kendo.ts.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

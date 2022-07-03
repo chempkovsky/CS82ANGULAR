@@ -1,0 +1,119 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+    bool localize = Context.Localize;
+
+    string  columsToSelectSelector =   "colums-to-select";
+
+    string columnSelectorComponentFolder        = "00033-column-selector.component.ts";
+    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, columnSelectorComponentFolder);
+
+    string columnSelectorDlgComponentFolder     = "00035-column-selector-dlg.component.ts";
+    string columnSelectorDlgComponentClassName  = GetComponentClassName(Model, columnSelectorDlgComponentFolder);
+#>
+
+<# 
+    if(localize) {
+#>
+<kendo-dialog-titlebar i18n="Columns To Show@@<#= columnSelectorDlgComponentClassName #>.Columns-To-Show">Columns To Show</kendo-dialog-titlebar>
+<# 
+    } else {
+#>
+<kendo-dialog-titlebar>Columns To Show</kendo-dialog-titlebar>
+<# 
+    }
+#>
+
+<div>
+    <app-<#= componentSelectorCommonPart #> 
+        [<#= columsToSelectSelector #>]="data"
+    ></app-<#= componentSelectorCommonPart #>>
+</div>
+<kendo-dialog-actions>
+<# 
+    if(localize) {
+#>
+  <button kendoButton (click)="onCancel()" cdkFocusInitial i18n="Cancel@@Cancel.Cancel">Cancel</button>
+  <button kendoButton (click)="onOk()" i18n="Ok@@Ok.Ok">Ok</button>
+<# 
+    } else {
+#>
+  <button kendoButton (click)="onCancel()" cdkFocusInitial>Cancel</button>
+  <button kendoButton (click)="onOk()">Ok</button>
+<# 
+    }
+#>
+</kendo-dialog-actions>
+
+<#+
+    string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        return refItem.FileName.Replace(".component","");
+    }
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+#>

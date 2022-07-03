@@ -24,9 +24,8 @@
 
 #>
 
-import { Component,  Inject, Input } from '@angular/core';
-// import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, Input } from '@angular/core';
+import { DialogRef, DialogContentBase } from "@progress/kendo-angular-dialog";
 import { <#= messageDialogDataModelClassName #> } from '<#= GetFolderName(Model, messageDialogDataModelFolder, messageDialogComponentFolder)#>';
 
 
@@ -36,14 +35,14 @@ import { <#= messageDialogDataModelClassName #> } from '<#= GetFolderName(Model,
   templateUrl: '<#= GetFolderName(Model, messageDialogComponentHtmlFolder, messageDialogComponentFolder)#>.html',
   styleUrls: ['<#= GetFolderName(Model, messageDialogComponentCssFolder, messageDialogComponentFolder)#>.css']
 })
-export class <#= messageDialogComponentClassName #>  {
+export class <#= messageDialogComponentClassName #> extends DialogContentBase  {
     @Input('data')
     public data: <#= messageDialogDataModelClassName #>|any;
-    constructor(public dialogRef: NgbActiveModal
-           // public dialogRef: MatDialogRef<MessageDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: <#= messageDialogDataModelClassName #> 
-        ) { }
+    constructor(public dialogRef: DialogRef) { 
+        super(dialogRef);
+    }
     onCancel() {
-        this.dialogRef.dismiss();
+        this.dialogRef.close(null);
     }
     onOk() {
         this.dialogRef.close(1);

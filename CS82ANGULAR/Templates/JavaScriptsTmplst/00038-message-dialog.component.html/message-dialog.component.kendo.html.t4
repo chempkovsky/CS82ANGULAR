@@ -1,0 +1,89 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+    bool localize = Context.Localize;
+
+    string messageDialogComponentFolder         = "00038-message-dialog.component.ts";
+    string messageDialogComponentClassName      = GetComponentClassName(Model, messageDialogComponentFolder);
+
+#>
+
+
+<kendo-dialog-titlebar>{{data.title}}</kendo-dialog-titlebar>
+<div>
+    <kendo-icon [name]="data.iconname" [themeColor]="data.iconcolor">
+    </kendo-icon>
+    <span>&nbsp;&nbsp;</span>
+    <kendo-label>{{data.message}}</kendo-label>
+</div>
+<kendo-dialog-actions>
+<# 
+    if(localize) {
+#>
+  <button kendoButton (click)="onCancel()" cdkFocusInitial i18n="Cancel@@Cancel.Cancel">Cancel</button>
+  <button kendoButton (click)="onOk()" i18n="Ok@@Ok.Ok">Ok</button>
+<# 
+    } else {
+#>
+  <button kendoButton (click)="onCancel()" cdkFocusInitial>No</button>
+  <button kendoButton (click)="onOk()">Yes</button>
+<# 
+    }
+#>
+</kendo-dialog-actions>
+
+
+<#+
+
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+#>

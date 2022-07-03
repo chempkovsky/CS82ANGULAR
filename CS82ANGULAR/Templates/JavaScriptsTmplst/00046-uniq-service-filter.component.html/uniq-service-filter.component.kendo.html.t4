@@ -1,0 +1,180 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+    bool localize = Context.Localize;
+
+
+    string AppearancePropName           = "appearance";
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string OverflowSelector             = "ovrflw";
+    string OverflowPropName             = "ovrflw";
+    string containerMenuItemsPropName           = "contMenuItems";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+
+    string OnBackBtnMethodName          = "onBackBtnMd";
+    string OnBackBtnPropName            = "onBackBtn";
+    string showBackBtnPropName          = "showBackBtn";
+    string showBackBtnSelector          = "show-back-btn";
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+    string fltrFlxPropName         = "fltrFlx";
+    string fltrMdPropName          = "fltrMd";
+    string fltrSmPropName          = "fltrSm";
+    string fltrXsPropName          = "fltrXs";
+
+    string tpAheadVarsPropName          = "tpAheadVars";
+    string tpAheadCptnPropName          = "tpAheadCptn";
+    string tpAheadOpnPropName           = "tpAheadOpn";
+    string tpAheadClsPropName           = "tpAheadCls";
+    string tpAheadFltChngPropName       = "tpAheadFltChng";
+
+    string showFilterExPropName         = "showFilterEx";
+    string MaxHeightExPropName          = "maxHeightEx";
+
+    string uniqFilterComponentFolder        = "00046-uniq-service-filter.component.ts";
+    string uniqFilterComponentClassName = GetComponentClassName(Model, uniqFilterComponentFolder);
+
+#>
+
+<div fxLayout="row" fxLayoutAlign="flex-end space-around"> 
+    <kendo-label fxFlex fxLayoutAlign="flex-start space-around">{{<#= captionPropName #>}}</kendo-label>
+    <button kendoButton themeColor="primary" (click)="<#= OnBackBtnMethodName #>()" *ngIf="<#= showBackBtnPropName #>" icon="arrow-left"
+<# 
+    if(localize) {
+#>
+    i18n-title="Navigate back to master@@<#= filterComponentClassName #>.Navigate-back-to-master"  title="Navigate back to master" > 
+<# 
+    } else {
+#>
+    title="Navigate back to master" > 
+<# 
+    }
+#>
+    </button>
+    <span fxFlex="4%"></span>  
+    <button kendoButton themeColor="primary" (click)="onApplyFilterClicked()" icon="refresh"
+<# 
+    if(localize) {
+#>
+          i18n-title="Apply filter@@<#= filterComponentClassName #>.Apply-filter"  title="Apply filter" > 
+<# 
+    } else {
+#>
+          title="Apply filter" > 
+<# 
+    }
+#>
+    </button>
+    <span fxFlex="2%"></span>     
+    <ng-template ngFor let-item [ngForOf]="<#= containerMenuItemsPropName #>">
+        <span fxFlex="1%"></span>  
+        <button kendoButton [themeColor]="item.iconColor" (click)="<#= onContainerMenuItemClickMethodName #>(item)" 
+            [title]="item.caption" [icon]="item.iconName"> 
+        </button>
+    </ng-template>            
+    <span fxFlex="1%"></span>
+</div> 
+
+<div *ngIf="<#= showFilterExPropName #>" [style.maxHeight.em]="<#= MaxHeightExPropName #>" [style.overflow]="<#= OverflowPropName #>"> 
+    <div fxLayout="row wrap" fxLayoutAlign="space-between" style="margin: 0 15px;">
+        <div *ngFor="let flt of webServiceFilters;let i = index" [fxFlex.gt-md]="flt.<#= fltrMdPropName #>" [fxFlex.gt-sm]="flt.<#= fltrSmPropName #>" [fxFlex.gt-xs]="flt.<#= fltrXsPropName #>" [fxFlex]="flt.<#= fltrFlxPropName #>">
+<#
+    for(int iii = 0; iii < 7;iii++) {
+#>
+            <ng-template [ngIf]="(flt.fltrDataType !==  'datetime') && (flt.fltrDataType !==  'bool')  && (flt.fltrDataType !==  'boolean')  && (i === <#= iii #>)">
+                <kendo-formfield  [appearance]="<#= AppearancePropName #>" fxFlex="100">
+                    <kendo-label>{{flt.fltrCaption}}</kendo-label>
+                    <kendo-dropdownlist
+                        placeholder="{{flt.fltrCaption}}"
+                        valueField
+                        textField="flt.fltrName"
+                        [data]="<#= tpAheadVarsPropName #><#= iii #>" 
+                        [formControl]="flt.fltrValue"
+                        [filterable]="true"
+                        (opened)="<#= tpAheadOpnPropName #><#= iii #>($event)"
+                        (closed)="<#= tpAheadClsPropName #><#= iii #>($event)"
+                        (filterChange)="<#= tpAheadFltChngPropName #><#= iii #>($event)"
+                    >
+                    </kendo-dropdownlist>
+                    <kendo-formerror *ngIf="flt.fltrValue.invalid">{{getErrorMessage(flt.fltrValue)}}</kendo-formerror>
+                    <kendo-formhint align="end" *ngIf="flt.fltrMaxLen">{{flt.fltrValue.value?.length || 0}}/{{flt.fltrMaxLen}}</kendo-formhint>
+                </kendo-formfield>
+            </ng-template>
+<#
+    }
+#>
+            <ng-template [ngIf]="(flt.fltrDataType === 'boolean' || flt.fltrDataType === 'bool') && (i === <#= iii #>)">
+                <kendo-formfield [appearance]="<#= AppearancePropName #>" fxFlex="100">
+                    <div class="k-checkbox-wrap">
+                      <input type="checkbox" kendoCheckBox [formControl]="flt.fltrValue" />
+                      <kendo-label class="k-checkbox-label">{{flt.fltrCaption}}</kendo-label>
+                    </div>
+                </kendo-formfield>
+            </ng-template>
+
+            <ng-template [ngIf]="(flt.fltrDataType === 'datetime') && (i === <#= iii #>)">
+                <kendo-formfield fxFlex="100">
+                    <kendo-label>{{flt.fltrCaption}}</kendo-label>
+                    <kendo-datepicker  [fillMode]="<#= AppearancePropName #>" placeholder="{{flt.fltrCaption}}" [formControl]="flt.fltrValue" [min]="flt.fltrMin" [max]="flt.fltrMax" > 
+                    </kendo-datepicker>
+                    <kendo-formerror *ngIf="flt.fltrValue.invalid">{{getErrorMessage(flt.fltrValue)}}</kendo-formerror>
+                </kendo-formfield>
+            </ng-template>
+        </div>
+    </div>
+</div>
+
+<#+
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+#>

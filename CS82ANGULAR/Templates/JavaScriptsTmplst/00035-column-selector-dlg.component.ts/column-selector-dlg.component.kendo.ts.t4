@@ -12,6 +12,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    bool localize = Context.Localize;
 
     string columnSelectorItemInterfaceFolder    = "00032-column-selector-item.interface.ts";
     string columnSelectorComponentFolder        = "00033-column-selector.component.ts";
@@ -20,12 +21,12 @@
     string columnSelectorDlgComponentFolder     = "00035-column-selector-dlg.component.ts";
 
     string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, columnSelectorDlgComponentFolder);
+    string columnSelectorDlgComponentClassName  = GetComponentClassName(Model, columnSelectorDlgComponentFolder);
 
 #>
 
-import { Component, ViewChild, Inject, Input } from '@angular/core';
-// import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, ViewChild, Input } from '@angular/core';
+import { DialogRef, DialogContentBase } from "@progress/kendo-angular-dialog";
 
 import { <#= GetModelClassName(Model, columnSelectorItemInterfaceFolder) #> } from '<#= GetFolderName(Model, columnSelectorItemInterfaceFolder, columnSelectorDlgComponentFolder)#>';
 import { <#= GetComponentClassName(Model, columnSelectorComponentFolder) #> } from '<#= GetFolderName(Model, columnSelectorComponentFolder, columnSelectorDlgComponentFolder)#>';
@@ -36,25 +37,32 @@ import { <#= GetComponentClassName(Model, columnSelectorComponentFolder) #> } fr
   styleUrls: ['<#= GetFolderName(Model, columnSelectorDlgCssComponentFolder, columnSelectorDlgComponentFolder)#>.css']
 })
 
-export class <#= GetComponentClassName(Model, columnSelectorDlgComponentFolder) #> { 
+export class <#= GetComponentClassName(Model, columnSelectorDlgComponentFolder) #> extends DialogContentBase { 
     @ViewChild(<#= GetComponentClassName(Model, columnSelectorComponentFolder) #>) childForm: <#= GetComponentClassName(Model, columnSelectorComponentFolder) #>|any;
-
     @Input('data')
-    data: Array<<#=  GetModelClassName(Model, columnSelectorItemInterfaceFolder) #>>|any;
-    constructor(
-        public dialogRef: NgbActiveModal
-        // public dialogRef: MatDialogRef<<#= GetComponentClassName(Model, columnSelectorDlgComponentFolder) #>>, 
-        // @Inject(MAT_DIALOG_DATA) public data: Array<<#=  GetModelClassName(Model, columnSelectorItemInterfaceFolder) #>>
-    ) { }
+    public data: Array<<#=  GetModelClassName(Model, columnSelectorItemInterfaceFolder) #>> = [];
+    constructor(public dialogRef: DialogRef) { 
+        super(dialogRef);
+    }
     onCancel() {
-        this.dialogRef.dismiss();
+        this.dialogRef.close(null);
     }
     onOk() {
         if (typeof this.childForm === 'undefined') return;
         if (this.childForm === null) return;
         let ind = this.childForm.colums.findIndex((e: { checked: boolean; }) => { return e.checked === true; })
         if(ind < 0) {
+<# 
+    if(localize) {
+#>
+            this.childForm.shwoError($localize`:No columns selected@@<#= columnSelectorDlgComponentClassName #>.No-columns-selected:No columns selected`);
+<# 
+    } else {
+#>
             this.childForm.shwoError('No columns selected');
+<# 
+    }
+#>
             return;
         }
         this.dialogRef.close(this.childForm.colums);

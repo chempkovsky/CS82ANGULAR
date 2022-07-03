@@ -13,6 +13,8 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
 
+    bool localize = Context.Localize;
+
     string ShowErrorMethodName          = "showError";
     string AppSettingServicePropName    = "appGlblSettings";
 
@@ -31,7 +33,6 @@
 #>
 
 import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
-// import { MatCheckboxChange } from '@angular/material/checkbox';
 import { <#= columnSelectorItemModelClassName #> } from '<#= GetFolderName(Model, columnSelectorItemInterfaceFolder, columnSelectorComponentFolder)#>';
 import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, columnSelectorComponentFolder)#>';
 
@@ -59,15 +60,26 @@ export class <#= columnSelectorComponentClassName #> implements OnInit {
    constructor(protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, private cd: ChangeDetectorRef) { }
    ngOnInit(): void {
    } 
-   onChanged(v: any // MatCheckboxChange
-    ) {
-       let i: number = this.colums.findIndex(e => { return e.name === v.value; })
+   onChanged(v: <#= columnSelectorItemModelClassName #>) {
+       let i: number = this.colums.findIndex(e => { return e.name === v.name; })
        if(i > -1) {
            this.colums[i].checked = v.checked;
        }
    }
    shwoError(s: string) {
-       this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('Number of columns', { message: s });
+       this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>(
+<# 
+    if(localize) {
+#>
+        $localize`:Number of columns@@<#= columnSelectorComponentClassName #>.Number-of-columns:Number of columns`, 
+<# 
+    } else {
+#>
+        'Number of columns', 
+<# 
+    }
+#>
+       { message: s });
    }
 }
 

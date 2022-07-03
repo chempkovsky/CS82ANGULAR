@@ -13,8 +13,12 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 
 
-<ul class="list-group">
-      <li class="list-group-item" *ngFor="let column of colums" >
-        <label> <input  type="checkbox"  [value]="column.name" [(ngModel)]="column.checked"  (change)="onChanged($event.target)"> {{column.caption}} </label>
-      </li>
-</ul>
+<kendo-listview [data]="colums">
+    <ng-template kendoListViewItemTemplate let-dataItem="dataItem">
+        {{ dataItem.productName }}
+        <div class="k-checkbox-wrap">
+            <input  type="checkbox" kendoCheckBox [(ngModel)]="dataItem.checked"  (change)="onChanged(dataItem)" />
+            <kendo-label  class="k-checkbox-label"> {{dataItem.caption}} </kendo-label>
+        </div>
+    </ng-template>
+</kendo-listview>
