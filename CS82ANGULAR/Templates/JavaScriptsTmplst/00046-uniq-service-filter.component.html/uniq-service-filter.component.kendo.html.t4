@@ -92,9 +92,13 @@
     <div fxLayout="row wrap" fxLayoutAlign="space-between" style="margin: 0 15px;">
         <div *ngFor="let flt of webServiceFilters;let i = index" [fxFlex.gt-md]="flt.<#= fltrMdPropName #>" [fxFlex.gt-sm]="flt.<#= fltrSmPropName #>" [fxFlex.gt-xs]="flt.<#= fltrXsPropName #>" [fxFlex]="flt.<#= fltrFlxPropName #>">
 <#
-    for(int iii = 0; iii < 7;iii++) {
+//    for(int iii = 0; iii < 7;iii++) {
+    {
+    int iii=0;
 #>
+<!-- 
             <ng-template [ngIf]="(flt.fltrDataType !==  'datetime') && (flt.fltrDataType !==  'bool')  && (flt.fltrDataType !==  'boolean')  && (i === <#= iii #>)">
+-->
                 <kendo-formfield fxFlex="100">
                     <kendo-label>{{flt.fltrCaption}}</kendo-label>
                     <kendo-dropdownlist
@@ -112,10 +116,13 @@
                     <kendo-formerror *ngIf="flt.fltrValue.invalid">{{getErrorMessage(flt.fltrValue)}}</kendo-formerror>
                     <kendo-formhint align="end" *ngIf="flt.fltrMaxLen">{{flt.fltrValue.value?.length || 0}}/{{flt.fltrMaxLen}}</kendo-formhint>
                 </kendo-formfield>
+<!-- 
             </ng-template>
+-->
 <#
     }
 #>
+<!-- 
             <ng-template [ngIf]="flt.fltrDataType === 'boolean' || flt.fltrDataType === 'bool'">
                 <kendo-formfield fxFlex="100">
                     <div class="k-checkbox-wrap">
@@ -133,6 +140,7 @@
                     <kendo-formerror *ngIf="flt.fltrValue.invalid">{{getErrorMessage(flt.fltrValue)}}</kendo-formerror>
                 </kendo-formfield>
             </ng-template>
+-->
         </div>
     </div>
 </div>

@@ -253,11 +253,11 @@
 
 #>
 import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { MatPaginatorIntl, PageEvent } from '@angular/material/paginator';
-import { Sort } from '@angular/material/sort';
-import { MatDialog } from '@angular/material/dialog';
+import { DataResult, SortDescriptor } from '@progress/kendo-data-query';
+import { DialogCloseResult, DialogService } from '@progress/kendo-angular-dialog';
 import { SelectionChange, SelectionModel } from '@angular/cdk/collections';
-import { catchError, Observable, of, Subject, switchMap } from 'rxjs';
+import { catchError, Observable, of, switchMap } from 'rxjs';
+import { PageChangeEvent } from "@progress/kendo-angular-grid";
 
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, sformComponentFolder)#>';
 import { <#= uniqFilterDefModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  uniqFilterDefModelFolder, sformComponentFolder)#>';
@@ -325,32 +325,6 @@ import { <#= GetInterfaceFilterName(m2mModel) #> } from '<#=  GetCrossComponentF
 #>
 
 
-<# 
-    if(localize) {
-#>
-// begin: internationalization of the mat-paginator
-/*
-class <#= Model.ViewName + "MtPgntrIntl" #> implements MatPaginatorIntl {
-    changes = new Subject<void>();
-    firstPageLabel = $localize`First page@@<#= componentClassName #>.firstPageLabel:First page`;
-    itemsPerPageLabel = $localize`Items per page@@<#= componentClassName #>.itemsPerPageLabel:Items per page`;
-    lastPageLabel = $localize`Last page@@<#= componentClassName #>.lastPageLabel:Last page`;
-    nextPageLabel = $localize`Next page@@<#= componentClassName #>.nextPageLabel:Next page`;
-    previousPageLabel = $localize`Previous page@@<#= componentClassName #>.previousPageLabel:Previous page`;
-    ofLabel = $localize`of@@<#= componentClassName #>.ofLabel:of`;
-    getRangeLabel(page: number, pageSize: number, length: number): string {
-        if (length == 0 || pageSize == 0) { return `0 of ${length}`; } 
-        length = Math.max(length, 0); 
-        const startIndex = page * pageSize; 
-        const endIndex = startIndex < length ? Math.min(startIndex + pageSize, length) : startIndex + pageSize; 
-        return `${startIndex + 1} - ${endIndex} ${this.ofLabel} ${length}`; 
-    }     
-}    
-*/
-// end: internationalization of the mat-paginator
-<# 
-    } 
-#>
 
 
 
@@ -358,13 +332,6 @@ class <#= Model.ViewName + "MtPgntrIntl" #> implements MatPaginatorIntl {
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, sformHtmlFolder, sformComponentFolder)#>.html',
   styleUrls: ['<#=  GetFolderName(Model, sformCssFolder, sformComponentFolder)#>.css'],
-<# 
-    if(localize) {
-#>
-//  providers: [{ provide: MatPaginatorIntl, useClass: <#= Model.ViewName + "MtPgntrIntl" #> }]
-<# 
-    } 
-#>
 })
 export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
 
@@ -438,11 +405,15 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
 <# 
         if(localize) {
 #>
-        'fullscann': $localize`:full scan@@<#= componentClassName #>.fullscann-menu:full scan`,
+        'fullscann': $localize`:Full scan@@<#= componentClassName #>.fullscann-menu:Full scan`,
+        'refreshtable': $localize`:Refresh table@@<#= componentClassName #>.refresh-table:Refresh table`,
+        'tablecolumns': $localize`:Table columns@@<#= componentClassName #>.table-columns:Table columns`,
 <# 
         } else {
 #>
-        'fullscann': 'full scan',
+        'fullscann': 'Full scan',
+        'refreshtable': 'Refresh table',
+        'tablecolumns': 'Table columns',
 <# 
         }
         if (Model.IsWebApiSelectOneByPrimarykey) {
@@ -565,16 +536,20 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
     }
 
 //===============
+    radioName="<#= Model.ViewName #>"+Math.random();
     isOnInitCalled: boolean = false;
     protected currentFilter: Array<<#= filterResultModelClassName #>> = [];
     protected <#= currentSortColumnPropName #>: string = '';
-    protected currentSortdirection: string = '';
+    protected currentSortdirection: string | any = '';
     public currentPageIndex: number = 0;
+    public kendoSkip: number = 0;
     public currentPageSize: number = <#= MatPaginatorPageSize #>;
     public dataSource: Array<<#= GetInterfaceName(Model) #>> = [];
-    matPaginatorLen: number = 0;
+    public kendoDataSource: DataResult|any;
+    public kendoSortDescriptor: SortDescriptor[] = [];
+    kendoTotal: number = 0;
     matPaginatorPageSize: number = <#= MatPaginatorPageSize #>;
-    matPaginatorPageSizeOptions: Array<number> = <#= MatPaginatorPageSizeOptions #>;
+    paginatorPageSizeOptions: Array<number> = <#= MatPaginatorPageSizeOptions #>;
     <#= DisplayedColumnsProperty #>:  Array<string> = ['<#= SelectColumnDefProperty #>', '<#= SelectMultColumnDefProperty #>', <#= GetDisplayedColumns(Model) #>, '<#= ActionColumnDefProperty #>'];
     @Input('<#= ShowFilterSelector #>') <#= ShowFilterPropName #>: boolean = true;
     @Input('<#= RowCommandsSelector #>')  <#= RowCommandsPropName #>:Array<<#= menuItemDataModelClassName #>>|any;
@@ -603,7 +578,10 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
     @Input('<#= showAddFltItemSelector #>') <#= showAddFltItemPropName #>: boolean = true;
     onTableMenuItemsData() {
         let tmp: Array<<#= menuItemDataModelClassName #>> = [];
-        tmp = tmp.concat(this.tableIndexMenuItemsData, this.<#= TableCommandsExPropName #>);
+        tmp = tmp.concat([
+                    {id: 'refreshtable', caption: this.<#= menuCaptionsPropName #>['refreshtable'], iconName: 'refresh', iconColor: 'primary', enabled: true, data: [] },
+                    {id: 'tablecolumns', caption: this.<#= menuCaptionsPropName #>['tablecolumns'], iconName: 'settings', iconColor: 'primary', enabled: true, data: [] },
+                ], this.tableIndexMenuItemsData, this.<#= TableCommandsExPropName #>);
         this.tableMenuItemsData = tmp;
     }
 
@@ -622,20 +600,18 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
     }
 
     @Input('<#= FilterMaxHeightPropSelector #>')  <#= FilterMaxHeightPropName #>: number | null = null;
-    public <#= OverflowPropName #>: string | null = null;   
 
-    <#= MaxHeightExPropName #>: number|null = null;
+    <#= MaxHeightExPropName #>: number|any = null;
     protected _<#= MaxHeightPropName #>: number|null = null;
     @Input('<#= MaxHeightPropSelector #>')
-        get <#= MaxHeightPropName #>(): number|null {
-            return this._<#= MaxHeightPropName #>;
-        }
+      get <#= MaxHeightPropName #>(): number|null {
+        return this._<#= MaxHeightPropName #>;
+      }
       set <#= MaxHeightPropName #>(inp: number|null) {
         this._<#= MaxHeightPropName #> = inp;
         if (!(typeof inp === 'undefined')) {
           if(!(inp === null)) {
             this.<#= MaxHeightExPropName #> = inp * this.<#= AppSettingServicePropName #>.tableHeightFactor + this.<#= AppSettingServicePropName #>.tableHeightAddition;
-            this.<#= OverflowPropName #> = 'auto';
             if(this.isOnInitCalled) {
               this.cd.detectChanges();
             }
@@ -643,7 +619,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
           }
         }
         this.<#= MaxHeightExPropName #> = null;
-        this.<#= OverflowPropName #> = null;
         if(this.isOnInitCalled) {
             this.cd.detectChanges();
         }
@@ -1033,6 +1008,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
         if(ef.csc) { this.<#= currentSortColumnPropName #> = ef.csc; } else { this.<#= currentSortColumnPropName #> = ''; } 
         if(ef.pgi) { this.currentPageIndex = ef.pgi; } else { this.currentPageIndex = 0; }
         if(ef.pgsz) { this.currentPageSize = ef.pgsz; } else { this.currentPageSize = <#= MatPaginatorPageSize #>; }
+        this.kendoSkip = this.currentPageIndex * this.currentPageSize;
         if(typeof ef.id === 'undefined') return;
         let mi: <#= menuItemDataModelClassName #>|any = this.tableIndexMenuItemsData.find((e: <#= menuItemDataModelClassName #>) => e.id === ef.id);
         if(mi) {
@@ -1067,6 +1043,48 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
                 }
 <#
                 }
+#>
+                break;           
+<#
+                }
+            }
+        }
+        if (Model.IsWebApiSelectOneByPrimarykey) {
+            for(int i = 0; i < uniqueKeys.Count; i++) { 
+                string indErrrorText = "";
+                bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
+                if (!indIsCorrect) {
+#>
+
+//
+// Could not generate fragment of code
+// Primary/Unique Index Is not correct:
+// <#= indErrrorText #>
+//
+
+<#
+                } else {
+                    string caption = "Primary";
+                    if(!uniqueKeys[i].IsPrimary) {
+                        caption = uniqueKeys[i].UniqueKeyName;
+                    }
+#>
+            case '<#= scannByMode + caption #>':  
+<#
+                    {
+                        for(int j = 0; j <  uniqueKeys[i].UniqueKeyProperties.Count; j++) {
+#>
+                if(ef.f['<#= searchSelectRowPropName + caption #><#= j #>']) {
+                    this.<#= searchSelectRowPropName + caption #><#= j #> = JSON.parse(ef.f['<#= searchSelectRowPropName + caption #><#= j #>']);
+                    if(this.<#= searchSelectRowPropName + caption #><#= j #>) {
+                        if(!(typeof this.<#= searchSelectRowPropName + caption #><#= j #> === 'undefined')) {
+                            r = r.concat(this.<#= formRootService #>.<#= row2FilterRsltMethodName #>(this.<#= searchSelectRowPropName + caption #><#= j #>));
+                        }
+                    }
+                }
+<#
+                        }
+                    }
 #>
                 break;           
 <#
@@ -1140,7 +1158,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
             }
         } // if(searchSchemas!= null) {...}
 #>    
-            protected dialog: MatDialog, private cd: ChangeDetectorRef) {
+            protected dialog: DialogService, private cd: ChangeDetectorRef) {
             this.cnFllscn = (<#= AppSettingServicePropName #>.getViewModelMask('<#= Model.ViewName #>') & 16) === 16;
         this.redefTableIndexMenuItemsData();
     }
@@ -1218,7 +1236,16 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
 #>
             case '<#= scannByMode + caption #>':  
                 if(flt) {
-                    kyvl['data'] = JSON.stringify(flt);
+<#
+                    int uksukpscount = uniqueKeys[i].UniqueKeyProperties.Count;
+                    for(int j = 0; j < uksukpscount; j++) {
+#>
+                    if(this.<#= searchSelectRowPropName + caption #><#= j #>) {
+                        kyvl['<#= searchSelectRowPropName + caption #><#= j #>'] = JSON.stringify(this.<#= searchSelectRowPropName + caption #><#= j #>);
+                    }
+<#
+                    }
+#>
                     r.f = kyvl;
                 }
                 break;           
@@ -1245,14 +1272,24 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
             this.onFilter();
         });
     }    
-    onSort(srt: Sort) {
-        this.<#= currentSortColumnPropName #> = srt.active;
-        this.currentSortdirection = srt.direction;
+    onSort(srt: Array<SortDescriptor>) {
+        this.kendoSortDescriptor = srt;
+        this.<#= currentSortColumnPropName #> = '';
+        this.currentSortdirection = '';
+        if (!(typeof this.kendoSortDescriptor === 'undefined')) {
+            if (!(this.kendoSortDescriptor === null)) {
+                if (this.kendoSortDescriptor.length > 0) {
+                    this.<#= currentSortColumnPropName #> = this.kendoSortDescriptor[0].field;
+                    this.currentSortdirection = this.kendoSortDescriptor[0].dir;
+                }
+            }
+        }
         this.onFilter();
     }
-    onPage(pg: PageEvent) {
-        this.currentPageIndex = pg.pageIndex;
-        this.currentPageSize = pg.pageSize;
+    onPage(pg: PageChangeEvent) {
+        this.kendoSkip = pg.skip;
+        this.currentPageIndex = pg.skip / pg.take;
+        this.currentPageSize = pg.take;
         this.onFilter();
     }
     onApplyFilter(flt: Array<IWebServiceFilterRslt>) {
@@ -1263,6 +1300,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
             fltrOperator: hf.fltrOperator,
             fltrValue: hf.fltrValue,
         }); });
+        this.kendoSkip = 0;
         this.currentPageIndex = 0;
         this.onFilter();
     }
@@ -1315,8 +1353,48 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
                     flt[e.fltrName] = [];
                     flt[opNm] = [];
                 }
-                flt[e.fltrName].push(e.fltrValue);
-                flt[opNm].push(e.fltrOperator);
+                switch (this.curIndexMenuItemsData.id) {
+<#
+        if (Model.IsWebApiSelectOneByPrimarykey) {
+            for(int i = 0; i < uniqueKeys.Count; i++) { 
+                string indErrrorText = "";
+                bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
+                if (!indIsCorrect) {
+#>
+
+//
+// Could not generate fragment of code
+// Primary/Unique Index Is not correct:
+// <#= indErrrorText #>
+//
+
+<#
+                } else {
+                    string caption = "Primary";
+                    string localRouteManyName = GetManyByRepPrimMethodNamePrefix;
+                    if(!uniqueKeys[i].IsPrimary) {
+                        caption = uniqueKeys[i].UniqueKeyName;
+                    }
+                    if(!uniqueKeys[i].IsPrimary) {
+                        localRouteManyName = GetManyByRepUnqMethodNamePrefix + caption;
+                    }
+#>
+                    case '<#= scannByMode + caption #>':  
+                        if(e.fltrValue) {
+                            flt[e.fltrName].push(e.fltrValue[e.fltrName]);
+                            flt[opNm].push(e.fltrOperator);
+                        }
+                        break;
+<#
+                }
+            }
+        }
+#>
+                    default:
+                      flt[e.fltrName].push(e.fltrValue);
+                      flt[opNm].push(e.fltrOperator);
+                      break;
+                }
             });
         }
         this.<#= onBeforeSqueryPropName #>(flt);
@@ -1370,7 +1448,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
                             pl = v.total;
                         }
                     }
-                    this.matPaginatorLen = pl;
+                    this.kendoTotal = pl;
                     let rslt: Array<<#= GetInterfaceName(Model) #>> = [];
                     if (!(typeof v.items === 'undefined')) {
                         if(!(v.items === null)) {
@@ -1385,6 +1463,10 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
                             currow = this.dataSource[0];
                         }
                     }
+                    this.kendoDataSource = {
+                        data: this.dataSource,
+                        total: this.kendoTotal
+                    };
                     this.<#= OnSelectRowMethodName #>(currow);
                     this.cd.detectChanges();
                 },
@@ -1413,6 +1495,14 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
         this.<#= OnRowCommandPropName #>.emit(v);
     }
     tableCommand(id: string) {
+        if(id === 'refreshtable') {
+            this.onFilter();
+            return;
+        }
+        if(id === 'tablecolumns') {
+            this.onSettings();
+            return;
+        }
 <#
 if (Model.IsWebApiSelectOneByPrimarykey) {
     if(uniqueKeys.Count > 0) {
@@ -1493,25 +1583,28 @@ if (Model.IsWebApiSelectOneByPrimarykey) {
                 locdata[ind].checked = true;
             }
         }
-        let dialogRef = this.dialog.open(<#=  componentSelectorDlgComponentClassName #>, {
-              data: locdata,
-              maxWidth: '100vw',
-              width: '65vw',
+        let dialogRef = this.dialog.open( {
+                content: <#=  componentSelectorDlgComponentClassName #>,
+                width: '65vw',
+                maxWidth: '100vw',
             });
-        dialogRef.afterClosed().subscribe({
-            next: (rslt: any) => {
+        const dlg = dialogRef.content.instance as <#=  componentSelectorDlgComponentClassName #>;
+        dlg.data = locdata;
+        dialogRef.result.subscribe((rslt: any) => {
                 if (!(typeof rslt === 'undefined')) {
                     if (!(rslt === null)) {
-                        let r: string[] = ['<#= SelectColumnDefProperty #>']
-                        if(this.<#= showMultiSelectedRowExPropName #>) r.push('<#= SelectMultColumnDefProperty #>');
-                        rslt.forEach((e: { checked: any; name: string; }) => { if (e.checked) { r.push(e.name) }});
-                        r.push('<#= ActionColumnDefProperty #>');
-                        this.<#= DisplayedColumnsProperty #> = r;
-                        this.cd.detectChanges();
+                       if(!(rslt instanceof DialogCloseResult)) {
+                            let r: string[] = ['<#= SelectColumnDefProperty #>']
+                            if(this.<#= showMultiSelectedRowExPropName #>) r.push('<#= SelectMultColumnDefProperty #>');
+                            rslt.forEach((e: { checked: any; name: string; }) => { if (e.checked) { r.push(e.name) }});
+                            r.push('<#= ActionColumnDefProperty #>');
+                            this.<#= DisplayedColumnsProperty #> = r;
+                            this.cd.detectChanges();
+                       }
                     }
                 }
             }
-        });
+        );
     } 
 
 
@@ -1522,6 +1615,10 @@ if (Model.IsWebApiSelectOneByPrimarykey) {
 #>
     <#= clearDatasourceMethodName #>(): void {
         this.dataSource = [];
+        this.kendoDataSource = {
+            data: this.dataSource,
+            total: 0
+        };
         this.inQuery = false;
         this.<#= applyFilterPropName #>.emit(this);
         this.<#= OnSelectRowMethodName #>(null);
@@ -1606,7 +1703,7 @@ if (Model.IsWebApiSelectOneByPrimarykey) {
                         pl = vd.total;
                     }
                 }
-                this.matPaginatorLen = pl;
+                this.kendoTotal = pl;
                 let rsltd: Array<<#= GetInterfaceName(m2mModel) #>> = [];
                 if (!(typeof vd.items === 'undefined')) {
                     if(!(vd.items === null)) {
@@ -1654,6 +1751,10 @@ if (Model.IsWebApiSelectOneByPrimarykey) {
                                 currow = this.dataSource[0];
                             }
                         }
+                        this.kendoDataSource = {
+                            data: this.dataSource,
+                            total: this.kendoTotal
+                        };
                         this.<#= OnSelectRowMethodName #>(currow);
                         this.cd.detectChanges();
                     },
@@ -1798,15 +1899,35 @@ if (Model.IsWebApiSelectOneByPrimarykey) {
 
 #>
 /////////////////////////////////////////
+<#
+{
+    for(int j = 0; j <  uniqueKeys[i].UniqueKeyProperties.Count; j++) {
+#>
+    <#= searchSelectRowPropName + caption #><#= j #>: <#= GetInterfaceName(Model) #> | any = null;
 
-    <#= searchSelectRowPropName + caption #>: <#= GetInterfaceName(Model) #> | any = null;
+<#
+    }
+}
+#>
     <#= afterObjSelPropName + caption #>(e:{v: any, i: number}) {
         if(typeof e === 'undefined') return;
         if(e === null) return;
-        if(e.v) {
-            this.<#= searchSelectRowPropName + caption #> = e.v as <#= GetInterfaceName(Model) #>;
-        } else {
-            this.<#= searchSelectRowPropName + caption #> = null;
+        switch(e.i) {
+<#
+{
+    for(int j = 0; j <  uniqueKeys[i].UniqueKeyProperties.Count; j++) {
+#>
+            case <#= j #>:
+                if(e.v) {
+                    this.<#= searchSelectRowPropName + caption #><#= j #> = e.v as <#= GetInterfaceName(Model) #>;
+                } else {
+                    this.<#= searchSelectRowPropName + caption #><#= j #> = null;
+                }
+                break;
+<#
+    }
+}
+#>
         }
     }
 
@@ -1842,8 +1963,12 @@ if (Model.IsWebApiSelectOneByPrimarykey) {
                     if(IsUsebByForeignKey(Model, modelViewPropertyOfVwSerializable)) continue;
 #>
         if(i > <#= ukprpcnt #>) { 
-            fltr.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#> = [wsfd[<#= ukprpcnt #>].fltrValue.value]; 
-            fltr.<#= GetFilterPropertyOperatorName(modelViewPropertyOfVwSerializable, Model, OperatorSufix)#> = ['<#= EqualOperator #>']
+            if (!(typeof  wsfd[<#= ukprpcnt #>].fltrValue.value === 'undefined')) {
+                if (!(wsfd[<#= ukprpcnt #>].fltrValue.value === null)) {
+                    fltr.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model) #> = [wsfd[<#= ukprpcnt #>].fltrValue.value.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model) #>]; 
+                    fltr.<#= GetFilterPropertyOperatorName(modelViewPropertyOfVwSerializable, Model, OperatorSufix)#> = ['<#= EqualOperator #>']
+                }
+            }
          } else if(i === <#= ukprpcnt #>) { 
             fltr.<#= GetTypeScriptPropertyName(modelViewPropertyOfVwSerializable, Model)#> = [value]; 
             fltr.<#= GetFilterPropertyOperatorName(modelViewPropertyOfVwSerializable, Model, OperatorSufix)#> = ['<#= LikeOperator #>']

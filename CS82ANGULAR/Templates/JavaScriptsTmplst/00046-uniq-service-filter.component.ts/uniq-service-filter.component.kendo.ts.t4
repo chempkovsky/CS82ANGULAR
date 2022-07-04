@@ -259,13 +259,14 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
                     fltrMaxLen: i.fltrMaxLen, fltrMin: i.fltrMin, fltrMax: i.fltrMax,
                     fltrFlx: i.fltrFlx, fltrMd: i.fltrMd, fltrSm: i.fltrSm, fltrXs: i.fltrXs
                 };
-                this.resetVldtrs(flt);
+                // this.resetVldtrs(flt);
                 if ((k > -1) && (!(typeof this.<#= externalFilterExPropName #>[k].fltrValue === 'undefined'))) flt.fltrValue.reset({ value: this.<#= externalFilterExPropName #>[k].fltrValue, disabled: false });
                 wsfd.push(flt);
             });
             this.webServiceFilters = wsfd;
             let indx: number = 0;
             this.webServiceFilters.forEach((flt: <#= uniqFilterModelClassName #>) => {
+/*
               if((flt.fltrDataType === 'boolean') || (flt.fltrDataType === 'bool')) {
                 if ((typeof flt.fltrValue.value === 'undefined') || (flt.fltrValue.value === null)) flt.fltrValue.patchValue(false, {emitEvent: false});
                 flt.fltrValue.valueChanges.subscribe({next: (e: any) => this.<#= afterObjSelPropName #>.emit({v:null, i: indx}) });
@@ -275,6 +276,8 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
               } else {
                 this.<#= tpahValChangedMethodName #>(flt.fltrValue, indx);
               }
+*/
+              this.<#= tpahValChangedMethodName #>(flt.fltrValue, indx);  
               indx = indx + 1;
             });
         } else {
@@ -556,8 +559,10 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
 #>
     }
     <#= tpahValChangedMethodName #>(fc: FormControl, indx: number): void {
-      fc.valueChanges.subscribe((value)=>{ this.<#= patchcontrolsMethodName #>(value, indx); });
+//      fc.valueChanges.subscribe((value)=>{ this.<#= patchcontrolsMethodName #>(value, indx); });
+      fc.valueChanges.subscribe((value)=>{ this.<#= afterObjSelPropName #>.emit({v: value, i: indx}); });
     }
+/*
     <#= patchcontrolsMethodName #>(val: any, pos: number): void {
       this.<#= afterObjSelPropName #>.emit({v:val, i: pos});
       if (typeof this.<#= tpAheadValPropName #> === 'undefined') 
@@ -568,6 +573,7 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
          }
       });
     }
+*/
     @Output('<#= afterObjSelSelector #>') <#= afterObjSelPropName #> = new EventEmitter<any>();
     @Input('<#= notifyAllSelector #>') <#= notifyAllPropName #>: boolean = false;
 }
