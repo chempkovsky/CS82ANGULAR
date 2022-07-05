@@ -209,9 +209,6 @@
                                     }
                                 } else {
                                     if( IsBooleanInput(modelViewUIFormPropertySerializable, Model) ) {
-#>
-                        <input matInput style="display: none" >
-<#
                                         if (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.ReadOnly) { 
 #>
                         <mat-checkbox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"  [disableRipple]="true" >{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</mat-checkbox>

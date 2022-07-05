@@ -1,0 +1,123 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+    bool localize = Context.Localize;
+
+    string HiddenFilterSelector         = "hidden-filter";
+    string HiddenFilterPropName         = "hiddenFilter";
+    string EformModeSelector            = "eform-mode";
+    string EformModePropName            = "eformMode";
+    string FormControlModelSelector     = "eform-control-model";
+    string FormControlModelPropName     = "eformControlModel";
+    string BeforeSubmitSelector         = "before-submit";
+    string BeforeSubmitPropName         = "beforeSubmit";
+    string AfterSubmitSelector          = "after-submit";
+    string AfterSubmitPropName          = "afterSubmit";
+    string OnAfterSubmitMethodName      = "onAfterSubmit";
+
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+    string updformComponentFolder       = "01504-Uform.component.ts";
+    string upddlgComponentFolder        = "01524-Udlg.component.ts";
+
+    string componentSelectorCommonPart  = GetComponentSelectorCommonPart(Model, updformComponentFolder);
+    string upddlgComponentClassName     = GetComponentClassName(Model, upddlgComponentFolder);
+#>
+<kendo-dialog-titlebar>{{data.title}}</kendo-dialog-titlebar>
+<div>
+    <app-<#= componentSelectorCommonPart #> 
+        [<#= captionSelector #>]="data.title" 
+        [<#= HiddenFilterSelector #>]="data.<#= HiddenFilterPropName #>"
+        [<#= FormControlModelSelector #>]="data.<#= FormControlModelPropName #>"
+        (<#= AfterSubmitSelector #>)="<#= OnAfterSubmitMethodName #>($event)"
+    ></app-<#= componentSelectorCommonPart #>>
+</div>
+<kendo-dialog-actions>
+<# 
+    if(localize) {
+#>
+  <button kendoButton (click)="onCancel()" cdkFocusInitial i18n="Cancel@@Cancel.Cancel">Cancel</button>
+  <button kendoButton (click)="onOk()" i18n="Ok@@Ok.Ok">Ok</button>
+<# 
+    } else {
+#>
+  <button kendoButton (click)="onCancel()" cdkFocusInitial>Cancel</button>
+  <button kendoButton (click)="onOk()">Ok</button>
+<# 
+    }
+#>
+</kendo-dialog-actions>
+
+<#+
+    string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        return refItem.FileName.Replace(".component","");
+    }
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+#>

@@ -548,7 +548,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
     public kendoDataSource: DataResult|any;
     public kendoSortDescriptor: SortDescriptor[] = [];
     kendoTotal: number = 0;
-    matPaginatorPageSize: number = <#= MatPaginatorPageSize #>;
     paginatorPageSizeOptions: Array<number> = <#= MatPaginatorPageSizeOptions #>;
     <#= DisplayedColumnsProperty #>:  Array<string> = ['<#= SelectColumnDefProperty #>', '<#= SelectMultColumnDefProperty #>', <#= GetDisplayedColumns(Model) #>, '<#= ActionColumnDefProperty #>'];
     @Input('<#= ShowFilterSelector #>') <#= ShowFilterPropName #>: boolean = true;

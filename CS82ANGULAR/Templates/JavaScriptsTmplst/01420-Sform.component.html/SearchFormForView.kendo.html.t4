@@ -252,9 +252,9 @@
       (sortChange)="onSort($event)"
       [height]="<#= MaxHeightExPropName #>">
 
-    <kendo-grid-command-column [width]="70"  [sticky]="true">
+    <kendo-grid-command-column [width]="75"  [sticky]="true">
       <ng-template kendoGridHeaderTemplate> 
-        <input type="checkbox" kendoCheckBox style="margin-left: 25px;" *ngIf="<#= showMultiSelectedRowPropName #>"       
+        <input type="checkbox" kendoCheckBox style="margin-left: 30px;" *ngIf="<#= showMultiSelectedRowPropName #>"       
             (change)="$event ? masterToggle() : null"
             [checked]="<#= multSelectionProperty #>.hasValue() && isAllSelected()"
             [indeterminate]="<#= multSelectionProperty #>.hasValue() && !isAllSelected()"/>
@@ -279,6 +279,7 @@
   <kendo-grid-column [title]="<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>']" 
     *ngIf="<#= DisplayedColumnsProperty #>.indexOf('<#= GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>') > -1"
     [width]="<#= w #>" 
+    field="<#= GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>"
     <#= kendoSortHeader(modelViewUIListPropertySerializable, Model) #>>
     <ng-template kendoGridCellTemplate let-e>
 <#
@@ -298,7 +299,7 @@
     }
 }
 #>
-    <kendo-grid-command-column [width]="44" [hidden]="false"  [sticky]="true">
+    <kendo-grid-command-column [width]="44" [sticky]="true">
       <ng-template kendoGridHeaderTemplate>    
         <kendo-dropdownbutton   icon="more-vertical" fillMode="flat" [data]="tableMenuItemsData" (itemClick)="tableCommand($event.id)">
            <ng-template kendoDropDownButtonItemTemplate let-m>

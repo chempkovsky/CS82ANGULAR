@@ -52,12 +52,13 @@
 
 #>
      <div fxLayout="row" fxLayoutAlign="flex-end space-around" style="margin-bottom: 12px;"> 
-        <label fxFlex fxLayoutAlign="flex-start space-around">{{<#= captionPropName #>}}</label>
+        <kendo-label fxFlex fxLayoutAlign="flex-start space-around">{{<#= captionPropName #>}}</kendo-label>
         <ng-template ngFor let-item [ngForOf]="<#= containerMenuItemsPropName #>">
             <span fxFlex="1%"></span>  
-            <button mat-icon-button (click)="<#= onContainerMenuItemClickMethodName #>(item)" 
-                [matTooltip]="item.caption"> 
-                <mat-icon  [color]="item.iconColor" >{{item.iconName}}</mat-icon>
+            <button kendoButton (click)="<#= onContainerMenuItemClickMethodName #>(item)" 
+                [themeColor]="item.iconColor"
+                [icon]="item.iconColor"
+                [title]="item.caption"> 
             </button>     
         </ng-template>            
         <span fxFlex="1%"></span>
@@ -127,28 +128,41 @@
                     if(modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Combo) {
 #>
                 <input type="hidden"  formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
-                <mat-form-field  [appearance]="<#= AppearancePropName #>" fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#= GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#= GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#= percentEq100.ToString() #>">
-                    <mat-label>{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</mat-label>
-                    <mat-select [formControl]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">
-                        <mat-option *ngFor="let aVal of <#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>;" [value]="aVal">{{ aVal.<#= GetComboControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #> }}</mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</mat-error>
-                    <mat-hint align="end">{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint']}}</mat-hint>
-                </mat-form-field>
+                <kendo-formfield  fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#= GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#= GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#= percentEq100.ToString() #>">
+                    <kendo-label>{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</kendo-label>
+                    <kendo-dropdownlist [fillMode]="<#= AppearancePropName #>" 
+                        [formControl]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>"
+                        [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']"
+                        [fillMode]="<#= AppearancePropName #>"
+                        [data]="<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>"
+                        valueField
+                        textField="<#= GetComboControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #>">
+                    </kendo-dropdownlist>
+                    <kendo-formerror *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</kendo-formerror>
+                    <kendo-formhint align="end">{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint']}}</kendo-formhint>
+                </kendo-formfield>
 <#
                     } /// if(modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Combo) {}
                     else if(modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Typeahead) {
 #>
                 <input type="hidden"  formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
-                <mat-form-field  [appearance]="<#= AppearancePropName #>" fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#= GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#= GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#= percentEq100.ToString() #>">
-                    <mat-label>{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</mat-label>
-                    <input type="text" [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" matInput [formControl]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>" [matAutocomplete]="typeAhead<#= typeAheadNo #>">
-                        <mat-autocomplete autoActiveFirstOption #typeAhead<#= typeAheadNo #>="matAutocomplete" [displayWith]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadDisplaySufix)#>">
-                        <mat-option *ngFor="let aVal of (<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> | async);" [value]="aVal">{{ aVal.<#= GetTypeaheadControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #> }}</mat-option>
-                    </mat-autocomplete>
-                    <mat-error *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</mat-error>
-                    <mat-hint align="end">{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint']}}</mat-hint>
-                </mat-form-field>
+                <kendo-formfield  fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#= GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#= GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#= percentEq100.ToString() #>">
+                    <kendo-label>{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</kendo-label>
+                    <kendo-dropdownlist [fillMode]="<#= AppearancePropName #>" 
+                        [formControl]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>"
+                        [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']"
+                        [fillMode]="<#= AppearancePropName #>"
+                        [data]="<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>"
+                        valueField
+                        [filterable]="true"
+                        (opened)="<#= GetExpressionForControlListOpen(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>(true)"
+                        (closed)="<#= GetExpressionForControlListOpen(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>(false)"
+                        (filterChange)="<#= GetExpressionForControlListFilter(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>($event)"
+                        textField="<#= GetTypeaheadControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #>">
+                    </kendo-dropdownlist>
+                    <kendo-formerror *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</kendo-formerror>
+                    <kendo-formhint align="end">{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint']}}</kendo-formhint>
+                </kendo-formfield>
 <#
                         typeAheadNo++;
                     } /// if(modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Typeahead) {}
@@ -156,79 +170,86 @@
                     {
                             bool hasButton = HasButton(modelViewUIFormPropertySerializable.InputTypeWhenDelete);
 #>
-                <mat-form-field  [appearance]="<#= AppearancePropName #>" fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#=  GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#=  GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#=  percentEq100.ToString() #>">
+                <kendo-formfield  fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#=  GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#=  GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#=  percentEq100.ToString() #>">
 <#
                             if(!IsBooleanInput(modelViewUIFormPropertySerializable, Model)) {
 #>
-                    <mat-label>{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</mat-label>
-
-<# 
+                    <kendo-label>{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</kendo-label>
+<#
+                                if(hasButton) {
+#>
+                    <div fxLayout="row"> 
+<#
+                                }
                             }
                             if (IsDateInput(modelViewUIFormPropertySerializable, Model)) {
-                                if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.ReadOnly) {
+                                if (hasButton || (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.ReadOnly)) {
 #>
-                    <input matInput [matDatepicker]="apicker<#= dateTmPickNo #>" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true">
-                    <mat-datepicker-toggle matSuffix [for]="apicker<#= dateTmPickNo #>" disabled></mat-datepicker-toggle>
+                    <kendo-datepicker [fillMode]="<#= AppearancePropName #>" [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']"  formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true"></kendo-datepicker>
 <#
                                 } else {
 #>
-                    <input matInput [matDatepicker]="apicker<#= dateTmPickNo #>" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
-                    <mat-datepicker-toggle matSuffix [for]="apicker<#= dateTmPickNo #>"></mat-datepicker-toggle>
+                    <kendo-datepicker [fillMode]="<#= AppearancePropName #>" [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"></kendo-datepicker>
 <#
                                 }
-#>
-                    <mat-datepicker #apicker<#= dateTmPickNo #>></mat-datepicker>
-<#
                                 dateTmPickNo++;
                             } else {
                                 if(IsMemoInput(modelViewUIFormPropertySerializable, Model)) {
                                     if (hasButton || (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.ReadOnly)) {
 #>
-                    <textarea  matInput [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true"></textarea>
+                    <kendo-textarea [fillMode]="<#= AppearancePropName #>" [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true"></kendo-textarea>
 <#
                                     } else {
 #>
-                    <textarea  matInput [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"></textarea>
+                    <kendo-textarea [fillMode]="<#= AppearancePropName #>" [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"></kendo-textarea>
 <#
                                     }
                                 } else {
                                     if( IsBooleanInput(modelViewUIFormPropertySerializable, Model) ) {
+#>
+                    <div class="k-checkbox-wrap">
+<#
                                         if (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.ReadOnly) { 
 #>
-                    <mat-checkbox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"  [disableRipple]="true" > {{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}} </mat-checkbox>
+                        <input type="checkbox" kendoCheckBox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"  [attr.disabled]="true" > 
 <#
                                         } else {
 #>
-                    <mat-checkbox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" > {{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}} </mat-checkbox>
+                        <input type="checkbox" kendoCheckBox formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" > 
 <#
                                         }
+#>
+                        <kendo-label class="k-checkbox-label" >{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</kendo-label>
+                    <div>
+<#
                                     }
                                     else
 				                    {
                                         if (hasButton || (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.ReadOnly)) { 
 #>
-                    <input <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #> matInput [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true">
+                    <input <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #> kendoTextBox [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true">
 <#
-                                            if (hasButton) {                           
-#>
-                    <button color="primary" mat-icon-button matSuffix (click)="<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>()" [disabled]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonDisable) #>"  >
-                      <mat-icon>search</mat-icon>
-                    </button>
-<#
-                                            }
                                         } else {
 #>
-                    <input <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #> matInput [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+                    <input <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #> kendoTextBox [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
 <#
                                         }
                                     }
-
+                                }
+                            }
+                            if(!IsBooleanInput(modelViewUIFormPropertySerializable, Model)) {
+                                if(hasButton) {
+#>
+                        <button kendoButton  themeColor="primary"  icon="search" (click)="<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>()" [disabled]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonDisable) #>"  >
+                        </button>
+                    </div> 
+<#
                                 }
                             }
 #>
-                    <mat-error *ngIf="<#=  GetExpressionForInvalid(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</mat-error>
-                    <mat-hint align="end">{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint']}}</mat-hint>
-                </mat-form-field>
+                    <kendo-formerror *ngIf="<#=  GetExpressionForInvalid(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</kendo-formerror>
+                    <kendo-formhint align="end">{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint']}}</kendo-formhint>
+                </kendo-formfield>
 <#
                     } // if (!((modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Combo) || (modelViewUIFormPropertySerializable.InputTypeWhenDelete == InputTypeEnum.Typeahead))) {}
                     XXXCnt++;
@@ -248,7 +269,7 @@
 
 #> 
     </div>
-
+    <div kendoDialogContainer></div>
 <#+
     string GetInterfaceName(ModelViewSerializable model) {
         return "I"+model.ViewName;
@@ -404,6 +425,15 @@
     }
     string GetExpressionForControlList(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string sufix) {
         return  GetTypeScriptPropertyNameWithSufix(prop, model, sufix) + "Vals";
+    }
+    string GetExpressionForControlListOpen(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string sufix) {
+        return  GetTypeScriptPropertyNameWithSufix(prop, model, sufix) + "OnOpen";
+    }
+    string GetExpressionForControlListIsOpen(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string sufix) {
+        return  GetTypeScriptPropertyNameWithSufix(prop, model, sufix) + "IsOpen";
+    }
+    string GetExpressionForControlListFilter(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string sufix) {
+        return  GetTypeScriptPropertyNameWithSufix(prop, model, sufix) + "OnFilter";
     }
     string GetExpressionForControlInvalid(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string sufix) {
         return  GetTypeScriptPropertyNameWithSufix(prop, model, sufix) + ".invalid";
