@@ -33,28 +33,29 @@
 
     string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, lformComponentFolder);
 #>
-<h3 mat-dialog-title>{{data.title}}</h3>
-<div mat-dialog-content>
+
+<kendo-dialog-titlebar>{{data.title}}</kendo-dialog-titlebar>
+<div>
     <app-<#= componentSelectorCommonPart #> (<#= SelectedRowSelector #>)="onSelectedRow($event)"
     [<#= HiddenFilterSelector #>] = "data.<#= HiddenFilterPropName #>" [<#= ShowFilterSelector #>]="data.<#= ShowFilterPropName #>"
     [<#= CanAddSelector #>]= "data.canAdd" [<#= CanUpdSelector #>]= "data.<#= CanUpdPropName #>" [<#= CanDelSelector #>]= "data.<#= CanDelPropName #>"
     ></app-<#= componentSelectorCommonPart #>>
 </div>
-<div mat-dialog-actions>
+<kendo-dialog-actions>
 <# 
     if(localize) {
 #>
-  <button mat-button (click)="onCancel()" cdkFocusInitial i18n="Cancel@@Cancel.Cancel">Cancel</button>
-  <button mat-button (click)="onOk()" i18n="Ok@@Ok.Ok">Ok</button>
+  <button kendoButton (click)="onCancel()" cdkFocusInitial i18n="Cancel@@Cancel.Cancel">Cancel</button>
+  <button kendoButton (click)="onOk()" i18n="Ok@@Ok.Ok">Ok</button>
 <# 
     } else {
 #>
-  <button mat-button (click)="onCancel()" cdkFocusInitial>Cancel</button>
-  <button mat-button (click)="onOk()">Ok</button>
+  <button kendoButton (click)="onCancel()" cdkFocusInitial>Cancel</button>
+  <button kendoButton (click)="onOk()">Ok</button>
 <#
     }
 #>
-</div>
+</kendo-dialog-actions>
 
 <#+
 

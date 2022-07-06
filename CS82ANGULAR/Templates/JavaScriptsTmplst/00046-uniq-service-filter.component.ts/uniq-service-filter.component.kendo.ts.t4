@@ -104,6 +104,8 @@
     string tpAheadOpnPropName           = "tpAheadOpn";
     string tpAheadClsPropName           = "tpAheadCls";
     string tpAheadFltChngPropName       = "tpAheadFltChng";
+    string tpAheadClearPropName         = "tpAheadClear";
+
 
     string clearTpAheadVarsMethodName   = "clrTpAheadVars";
     string tpahValChangedMethodName     = "tpahVlChngs";
@@ -540,11 +542,14 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
             return;      
         } 
         this.<#= tpAheadFncPropName  #>(this.webServiceFilterDefs[<#= iii #>].fltrSrv, this.webServiceFilters, value, <#= iii #>)
-        .subscribe((data)=> {this.<#= tpAheadVarsPropName #><#= iii #> = data});
+        .subscribe((data: any)=> {this.<#= tpAheadVarsPropName #><#= iii #> = data});
     }
 <#
     }
 #>
+    <#= tpAheadClearPropName #>(i: number) {
+        this.webServiceFilters[i].fltrValue.patchValue(null, {emitEvent: true});
+    }
 
     @Input('<#= tpAheadValSelector #>') <#= tpAheadValPropName #>!: (v: any, i: number) => any;
     @Input('<#= tpAheadFncSelector #>') <#= tpAheadFncPropName  #>!: (srv: any, wsfs: Array<<#= uniqFilterModelClassName #>>, value: any, i: number) => Observable<Array<any>>;

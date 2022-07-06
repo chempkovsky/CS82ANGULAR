@@ -132,7 +132,6 @@
                     <kendo-label>{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</kendo-label>
                     <kendo-dropdownlist [fillMode]="<#= AppearancePropName #>" 
                         [formControl]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>"
-                        [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']"
                         [fillMode]="<#= AppearancePropName #>"
                         [data]="<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>"
                         valueField
@@ -150,7 +149,6 @@
                     <kendo-label>{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</kendo-label>
                     <kendo-dropdownlist [fillMode]="<#= AppearancePropName #>" 
                         [formControl]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>"
-                        [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']"
                         [fillMode]="<#= AppearancePropName #>"
                         [data]="<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>"
                         valueField
@@ -269,7 +267,6 @@
 
 #> 
     </div>
-    <div kendoDialogContainer></div>
 <#+
     string GetInterfaceName(ModelViewSerializable model) {
         return "I"+model.ViewName;

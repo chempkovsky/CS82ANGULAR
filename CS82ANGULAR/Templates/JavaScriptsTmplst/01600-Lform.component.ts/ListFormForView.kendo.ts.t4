@@ -214,14 +214,9 @@
 #>
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { FormControl, Validators, ValidatorFn } from '@angular/forms';
-import { MatSelectChange } from '@angular/material/select';
-import { MatDialog } from '@angular/material/dialog';
+import { DialogCloseResult, DialogService } from '@progress/kendo-angular-dialog';
 import { firstValueFrom } from 'rxjs';
 
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { MatSort, Sort } from '@angular/material/sort';
-import { MatRow } from '@angular/material/table';
-import { ProgressBarMode } from '@angular/material/progress-bar';
 
 
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, lformComponentFolder)#>';
@@ -474,15 +469,15 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 
     rowMenuItemsData = [
           {id: '<#= ActionParamUpdateMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'], iconName: 'edit', iconColor: 'primary', enabled: true},
-          {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'delete_forever', iconColor: 'warn', enabled: true},
+          {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'delete', iconColor: 'warning', enabled: true},
           {id: '<#= ActionParamViewMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'preview', iconColor: 'primary', enabled: true},
         ];
     tableMenuItemsData = [
         {id: '<#= ActionParamAddMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'], iconName: 'create', iconColor: 'primary', enabled: true},
-        {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'], iconName: 'delete_forever', iconColor: 'warn', enabled: true},
+        {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'], iconName: 'delete', iconColor: 'warning', enabled: true},
       ];
 
-    constructor(private  <#= formRootService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, public dialog: MatDialog, private cd: ChangeDetectorRef) {
+    constructor(private  <#= formRootService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, public dialog: DialogService, private cd: ChangeDetectorRef) {
     }
     permMask: number = 0;
     ngOnInit() {
@@ -496,7 +491,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     onRowMenuItemsData() {
         let tmp: Array<<#= menuItemDataModelClassName #>> = [
           {id: '<#= ActionParamUpdateMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'], iconName: 'edit', iconColor: 'primary', enabled: true },
-          {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'delete_forever', iconColor: 'warn', enabled: true},
+          {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'delete', iconColor: 'warning', enabled: true},
           {id: '<#= ActionParamViewMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'preview', iconColor: 'primary', enabled: true },
         ];
         tmp = tmp.concat(this._<#= RowCommandsPropName #>);
@@ -507,8 +502,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     }
     onTableMenuItemsData() {
         let tmp: Array<<#= menuItemDataModelClassName #>> = [
-            {id: '<#= ActionParamAddMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'], iconName: 'create', iconColor: 'primary', enabled: true},
-            {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'delete_forever', iconColor: 'warn', enabled: true},
+            {id: '<#= ActionParamAddMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'], iconName: 'plus', iconColor: 'primary', enabled: true},
+            {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'delete', iconColor: 'warning', enabled: true},
         ];
         tmp = tmp.concat(this._<#= TableCommandsPropName #>);
         tmp[0].enabled = this._<#= CanAddPropName #> && ((this.permMask & 8) === 8) <# if (!Model.IsWebApiAdd) { #> && false <# } #>;
@@ -537,12 +532,14 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         };
         let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
         let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
-        let dialogRef = this.dialog.open(<#=  vdlgComponentClassName #>, {
-              data: locdata,
+        let dialogRef = this.dialog.open({
+              content: <#=  vdlgComponentClassName #>,
               maxWidth: mw,
               width: w,
             });
-        dialogRef.afterClosed().subscribe(rslt => {
+        const dlg = dialogRef.content.instance as <#=  vdlgComponentClassName #>;
+        dlg.data = locdata;
+        dialogRef.result.subscribe((rslt: any) => {
         });
 <#
     }
@@ -562,29 +559,34 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         };
         let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
         let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
-        let dialogRef = this.dialog.open(<#=  adlgComponentClassName #>, {
-              data: locdata,
+        let dialogRef = this.dialog.open({
+              content: <#= adlgComponentClassName #>,
               maxWidth: mw,
               width: w,
             });
-        dialogRef.afterClosed().subscribe(rslt => {
+        const dlg = dialogRef.content.instance as <#=  adlgComponentClassName #>;
+        dlg.data = locdata;
+        dialogRef.result.subscribe((rslt: any) => {
             if (!(typeof rslt === 'undefined')) {
                 if (!(rslt === null)) {
-                    if (!( typeof rslt.<#= FormControlNewModelPropName #> === 'undefined') ) {
-                        if (!( rslt.<#= FormControlNewModelPropName #> === null) ) {
-                            if (!Array.isArray(sender.dataSource)) {
-                                sender.dataSource = [];
-                            }
-                            sender.dataSource.splice(0, 0, rslt.eformNewControlModel);
-                            sender.dataSource = sender.dataSource.slice(0);
-                            let isNDef = true;
-                            if (!(typeof sender.currentRow === 'undefined')) {
-                                if (!(sender.currentRow === null)) {
-                                    isNDef = false;
+                    if(!(rslt instanceof DialogCloseResult)) {
+                        if (!( typeof rslt.<#= FormControlNewModelPropName #> === 'undefined') ) {
+                            if (!( rslt.<#= FormControlNewModelPropName #> === null) ) {
+                                if (!Array.isArray(sender.dataSource)) {
+                                    sender.dataSource = [];
                                 }
-                            }
-                            if(isNDef) {
-                                sender.<#= OnSelectRowMethodName #>(rslt.eformNewControlModel);
+                                sender.dataSource.splice(0, 0, rslt.eformNewControlModel);
+                                sender.dataSource = sender.dataSource.slice(0);
+                                sender.kendoDataSource = {data: sender.dataSource, total: sender.kendoDataSource.total};
+                                let isNDef = true;
+                                if (!(typeof sender.currentRow === 'undefined')) {
+                                    if (!(sender.currentRow === null)) {
+                                        isNDef = false;
+                                    }
+                                }
+                                if(isNDef) {
+                                    sender.<#= OnSelectRowMethodName #>(rslt.eformNewControlModel);
+                                }
                             }
                         }
                     }
@@ -608,17 +610,21 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         };
         let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
         let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
-        let dialogRef = this.dialog.open(<#=  udlgComponentClassName #>, {
-              data: locdata,
+        let dialogRef = this.dialog.open({
+              content:<#=  udlgComponentClassName #>,
               maxWidth: mw,
               width: w,
             });
-        dialogRef.afterClosed().subscribe(rslt => {
+        const dlg = dialogRef.content.instance as <#=  udlgComponentClassName #>;
+        dlg.data = locdata;
+        dialogRef.result.subscribe((rslt: any) => {
             if (!(typeof rslt === 'undefined')) {
                 if (!(rslt === null)) {
-                    if (!((typeof rslt.<#= FormControlModelPropName #> === 'undefined') || (typeof rslt.<#= FormControlNewModelPropName #> === 'undefined'))) {
-                        if (!((rslt.<#= FormControlModelPropName #> === null) || (rslt.<#= FormControlNewModelPropName #> === null))) {
-                            this.<#= formRootService #>.<#= src2destMethodName #>(rslt.<#= FormControlNewModelPropName #>, rslt.<#= FormControlModelPropName #>);
+                    if(!(rslt instanceof DialogCloseResult)) {
+                        if (!((typeof rslt.<#= FormControlModelPropName #> === 'undefined') || (typeof rslt.<#= FormControlNewModelPropName #> === 'undefined'))) {
+                            if (!((rslt.<#= FormControlModelPropName #> === null) || (rslt.<#= FormControlNewModelPropName #> === null))) {
+                                this.<#= formRootService #>.<#= src2destMethodName #>(rslt.<#= FormControlNewModelPropName #>, rslt.<#= FormControlModelPropName #>);
+                            }
                         }
                     }
                 }
@@ -641,35 +647,41 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         };
         let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
         let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
-        let dialogRef = this.dialog.open(<#=  ddlgComponentClassName #>, {
-              data: locdata,
+        let dialogRef = this.dialog.open({
+              content: <#=  ddlgComponentClassName #>,
               maxWidth: mw,
               width: w,
             });
-        dialogRef.afterClosed().subscribe(rslt => {
+        const dlg = dialogRef.content.instance as <#=  ddlgComponentClassName #>;
+        dlg.data = locdata;
+        dialogRef.result.subscribe((rslt: any) => {
             if (!(typeof rslt === 'undefined')) {
                 if (!(rslt === null)) {
-                    if (!((typeof rslt.<#= FormControlModelPropName #> === 'undefined') || (typeof rslt.<#= FormControlNewModelPropName #> === 'undefined'))) {
-                        if (!((rslt.<#= FormControlModelPropName #> === null) || (rslt.<#= FormControlNewModelPropName #> === null))) {
-                            if (!Array.isArray(sender.dataSource)) {
-                                sender.dataSource = [];
-                            }
-                            let i: number = sender.dataSource.indexOf(rslt.<#= FormControlModelPropName #>);
-                            if (i > -1) {
-                                if (!(sender.currentRow === null)) {
-                                    if (sender.currentRow === rslt.eformControlModel) {
-                                        if (i > 0) {
-                                            sender.<#= OnSelectRowMethodName #>(sender.dataSource[i-1]);
-                                        } else if (i < sender.dataSource.length-1) {
-                                            sender.<#= OnSelectRowMethodName #>(sender.dataSource[i+1]);
-                                        } else {
-                                            sender.<#= OnSelectRowMethodName #>(null);
+                    if(!(rslt instanceof DialogCloseResult)) {
+                        if (!((typeof rslt.<#= FormControlModelPropName #> === 'undefined') || (typeof rslt.<#= FormControlNewModelPropName #> === 'undefined'))) {
+                            if (!((rslt.<#= FormControlModelPropName #> === null) || (rslt.<#= FormControlNewModelPropName #> === null))) {
+                                if (!Array.isArray(sender.dataSource)) {
+                                    sender.dataSource = [];
+                                }
+                                let i: number = sender.dataSource.indexOf(rslt.<#= FormControlModelPropName #>);
+                                if (i > -1) {
+                                    if (!(sender.currentRow === null)) {
+                                        if (sender.currentRow === rslt.eformControlModel) {
+                                            if (i > 0) {
+                                                sender.<#= OnSelectRowMethodName #>(sender.dataSource[i-1]);
+                                            } else if (i < sender.dataSource.length-1) {
+                                                sender.<#= OnSelectRowMethodName #>(sender.dataSource[i+1]);
+                                            } else {
+                                                sender.<#= OnSelectRowMethodName #>(null);
+                                            }
                                         }
                                     }
-                                }
-                                sender.dataSource.splice(i, 1);
-                                sender.dataSource = sender.dataSource.slice(0);
-                            } 
+                                    sender.dataSource.splice(i, 1);
+                                    sender.dataSource = sender.dataSource.slice(0);
+                                    sender.kendoDataSource = {data: sender.dataSource, total: sender.kendoDataSource.total};
+
+                                } 
+                            }
                         }
                     }
                 }
@@ -691,14 +703,17 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             title: 'Delete Items',
             message: 'Delete Selected Items ?',
             iconname: 'warning',
-            iconcolor: 'warn'
+            iconcolor: 'warning'
         };
-        let dialogRef = this.dialog.open(<#=  messageDialogComponentClassName #>, {
-              data: locdata,
+        let dialogRef = this.dialog.open({
+              content: <#=  messageDialogComponentClassName #>
             });
-        dialogRef.afterClosed().subscribe(async rslt => {
+        const dlg = dialogRef.content.instance as <#=  messageDialogComponentClassName #>;
+        dlg.data = locdata;
+        dialogRef.result.subscribe(async (rslt: any) => {
             if (typeof rslt === 'undefined') return;
             if (rslt === null) return;
+            if(rslt instanceof DialogCloseResult) return;
             let currRowsCp: Array<<#= GetInterfaceName(Model) #>> = sender.<#= currentMultiRowPropName #>.slice();
             let deletedRows: Array<<#= GetInterfaceName(Model) #>> = [];
             for(let row of currRowsCp) {
@@ -724,6 +739,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 if(i > -1) sender.dataSource.splice(i, 1);
             });
             sender.dataSource = sender.dataSource.slice(0);
+            sender.kendoDataSource = {data: sender.dataSource, total: sender.kendoDataSource.total};
             if ((deletedRows.indexOf( sender.<#= currentRowPropName #>  as <#= GetInterfaceName(Model) #>) > -1) && (sender.dataSource.length > 0)) sender.<#= OnSelectRowMethodName #>(sender.dataSource[0]);
         });
 <#

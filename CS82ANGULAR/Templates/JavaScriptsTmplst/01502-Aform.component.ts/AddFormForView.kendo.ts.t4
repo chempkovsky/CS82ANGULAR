@@ -820,9 +820,13 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     }
     public <#= GetExpressionForControlListFilter(fk.Item3, Model, TypeaheadSufix) #>(value: any) {
         if (this.<#=  GetExpressionForControlListIsOpen(fk.Item3, Model, TypeaheadSufix) #> === true) {
+            if(!this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#=  IsSetFilterByCurrDirMstrsMethodName #>()) {
+                this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: this.<#= frasesPropName #>['Not-all-masters'],});
+                return;
+            }
             this.<#=  GetExpressionForControlList(fk.Item3, Model, TypeaheadSufix) #> = [];
             this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= GetCllctByFldFilterMethodName #>('<#= GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId) #>', value)
-            .subscribe((data)=> {this.<#=  GetExpressionForControlList(fk.Item3, Model, TypeaheadSufix) #> = data});
+            .subscribe((data: any)=> {this.<#=  GetExpressionForControlList(fk.Item3, Model, TypeaheadSufix) #> = data});
         }
     }
 // end instead of Typeahead
@@ -891,8 +895,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
         let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
         let dialogRef = this.dialog.open({
-        let dialogRef = this.dialog.open({
-            content: <#= GetComponentClassName(fk.Item2, sdlgComponentFolder) #>
+            content: <#= GetComponentClassName(fk.Item2, sdlgComponentFolder) #>,
             maxWidth: mw,
             width: w,
         });
@@ -901,8 +904,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         dialogRef.result.subscribe((rslt: any) => {
             if (!(typeof rslt === 'undefined')) {
                 if (!(rslt === null)) {
-                    if (!(rslt.<#= SelectedItemsPropName #> === 'undefined')) {
-                        if(!(rslt instanceof DialogCloseResult)) {
+                    if(!(rslt instanceof DialogCloseResult)) {
+                        if (!(rslt.<#= SelectedItemsPropName #> === 'undefined')) {
                             if(Array.isArray(rslt.<#= SelectedItemsPropName #>)) {
                                 if(rslt.<#= SelectedItemsPropName #>.length > 0) {
                                     this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Interface2ValuesMethodName #>(rslt.<#= SelectedItemsPropName #>[0], true);
