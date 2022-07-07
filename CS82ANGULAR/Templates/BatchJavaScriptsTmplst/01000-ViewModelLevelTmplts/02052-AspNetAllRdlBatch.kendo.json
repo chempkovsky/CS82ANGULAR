@@ -1,0 +1,248 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "1.",
+    "  Please make sure that you selected src\\app folder",
+    "",
+    "2.",
+    " Please make that AspNet ModelViews has the following names",
+    " (Names are case sensitive)",
+    "     aspnetmodelView",
+    "     aspnetuserView",
+    "     aspnetroleView",
+    "     aspnetuserrolesView",
+    "     aspnetrolemaskView",
+    "     aspnetusermaskView",
+    "     aspnetuserpermsView",
+    "",
+    "",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.css",
+      "GeneratorSript": "DListRouterFormForView.css.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.html",
+      "GeneratorSript": "DListRouterFormForView.kendo.html.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.ts",
+      "GeneratorSript": "DListRouterFormForView.ForAspNetModel.kendo.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "02030-Rdl.module.ts",
+      "GeneratorSript": "rdlformModuleForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "02040-Rdl.routing.module.ts",
+      "GeneratorSript": "rdl.routing.module.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "02050-Rdl-lazy.routing.module.ts",
+      "GeneratorSript": "rdl-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+
+
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.css",
+      "GeneratorSript": "DListRouterFormForView.css.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.html",
+      "GeneratorSript": "DListRouterFormForView.kendo.html.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.ts",
+      "GeneratorSript": "DListRouterFormForView.kendo.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "02030-Rdl.module.ts",
+      "GeneratorSript": "rdlformModuleForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "02040-Rdl.routing.module.ts",
+      "GeneratorSript": "rdl.routing.module.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "02050-Rdl-lazy.routing.module.ts",
+      "GeneratorSript": "rdl-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.css",
+      "GeneratorSript": "DListRouterFormForView.css.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.html",
+      "GeneratorSript": "DListRouterFormForView.kendo.html.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.ts",
+      "GeneratorSript": "DListRouterFormForView.ForAspNetRole.kendo.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "02030-Rdl.module.ts",
+      "GeneratorSript": "rdlformModuleForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "02040-Rdl.routing.module.ts",
+      "GeneratorSript": "rdl.routing.module.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "02050-Rdl-lazy.routing.module.ts",
+      "GeneratorSript": "rdl-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.css",
+      "GeneratorSript": "DListRouterFormForView.css.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.html",
+      "GeneratorSript": "DListRouterFormForView.kendo.html.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.ts",
+      "GeneratorSript": "DListRouterFormForView.kendo.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "02030-Rdl.module.ts",
+      "GeneratorSript": "rdlformModuleForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "02040-Rdl.routing.module.ts",
+      "GeneratorSript": "rdl.routing.module.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "02050-Rdl-lazy.routing.module.ts",
+      "GeneratorSript": "rdl-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+
+
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.css",
+      "GeneratorSript": "DListRouterFormForView.css.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.html",
+      "GeneratorSript": "DListRouterFormForView.kendo.html.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.ts",
+      "GeneratorSript": "DListRouterFormForView.kendo.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "02030-Rdl.module.ts",
+      "GeneratorSript": "rdlformModuleForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "02040-Rdl.routing.module.ts",
+      "GeneratorSript": "rdl.routing.module.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "02050-Rdl-lazy.routing.module.ts",
+      "GeneratorSript": "rdl-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+
+    {
+      "DestinationFolder": "components\\aspnetusermask-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.css",
+      "GeneratorSript": "DListRouterFormForView.css.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetusermask-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.html",
+      "GeneratorSript": "DListRouterFormForView.kendo.html.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetusermask-view\\rdlist",
+      "GeneratorType": "02020-Rdlist.component.ts",
+      "GeneratorSript": "DListRouterFormForView.kendo.ts.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetusermask-view",
+      "GeneratorType": "02030-Rdl.module.ts",
+      "GeneratorSript": "rdlformModuleForView.ts.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetusermask-view",
+      "GeneratorType": "02040-Rdl.routing.module.ts",
+      "GeneratorSript": "rdl.routing.module.ts.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetusermask-view",
+      "GeneratorType": "02050-Rdl-lazy.routing.module.ts",
+      "GeneratorSript": "rdl-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetusermaskView"
+    }
+
+  ]
+}

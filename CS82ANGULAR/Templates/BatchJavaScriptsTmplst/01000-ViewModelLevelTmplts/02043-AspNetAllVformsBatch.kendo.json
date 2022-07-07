@@ -1,0 +1,277 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "1.",
+    "  Please make sure that you selected src\\app folder",
+    "",
+    "2.",
+    " Please make that AspNet ModelViews has the following names",
+    " (Names are case sensitive)",
+    "     aspnetmodelView",
+    "     aspnetuserView",
+    "     aspnetroleView",
+    "     aspnetuserrolesView",
+    "     aspnetrolemaskView",
+    "     aspnetusermaskView",
+    "     aspnetuserpermsView",
+    "",
+    "",
+    ""
+  ],
+  "BatchItems": [
+
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\vform",
+      "GeneratorType": "01500-Vform.component.css",
+      "GeneratorSript": "ViewFormForView.css.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\vform",
+      "GeneratorType": "01500-Vform.component.html",
+      "GeneratorSript": "ViewFormForView.kendo.html.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\vform",
+      "GeneratorType": "01500-Vform.component.ts",
+      "GeneratorSript": "ViewFormForView.kendo.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\vdlg",
+      "GeneratorType": "01510-Vdlg.interface.ts",
+      "GeneratorSript": "InterfaceForVdlg.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\vdlg",
+      "GeneratorType": "01520-Vdlg.component.css",
+      "GeneratorSript": "ViewDlgFormForView.css.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\vdlg",
+      "GeneratorType": "01520-Vdlg.component.html",
+      "GeneratorSript": "ViewDlgFormForView.kendo.html.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\vdlg",
+      "GeneratorType": "01520-Vdlg.component.ts",
+      "GeneratorSript": "ViewDlgFormForView.kendo.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01550-V.module.ts",
+      "GeneratorSript": "vformModuleForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+
+
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\vform",
+      "GeneratorType": "01500-Vform.component.css",
+      "GeneratorSript": "ViewFormForView.css.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\vform",
+      "GeneratorType": "01500-Vform.component.html",
+      "GeneratorSript": "ViewFormForView.kendo.html.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\vform",
+      "GeneratorType": "01500-Vform.component.ts",
+      "GeneratorSript": "ViewFormForView.kendo.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\vdlg",
+      "GeneratorType": "01510-Vdlg.interface.ts",
+      "GeneratorSript": "InterfaceForVdlg.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\vdlg",
+      "GeneratorType": "01520-Vdlg.component.css",
+      "GeneratorSript": "ViewDlgFormForView.css.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\vdlg",
+      "GeneratorType": "01520-Vdlg.component.html",
+      "GeneratorSript": "ViewDlgFormForView.kendo.html.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\vdlg",
+      "GeneratorType": "01520-Vdlg.component.ts",
+      "GeneratorSript": "ViewDlgFormForView.kendo.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01550-V.module.ts",
+      "GeneratorSript": "vformModuleForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+
+
+
+
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\vform",
+      "GeneratorType": "01500-Vform.component.css",
+      "GeneratorSript": "ViewFormForView.css.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\vform",
+      "GeneratorType": "01500-Vform.component.html",
+      "GeneratorSript": "ViewFormForView.kendo.html.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\vform",
+      "GeneratorType": "01500-Vform.component.ts",
+      "GeneratorSript": "ViewFormForView.kendo.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\vdlg",
+      "GeneratorType": "01510-Vdlg.interface.ts",
+      "GeneratorSript": "InterfaceForVdlg.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\vdlg",
+      "GeneratorType": "01520-Vdlg.component.css",
+      "GeneratorSript": "ViewDlgFormForView.css.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\vdlg",
+      "GeneratorType": "01520-Vdlg.component.html",
+      "GeneratorSript": "ViewDlgFormForView.kendo.html.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\vdlg",
+      "GeneratorType": "01520-Vdlg.component.ts",
+      "GeneratorSript": "ViewDlgFormForView.kendo.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01550-V.module.ts",
+      "GeneratorSript": "vformModuleForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+
+
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\vform",
+      "GeneratorType": "01500-Vform.component.css",
+      "GeneratorSript": "ViewFormForView.css.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\vform",
+      "GeneratorType": "01500-Vform.component.html",
+      "GeneratorSript": "ViewFormForView.kendo.html.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\vform",
+      "GeneratorType": "01500-Vform.component.ts",
+      "GeneratorSript": "ViewFormForView.kendo.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\vdlg",
+      "GeneratorType": "01510-Vdlg.interface.ts",
+      "GeneratorSript": "InterfaceForVdlg.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\vdlg",
+      "GeneratorType": "01520-Vdlg.component.css",
+      "GeneratorSript": "ViewDlgFormForView.css.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\vdlg",
+      "GeneratorType": "01520-Vdlg.component.html",
+      "GeneratorSript": "ViewDlgFormForView.kendo.html.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\vdlg",
+      "GeneratorType": "01520-Vdlg.component.ts",
+      "GeneratorSript": "ViewDlgFormForView.kendo.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01550-V.module.ts",
+      "GeneratorSript": "vformModuleForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+
+
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\vform",
+      "GeneratorType": "01500-Vform.component.css",
+      "GeneratorSript": "ViewFormForView.css.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\vform",
+      "GeneratorType": "01500-Vform.component.html",
+      "GeneratorSript": "ViewFormForView.kendo.html.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\vform",
+      "GeneratorType": "01500-Vform.component.ts",
+      "GeneratorSript": "ViewFormForView.kendo.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\vdlg",
+      "GeneratorType": "01510-Vdlg.interface.ts",
+      "GeneratorSript": "InterfaceForVdlg.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\vdlg",
+      "GeneratorType": "01520-Vdlg.component.css",
+      "GeneratorSript": "ViewDlgFormForView.css.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\vdlg",
+      "GeneratorType": "01520-Vdlg.component.html",
+      "GeneratorSript": "ViewDlgFormForView.kendo.html.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\vdlg",
+      "GeneratorType": "01520-Vdlg.component.ts",
+      "GeneratorSript": "ViewDlgFormForView.kendo.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01550-V.module.ts",
+      "GeneratorSript": "vformModuleForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    }
+
+
+  ]
+}

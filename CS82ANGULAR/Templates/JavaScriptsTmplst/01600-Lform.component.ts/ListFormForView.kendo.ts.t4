@@ -679,7 +679,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                                     sender.dataSource.splice(i, 1);
                                     sender.dataSource = sender.dataSource.slice(0);
                                     sender.kendoDataSource = {data: sender.dataSource, total: sender.kendoDataSource.total};
-
                                 } 
                             }
                         }

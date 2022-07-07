@@ -1,0 +1,145 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+    bool localize = Context.Localize;
+
+    string HiddenFilterSelector         = "hidden-filter";
+    string HiddenFilterPropName         = "hiddenFilter";
+    string FormControlModelSelector     = "eform-control-model";
+    string FormControlModelPropName     = "eformControlModel";
+    string BeforeSubmitSelector         = "before-submit";
+    string BeforeSubmitPropName         = "beforeSubmit";
+    string AfterSubmitSelector          = "after-submit";
+    string AfterSubmitPropName          = "afterSubmit";
+    string OnAfterSubmitMethodName      = "onAfterSubmit";
+    string TitlePropName                = "title";
+    string AppearancePropName           = "appearance";
+    string OutletNamePrefix             = "oltnm";
+    string SelectedDetailPropName       = "selectedDetail";
+    string DetailViewsPropName          = "detailViews";
+    string OnDetailChangedMethodName    = "onDetailChanged";
+    string ShowDetailsPropName          = "showDetails";
+    string NavBackToMasterPropName      = "NavBackToMaster";
+    string frasesPropName               = "frases";
+
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+
+
+
+    string vformComponentFolder         = "01500-Vform.component.ts";
+    string componentSelectorCommonPart  = GetComponentSelectorCommonPart(Model, vformComponentFolder);
+    string rvComponentFolder            = "01820-RV.component.ts";
+    string rvcomponentClassName         = GetComponentClassName(Model, rvComponentFolder);
+
+#>
+<kendo-card width>
+    <kendo-card-header>
+        <div fxLayout>
+            <button kendoButton themeColor="primary" icon="arrow-left" (click)="onCancel()" fxFlex="19%" [title]="<#= frasesPropName #>['<#= NavBackToMasterPropName #>']"> 
+            </button>    
+            <kendo-formfield fxFlex="79%" *ngIf="<#= ShowDetailsPropName #>">
+                <kendo-dropdownlist 
+                    [fillMode]="appearance" 
+                    valueField
+                    textField="caption"
+                    [data]="<#= DetailViewsPropName #>"
+                    [defaultItem]="<#= SelectedDetailPropName #>"
+                    (selectionChange)="<#= OnDetailChangedMethodName #>($event)"
+                >
+                </kendo-dropdownlist>
+            </kendo-formfield>
+        </div>
+    </kendo-card-header>
+    <kendo-card-body>
+        <app-<#= componentSelectorCommonPart #> 
+            [<#= captionSelector #>]="<#= TitlePropName #>" 
+            [<#= HiddenFilterSelector #>]="<#= HiddenFilterPropName #>"
+            [<#= FormControlModelSelector #>]="<#= FormControlModelPropName #>"
+            (<#= AfterSubmitSelector #>)="<#= OnAfterSubmitMethodName #>($event)"
+            [<#= containerMenuItemsSelector #>]="<#= containerMenuItemsPropName #>"
+            (<#= onContainerMenuItemClickSelector #>)="<#= onContainerMenuItemClickMethodName #>($event)"
+        ></app-<#= componentSelectorCommonPart #>>
+    </kendo-card-body>
+</kendo-card>
+ <!-- <router-outlet name='<#=  OutletNamePrefix + Model.ViewName #>'></router-outlet>   -->
+ <router-outlet></router-outlet>
+
+<#+
+    string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        return refItem.FileName.Replace(".component","");
+    }
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+#>

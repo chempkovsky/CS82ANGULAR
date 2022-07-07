@@ -1,0 +1,70 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "1.",
+    "Please make sure that you have already run the following scripts for the current ViewModel",
+    "                                01100-.interface.ts",
+    "                                01200-Page.interface.ts",
+    "                                01300-Filter.interface.ts",
+    "                                01400-.service.ts",
+    "                                01420-Sform.component.ts",
+    "                                01440-Sdlg.component.ts",
+    "                                01500-Eform.component.ts",
+    "                                01520-Edlg.component.ts",
+    "",
+    "                                AND",
+    "",
+    "Please make sure that you have already run the following scripts for all MASTER ViewModels",
+    "                                01100-.interface.ts",
+    "                                01200-Page.interface.ts",
+    "                                01300-Filter.interface.ts",
+    "                                01400-.service.ts",
+    "                                01420-Sform.component.ts",
+    "                                01440-Sdlg.component.ts",
+    "",
+    "2.",
+    "Please make sure that you selected src\\app\\components\\your-view-model-name folder",
+    "  where [your-view-model-name] is a name of currently selected ViewModel",
+    "",
+    "",
+    "                                After you have finished the current batch generation",
+    "Please include 'L.module.ts' in the import:[]-section of AppModule",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "rdlist",
+      "GeneratorType": "02020-Rdlist.component.css",
+      "GeneratorSript": "DListRouterFormForView.css.t4"
+    },
+    {
+      "DestinationFolder": "rdlist",
+      "GeneratorType": "02020-Rdlist.component.html",
+      "GeneratorSript": "DListRouterFormForView.kendo.html.t4"
+    },
+    {
+      "DestinationFolder": "rdlist",
+      "GeneratorType": "02020-Rdlist.component.ts",
+      "GeneratorSript": "DListRouterFormForView.kendo.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "02030-Rdl.module.ts",
+      "GeneratorSript": "rdlformModuleForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "02040-Rdl.routing.module.ts",
+      "GeneratorSript": "rdl.routing.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "02050-Rdl-lazy.routing.module.ts",
+      "GeneratorSript": "rdl-lazy.routing.module.ts.t4"
+    }
+
+
+
+  ]
+}

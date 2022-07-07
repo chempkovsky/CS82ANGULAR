@@ -1,0 +1,2082 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#
+    bool localize = Context.Localize;
+
+    string HiddenFilterPrefix           = "hf";
+    string IdPrefix                     = "id";
+    string ItemParamName                = "item";  
+    string VPrefix                      = "View";
+    string APrefix                      = "Add";
+    string UPrefix                      = "Upd";
+    string DPrefix                      = "Del";
+    string DepthParamName               = "depth"; 
+    string HiddenFilterAsFltRsltSuffix  = "HiddenFilterAsFltRslt";
+    string HiddenFilterByRowSuffix      = "HiddenFilterByRow";
+    string uidParamName                 = "uid"; 
+    string routeFilterMaxHeightPropName = "fh";
+
+    string NavPrefix                    = "np";
+    string OutletNmPropName             = "outletNm";
+    string IsDetailPropName             = "isdtl";
+    string routeShowFilterPropName      = "sf";
+    string routeDepthParamName          = "dp"; 
+    string routeMaxHeightPropName       = "mh";
+    string routeOutletNmPropName        = "oltn";
+
+    string getStorageItemMethodName     = "getStorageItem";
+    string setStorageItemMethodName     = "setStorageItem";
+    string getStorageLengthMethodName   = "getStorageLength";
+    string removeStorageItemMethodName  = "removeStorageItem";
+    string getStorageKeyMethodName      = "getStorageKey";
+    string clearStorageMethodName       = "getStorageKey";
+
+    string GetOneMethodName             = "getone";
+    string DeleteOneMethodName          = "deleteone";
+
+
+    string ActionParamName              = "mode";  
+    string ActionParamAddMode           = "add";
+    string ActionParamUpdateMode        = "update";
+    string ActionParamDeleteMode        = "delete";
+    string ActionParamDeleteSelMode     = "deletesel";
+    string ActionParamNavM2mNotAllwd    = "nvm2mntallwd";
+    string ActionParamViewMode          = "view";
+    string ViewNameParamName            = "view";
+    string NavigationParamName          = "nav";
+    string NavigationAddOnName          = "addon";
+
+    // WebApi service's method names
+
+    string CanAddSelector           = "can-add";
+    string CanAddPropName           = "canAdd";
+    string CanUpdSelector           = "can-update";
+    string CanUpdPropName           = "canUpdate";
+    string CanDelSelector           = "can-delete";
+    string CanDelPropName           = "canDelete";
+    string HiddenFilterSelector     = "hidden-filter";
+    string HiddenFilterPropName     = "hiddenFilter";
+    string ShowFilterSelector       = "show-filter";
+    string ShowFilterPropName       = "showFilter";
+    string applyFilterSelector      = "apply-filter";
+    string applyFilterPropName      = "applyFilter";
+    string ShowErrorMethodName      = "showError";
+
+
+    string AppSettingServicePropName    = "appGlblSettings";
+    string formRootService              = "frmRootSrv";
+    string formServicePrefix            = "frmSrv";
+
+    
+    string RowCommandsSelector          = "row-commands";
+    string RowCommandsPropName          = "rowCommands";
+    string TableCommandsSelector        = "table-commands";
+    string TableCommandsPropName        = "tableCommands";
+
+    string OnRowCommandSelector         = "on-row-command";
+    string OnRowCommandPropName         = "onRowCommand";
+    string OnTableCommandSelector       = "on-table-command";
+    string OnTableCommandPropName       = "onTableCommand";
+
+    string externalFilterSelector               = "external-filter";
+    string externalFilterPropName               = "externalFilter";
+    string beforeSquerySelector                 = "before-squery";
+    string beforeSqueryPropName                 = "beforeSquery";
+    string OnBeforeSqueryMethodName             = "onBeforeSquery";
+
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string FilterMaxHeightPropSelector  = "filter-max-height";
+    string FilterMaxHeightPropName      = "filterMaxHeight";
+    string frasesPropName               = "frases";
+
+
+    string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
+    string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
+    string menuItemDataModelFolder      = "00017-menu-item-data.interface.ts";
+    string eventEmitterDataModelFolder  = "00018-event-emitter-data.interface.ts";
+    string eventEmitterPubModelFolder   = "00019-event-emitter-pub.interface.ts";
+    string itemHeightDataModelFolder    = "00016-item-height-data.interface.ts";
+
+    string messageDialogInterfaceFolder = "00037-message-dialog.interface.ts";
+    string messageDialogComponentFolder = "00038-message-dialog.component.ts";
+
+    string viewInterfaceFolder          = "01100-.interface.ts";
+    string viewInterfaceFltFolder       = "01300-Filter.interface.ts";
+    string viewServiceFolder            = "01400-.service.ts";
+
+
+    string sformComponentFolder         = "01420-Sform.component.ts";
+
+
+    string rlistCssFolder               = "01920-Rlist.component.css";
+    string rlistHtmlFolder              = "01920-Rlist.component.html";
+    string rlistComponentFolder         = "01920-Rlist.component.ts";
+
+
+
+    string ActionColumnDefProperty      = "menuAction";
+    string SelectColumnDefProperty      = "selectAction";
+    string DisplayedColumnsProperty     = "displayedColumns";
+    string MatPaginatorPageSize         = "10";
+    string MatPaginatorPageSizeOptions  = "[10, 25, 50, 100]";
+
+    string serviceClassName = GetServiceClassName(Model, viewServiceFolder);
+    string appSettingServiceClassName = GetCommonServiceClassName(Context, appSettingServiceFolder);
+    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, rlistComponentFolder);
+    string componentClassName = GetComponentClassName(Model, rlistComponentFolder);
+    string searchComponentClassName = GetComponentClassName(Model, sformComponentFolder);
+    string filterResultModelClassName = GetModelClassName(Context, filterResultModelFolder);
+    string eventEmitterDataModelClassName   = GetModelClassName(Context, eventEmitterDataModelFolder);
+    string menuItemDataModelClassName   = GetModelClassName(Context, menuItemDataModelFolder);
+    string eventEmitterPubModelClassName    = GetModelClassName(Context, eventEmitterPubModelFolder);
+    string itemHeightDataModelClassName   = GetModelClassName(Context, itemHeightDataModelFolder);
+
+    string messageDialogComponentClassName = GetContextComponentClassName(Context, messageDialogComponentFolder);
+    string messageDialogInterfaceName = GetModelClassName(Context, messageDialogInterfaceFolder);
+
+    List<ModelViewPropertyOfVwSerializable> primKeys= GetModelPrimaryKeyProps(Model);
+    List<string> detailViewNames =  GetDetailViews(Model, Context, null);
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// the current script differs from the default one in only one line: List<string> detailViewNamesToExclude = new List<string>() { "aspnetuserrolesView"}; 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    List<string> detailViewNamesToExclude = new List<string>() { "aspnetuserrolesView"}; 
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
+        GetSearchResources(Model, Context);
+
+    string OnBackBtnMethodName          = "onBackBtnMd";
+    string OnBackBtnPropName            = "onBackBtn";
+    string OnBackBtnSelector            = "on-back-btn";
+    string showBackBtnPropName          = "showBackBtn";
+    string showBackBtnSelector          = "show-back-btn";
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+    string currentRowPropName           = "currentRow";
+    string OnSelectRowMethodName        = "onSelectRow";
+    string showMultiSelectPropName      = "showMultiSelect";
+    string showMultiSelectedRowSelector = "show-multi-selected-row";
+    string showMultiSelectedRowPropName = "showMultiSelectedRow";
+    string multiSelectedRowSelector     = "multi-selected-row";
+    string multiSelectedRowPropName     = "multiSelectedRow";
+    string onMultiSelectedRowPropName   = "onMultiSelectedRow";
+    string currentMultiRowPropName      = "currentMultiRow";
+    string LOutletNamePrefix            = "loltnm"; //
+    string OnDetailChangedMethodName    = "onDetailChanged";
+    string ToDetailMethodName           = "toDetail";
+    string SelectedDetailPropName       = "selectedDetail";
+    string DetailViewsPropName          = "detailViews";
+    string ShowDetailsPropName          = "showDetails";
+    string AppearancePropName           = "appearance";
+    string selectedRowSelector          = "selected-row";
+    string selectedRowPropName          = "selectedRow";
+
+    string OutletNameValue = LOutletNamePrefix + Model.ViewName;
+
+#>
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router, ParamMap, UrlSegment, ActivatedRouteSnapshot, NavigationStart } from '@angular/router';
+import { firstValueFrom, takeWhile } from 'rxjs';
+
+
+import { DialogCloseResult, DialogService } from '@progress/kendo-angular-dialog';
+import { DropDownFillMode } from '@progress/kendo-angular-dropdowns';
+import { InputFillMode } from '@progress/kendo-angular-inputs';
+import { DateInputFillMode } from '@progress/kendo-angular-dateinputs';
+
+
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, rlistComponentFolder)#>';
+import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, rlistComponentFolder, Context, Model.ViewName, viewServiceFolder) #>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, rlistComponentFolder)#>';
+import { <#= searchComponentClassName #> } from '<#=  GetFolderName(Model, sformComponentFolder, rlistComponentFolder) #>';
+import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, rlistComponentFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  menuItemDataModelFolder, rlistComponentFolder)#>';
+import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Model, Context, eventEmitterPubModelFolder, rlistComponentFolder)#>';
+import { <#= itemHeightDataModelClassName #> } from '<#= GetCommonFolderName(Model, Context, itemHeightDataModelFolder, rlistComponentFolder)#>';
+import { <#= GetInterfaceName(Model) #> } from '<#=  GetFolderName(Model, viewInterfaceFolder, rlistComponentFolder) #>';
+// import { <#= GetInterfaceFilterName(Model) #> } from '<#= GetCrossComponentFolderName(Model, rlistComponentFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
+import { <#= messageDialogInterfaceName #> } from '<#=  GetCommonFolderName(Model, Context,  messageDialogInterfaceFolder, rlistComponentFolder)#>';
+import { <#= messageDialogComponentClassName #> } from '<#=  GetCommonFolderName(Model, Context,  messageDialogComponentFolder, rlistComponentFolder)#>';
+
+<#
+        if(searchSchemas!= null) {
+            List<ModelViewSerializable> mdls = new List<ModelViewSerializable>();
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+                if(mdls.Any(p => p == m2mModel)) continue;
+                mdls.Add(m2mModel);
+#>
+import { <#= GetServiceClassName(m2mModel, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, sformComponentFolder, Context, m2mModel.ViewName, viewServiceFolder) #>';
+<#
+            }
+        }
+#>
+
+
+@Component({
+  selector: 'app-<#= componentSelectorCommonPart #>',
+  templateUrl: '<#= GetFolderName(Model, rlistHtmlFolder, rlistComponentFolder)#>.html',
+  styleUrls: ['<#=  GetFolderName(Model, rlistCssFolder, rlistComponentFolder)#>.css']
+})
+export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
+<# 
+    if(localize) {
+#>
+    <#= frasesPropName #>: {[key:string]: string}  = {
+        '<#= ActionParamNavM2mNotAllwd #>':  $localize`:Navigating to detail form is not allowed in One-to-Many mode@@<#= componentClassName #>.<#= ActionParamNavM2mNotAllwd #>:Navigating to detail form is not allowed in One-to-Many mode`,
+        '<#= captionPropName #>': $localize`:<#= Model.PluralTitle #>@@<#= componentClassName #>.<#= captionPropName #>:<#= Model.PluralTitle #>`,
+        '<#= ActionParamUpdateMode #>': $localize`:Modify Item@@<#= componentClassName #>.<#= ActionParamUpdateMode #>:Modify Item`,
+        '<#= ActionParamDeleteMode #>': $localize`:Delete Item@@<#= componentClassName #>.<#= ActionParamDeleteMode #>:Delete Item`,
+        '<#= ActionParamViewMode #>': $localize`:View Item@@<#= componentClassName #>.<#= ActionParamViewMode #>:View Item`,
+        '<#= ActionParamAddMode #>': $localize`:Add Item@@<#= componentClassName #>.<#= ActionParamAddMode #>:Add Item`,
+        '<#= ActionParamDeleteSelMode #>': $localize`:Delete Selected@@<#= componentClassName #>.<#= ActionParamDeleteSelMode #>:Delete Selected`,
+<#
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
+            ModelViewSerializable detailView = GetViewByName(Context, detailViewName);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) continue;
+            if (foreignKeys.Count < 1) continue;
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+#>
+        '<#= viewToNavigate.ViewName +"__"+ detailView.ViewName #>': $localize`:<#= viewToNavigate.PluralTitle #>(<#= detailView.Title #>)@@<#= componentClassName #>.<#= viewToNavigate.ViewName + detailView.ViewName #>:<#= viewToNavigate.PluralTitle #>(<#= detailView.Title #>)`,
+<#
+                        continue;
+                    }
+                }
+
+#>
+        '<#= detailView.ViewName + foreignKey.NavigationName #>': $localize`:<#= detailView.PluralTitle #>(<#= foreignKey.NavigationName #>)@@<#= componentClassName #>.<#=detailView.ViewName + foreignKey.NavigationName #>:<#= detailView.PluralTitle #>(<#= foreignKey.NavigationName #>)`,
+<#
+            }
+        }
+#>
+
+    };
+<# 
+    } else {
+#>
+    <#= frasesPropName #>: {[key:string]: string}  = {
+        '<#= ActionParamNavM2mNotAllwd #>':  'Navigating to detail form is not allowed in One-to-Many mode',
+        '<#= captionPropName #>': '<#= Model.PluralTitle #>',
+        '<#= ActionParamUpdateMode #>': 'Modify Item',
+        '<#= ActionParamDeleteMode #>': 'Delete Item',
+        '<#= ActionParamViewMode #>': 'View Item',
+        '<#= ActionParamAddMode #>': 'Add Item',
+        '<#= ActionParamDeleteSelMode #>': 'Delete Selected',
+<#
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
+            ModelViewSerializable detailView = GetViewByName(Context, detailViewName);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) continue;
+            if (foreignKeys.Count < 1) continue;
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+#>
+        '<#= viewToNavigate.ViewName +"__"+ detailView.ViewName #>': '<#= viewToNavigate.PluralTitle #>(<#= detailView.Title #>)',
+<#
+                        continue;
+                    }
+                }
+#>
+        '<#= detailView.ViewName + foreignKey.NavigationName #>': '<#= detailView.PluralTitle #>(<#= foreignKey.NavigationName #>)',
+<#
+            }
+        }
+#>
+    };
+<# 
+    } 
+#>
+
+
+
+    public <#= ShowDetailsPropName #>: boolean = false;
+    @Input('<#= showMultiSelectedRowSelector #>') <#= showMultiSelectedRowPropName #>: boolean = true;
+    public <#= AppearancePropName #>: DropDownFillMode|InputFillMode|DateInputFillMode = 'outline';
+
+    @Output('<#= multiSelectedRowSelector #>') <#= multiSelectedRowPropName #>: EventEmitter<Array<<#= GetInterfaceName(Model) #>>> = new EventEmitter<Array<<#= GetInterfaceName(Model) #>>>();
+    <#= onMultiSelectedRowPropName #>(e: Array<<#= GetInterfaceName(Model) #>>): void {
+        this.<#= multiSelectedRowPropName #>.emit(e);
+    }
+
+
+    @Input('<#= captionSelector #>') <#= captionPropName #>: string = this.<#= frasesPropName #>['<#= captionPropName #>'];
+    <#= NavPrefix #>: string|any = '';
+    <#= OutletNmPropName #> : string = 'primary';
+
+    isPostNavApplied: boolean = false;
+    isOnInitCalled: boolean = false;
+    <#= DepthParamName #>: number = 1;
+    <#= HiddenFilterPrefix #>: string = '<#= HiddenFilterPrefix + "1" #>';
+    <#= uidParamName #>: string|null = null;
+    <#= showBackBtnPropName #>: boolean = false;
+    @Input('<#= FilterMaxHeightPropSelector #>')  <#= FilterMaxHeightPropName #>: number | null = null;
+    @Input('<#= MaxHeightPropSelector #>') <#= MaxHeightPropName #>: number | null = null;
+    @Output('<#= onContainerMenuItemClickSelector #>') <#= onContainerMenuItemClickEmitter #> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
+    @Input('<#= containerMenuItemsSelector #>') <#= containerMenuItemsPropName #>: Array<<#= menuItemDataModelClassName #>> = [];
+    <#= onContainerMenuItemClickMethodName #>(e: <#= eventEmitterDataModelClassName #>)  {
+        this.<#= onContainerMenuItemClickEmitter #>.emit(e);
+    }
+    @Input('<#= ShowFilterSelector #>') <#= ShowFilterPropName #>: boolean = true;
+    protected _<#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
+    @Input('<#= HiddenFilterSelector #>') 
+        get <#= HiddenFilterPropName #>(): Array<<#= filterResultModelClassName #>> {
+            return this._<#= HiddenFilterPropName #>;
+        }
+        set <#= HiddenFilterPropName #>(v :Array<<#= filterResultModelClassName #>>) {
+            if (typeof v === 'undefined') {
+                this._<#= HiddenFilterPropName #> = [];
+            } else if (!Array.isArray(v)) {
+                this._<#= HiddenFilterPropName #> = [];
+            } else {
+                this._<#= HiddenFilterPropName #> =  v;
+            }
+            if(this.isOnInitCalled) {
+                this.cd.detectChanges();
+            }
+        }
+    rowMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
+         {id: '<#= ActionParamUpdateMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'], iconName: 'edit', iconColor: 'primary', enabled: true},
+         {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'delete_forever', iconColor: 'warn', enabled: true},
+         {id: '<#= ActionParamViewMode #>',   caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'preview', iconColor: 'primary', enabled: true},
+      ];
+    tableMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
+         {id: '<#= ActionParamAddMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'], iconName: 'create', iconColor: 'primary', enabled: true},
+         {id: '<#= ActionParamDeleteSelMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'], iconName: 'delete_forever', iconColor: 'warn', enabled: true},
+      ];
+    constructor(protected route: ActivatedRoute, protected router: Router, protected  <#= formRootService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
+<#
+        if(searchSchemas!= null) {
+            List<ModelViewSerializable> smds = new List<ModelViewSerializable>();
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+#>
+                public  <#= formServicePrefix + m2mModel.ViewName #>: <#= GetServiceClassName(m2mModel, viewServiceFolder) #>,
+<#
+            }
+        } // if(searchSchemas!= null) {...}
+#>    
+        public dialog: DialogService, 
+        protected cd: ChangeDetectorRef) {
+    }
+    permMask: number = 0;
+    extfltrOn: boolean = false;
+    <#= IsDetailPropName #>: boolean = false;
+    currPath: string = '';
+    isNtDstrd: boolean = true;
+    ngOnDestroy(): void {
+        this.isNtDstrd = false;
+    }
+    ngOnInit() {
+        this.router.events.pipe(
+            takeWhile(v => this.isNtDstrd)
+        ).subscribe(event =>{
+            if (event instanceof NavigationStart){
+                if(!event.url.includes(this.currPath)) {
+                    if(this.uid) this.<#= AppSettingServicePropName #>.<#= removeStorageItemMethodName #>(this.<#= uidParamName #> as string);
+                }
+            }
+        });
+        this.currPath = this.router.url;
+        let luid = '<#= componentClassName #>';
+        this.permMask = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= Model.ViewName #>');
+        this.isPostNavApplied = false;
+        if (!(typeof this.route.snapshot.data === 'undefined')) {
+            if (!(this.route.snapshot.data === null)) {
+                if (!(typeof this.route.snapshot.data['<#= routeShowFilterPropName #>'] === 'undefined')) {
+                    this.<#= ShowFilterPropName #> = this.route.snapshot.data['<#= routeShowFilterPropName #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= routeMaxHeightPropName #>'] === 'undefined')) {
+                    this.<#= MaxHeightPropName #> = this.route.snapshot.data['<#= routeMaxHeightPropName #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= routeFilterMaxHeightPropName #>'] === 'undefined')) {
+                    this.<#= FilterMaxHeightPropName #> = this.route.snapshot.data['<#= routeFilterMaxHeightPropName #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= HiddenFilterPrefix #>'] === 'undefined')) {
+                    this.<#= HiddenFilterPrefix #> = this.route.snapshot.data['<#= HiddenFilterPrefix #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= routeDepthParamName #>'] === 'undefined')) {
+                    this.<#= DepthParamName #> = this.route.snapshot.data['<#= routeDepthParamName #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= uidParamName #>'] === 'undefined')) {
+                    luid = this.route.snapshot.data['<#= uidParamName #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= NavPrefix #>'] === 'undefined')) {
+                    this.<#= NavPrefix #> = this.route.snapshot.data['<#= NavPrefix #>'];
+                }
+/*
+                if (!(typeof this.route.snapshot.data['<#= routeOutletNmPropName #>'] === 'undefined')) {
+                    this.<#= OutletNmPropName #> = this.route.snapshot.data['<#= routeOutletNmPropName #>'];
+                }
+*/
+                if (!(typeof this.route.snapshot.data['<#= IsDetailPropName #>'] === 'undefined')) {
+                    this.<#= IsDetailPropName #> = this.route.snapshot.data['<#= IsDetailPropName #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= showMultiSelectPropName #>'] === 'undefined')) {
+                    this.<#= showMultiSelectedRowPropName #> = this.route.snapshot.data['<#= showMultiSelectPropName #>'];
+                }
+            }
+        }
+        luid = luid + ':' +this.<#= DepthParamName #>;
+        if(this.<#= DepthParamName #> > 1) {
+          this.route.paramMap.subscribe(prms => {
+            let lhf: Array<<#= filterResultModelClassName #>> = [];
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                let phf: {[key: string]: {[key: string]: {[key: string]: any}}} | any =  JSON.parse(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
+                lhf = this.<#= formRootService #>.get<#= HiddenFilterAsFltRsltSuffix #>(phf);
+<#
+    if (searchSchemas != null) {
+        if(searchSchemas.Count > 0) {
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+                if(sch.Item5 == null) continue;
+                if(sch.Item5.Count != 1) continue;
+                if(sch.Item4 != null) continue;
+                
+#>
+                if(lhf.length === 0) {
+                    lhf = lhf.concat(this.<#= formServicePrefix + m2mModel.ViewName #>.get<#= HiddenFilterAsFltRsltSuffix #>(phf));
+                    this.extfltrOn = this.extfltrOn || (lhf.length > 0);
+                }
+<#
+            }
+        }
+    }
+#>
+            }
+            if(Array.isArray(lhf)) {
+                lhf.forEach((v:{fltrName: string, fltrValue: any}) => {
+                    luid = luid + ':' + v.fltrName + ':' + v.fltrValue
+                });
+            }
+            this.<#= HiddenFilterPropName #> = lhf;
+            this.<#= showBackBtnPropName #> = !this.<#= IsDetailPropName #>;
+          });
+        } else {
+            this.<#= showBackBtnPropName #> = false;
+        }
+        this.<#= uidParamName #> = luid;
+        let si: string|any = this.<#= AppSettingServicePropName #>.<#= getStorageItemMethodName #>(this.<#= uidParamName #>);
+        if(!(typeof si === 'undefined')) {
+            if(!(si === null)) {
+                this.<#= externalFilterPropName #> = si;
+            }
+        }
+        
+        this.tableMenuItemsData[0].enabled = ((this.permMask & 8) === 8) && (!this.extfltrOn) <# if (!Model.IsWebApiAdd) { #> && false <# } #>;
+        this.tableMenuItemsData[1].enabled = ((this.permMask & 2) === 2) && (!this.extfltrOn) <# if (!Model.IsWebApiDelete) { #> && false <# } #>;
+
+        this.rowMenuItemsData[0].enabled = this.rowMenuItemsData[0].enabled && (!this.extfltrOn) && ((this.permMask & 4) === 4) <# if (!Model.IsWebApiUpdate) { #> && false <# } #>; // modify
+        this.rowMenuItemsData[1].enabled = this.rowMenuItemsData[1].enabled && (!this.extfltrOn) && ((this.permMask & 2) === 2) <# if (!Model.IsWebApiDelete) { #> && false <# } #>; // delete
+        this.rowMenuItemsData[2].enabled = this.rowMenuItemsData[2].enabled && (!this.extfltrOn) <# if (!Model.IsWebApiSelectOneByPrimarykey) { #> && false <# } #>; // view
+<#
+    {
+        if (detailViewNames.Count > 0) {
+#>
+        if(!this.<#= IsDetailPropName #>) {
+            let msk: number = 0;
+<#
+        }
+        int id = 1;
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
+            ModelViewSerializable detailView = GetViewByName(Context, detailViewName);
+            if(detailView == null) continue;
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) continue;
+            if (foreignKeys.Count < 1) continue;
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+
+            {
+                foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                    if(isM2m) {
+                        // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                        tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                        if (tmpSearchSchema != null) {
+                            int  cnt = 0;
+                            if(tmpSearchSchema.Item5 == null) continue;
+                            if(tmpSearchSchema.Item5.Count != 1) continue;
+                            if(tmpSearchSchema.Item4 != null) continue;
+                            if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                            ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+#>
+            msk = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= viewToNavigate.ViewName #>');
+            if((msk & 1) === 1) {
+                this.rowMenuItemsData.push(
+                 { id: '<#= id #>', caption: this.<#= frasesPropName #>['<#= viewToNavigate.ViewName +"__"+ detailView.ViewName #>'], iconName: 'arrow_forward', iconColor: 'primary', enabled: true, 
+                    data: {
+                        <#= ViewNameParamName #>: '<#= viewToNavigate.ViewName #>',
+                        <#= NavigationParamName #>: '<#= foreignKey.NavigationName #>',
+                        <#= NavigationAddOnName #>: '<#= detailView.ViewName #>'
+                    }
+                 }
+                );
+            }
+
+<#
+                            id++;
+                            continue;
+                        }
+                    }
+#>
+            msk = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= detailViewName #>');
+            if((msk & 1) === 1) {
+                this.rowMenuItemsData.push(
+                 { id: '<#= id #>', caption: this.<#= frasesPropName #>['<#=detailView.ViewName + foreignKey.NavigationName #>'], iconName: 'arrow_forward', iconColor: 'primary', enabled: true, 
+                    data: {
+                        <#= ViewNameParamName #>: '<#= detailViewName #>',
+                        <#= NavigationParamName #>: '<#= foreignKey.NavigationName #>',
+                    }
+                 }
+                );
+            }
+<#
+                    id++;
+                }
+            }
+        }
+        if (detailViewNames.Count > 0) {
+#>
+        }
+<#
+        }
+    }
+    if(detailViewNames.Count > 0) {
+#>
+        this.<#= SelectedDetailPropName #> = this.<#= DetailViewsPropName #>[0];
+        this.<#= ShowDetailsPropName #> = !this.<#= IsDetailPropName #>;
+<#
+    }
+#>
+        this.isOnInitCalled = true;
+    }
+    @Output('on-row-command') onRowCommand: EventEmitter<<#= eventEmitterDataModelClassName #>> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
+    @Output('on-table-command') onTableCommand: EventEmitter<<#= eventEmitterDataModelClassName #>> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
+    @Output('<#= selectedRowSelector #>') <#= selectedRowPropName #>: EventEmitter<<#= GetInterfaceName(Model) #>> = new EventEmitter<<#= GetInterfaceName(Model) #>>();
+    <#= OnSelectRowMethodName #>(e: <#= GetInterfaceName(Model) #>|any) {
+        this.<#= ToDetailMethodName #>();
+        this.<#= selectedRowPropName #>.emit(e);
+    }
+    @ViewChild(<#= GetComponentClassName(Model, sformComponentFolder) #>) childForm!: <#= GetComponentClassName(Model, sformComponentFolder) #>;
+    public <#= SelectedDetailPropName #>: {caption: string, vw: string|null, nv: string|null, addon: string|null}|null = null;
+    public <#= DetailViewsPropName #>: Array<{caption: string, vw: string|null, nv: string|null, addon: string|null}> = [
+        {caption:'Hide details', vw:null, nv:null, addon: null},
+<#
+    {
+        foreach(string detailVwnm in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailVwnm)) continue;
+            ModelViewSerializable detailView = GetViewByName(Context, detailVwnm);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+#>
+        {caption: this.<#= frasesPropName #>['<#= viewToNavigate.ViewName +"__"+ detailView.ViewName #>'], vw: '<#= viewToNavigate.ViewName #>', nv: '<#= foreignKey.NavigationName #>', addon: '<#= detailView.ViewName #>'},
+<#
+                        continue;
+                    }
+                }
+
+#>
+        {caption: this.<#= frasesPropName #>['<#= detailView.ViewName + foreignKey.NavigationName #>'], vw: '<#= detailVwnm #>', nv: '<#= foreignKey.NavigationName #>', addon: '<#= detailVwnm #>'},
+<#
+            }
+            
+        }
+    }
+#>
+    ];
+    public <#= OnDetailChangedMethodName #>(v: {caption: string, vw: string|null, nv: string|null, addon: string|null}|null) {
+        if(v) {
+            this.<#= SelectedDetailPropName #> = v;
+        } else {
+            this.<#= SelectedDetailPropName #> = this.<#= DetailViewsPropName #>[0];
+        }
+        this.<#= ToDetailMethodName #>();
+    }
+    public <#= ToDetailMethodName #>() {
+        if(!this.<#= ShowDetailsPropName #>) return;
+        let isNtDef: boolean = (this.<#= SelectedDetailPropName #> === null) || (typeof this.childForm.<#= currentRowPropName #> === 'undefined');
+        isNtDef = isNtDef ? isNtDef : ((this.<#= SelectedDetailPropName #>!.vw === null) || (this.<#= SelectedDetailPropName #>!.nv === null) || (this.childForm.<#= currentRowPropName #> === null));
+/*
+        if(isNtDef) {
+            this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(()=>{
+                this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route});
+            });
+        } else {
+            this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(
+                () => {
+                    let qp: string[] = [];
+                    qp.push( '<#= OutletNameValue +"2" #>' + this.<#= SelectedDetailPropName #>!.vw );
+                    qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(this.childForm.<#= currentRowPropName #>, this.<#= SelectedDetailPropName #>!.nv)));
+                    this.router.navigate([{ outlets: { '<#=  OutletNameValue #>' : qp } }], {relativeTo: this.route});
+                }
+            );
+        }
+*/
+        // for the named router-outlet uncomment the lines above and comment the lines below. Do not forget about html-file.
+        if(isNtDef) {
+            this.router.navigate(['./'], {relativeTo: this.route});
+        } else {
+            let qp: string[] = [];
+            qp.push( '<#= OutletNameValue +"2" #>' + this.<#= SelectedDetailPropName #>!.vw );
+            qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(this.childForm.<#= currentRowPropName #>, this.<#= SelectedDetailPropName #>!.nv)));
+            this.router.navigate(qp, {relativeTo: this.route});
+        }
+
+    }
+
+    onDeleteMultiple(sender: <#= searchComponentClassName #>) {
+<#
+    if(Model.IsWebApiDelete) {
+#>
+        let locdata: <#=  messageDialogInterfaceName #> = {
+            title: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'],
+            message: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'] + ' ?',
+            iconname: 'warning',
+            iconcolor: 'warn'
+        };
+        let dialogRef = this.dialog.open({
+              content: <#=  messageDialogComponentClassName #>,
+            });
+        const dlg = dialogRef.content.instance as <#=  messageDialogComponentClassName #>;
+        dlg.data = locdata;
+        dialogRef.result.subscribe(async (rslt: any) => {
+            if (typeof rslt === 'undefined') return;
+            if (rslt === null) return;
+            if(rslt instanceof DialogCloseResult) return;
+            let currRowsCp: Array<<#= GetInterfaceName(Model) #>> = sender.<#= currentMultiRowPropName #>.slice();
+            let deletedRows: Array<<#= GetInterfaceName(Model) #>> = [];
+            for(let row of currRowsCp) {
+                try {
+                    // let data: <#= GetInterfaceName(Model) #>  =  
+                    await firstValueFrom<<#= GetInterfaceName(Model) #>>(this.<#= formRootService #>.<#= DeleteOneMethodName #>(<# 
+                    {
+                        int counter = 0;
+                        //List<ModelViewPropertyOfVwSerializable> primKeys = GetPrimaryKeyProps(Context, Model.ViewName);
+                        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+                            if(counter > 0) { #>, <#} #>  row.<#= GetTypeScriptPropertyName(prop, Model) #> <#
+                            counter++;
+                        }
+                    }#>));
+                    deletedRows.push(row);
+                } catch (error) {
+                    this.appGlblSettings.showError('http', error)
+                }
+            }
+            sender.deselectRows(deletedRows);
+            deletedRows.forEach((r: <#= GetInterfaceName(Model) #>) => {
+                let i: number = sender.dataSource.indexOf(r); 
+                if(i > -1) sender.dataSource.splice(i, 1);
+            });
+            sender.dataSource = sender.dataSource.slice(0);
+            sender.kendoDataSource = {data: sender.dataSource, total: sender.kendoDataSource.total};
+            if ((deletedRows.indexOf( sender.<#= currentRowPropName #>  as <#= GetInterfaceName(Model) #>) > -1) && (sender.dataSource.length > 0)) sender.<#= OnSelectRowMethodName #>(sender.dataSource[0]);
+        });
+<#
+    }
+#>
+    }
+
+    rowCommand(v: <#= eventEmitterDataModelClassName #>) {
+        let qp: string[] = [];
+<#
+        if(primKeys != null) {
+#>      
+        let flt: any = {
+<#
+            foreach(ModelViewPropertyOfVwSerializable primKey in primKeys) { 
+#>      
+          <#= GetTypeScriptPropertyName(primKey, Model) #>: v.value.<#= GetTypeScriptPropertyName(primKey, Model) #>,
+<#
+            }
+#>
+        };
+<#
+        } else {
+#>
+        let flt: any = v.value;
+<#
+        }
+#>
+        if(v.id === '<#= ActionParamViewMode #>') {
+            qp.push( '<#= VPrefix #>' + '<#= Model.ViewName #>' );
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
+            } else {
+                qp.push(JSON.stringify({}));
+            }
+            qp.push(JSON.stringify(flt));
+        } else if(v.id === '<#= ActionParamUpdateMode #>') {
+            qp.push( '<#= UPrefix #>' + '<#= Model.ViewName #>' );
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
+            } else {
+                qp.push(JSON.stringify({}));
+            }
+            qp.push(JSON.stringify(flt));
+        } else if(v.id === '<#= ActionParamDeleteMode #>') {
+            qp.push( '<#= DPrefix #>' + '<#= Model.ViewName #>' );
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
+            } else {
+                qp.push(JSON.stringify({}));
+            }
+            qp.push(JSON.stringify(flt));
+        } else {
+            let id = this.rowMenuItemsData.findIndex(e => { return e.id === v.id; })
+            if(id < 0) return;
+            let mnItm: IMenuItemData = this.rowMenuItemsData[id];
+            if (!(typeof mnItm.data === 'undefined')) {
+                if(this.<#= OutletNmPropName #> === 'primary') {
+                    qp.push( this.<#= NavPrefix #> +  mnItm.data.view );
+                    qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(v.value, mnItm.data.nav)));
+                } else {
+                    this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('navigation', {message: this.<#= frasesPropName #>['<#= ActionParamNavM2mNotAllwd #>']});
+                    return;
+                }
+            } else {
+                this.onRowCommand.emit(v);
+                return;
+            }
+        }
+
+        this.router.navigate(qp, {relativeTo: this.route});
+        // for the named router-outlet uncomment the lines above and comment the lines below. Do not forget about html-file.
+/*
+        if(this.<#= OutletNmPropName #> === 'primary') {
+            this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(()=>{
+                this.router.navigate(qp, {relativeTo: this.route})
+            });
+        } else {
+            qp[0] = this.<#= OutletNmPropName #> + '2' + qp[0];
+            this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route.parent!.parent}).then(
+                ()=> {
+                    this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: qp }}], {relativeTo: this.route.parent!.parent});
+                }
+            );
+        }
+*/
+    }
+    tableCommand(v: <#= eventEmitterDataModelClassName #>) {
+        if(v.id === '<#= ActionParamDeleteMode #>') {
+            this.onDeleteMultiple( v.sender );
+        } else if(v.id === '<#= ActionParamAddMode #>') {
+            let qp: string[] = [];
+            qp.push( '<#= APrefix #>' + '<#= Model.ViewName #>' );
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
+            } else {
+                qp.push(JSON.stringify({}));
+            }
+
+             this.router.navigate(qp, {relativeTo: this.route});
+            // for the named router-outlet comment the line above and uncomment the lines below. Do not forget about html-file.
+/*
+            if(this.<#= OutletNmPropName #> === 'primary') {
+                this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(()=>{
+                    this.router.navigate(qp, {relativeTo: this.route});
+                });
+            } else {
+                qp[0] = this.<#= OutletNmPropName #> + '2' + qp[0];
+                this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route.parent!.parent}).then(
+                    ()=> {
+                        this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: qp }}], {relativeTo: this.route.parent!.parent});
+                    }
+                );
+            }
+*/
+        } else {
+            this.onTableCommand.emit(v);
+            return;
+        }
+    }
+    <#= applyFilterPropName #>(frm: <#= searchComponentClassName #> | any) {
+        if(this.isPostNavApplied) {
+            return;
+        }
+        this.isPostNavApplied = true;
+
+        
+        let act: string | any = undefined;
+        if (!(typeof this.route.snapshot.queryParams['<#= ActionParamName #>'] === 'undefined')) {
+            act = this.route.snapshot.queryParams['<#= ActionParamName #>'];
+        }
+        if(typeof act === 'undefined') return;
+        if(act === null) return;
+
+        let flt: <#= GetInterfaceName(Model) #> | any = JSON.parse(this.route.snapshot.queryParams['<#= ItemParamName #>']);
+        if(typeof flt === 'undefined') return;
+        if(flt === null) return;
+
+<#
+    if (Model.IsWebApiSelectOneByPrimarykey) {
+#>
+        if ((act === '<#= APrefix #>') ||
+            (act === '<#= UPrefix #>')) {
+<#
+    for(int i = 0 ; i < primKeys.Count; i++) {
+#>
+            if(typeof flt['<#= GetTypeScriptPropertyName(primKeys[i], Model) #>'] === 'undefined') {
+                return;
+            }
+            let <#= GetPrimKeyVarName(primKeys[i]) #>: any = flt['<#= GetTypeScriptPropertyName(primKeys[i], Model) #>'];
+<#
+    }
+#>
+            this.<#= formRootService #>.<#= GetOneMethodName #>(
+<# {
+            int k = 0;
+            foreach(ModelViewPropertyOfVwSerializable primKey in primKeys) { 
+                if (k > 0)  {
+#>
+                , <#= GetPrimKeyVarName(primKey) #>
+<#
+                } else {
+                    k++;
+#>
+                  <#= GetPrimKeyVarName(primKey) #>
+<#
+                }
+            }
+   }
+#> 
+            ).subscribe({
+                   next: (data: <#= GetInterfaceName(Model) #> ) => { // success path
+                        if (typeof data === 'undefined') return;
+                        if (data === null) return;
+                        if(typeof frm.dataSource === 'undefined') return;
+                        if(!Array.isArray(frm.dataSource)) return;
+                        let i: number = frm.dataSource.findIndex((e:any) => {
+                            return <# {int k = 0;
+                                    foreach(ModelViewPropertyOfVwSerializable primKey in primKeys) { if (k > 0)  { #> && <# } 
+                                    #> (e.<#= GetTypeScriptPropertyName(primKeys[k], Model) #> === data.<#= GetTypeScriptPropertyName(primKeys[k], Model) #>)<#
+                                    k++;
+                                }} #>
+                        });
+                        if(i < 0) {
+                            frm.dataSource.splice(0, 0, data);
+                            frm.dataSource = frm.dataSource.slice(0);
+                            let isNDef = true;
+                            if (!(typeof frm.currentRow === 'undefined')) {
+                                if (!(frm.currentRow === null)) {
+                                    isNDef = false;
+                                }
+                            }
+                            if(isNDef) {
+                                frm.<#= OnSelectRowMethodName #>(data);
+                            }
+                        } else { 
+                            frm.<#= OnSelectRowMethodName #>(frm.dataSource[i]); 
+                        }
+                   },
+                   error: (error) => { // error path
+                        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
+                        this.onBackBtn(); // navigation is correct: onBackBtn is correct method here
+                   } 
+                });
+            return;
+        }
+<#
+    } else {
+#>
+// IsSelectOne is not set for given view
+<#
+    }
+#>
+    }
+    onBackBtn(e?: any) {
+        if (this.<#= DepthParamName #> > 1) {
+//            this.<#= AppSettingServicePropName #>.<#= removeStorageItemMethodName #>(this.<#= uidParamName #> as string);
+
+            this.router.navigate(['../../'], {relativeTo: this.route});
+            // for the named router-outlet comment the line above and uncomment the lines below. Do not forget about html-file.
+/*
+            if(this.<#= OutletNmPropName #> === 'primary') {
+                this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(()=>{
+                    this.router.navigate(['../../'], {relativeTo: this.route});
+                });
+            } else {
+                // there is no parant, so do just hide detail component
+                this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: null }}], {relativeTo: this.route.parent!.parent});
+            }
+*/
+        }
+    }
+
+    public <#= externalFilterPropName #>: string | any;
+
+    <#= OnBeforeSqueryMethodName #>(cf: string | any): void {
+        if (this.<#= uidParamName #> === null) return;
+        let cfs: string = '';
+        if(!(typeof cf === 'undefined')) {
+            if(!(cf === null)) {
+                cfs = cf;
+            }
+        }
+        this.<#= AppSettingServicePropName #>.<#= setStorageItemMethodName #>(this.<#= uidParamName #>, cfs);
+    }
+
+}
+
+
+<#+
+    string GetInterfaceName(ModelViewSerializable model) {
+        if(model == null) {
+            return "I";
+        }
+        return "I"+model.ViewName;
+    }
+    ModelViewPropertyOfFkSerializable GetScalarPropByPrincipalKeyProp(ModelViewForeignKeySerializable foreignKey, ModelViewKeyPropertySerializable principalKeyProp) {
+        if ((foreignKey == null) || (principalKeyProp == null)) {
+            return null;
+        }
+        if(foreignKey.ScalarProperties == null) {
+            return null;
+        }
+        return foreignKey.ScalarProperties.Where(p => (p.OriginalPropertyName == principalKeyProp.OriginalPropertyName) && (p.ForeignKeyNameChain == foreignKey.NavigationName)).FirstOrDefault();
+    }
+
+    string GetServiceClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".service","Service");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    ModelViewPropertyOfVwSerializable GetScalarPropByOriginalPropertyNameAndForeignKeyNameChain(ModelViewSerializable model, string originalPropertyName, string foreignKeyNameChain) {
+        if ( (model == null) || (string.IsNullOrEmpty(originalPropertyName)) ) {
+            return null;
+        }
+        if(string.IsNullOrEmpty(foreignKeyNameChain)) {
+            return model.ScalarProperties.Where(p => (p.OriginalPropertyName == originalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain))).FirstOrDefault();
+        } else {
+            return model.ScalarProperties.Where(p => (p.OriginalPropertyName == originalPropertyName) && (p.ForeignKeyNameChain==foreignKeyNameChain)).FirstOrDefault();
+        }
+    }
+    string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        return refItem.FileName.Replace(".component","");
+    }
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+    string GetModelClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".interface","");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return "I" + sb.ToString();
+    }
+    List<ModelViewPropertyOfVwSerializable> GetModelPrimaryKeyProps(ModelViewSerializable model) {
+        List<ModelViewPropertyOfVwSerializable> result = new List<ModelViewPropertyOfVwSerializable>();
+        if (model == null)
+        {
+            return result;
+        }
+        if ((model.PrimaryKeyProperties == null) || (model.ScalarProperties == null)) {
+            return result;
+        }
+        foreach(ModelViewKeyPropertySerializable modelViewKeyPropertySerializable in model.PrimaryKeyProperties) {
+            ModelViewPropertyOfVwSerializable prop = GetScalarPropByOriginaPropName(modelViewKeyPropertySerializable.OriginalPropertyName, model);
+            if(prop != null) {
+                result.Add(prop);
+            }
+        }
+        return result;
+    }
+    List<string> GetDetailViews(ModelViewSerializable model, DbContextSerializable context, List<string> result)
+        {
+            if (result == null)
+            {
+                result = new List<string>();
+            }
+            if ((model == null) || (context == null))
+            {
+                return result;
+            }
+            if ((model.ScalarProperties == null) || (model.PrimaryKeyProperties == null) || (context.ModelViews == null)) {
+                return result;
+            }
+            if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1))
+            {
+                return result;
+            }
+            List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(model);
+            if(primKeys == null)
+            {
+                return result;
+            }
+            if (primKeys.Count != model.PrimaryKeyProperties.Count)
+            {
+                return result;
+            }
+            string RootEntityFullClassName = model.RootEntityFullClassName;
+            string RootEntityUniqueProjectName = model.RootEntityUniqueProjectName;
+            List<ModelViewSerializable> details =
+                context.ModelViews.Where(m => m.ForeignKeys.Any(f => (f.ViewName == model.ViewName) && (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName))).ToList();
+            if(details.Count < 1)
+            {
+                return result;
+            }
+            foreach(ModelViewSerializable detail in details)
+            {
+                if (detail.ScalarProperties == null) continue;
+                if (detail.ForeignKeys == null) continue;
+                if (detail.ForeignKeys.Count < 1) continue;
+                List<ModelViewForeignKeySerializable> ForeignKeys =
+                    detail.ForeignKeys.Where(f => (f.ViewName == model.ViewName) && (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName)).ToList();
+                if (ForeignKeys.Count < 1) continue;
+                bool canBeUsed = false;
+                foreach(ModelViewForeignKeySerializable ForeignKey in ForeignKeys)
+                {
+                    bool hasForeignKeyProps = true;
+                    if (ForeignKey.ForeignKeyProps != null)
+                    {
+                        for(int i = 0; i < ForeignKey.ForeignKeyProps.Count; i++)
+                        {
+                            ModelViewKeyPropertySerializable ForeignKeyProp = ForeignKey.ForeignKeyProps[i];
+                            if (!(detail.ScalarProperties.Any(s => (s.OriginalPropertyName == ForeignKeyProp.OriginalPropertyName) && (string.IsNullOrEmpty(s.ForeignKeyNameChain)))))
+                            {
+                                hasForeignKeyProps = false;
+                            }
+                            if(!hasForeignKeyProps)
+                            {
+                                ModelViewKeyPropertySerializable PrincipalKeyProp = ForeignKey.PrincipalKeyProps[i];
+                                if (detail.ScalarProperties.Any(s => (s.OriginalPropertyName == PrincipalKeyProp.OriginalPropertyName) && (s.ForeignKeyNameChain == ForeignKey.NavigationName)))
+                                {
+                                    hasForeignKeyProps = true;
+                                } else
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    } else
+                    {
+                        hasForeignKeyProps = false;
+                    }
+                    if (hasForeignKeyProps)
+                    {
+                        canBeUsed = true;
+                        break;
+                    }
+                }
+                if(canBeUsed)
+                {
+                    if(!result.Contains(detail.ViewName))
+                    {
+                        result.Add(detail.ViewName);
+                    }
+                }
+            }
+            return result;
+    }
+    List<ModelViewForeignKeySerializable> GetDetailViewForeignKeys(ModelViewSerializable model, ModelViewSerializable detail, List<ModelViewForeignKeySerializable> result)
+    {
+            if (result == null) result = new List<ModelViewForeignKeySerializable>();
+            if ((model == null) || (detail == null))
+            {
+                return result;
+            }
+            if ((model.PrimaryKeyProperties == null) || (detail.ScalarProperties == null) || (detail.ForeignKeys == null))
+            {
+                return result;
+            }
+            if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1))
+            {
+                return result;
+            }
+            List<ModelViewPropertyOfVwSerializable> primKeys = GetModelPrimaryKeyProps(model);
+            if (primKeys == null)
+            {
+                return result;
+            }
+            if (primKeys.Count != model.PrimaryKeyProperties.Count)
+            {
+                return result;
+            }
+            string RootEntityFullClassName = model.RootEntityFullClassName;
+            string RootEntityUniqueProjectName = model.RootEntityUniqueProjectName;
+            List<ModelViewForeignKeySerializable> ForeignKeys =
+                detail.ForeignKeys.Where(f => (f.ViewName == model.ViewName) && (f.NavigationEntityFullName == RootEntityFullClassName) && (f.NavigationEntityUniqueProjectName == RootEntityUniqueProjectName)).ToList();
+            if (ForeignKeys.Count < 1)
+            {
+                return result;
+            }
+            foreach (ModelViewForeignKeySerializable ForeignKey in ForeignKeys)
+            {
+                bool hasForeignKeyProps = true;
+                if (ForeignKey.ForeignKeyProps != null)
+                {
+                    for (int i = 0; i < ForeignKey.ForeignKeyProps.Count; i++)
+                    {
+                        ModelViewKeyPropertySerializable ForeignKeyProp = ForeignKey.ForeignKeyProps[i];
+                        hasForeignKeyProps =
+                            detail.ScalarProperties.Any(s => (s.OriginalPropertyName == ForeignKeyProp.OriginalPropertyName) && (string.IsNullOrEmpty(s.ForeignKeyNameChain)));
+                        if (!hasForeignKeyProps)
+                        {
+                            ModelViewKeyPropertySerializable PrincipalKeyProp = ForeignKey.PrincipalKeyProps[i];
+                            hasForeignKeyProps = detail.ScalarProperties.Any(s => (s.OriginalPropertyName == PrincipalKeyProp.OriginalPropertyName) && (s.ForeignKeyNameChain == ForeignKey.NavigationName));
+                            {
+                                hasForeignKeyProps = true;
+                            }
+                            if(!hasForeignKeyProps)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    hasForeignKeyProps = false;
+                }
+                if (hasForeignKeyProps)
+                {
+                    result.Add(ForeignKey);
+                    break;
+                }
+            }
+            return result;
+    }
+    string GetCommonFolderName(ModelViewSerializable model, DbContextSerializable context,  string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if ((model.CommonStaffs == null) || (context.CommonStaffs == null)) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    public string FirstLetterToLower(string str)
+    {
+        if (str == null)
+            return null;
+        if (str.Length > 1)
+            return char.ToLower(str[0]) + str.Substring(1);
+        return str.ToUpper();
+    }
+    string GetTypeScriptPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if (model.GenerateJSonAttribute) {
+            return prop.JsonPropertyName;
+        } else {
+            return FirstLetterToLower(prop.ViewPropertyName);
+        }
+    }
+    string GetCCharpDatatype(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
+        if ((prop == null) || (model == null)) return "";
+        return prop.UnderlyingTypeName.ToLower().Replace("system.", "");
+    }
+    string GetPrimKeyVarName(ModelViewPropertyOfVwSerializable pkpModelViewUIFormPropertySerializable) {
+        return "pkp" + pkpModelViewUIFormPropertySerializable.ViewPropertyName;
+    }
+    string GetCrossComponentFolderName(ModelViewSerializable model, string currFolder, DbContextSerializable context, string refViewName, string refFolder) {
+        string result="./";
+        if ((model == null) || string.IsNullOrEmpty(currFolder) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(refViewName)) {
+            return result;
+        }
+        if ((model.CommonStaffs == null) || (context.ModelViews == null)) {
+            return result;
+        }
+        ModelViewSerializable refModel = context.ModelViews.Where(v => v.ViewName == refViewName).FirstOrDefault();
+        if (refModel == null) {
+            return result;
+        }
+        if (refModel.CommonStaffs == null)  {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            refModel.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+        CommonStaffSerializable curItem= 
+            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+        if ((refItem == null) || (curItem == null)) {
+            return result;
+        }
+        string[] refFolders  = new string[] {};
+        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
+            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        string[] currFolders = new string[]{};
+        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
+            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+        }
+        int refLen = refFolders.Length;
+        int currLen = currFolders.Length;
+        int minLen = refLen < currLen ? refLen : currLen;
+        int cnt= 0;
+        for(int i = 0; i < minLen; i++) {
+            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
+            cnt++;
+        }
+        if(currLen > cnt) {
+            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
+        }
+        if(refLen > cnt) {
+            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+        }
+        result += refItem.FileName;
+        return result;
+    }
+    string GetCommonServiceClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType)) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".service","Service");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+                
+        }
+        return sb.ToString();
+    }
+    string GetInterfaceFilterName(ModelViewSerializable model) {
+        return "I"+model.ViewName + "Filter";
+    }
+    string GetContextComponentClassName(DbContextSerializable context, string fileType) {
+        string result="";
+        if ((context == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (context.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+////////////////////////////////////////////////////////
+    ModelViewPropertyOfVwSerializable GetScalarPropByOriginaPropName(string origPropName, ModelViewSerializable model) { 
+        if (string.IsNullOrEmpty(origPropName) || (model == null)) return null;
+        if ((model.AllProperties == null) || (model.ScalarProperties == null)) return null;
+        ModelViewPropertyOfVwSerializable sprop = model.ScalarProperties.Where(p => 
+                (p.OriginalPropertyName == origPropName) && 
+                string.IsNullOrEmpty(p.ForeignKeyName)).FirstOrDefault();
+        if(sprop != null) return sprop;
+        if(model.ForeignKeys == null) return null;
+        if(model.ForeignKeys.Count < 1) return null;
+        foreach(ModelViewForeignKeySerializable fk in model.ForeignKeys) {
+            if ((fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) continue;
+            if ((fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1)) continue;
+            for(int i = 0; i < fk.ForeignKeyProps.Count; i++) {
+                if(fk.ForeignKeyProps[i].OriginalPropertyName == origPropName) {
+                    sprop = model.ScalarProperties.Where(p => 
+                        (p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && 
+                        (p.ForeignKeyName == fk.NavigationName) && 
+                        (p.ForeignKeyName == p.ForeignKeyNameChain)
+                    ).FirstOrDefault();
+                    if(sprop != null) return sprop;
+                }
+            }
+        }
+        return null;
+    }
+    bool IsTableMatchesIndex(ModelViewSerializable model) {
+        if (model == null)  return false;
+        if ((model.ScalarProperties == null) || (model.PrimaryKeyProperties == null)) return false;
+        if ((model.ScalarProperties.Count != model.PrimaryKeyProperties.Count) || (model.ScalarProperties.Count < 1)) return false;
+        foreach(ModelViewKeyPropertySerializable pkp in model.PrimaryKeyProperties) {
+             if(GetScalarPropByOriginaPropName(pkp.OriginalPropertyName, model) == null) return false;
+        }
+        return true;
+    }
+    bool IsForeigKeyMapedToTailOfPrimKey(ModelViewForeignKeySerializable fk, ModelViewSerializable model) {
+        if ((model == null) || (fk == null)) return false;
+        if ((model.PrimaryKeyProperties == null) || (model.ForeignKeys == null) || (fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) return false;
+        if ((model.PrimaryKeyProperties.Count < 1) || (fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1) || (fk.ForeignKeyProps.Count >= model.PrimaryKeyProperties.Count) ) return false;
+        for(int i = 0; i < fk.ForeignKeyProps.Count; i++) {
+            if (fk.ForeignKeyProps[fk.ForeignKeyProps.Count - (1 + i)].OriginalPropertyName != model.PrimaryKeyProperties[model.PrimaryKeyProperties.Count - (1 + i)].OriginalPropertyName) return false;
+        }
+        return true;
+    }
+    bool IsForeigKeyMapedToScalars(ModelViewForeignKeySerializable fk, ModelViewSerializable model) {
+        if ((model == null) || (fk == null)) return false;
+        if ((model.ScalarProperties == null) || (fk.ForeignKeyProps == null)) return false;
+        if (fk.ForeignKeyProps.Count < 1) return false;
+        foreach(ModelViewKeyPropertySerializable fkp in fk.ForeignKeyProps) {
+             if(GetScalarPropByOriginaPropName(fkp.OriginalPropertyName, model) == null) return false;
+        }
+        return true;
+    }
+    bool IsForeigKeyMapedToScalarsEx(ModelViewForeignKeySerializable detailFk, ModelViewSerializable detailModel, ModelViewSerializable model) {
+        if ((detailModel == null) || (detailFk == null) || (model == null)) return false;
+        if ((detailModel.ScalarProperties == null) || (detailFk.ForeignKeyProps == null) || (model.ScalarProperties == null) || (detailFk.PrincipalKeyProps == null) || (model.PrimaryKeyProperties == null)) return false;
+        if ((detailFk.ForeignKeyProps.Count < 1) || (model.ScalarProperties.Count < 1) || (model.PrimaryKeyProperties.Count != detailFk.ForeignKeyProps.Count) || (detailFk.PrincipalKeyProps.Count != detailFk.ForeignKeyProps.Count) || (model.PrimaryKeyProperties.Count != detailFk.ForeignKeyProps.Count)) return false;
+        for(int i = 0; i < detailFk.ForeignKeyProps.Count; i++) {
+             ModelViewPropertyOfVwSerializable detailsprp = GetScalarPropByOriginaPropName(detailFk.ForeignKeyProps[i].OriginalPropertyName, detailModel);
+             if(detailsprp == null) return false;
+             ModelViewPropertyOfVwSerializable modelsprp = GetScalarPropByOriginaPropName(detailFk.PrincipalKeyProps[i].OriginalPropertyName, model);
+             if(modelsprp == null) return false;
+             if(modelsprp.ViewPropertyName != detailsprp.ViewPropertyName) return false;
+        }
+        return true;
+    }
+    bool IsForeigKeyMapedToScalarsExEx(ModelViewForeignKeySerializable detailFk, ModelViewSerializable detailModel, ModelViewSerializable model) {
+        if ((detailModel == null) || (detailFk == null) || (model == null)) return false;
+        if ((detailModel.ScalarProperties == null) || (detailFk.ForeignKeyProps == null) || (model.ScalarProperties == null) || (detailFk.PrincipalKeyProps == null) || (model.ForeignKeys == null)) return false;
+        if ((detailFk.ForeignKeyProps.Count < 1) || (model.ScalarProperties.Count < 1) || (detailFk.PrincipalKeyProps.Count != detailFk.ForeignKeyProps.Count)) return false;
+        List<ModelViewForeignKeySerializable> modelFks =  model.ForeignKeys.Where(f => f.ViewName == detailFk.ViewName).ToList();
+        if(modelFks.Count < 1) return false;
+        for(int i = 0; i < detailFk.ForeignKeyProps.Count; i++) {
+             ModelViewPropertyOfVwSerializable detailsprp = GetScalarPropByOriginaPropName(detailFk.ForeignKeyProps[i].OriginalPropertyName, detailModel);
+             if(detailsprp == null) return false;
+        }
+        foreach(ModelViewForeignKeySerializable modelFk in modelFks) {
+            if(modelFk.ForeignKeyProps == null) continue;
+            if(modelFk.ForeignKeyProps.Count != detailFk.ForeignKeyProps.Count) continue;
+            bool passed = false;
+            for(int i = 0; i < detailFk.ForeignKeyProps.Count; i++) {
+                 ModelViewPropertyOfVwSerializable detailsprp = GetScalarPropByOriginaPropName(detailFk.ForeignKeyProps[i].OriginalPropertyName, detailModel);
+                 ModelViewPropertyOfVwSerializable modelsprp = GetScalarPropByOriginaPropName(modelFk.ForeignKeyProps[i].OriginalPropertyName, model);
+                 passed = modelsprp != null;
+                 if(!passed) break;
+                 passed = modelsprp.ViewPropertyName == detailsprp.ViewPropertyName;
+                 if(!passed) break;
+            }
+            if (passed) return true;
+        }
+        return false;
+    }
+    bool IsOnePropForeigKey(ModelViewForeignKeySerializable searchFk) {
+        if(searchFk == null) return false;
+        if((searchFk.PrincipalKeyProps == null) || (searchFk.ForeignKeyProps == null )) return false;
+        if((searchFk.PrincipalKeyProps.Count == searchFk.ForeignKeyProps.Count) && (searchFk.ForeignKeyProps.Count == 1)) return true;
+        return false;
+    }
+    bool IsLookUpTable(ModelViewSerializable searchMdl) {
+        if (searchMdl == null) return false;
+        if ((searchMdl.ScalarProperties == null) || (searchMdl.PrimaryKeyProperties == null) || (searchMdl.UniqueKeys == null)) return false;
+        if ((searchMdl.ScalarProperties.Count != 2) || (searchMdl.PrimaryKeyProperties.Count != 1) || (searchMdl.UniqueKeys.Count != 1)) return false;
+        if (searchMdl.UniqueKeys[0].UniqueKeyProperties == null) return false;
+        if (searchMdl.UniqueKeys[0].UniqueKeyProperties.Count != 1) return false;
+        if (searchMdl.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName == searchMdl.PrimaryKeyProperties[0].OriginalPropertyName) return false;
+        if ((GetScalarPropByOriginaPropName(searchMdl.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName, searchMdl) == null) ||
+            (GetScalarPropByOriginaPropName(searchMdl.PrimaryKeyProperties[0].OriginalPropertyName, searchMdl) == null)) return false;
+        return true;
+    }
+    bool IsUniqKeyMapedToScalarsEx(ModelViewUniqueKeySerializable searchUk, ModelViewSerializable searchModel, ModelViewSerializable model) {
+        if ((searchModel == null) || (searchUk == null) || (model == null)) return false;
+        if ((searchModel.ScalarProperties == null) || (searchUk.UniqueKeyProperties == null) || (model.ScalarProperties == null)) return false;
+        if ((searchUk.UniqueKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1)) return false;
+        foreach(ModelViewKeyPropertySerializable ukp in searchUk.UniqueKeyProperties) {
+             ModelViewPropertyOfVwSerializable sprp = GetScalarPropByOriginaPropName(ukp.OriginalPropertyName, searchModel);
+             if(sprp == null) return false;
+             if(!model.ScalarProperties.Any(p => p.ViewPropertyName == sprp.ViewPropertyName)) return false;
+        }
+        return true;
+    }
+    bool IsForeigKeyMapedToPrimKey(ModelViewForeignKeySerializable fk, ModelViewSerializable model) {
+        if ((model == null) || (fk == null)) return false;
+        if ((model.PrimaryKeyProperties == null) || (model.ForeignKeys == null) || (fk.PrincipalKeyProps == null) || (fk.ForeignKeyProps == null)) return false;
+        if ((model.PrimaryKeyProperties.Count < 1) || (fk.PrincipalKeyProps.Count != fk.ForeignKeyProps.Count) || (fk.ForeignKeyProps.Count < 1) || (fk.ForeignKeyProps.Count >= model.PrimaryKeyProperties.Count) ) return false;
+        foreach(ModelViewKeyPropertySerializable fkp in fk.ForeignKeyProps) {
+            if( !model.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == fkp.OriginalPropertyName) ) return false;
+        }
+        return true;
+    }
+    bool IsForeigKeyWithCorrectPropsOrder(ModelViewForeignKeySerializable otherFk, ModelViewSerializable m2mMdl) {
+        if ((m2mMdl == null) || (otherFk == null)) return false;
+        if ((m2mMdl.PrimaryKeyProperties == null) || (otherFk.ForeignKeyProps == null)) return false;
+        if ((m2mMdl.PrimaryKeyProperties.Count < 1) || (otherFk.ForeignKeyProps.Count < 1)) return false;
+        List<int> positions = new List<int>();
+        foreach(ModelViewKeyPropertySerializable fkp in otherFk.ForeignKeyProps) {
+            int index = m2mMdl.PrimaryKeyProperties.FindIndex(delegate(ModelViewKeyPropertySerializable pkp) { return pkp.OriginalPropertyName == fkp.OriginalPropertyName; });
+            if(index < 0) return false;
+            positions.Add(index);
+        }
+        positions.Sort();
+        for(int i = 0; i < positions.Count-1; i++) {
+            if(positions[i] + 1 != positions[i+1]) return false;
+        }
+        return true;
+    }
+    int GetForeigKeyMaxPropsPosition(ModelViewForeignKeySerializable otherFk, ModelViewSerializable m2mMdl) {
+        if ((m2mMdl == null) || (otherFk == null)) return -1;
+        if ((m2mMdl.PrimaryKeyProperties == null) || (otherFk.ForeignKeyProps == null)) return -1;
+        if ((m2mMdl.PrimaryKeyProperties.Count < 1) || (otherFk.ForeignKeyProps.Count < 1)) return -1;
+        int rslt = 0;
+        foreach(ModelViewKeyPropertySerializable fkp in otherFk.ForeignKeyProps) {
+            int index = m2mMdl.PrimaryKeyProperties.FindIndex(delegate(ModelViewKeyPropertySerializable pkp) { return pkp.OriginalPropertyName == fkp.OriginalPropertyName; });
+            if(index < 0) return -1;
+            if(rslt < index) rslt = index;
+        }
+        return rslt;
+    }
+    List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> GetSearchResources(ModelViewSerializable model, DbContextSerializable context) {
+        if ((context == null) || (model == null)) return null;
+        if ((context.ModelViews == null) || (model.PrimaryKeyProperties == null) || (model.ScalarProperties == null) ) return null;
+        if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1)) return null;
+        List<ModelViewSerializable> m2mMdls = context.ModelViews.Where(p => (p.ForeignKeys.Any(f => f.ViewName == model.ViewName) && (p.ForeignKeys.Count > 1))).ToList();
+        if(m2mMdls.Count < 1) {
+            return null;
+        }
+        // m2mModel, m2mForeignKey, List<Tuple< model.ForeignKey, m2mModel.additionalForeignKey >>, searchModel, searchFk, searchUk, ukpropsMpt, ukpropsToFrgn
+        List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> result = null;
+        foreach(ModelViewSerializable m2mMdl in m2mMdls) {
+            if (!IsTableMatchesIndex(m2mMdl)) {
+                continue;
+            }
+            List<ModelViewForeignKeySerializable> m2mFks = m2mMdl.ForeignKeys.Where(f => f.ViewName == model.ViewName).ToList();
+            foreach(ModelViewForeignKeySerializable m2mFk in m2mFks) {
+                if(!IsForeigKeyMapedToTailOfPrimKey(m2mFk, m2mMdl)) continue;
+                if(!IsForeigKeyMapedToScalarsEx(m2mFk, m2mMdl, model)) continue;
+                // m2mMdl - m2mModel, m2mFk - m2mForeignKey,
+                List<KeyValuePair<ModelViewForeignKeySerializable,int>> searchFks = null;
+                List<int> searchFkPosition = null;
+                foreach(ModelViewForeignKeySerializable searchFk in m2mMdl.ForeignKeys) {
+                    if (m2mFk == searchFk) continue;
+                    if (!IsOnePropForeigKey(searchFk)) continue;
+                    ModelViewSerializable searchMdl = context.ModelViews.Where(mv => (mv.ViewName == searchFk.ViewName)).FirstOrDefault();
+                    if (searchMdl == null) continue;
+                    if (!IsLookUpTable(searchMdl)) continue;
+                    if (!IsUniqKeyMapedToScalarsEx(searchMdl.UniqueKeys[0], searchMdl, model)) continue;
+                    if (searchFks == null) searchFks = new List<KeyValuePair<ModelViewForeignKeySerializable,int>>();
+                    searchFks.Add(new KeyValuePair<ModelViewForeignKeySerializable,int>( searchFk, GetForeigKeyMaxPropsPosition(searchFk, m2mMdl) ));
+                }
+                if(searchFks == null) {
+                    continue;
+                }
+                int lastValidPosition = m2mMdl.PrimaryKeyProperties.Count - model.PrimaryKeyProperties.Count - 1;
+                if(searchFks != null) {
+                    if(searchFks.Any(p => p.Value < 0)) continue;
+                    searchFks = searchFks.OrderBy(p => p.Value).ToList();
+                    bool IsCorrect = true;
+                    for(int i = 0; i < searchFks.Count-1; i++) {
+                        IsCorrect = searchFks[i].Value == searchFks[i+1].Value - 1;
+                        if(!IsCorrect) break;
+                    }
+                    if(!IsCorrect) {
+                        continue;
+                    }
+                    if(searchFks[searchFks.Count-1].Value != lastValidPosition) { 
+                        continue;
+                    }
+                    lastValidPosition = searchFks[0].Value - 1;
+                }
+                
+
+                List<KeyValuePair<ModelViewForeignKeySerializable,int>> otherFks = null;
+                foreach(ModelViewForeignKeySerializable otherFk in m2mMdl.ForeignKeys) {
+                    if (m2mFk == otherFk) continue;
+                    if (searchFks != null) {
+                        if(searchFks.Any(p => p.Key == otherFk)) continue;
+                    }
+                    if(!IsForeigKeyMapedToPrimKey(otherFk, m2mMdl)) continue;
+                    if(!IsForeigKeyMapedToScalarsExEx(otherFk, m2mMdl, model)) continue;
+                    if(!IsForeigKeyWithCorrectPropsOrder(otherFk, m2mMdl)) continue;
+                    int mxPs = GetForeigKeyMaxPropsPosition(otherFk, m2mMdl);
+                    if((mxPs < 0) || (mxPs > lastValidPosition)) continue;
+                    if(otherFks == null) otherFks = new List<KeyValuePair<ModelViewForeignKeySerializable,int>>();
+                    otherFks.Add(new KeyValuePair<ModelViewForeignKeySerializable,int>(otherFk, mxPs));
+                }
+                if(otherFks != null) {
+                    otherFks = otherFks.OrderBy(p => p.Value).ToList();
+                    bool IsCorrect = true;
+                    for(int i = 0; i < otherFks.Count-1; i++) {
+                        IsCorrect = otherFks[i].Value == otherFks[i+1].Value - otherFks[i].Key.ForeignKeyProps.Count;
+                        if(!IsCorrect) break;
+                    }
+                    if(!IsCorrect) continue;
+                    if(otherFks[otherFks.Count-1].Value != lastValidPosition) 
+                        continue;
+                    lastValidPosition = otherFks[0].Value - otherFks[0].Key.ForeignKeyProps.Count;
+                }
+                
+
+                List<KeyValuePair<ModelViewForeignKeySerializable,int>> externalFks = null;
+                foreach(ModelViewForeignKeySerializable externalFk in m2mMdl.ForeignKeys) {
+                    if (externalFk == m2mFk) continue;
+                    if (searchFks != null) {
+                        if(searchFks.Any(p => p.Key == externalFk)) continue;
+                    }
+                    if (otherFks != null) {
+                        if(otherFks.Any(p => p.Key == externalFk)) continue;
+                    }
+                    if(!IsForeigKeyMapedToPrimKey(externalFk, m2mMdl)) continue;
+                    if(!IsForeigKeyMapedToScalars(externalFk, m2mMdl)) continue;
+                    if(!IsForeigKeyWithCorrectPropsOrder(externalFk, m2mMdl)) continue;
+                    int mxPs = GetForeigKeyMaxPropsPosition(externalFk, m2mMdl);
+                    if((mxPs < 0) || (mxPs > lastValidPosition)) continue;
+                    if(externalFks == null) externalFks = new List<KeyValuePair<ModelViewForeignKeySerializable,int>>();
+                    externalFks.Add(new KeyValuePair<ModelViewForeignKeySerializable,int>(externalFk, mxPs));
+                }
+                if(externalFks != null) {
+                    externalFks = externalFks.OrderBy(p => p.Value).ToList();
+                    bool IsCorrect = true;
+                    for(int i = 0; i < externalFks.Count-1; i++) {
+                        IsCorrect = externalFks[i].Value == externalFks[i+1].Value - externalFks[i].Key.ForeignKeyProps.Count;
+                        if(!IsCorrect) break;
+                    }
+                    if(!IsCorrect) continue;
+                    if(externalFks[externalFks.Count-1].Value != lastValidPosition) continue;
+                    lastValidPosition = externalFks[0].Value - externalFks[0].Key.ForeignKeyProps.Count;
+                }
+                if(lastValidPosition != -1) continue;
+                int AllFkCount = (searchFks == null ? 0 : searchFks.Count) +
+                                (otherFks == null ? 0 : otherFks.Count) +
+                                (externalFks == null ? 0 : externalFks.Count);
+                if (AllFkCount != (m2mMdl.ForeignKeys.Count - 1)) continue;
+                if(result == null) {
+                    result = new List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>>();
+                }
+                result.Add(new Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>(
+                    m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                ));
+            }
+        }
+        return result;
+    }
+    bool AllPrimKeyPropsAreForeignKeysProps(ModelViewSerializable m2mMdl) {
+        if(m2mMdl == null) return false;
+        if((m2mMdl.PrimaryKeyProperties == null) || (m2mMdl.ForeignKeys == null)) return false;
+        int cnt = 0;
+        foreach(ModelViewForeignKeySerializable fk in m2mMdl.ForeignKeys) {
+            if (fk.ForeignKeyProps == null) return false;
+            cnt += fk.ForeignKeyProps.Count;
+        }
+        if(cnt != m2mMdl.PrimaryKeyProperties.Count) return false;
+        List<string> passed = new List<string>();
+        foreach(ModelViewForeignKeySerializable fk in m2mMdl.ForeignKeys) {
+            foreach(ModelViewKeyPropertySerializable fkp in fk.ForeignKeyProps) {
+                if(!m2mMdl.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == fkp.OriginalPropertyName)) return false;
+                if(passed.Any(p => p == fkp.OriginalPropertyName)) return false;
+                passed.Add(fkp.OriginalPropertyName);
+            }
+        }
+        return true;
+    }
+    bool ForeignKeysOrderedInsidePrimKey(ModelViewSerializable m2mMdl) {
+        if(m2mMdl == null) return false;
+        if((m2mMdl.PrimaryKeyProperties == null) || (m2mMdl.ForeignKeys == null)) return false;
+        ModelViewForeignKeySerializable currFk = null;
+        int firstInx = 0;
+        int lastInx = 0;
+        for(int i = 0; i < m2mMdl.PrimaryKeyProperties.Count; i++) {
+            ModelViewKeyPropertySerializable pkprp = m2mMdl.PrimaryKeyProperties[i];
+            ModelViewForeignKeySerializable fk = m2mMdl.ForeignKeys.Where(f => f.ForeignKeyProps.Any(p => p.OriginalPropertyName == pkprp.OriginalPropertyName)).FirstOrDefault();
+            if(fk == null) return false;
+            if(i == 0) { 
+                currFk = fk;
+                continue;
+            }
+            if(fk == currFk) {
+                lastInx = i;
+                continue;
+            }
+            if(currFk.ForeignKeyProps.Count != lastInx - firstInx + 1) return false;
+            currFk = fk;
+            firstInx = i;
+            lastInx = i;
+        }
+        if(currFk.ForeignKeyProps.Count != lastInx - firstInx + 1) return false;
+        return true;
+    }
+    bool IsForeignKeyFirstInsidePrimKey(ModelViewSerializable m2mMdl, ModelViewForeignKeySerializable m2mFk) {
+        if((m2mMdl == null) || (m2mFk == null)) return false;
+        if((m2mMdl.PrimaryKeyProperties == null) || (m2mFk.ForeignKeyProps == null)) return false;
+        ModelViewForeignKeySerializable currFk = null;
+        int firstInx = 0;
+        int lastInx = 0;
+        for(int i = 0; i < m2mMdl.PrimaryKeyProperties.Count; i++) {
+            ModelViewKeyPropertySerializable pkprp = m2mMdl.PrimaryKeyProperties[i];
+            if(m2mFk.ForeignKeyProps.Any(p => p.OriginalPropertyName == pkprp.OriginalPropertyName)) {
+                if(i == 0) { 
+                    currFk = m2mFk;
+                    continue;
+                }
+                lastInx = i;
+            } else break;
+        }
+        if(currFk == null) return false;
+        if(currFk.ForeignKeyProps.Count != lastInx - firstInx + 1) return false;
+        return true;
+    }
+    ModelViewForeignKeySerializable GetLastForeignKey(ModelViewSerializable m2mMdl) {
+        if(m2mMdl == null)  return null;
+        if((m2mMdl.PrimaryKeyProperties == null) || (m2mMdl.ForeignKeys == null))  return null;
+        if(m2mMdl.PrimaryKeyProperties.Count < 1) return null;
+        ModelViewKeyPropertySerializable pkprp =m2mMdl.PrimaryKeyProperties[m2mMdl.PrimaryKeyProperties.Count - 1];
+        return m2mMdl.ForeignKeys.Where(f => f.ForeignKeyProps.Any(p => p.OriginalPropertyName == pkprp.OriginalPropertyName)).FirstOrDefault();
+    }
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> GetSearchResourcesForLastFk(ModelViewSerializable model, ModelViewSerializable m2mMdl, ModelViewForeignKeySerializable m2mFk, DbContextSerializable context) {
+        if ((context == null) || (model == null) || (m2mMdl == null) || (m2mFk == null)) return null;
+        if ((context.ModelViews == null) || (model.PrimaryKeyProperties == null) || (model.ScalarProperties == null) || (m2mMdl.ForeignKeys == null) ) return null;
+        if ((model.PrimaryKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1)) return null;
+        if (!m2mMdl.ForeignKeys.Any(f => f == m2mFk)) return null;
+        if (m2mFk.ViewName != model.ViewName) return null;
+        if (!IsTableMatchesIndex(m2mMdl)) return null;
+        if(!IsForeigKeyMapedToTailOfPrimKey(m2mFk, m2mMdl)) return null;
+        if(!IsForeigKeyMapedToScalarsEx(m2mFk, m2mMdl, model)) return null;
+        // m2mMdl - m2mModel, m2mFk - m2mForeignKey,
+        List<KeyValuePair<ModelViewForeignKeySerializable,int>> searchFks = null;
+        List<int> searchFkPosition = null;
+        foreach(ModelViewForeignKeySerializable searchFk in m2mMdl.ForeignKeys) {
+            if (m2mFk == searchFk) continue;
+            if (!IsOnePropForeigKey(searchFk)) continue;
+            ModelViewSerializable searchMdl = context.ModelViews.Where(mv => (mv.ViewName == searchFk.ViewName)).FirstOrDefault();
+            if (searchMdl == null) continue;
+            if (!IsLookUpTable(searchMdl)) continue;
+            if (!IsUniqKeyMapedToScalarsEx(searchMdl.UniqueKeys[0], searchMdl, model)) continue;
+            if (searchFks == null) searchFks = new List<KeyValuePair<ModelViewForeignKeySerializable,int>>();
+            searchFks.Add(new KeyValuePair<ModelViewForeignKeySerializable,int>( searchFk, GetForeigKeyMaxPropsPosition(searchFk, m2mMdl) ));
+        }
+        if(searchFks == null) return null;
+        int lastValidPosition = m2mMdl.PrimaryKeyProperties.Count - model.PrimaryKeyProperties.Count - 1;
+        if(searchFks != null) {
+            if(searchFks.Any(p => p.Value < 0)) return null;
+            searchFks = searchFks.OrderBy(p => p.Value).ToList();
+            bool IsCorrect = true;
+            for(int i = 0; i < searchFks.Count-1; i++) {
+                IsCorrect = searchFks[i].Value == searchFks[i+1].Value - 1;
+                if(!IsCorrect) break;
+            }
+            if(!IsCorrect) return null;
+            if(searchFks[searchFks.Count-1].Value != lastValidPosition) return null;
+            lastValidPosition = searchFks[0].Value - 1;
+        }
+        List<KeyValuePair<ModelViewForeignKeySerializable,int>> otherFks = null;
+        foreach(ModelViewForeignKeySerializable otherFk in m2mMdl.ForeignKeys) {
+            if (m2mFk == otherFk) continue;
+            if (searchFks != null) {
+                if(searchFks.Any(p => p.Key == otherFk)) continue;
+            }
+            if(!IsForeigKeyMapedToPrimKey(otherFk, m2mMdl)) continue;
+            if(!IsForeigKeyMapedToScalarsExEx(otherFk, m2mMdl, model)) continue;
+            if(!IsForeigKeyWithCorrectPropsOrder(otherFk, m2mMdl)) continue;
+            int mxPs = GetForeigKeyMaxPropsPosition(otherFk, m2mMdl);
+            if((mxPs < 0) || (mxPs > lastValidPosition)) continue;
+            if(otherFks == null) otherFks = new List<KeyValuePair<ModelViewForeignKeySerializable,int>>();
+            otherFks.Add(new KeyValuePair<ModelViewForeignKeySerializable,int>(otherFk, mxPs));
+        }
+        if(otherFks != null) {
+            otherFks = otherFks.OrderBy(p => p.Value).ToList();
+            bool IsCorrect = true;
+            for(int i = 0; i < otherFks.Count-1; i++) {
+                IsCorrect = otherFks[i].Value == otherFks[i+1].Value - otherFks[i].Key.ForeignKeyProps.Count;
+                if(!IsCorrect) break;
+            }
+            if(!IsCorrect) return null;
+            if(otherFks[otherFks.Count-1].Value != lastValidPosition) return null;
+            lastValidPosition = otherFks[0].Value - otherFks[0].Key.ForeignKeyProps.Count;
+        }
+                
+
+        List<KeyValuePair<ModelViewForeignKeySerializable,int>> externalFks = null;
+        foreach(ModelViewForeignKeySerializable externalFk in m2mMdl.ForeignKeys) {
+            if (externalFk == m2mFk) continue;
+            if (searchFks != null) {
+                if(searchFks.Any(p => p.Key == externalFk)) continue;
+            }
+            if (otherFks != null) {
+                if(otherFks.Any(p => p.Key == externalFk)) continue;
+            }
+            if(!IsForeigKeyMapedToPrimKey(externalFk, m2mMdl)) continue;
+            if(!IsForeigKeyMapedToScalars(externalFk, m2mMdl)) continue;
+            if(!IsForeigKeyWithCorrectPropsOrder(externalFk, m2mMdl)) continue;
+            int mxPs = GetForeigKeyMaxPropsPosition(externalFk, m2mMdl);
+            if((mxPs < 0) || (mxPs > lastValidPosition)) continue;
+            if(externalFks == null) externalFks = new List<KeyValuePair<ModelViewForeignKeySerializable,int>>();
+            externalFks.Add(new KeyValuePair<ModelViewForeignKeySerializable,int>(externalFk, mxPs));
+        }
+        if(externalFks != null) {
+            externalFks = externalFks.OrderBy(p => p.Value).ToList();
+            bool IsCorrect = true;
+            for(int i = 0; i < externalFks.Count-1; i++) {
+                IsCorrect = externalFks[i].Value == externalFks[i+1].Value - externalFks[i].Key.ForeignKeyProps.Count;
+                if(!IsCorrect) break;
+            }
+            if(!IsCorrect) return null;
+            if(externalFks[externalFks.Count-1].Value != lastValidPosition) return null;
+            lastValidPosition = externalFks[0].Value - externalFks[0].Key.ForeignKeyProps.Count;
+        }
+        if(lastValidPosition != -1) return null;
+        int AllFkCount = (searchFks == null ? 0 : searchFks.Count) +
+                        (otherFks == null ? 0 : otherFks.Count) +
+                        (externalFks == null ? 0 : externalFks.Count);
+        if (AllFkCount != (m2mMdl.ForeignKeys.Count - 1)) return null;
+        return new Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>(
+            m2mMdl, m2mFk, searchFks, otherFks, externalFks
+        );
+    }
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> DetailViewAsM2mMdl(ModelViewSerializable m2mMdl, DbContextSerializable context) {
+        if ((m2mMdl == null) || (context == null)) return null;
+        if ((m2mMdl.ForeignKeys == null) || (context.ModelViews == null)) return null;
+        if (!IsTableMatchesIndex(m2mMdl)) return null;
+        if (!AllPrimKeyPropsAreForeignKeysProps(m2mMdl)) return null;
+        if (!ForeignKeysOrderedInsidePrimKey(m2mMdl)) return null;
+        ModelViewForeignKeySerializable lastFk = GetLastForeignKey(m2mMdl);
+        if(lastFk == null) return null;
+        ModelViewSerializable model = context.ModelViews.Where(m => m.ViewName == lastFk.ViewName).FirstOrDefault();
+        if(model == null) return null;
+        return GetSearchResourcesForLastFk(model, m2mMdl, lastFk, context);
+    }
+    ModelViewPropertyOfVwSerializable GetModelScalarPropByKeyProp(ModelViewSerializable model, ModelViewKeyPropertySerializable pk) {
+        ModelViewPropertyOfVwSerializable rslt = null;
+        if ((model == null) || (pk == null)) return null;
+        if (model.ScalarProperties == null) return null;
+        if (model.AllProperties == null) return null;
+        ModelViewEntityPropertySerializable aprop = model.AllProperties.Where(p => p.OriginalPropertyName == pk.OriginalPropertyName).FirstOrDefault();
+        if(aprop == null) return null;
+        ModelViewPropertyOfVwSerializable scProp = 
+            model.ScalarProperties.Where(p => ((p.OriginalPropertyName == pk.OriginalPropertyName) && (string.IsNullOrEmpty(p.ForeignKeyNameChain)))).FirstOrDefault();
+        if (scProp != null) return scProp;
+        if (model.ForeignKeys != null) {
+            foreach(ModelViewForeignKeySerializable fk in model.ForeignKeys) {
+                scProp = null;
+                if ((fk.ForeignKeyProps != null) && (fk.PrincipalKeyProps != null)) {
+                    int cnt = fk.ForeignKeyProps.Count;
+                    if (cnt < fk.PrincipalKeyProps.Count)
+                    {
+                        cnt = fk.PrincipalKeyProps.Count;
+                    }
+                    for(int i = 0; i < cnt; i++)
+                    {
+                        if(fk.ForeignKeyProps[i].OriginalPropertyName == pk.OriginalPropertyName)
+                        {
+                            scProp=
+                                model.ScalarProperties.Where(p =>
+                                ((p.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && (p.ForeignKeyNameChain == fk.NavigationName))).FirstOrDefault();
+                        }
+                        if(scProp != null) return scProp;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    ModelViewSerializable GetViewByName(DbContextSerializable context, string viewName) {
+        if(context == null) return null;
+        return context.ModelViews.Where(p => p.ViewName == viewName).FirstOrDefault();
+    }
+    ModelViewPropertyOfVwSerializable GetFirstPropOfFirstUniqueKey(ModelViewSerializable model) {
+        if(model == null) return null;
+        if(model.UniqueKeys == null) return null;
+        if(model.UniqueKeys.Count < 1) return null;
+        if(model.UniqueKeys[0].UniqueKeyProperties == null) return null;
+        if(model.UniqueKeys[0].UniqueKeyProperties.Count < 1) return null;
+        return GetScalarPropByOriginaPropName(model.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName, model);
+    }
+
+#>
