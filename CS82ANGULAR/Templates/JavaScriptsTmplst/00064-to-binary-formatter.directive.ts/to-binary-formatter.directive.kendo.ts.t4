@@ -32,10 +32,10 @@ import { <#= toBinaryPipeClassName #> } from '<#= GetFolderName(Model, toBinaryP
  @Directive({ 
    selector: '[<#= toBinaryFormatterDirectiveSelectorName #>]',
    providers: [
-     //{
-       //provide: MAT_INPUT_VALUE_ACCESSOR, 
-       //useExisting: forwardRef(() => <#= toBinaryFormatterDirectiveClassName #>)
-     //},
+//     {
+//       provide: MAT_INPUT_VALUE_ACCESSOR, 
+//       useExisting: forwardRef(() => <#= toBinaryFormatterDirectiveClassName #>)
+//     },
      {
        provide: NG_VALUE_ACCESSOR,
        useExisting: forwardRef(() => <#= toBinaryFormatterDirectiveClassName #>),

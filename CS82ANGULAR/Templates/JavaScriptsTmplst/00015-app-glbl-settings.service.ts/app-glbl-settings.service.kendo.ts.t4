@@ -424,7 +424,7 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
 */
     };
     getViewModelMask(vwModel: string): number {
-      return 15; // delete this line when <#= vwModelsPropName #> is ready
+      return 31; // delete this line when <#= vwModelsPropName #> is ready
       let pk = this.<#= vwModelsPropName #>[vwModel];
       if(typeof pk === 'undefined') { return 0; } else { return pk; }
 /*

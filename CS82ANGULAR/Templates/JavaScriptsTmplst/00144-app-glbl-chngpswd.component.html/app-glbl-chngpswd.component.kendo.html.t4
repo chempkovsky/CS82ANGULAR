@@ -41,25 +41,23 @@
     <kendo-card-body>
 
     <div [formGroup]="chngpswdFormGroup" (ngSubmit)="doSubmit()" fxLayout="column wrap">
-        <kendo-formfield  [appearance]="appearance">
+        <kendo-formfield>
 <# 
     if(localize) {
 #>
             <kendo-label i18n="Old Password@@<#= appChangePasswordComponentClassName #>.Old-Password-label">Old Password</kendo-label>
             <div fxLayout="row"> 
-                <kendo-textbox [fillMode]="appearance" i18n-placeholder="Old Password@@<#= appChangePasswordComponentClassName #>.Old-Password-placeholder" placeholder="Old Password..." formControlName="oldpassword" [type]="oldpwdhide ? 'password' : 'text'">
-                </kendo-textbox>
+                <input kendoTextBox i18n-placeholder="Old Password@@<#= appChangePasswordComponentClassName #>.Old-Password-placeholder" placeholder="Old Password..." formControlName="oldpassword" [type]="oldpwdhide ? 'password' : 'text'">
 <# 
     } else {
 #>
             <kendo-label>Old Password</kendo-label>
             <div fxLayout="row"> 
-                <kendo-textbox [fillMode]="appearance" placeholder="Old Password..." formControlName="oldpassword" [type]="oldpwdhide ? 'password' : 'text'">
-                </kendo-textbox>
+                <input kendoTextBox  placeholder="Old Password..." formControlName="oldpassword" [type]="oldpwdhide ? 'password' : 'text'">
 <# 
     }
 #>
-                <button kendoButton  [icon]="oldpwdhide ? 'cancel' : 'eye'" (click)="oldpwdhide = !oldpwdhide"  >
+                <button kendoButton  [icon]="oldpwdhide ? 'eye' : 'cancel'" (click)="oldpwdhide = !oldpwdhide"  >
                 </button>
             </div> 
             <kendo-formerror *ngIf="chngpswdFormGroup.controls['oldpassword'].invalid">{{getErrorMessage(chngpswdFormGroup.controls['oldpassword'])}}</kendo-formerror>
@@ -76,25 +74,23 @@
 #>
 
         </kendo-formfield>
-        <kendo-formfield  [appearance]="appearance" >
+        <kendo-formfield>
 <# 
     if(localize) {
 #>
             <kendo-label i18n="New Password@@<#= appChangePasswordComponentClassName #>.New-Password-label">New Password</kendo-label>
             <div fxLayout="row"> 
-                <kendo-textbox [fillMode]="appearance" i18n-placeholder="New Password@@<#= appChangePasswordComponentClassName #>.New-Password-placeholder" placeholder="New Password"  formControlName="newPassword" [type]="pwdhide ? 'password' : 'text'">
-                </kendo-textbox>
+                <input kendoTextBox  i18n-placeholder="New Password@@<#= appChangePasswordComponentClassName #>.New-Password-placeholder" placeholder="New Password"  formControlName="newPassword" [type]="pwdhide ? 'password' : 'text'">
 <# 
     } else {
 #>
             <kendo-label>New Password</kendo-label>
             <div fxLayout="row"> 
-                <kendo-textbox [fillMode]="appearance" placeholder="New Password..." formControlName="newPassword" [type]="pwdhide ? 'password' : 'text'">
-                </kendo-textbox>
+                <input kendoTextBox  placeholder="New Password..." formControlName="newPassword" [type]="pwdhide ? 'password' : 'text'">
 <# 
     }
 #>
-                <button kendoButton  [icon]="pwdhide ? 'cancel' : 'eye'" (click)="pwdhide = !pwdhide"  >
+                <button kendoButton  [icon]="pwdhide ? 'eye' : 'cancel'" (click)="pwdhide = !pwdhide"  >
                 </button>
             </div> 
             <kendo-formerror *ngIf="chngpswdFormGroup.controls['newPassword'].invalid">{{getErrorMessage(chngpswdFormGroup.controls['newPassword'])}}</kendo-formerror>
@@ -110,26 +106,23 @@
     }
 #>
         </kendo-formfield>
-        <kendo-formfield  [appearance]="appearance">
+        <kendo-formfield>
 <# 
     if(localize) {
 #>
             <kendo-label i18n="Confirm Password@@<#= appChangePasswordComponentClassName #>.Confirm-Password-label">Confirm Password</kendo-label>
             <div fxLayout="row"> 
-                <kendo-textbox [fillMode]="appearance" i18n-placeholder="New Password@@<#= appChangePasswordComponentClassName #>.Confirm-Password-placeholder" placeholder="Confirm Password"  formControlName="confirmPassword" [type]="cnfPwdhide ? 'password' : 'text'">
-                </kendo-textbox>
+                <input kendoTextBox  i18n-placeholder="New Password@@<#= appChangePasswordComponentClassName #>.Confirm-Password-placeholder" placeholder="Confirm Password"  formControlName="confirmPassword" [type]="cnfPwdhide ? 'password' : 'text'">
 <# 
     } else {
 #>
             <kendo-label>Confirm Password</kendo-label>
             <div fxLayout="row"> 
-                <kendo-textbox [fillMode]="appearance" placeholder="Confirm Password..." formControlName="confirmPassword" [type]="cnfPwdhide ? 'password' : 'text'">
-                </kendo-textbox>
+                <input kendoTextBox  placeholder="Confirm Password..." formControlName="confirmPassword" [type]="cnfPwdhide ? 'password' : 'text'">
 <# 
     }
 #>
-
-                <button kendoButton  [icon]="cnfPwdhide ? 'cancel' : 'eye'" (click)="cnfPwdhide = !cnfPwdhide"  >
+                <button kendoButton  [icon]="cnfPwdhide ? 'eye' : 'cancel'" (click)="cnfPwdhide = !cnfPwdhide"  >
                 </button>
             </div> 
             <kendo-formerror *ngIf="chngpswdFormGroup.controls['confirmPassword'].invalid">{{getErrorMessage(chngpswdFormGroup.controls['confirmPassword'])}}</kendo-formerror>

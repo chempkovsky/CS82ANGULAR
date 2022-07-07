@@ -52,8 +52,9 @@ export class AppComponent {
     }  
 
     mainMenuItems: Array<{id?: number | string, parentId?: number | string, text?: string, icon?: string, disabled?: boolean, selected?: boolean, separator?: boolean, path?: string}> = [
-      { text: "Inbox", icon: "k-i-home", selected: false, path: "/home" },
-      { separator: true },
+      { text: "Home", icon: "k-i-home", selected: false, path: "/home" },
+// never leave separator as the last element of an array
+//      { separator: true },
     ]
 
     cogMenuItems: Array<{id?: number | string, text?: string, icon?: string, disabled?: boolean, path: string}> = [

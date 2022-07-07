@@ -76,20 +76,18 @@
 #>
                 <kendo-label i18n="Password@@<#= appLoginComponentClassName #>.Password-label">Password</kendo-label>
                 <div fxLayout="row"> 
-                    <kendo-textbox [fillMode]="appearance" i18n-placeholder="Password@@<#= appLoginComponentClassName #>.Password-placeholder" placeholder="Password" formControlName="password" [type]="pwdhide ? 'password' : 'text'">
-                    </kendo-textbox>
+                    <input kendoTextBox i18n-placeholder="Password@@<#= appLoginComponentClassName #>.Password-placeholder" placeholder="Password" formControlName="password" [type]="pwdhide ? 'password' : 'text'">
 <# 
     } else {
 #>
                 <kendo-label>Password</kendo-label>
                 <div fxLayout="row"> 
-                    <kendo-textbox [fillMode]="appearance" placeholder="Password" formControlName="password" [type]="pwdhide ? 'password' : 'text'">
-                    </kendo-textbox>
+                    <input kendoTextBox placeholder="Password" formControlName="password" [type]="pwdhide ? 'password' : 'text'">
 <# 
     }
 #>
 
-                    <button kendoButton  [icon]="pwdhide ? 'cancel' : 'eye'" (click)="pwdhide = !pwdhide"  >
+                    <button kendoButton  [icon]="pwdhide ? 'eye' : 'cancel'" (click)="pwdhide = !pwdhide"  >
                     </button>
                 </div> 
 

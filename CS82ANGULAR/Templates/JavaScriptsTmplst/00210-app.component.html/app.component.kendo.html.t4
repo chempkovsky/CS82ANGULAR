@@ -31,7 +31,7 @@
             <ng-template kendoDropDownButtonItemTemplate let-m>
               <div [routerLink]="m.path">
                 <span class="k-icon {{ m.icon }}"></span>
-                <span style="margin-left: 5px;">{{ m.text  }}</span>
+                <span style="margin-left: 10px;">{{ m.text  }}</span>
               </div>
             </ng-template> 
           </kendo-dropdownbutton>          
@@ -46,12 +46,11 @@
           [mini]="true"
           [expanded]="true"
           position="start"
-          (select)="onSelectMenuItem($event)"
         >
         <ng-template kendoDrawerItemTemplate let-item>
           <div class="k-drawer-link" [routerLink]="item.path">
             <span class="k-icon {{ item.icon }}"></span>
-            <span style="margin-left: 5px;">{{ item.text }}</span>
+            <span style="margin-left: 10px;">{{ item.text }}</span>
           </div>
         </ng-template>        
       </kendo-drawer>

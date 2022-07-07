@@ -77,19 +77,17 @@
 #>
             <kendo-label i18n="Password@@<#= appRegisterComponentClassName #>.Password-label">Password</kendo-label>
             <div fxLayout="row"> 
-                <kendo-textbox [fillMode]="appearance" i18n-placeholder="Password placeholder@@<#= appRegisterComponentClassName #>.Password-placeholder"  placeholder="Password" formControlName="password" [type]="pwdhide ? 'password' : 'text'">
-                </kendo-textbox>
+                <input kendoTextBox i18n-placeholder="Password placeholder@@<#= appRegisterComponentClassName #>.Password-placeholder"  placeholder="Password" formControlName="password" [type]="pwdhide ? 'password' : 'text'">
 <# 
     } else {
 #>
             <kendo-label>Password</kendo-label>
             <div fxLayout="row"> 
-                <kendo-textbox [fillMode]="appearance" placeholder="Password..." formControlName="password" [type]="pwdhide ? 'password' : 'text'">
-                </kendo-textbox>
+                <input kendoTextBox  placeholder="Password..." formControlName="password" [type]="pwdhide ? 'password' : 'text'">
 <# 
     }
 #>
-                <button kendoButton  [icon]="pwdhide ? 'cancel' : 'eye'" (click)="pwdhide = !pwdhide"  >
+                <button kendoButton  [icon]="pwdhide ? 'eye' : 'cancel'" (click)="pwdhide = !pwdhide"  >
                 </button>
             </div> 
             <kendo-formerror *ngIf="registerFormGroup.controls['password'].invalid">{{getErrorMessage(registerFormGroup.controls['password'])}}</kendo-formerror>
@@ -111,19 +109,17 @@
 #>
             <kendo-label i18n="Confirm Password@@<#= appRegisterComponentClassName #>.Confirm-Password-label">Confirm Password</kendo-label>
             <div fxLayout="row"> 
-                <kendo-textbox [fillMode]="appearance" i18n-placeholder="Confirm Password@@<#= appRegisterComponentClassName #>.Confirm-Password-placeholder" placeholder="Confirm Password" formControlName="confirmPassword" [type]="cnfPwdhide ? 'password' : 'text'">
-                </kendo-textbox>
+                <input kendoTextBox i18n-placeholder="Confirm Password@@<#= appRegisterComponentClassName #>.Confirm-Password-placeholder" placeholder="Confirm Password" formControlName="confirmPassword" [type]="cnfPwdhide ? 'password' : 'text'">
 <# 
     } else {
 #>
             <kendo-label>Confirm Password</kendo-label>
             <div fxLayout="row"> 
-                <kendo-textbox [fillMode]="appearance" placeholder="Confirm Password" formControlName="confirmPassword" [type]="cnfPwdhide ? 'password' : 'text'">
-                </kendo-textbox>
+                <input kendoTextBox placeholder="Confirm Password" formControlName="confirmPassword" [type]="cnfPwdhide ? 'password' : 'text'">
 <# 
     }
 #>
-                <button kendoButton  [icon]="cnfPwdhide ? 'cancel' : 'eye'" (click)="cnfPwdhide = !cnfPwdhide"  >
+                <button kendoButton  [icon]="cnfPwdhide ? 'eye' : 'cancel'" (click)="cnfPwdhide = !cnfPwdhide"  >
                 </button>
             </div> 
 
