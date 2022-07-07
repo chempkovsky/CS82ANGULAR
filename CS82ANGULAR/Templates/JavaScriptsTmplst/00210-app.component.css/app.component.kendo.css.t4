@@ -1,0 +1,61 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="css" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+html,
+body,
+.custom-application-wrapper {
+  margin: 0;
+  padding: 0;
+  border-width: 0;
+  height: 100%;
+}
+
+html {
+  overflow: hidden;
+}
+
+
+.custom-application-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.custom-application-drawer-container .k-drawer-content {
+  overflow: auto;
+}
+
+.custom-application-drawer-container {
+    flex: 1;
+    overflow: auto;
+    align-items: stretch;
+  }
+  
+
+.custom-application-toolbar {
+  width: 100%;
+  background-color: rgb(61, 69, 175);
+  line-height: 10px;
+  border-bottom: inset;
+  border-bottom-width: 1px;
+  padding: 3px 8px;
+  color: #fdfdfdfd;
+  flex-shrink: 0;
+}
+.custom-application-caption {
+  font-weight: bold;
+  margin-left: 10px;
+  margin-right: 10px;
+  font-size: 17px;
+}

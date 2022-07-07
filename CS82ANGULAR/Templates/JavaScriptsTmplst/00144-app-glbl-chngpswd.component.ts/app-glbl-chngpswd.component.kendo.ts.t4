@@ -12,68 +12,134 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    bool localize = Context.Localize;
 
     string appSettingServiceFolder          = "00015-app-glbl-settings.service.ts";
     string appRegisterInterfaceFolder       = "00118-app-glbl-register.interface.ts";
     string appLoginInterfaceFolder          = "00120-app-glbl-login.interface.ts";
+    string appChangePasswordInterfaceFolder = "00122-app-glbl-chngpswd.interface.ts";
+
     string appLoginServiceFolder            = "00130-app-glbl-login.service.ts";
 
-
-    string appLoginHtmlComponentFolder      = "00140-app-glbl-login.component.html";
-    string appLoginCssComponentFolder       = "00140-app-glbl-login.component.css";
-    string appLoginComponentFolder          = "00140-app-glbl-login.component.ts";
-
-
-    string appLogoutCssComponentFolder      = "00142-app-glbl-logout.component.css";
-    string appLogoutHtmlComponentFolder     = "00142-app-glbl-logout.component.html";
-    string appLogoutComponentFolder         = "00142-app-glbl-logout.component.ts";
+    string appChangePasswordHtmlComponentFolder   = "00144-app-glbl-chngpswd.component.html";
+    string appChangePasswordCssComponentFolder    = "00144-app-glbl-chngpswd.component.css";
+    string appChangePasswordComponentFolder       = "00144-app-glbl-chngpswd.component.ts";
 
     string appRegisterModelClassName        = GetModelClassName(Model, appRegisterInterfaceFolder);
     string appLoginModelClassName           = GetModelClassName(Model, appLoginInterfaceFolder);
+    string appChangePasswordModelClassName  = GetModelClassName(Model, appChangePasswordInterfaceFolder);
     string appSettingServiceClassName       = GetServiceClassName(Model, appSettingServiceFolder);
     string appLoginServiceClassName         = GetServiceClassName(Model, appLoginServiceFolder);
-    string appLoginComponentClassName       = GetComponentClassName(Model, appLoginComponentFolder);
-    string appLogoutComponentClassName      = GetComponentClassName(Model, appLogoutComponentFolder);
 
-    string appLogoutComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, appLogoutComponentFolder);
+    string appChangePasswordComponentClassName    = GetComponentClassName(Model, appChangePasswordComponentFolder);
+
+    string appChangePasswordComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, appChangePasswordComponentFolder);
 
     string AppearancePropName           = "appearance";
     string ShowErrorMethodName          = "showError";
     string securityServiceName          = "scrtSvr";
     string registerMethodName           = "register";
-    string loginMethodName              = "login";
-    string logoutMethodName             = "logout";
+    string changePasswordMethodName     = "changePassword";
     string AppSettingServicePropName    = "appGlblSettings";
-    string getAuthIntoMethodName        = "getAuthInto";
-    string setAuthIntoMethodName        = "setAuthInto";
                                 
 #>
 import { Component } from '@angular/core';
+import { FormControl, Validators, ValidatorFn, FormGroup, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DropDownFillMode } from '@progress/kendo-angular-dropdowns';
+import { InputFillMode } from '@progress/kendo-angular-inputs';
+import { DateInputFillMode } from '@progress/kendo-angular-dateinputs';
 
-import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, appLogoutComponentFolder)#>';
-import { <#= appLoginServiceClassName #> } from '<#= GetFolderName(Model, appLoginServiceFolder, appLogoutComponentFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, appChangePasswordComponentFolder)#>';
+import { <#= appLoginServiceClassName #> } from '<#= GetFolderName(Model, appLoginServiceFolder, appChangePasswordComponentFolder)#>';
+import { <#= appChangePasswordModelClassName #> } from '<#= GetFolderName(Model, appChangePasswordInterfaceFolder, appChangePasswordComponentFolder)#>';
 
 
 @Component({
-  selector: 'app-<#= appLogoutComponentSelectorCommonPart #>',
-  templateUrl: '<#= GetFolderName(Model, appLogoutHtmlComponentFolder, appLogoutComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderName(Model, appLogoutCssComponentFolder, appLogoutComponentFolder) #>.css']
+  selector: 'app-<#= appChangePasswordComponentSelectorCommonPart #>',
+  templateUrl: '<#= GetFolderName(Model, appChangePasswordHtmlComponentFolder, appChangePasswordComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderName(Model, appChangePasswordCssComponentFolder, appChangePasswordComponentFolder) #>.css']
 })
-export class <#= appLogoutComponentClassName #> {
-    title: string = 'Do you want to Sign Out?';
-    public appearance: string = 'outline';
+export class <#= appChangePasswordComponentClassName #> {
+<# 
+    if(localize) {
+#>
+    title: string = $localize`:Change Password@@<#= appChangePasswordComponentClassName #>.Change-Password:Change Password`;
+<# 
+    } else {
+#>
+    title: string = 'Change Password';
+<# 
+    }
+#>
+
+    cnfPwdhide: boolean = true;
+    pwdhide: boolean = true;
+    oldpwdhide: boolean = true;
+    public <#= AppearancePropName #>: DropDownFillMode|InputFillMode|DateInputFillMode = 'outline';
+    chngpswdFormGroup: FormGroup;
+
 
     constructor(private <#= securityServiceName #>: <#= appLoginServiceClassName #>, protected router: Router, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #> ) {
-        this.appearance = this.<#= AppSettingServicePropName #>.appearance;
+        this.<#= AppearancePropName #> = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
+
+        this.chngpswdFormGroup =  new FormGroup({});
+        let locValidators: ValidatorFn[]; 
+
+        locValidators = [ Validators.required,Validators.minLength(6) ];
+        this.chngpswdFormGroup.addControl('oldpassword', new FormControl({ value: null, disabled: false}, locValidators));
+
+        locValidators = [ Validators.required,Validators.minLength(6) ];
+        this.chngpswdFormGroup.addControl('newPassword', new FormControl({ value: null, disabled: false}, locValidators));
+
+        locValidators = [ Validators.required,Validators.minLength(6) ];
+        this.chngpswdFormGroup.addControl('confirmPassword', new FormControl({ value: null, disabled: false}, locValidators));
+    } 
+    getErrorMessage(fc: AbstractControl): string {
+        return this.<#= AppSettingServicePropName #>.getValidationErrorMessage(fc);
     } 
     doSubmit() {
-        this.<#= securityServiceName #>.<#= logoutMethodName #>()
+        if(typeof this.chngpswdFormGroup === 'undefined') return;
+        if(this.chngpswdFormGroup === null) return;
+        if (this.chngpswdFormGroup.invalid) {
+            this.chngpswdFormGroup.markAllAsTouched();
+            return;
+        }
+        if(!(this.chngpswdFormGroup.controls['newPassword'].value === this.chngpswdFormGroup.controls['confirmPassword'].value)) {
+            let msg = {
+<# 
+    if(localize) {
+#>
+                message: $localize`:New Password and Confirm Password must be identical@@<#= appChangePasswordComponentClassName #>.New-Password-dentical:New Password and Confirm Password must be identical` 
+<# 
+    } else {
+#>
+                message: 'New Password and Confirm Password must be identical'
+<# 
+    }
+#>
+            };
+<# 
+    if(localize) {
+#>
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>($localize`:Input Error@@<#= appChangePasswordComponentClassName #>.Input-Error:Input Error`, msg);
+<# 
+    } else {
+#>
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('Input Error', msg);
+<# 
+    }
+#>
+            return;
+        }
+        let chPwd: <#= appChangePasswordModelClassName #> = {
+           OldPassword: this.chngpswdFormGroup.controls['oldpassword'].value,
+           NewPassword: this.chngpswdFormGroup.controls['newPassword'].value,
+           ConfirmPassword: this.chngpswdFormGroup.controls['confirmPassword'].value,
+        }
+        this.<#= securityServiceName #>.<#= changePasswordMethodName #>(chPwd)
         .subscribe({
             next: (respdata: any ) => { // success path
-                this.<#= AppSettingServicePropName #>.perms = [0,0,0,0,  0,0,0,0,  0,0,0,0,  0,0,  1,0,0];
-                this.<#= AppSettingServicePropName #>.<#= setAuthIntoMethodName #>(null);
-                this.<#= AppSettingServicePropName #>.userName = null;
                 this.router.navigate(['/']);
             },
             error: (error) => { // error path

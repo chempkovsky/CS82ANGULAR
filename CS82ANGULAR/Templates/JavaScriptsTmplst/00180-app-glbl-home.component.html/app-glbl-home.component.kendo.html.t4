@@ -1,0 +1,89 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+<#
+    bool localize = Context.Localize;
+
+
+    string homeComponentFolder        = "00180-app-glbl-home.component.ts";
+    string homeComponentClassName = GetComponentClassName(Model, homeComponentFolder);
+
+#>
+
+
+<div class="home-container">
+    <div class="home-item-container" fxLayout="column" fxLayoutAlign="center space-between">
+        <h1 fxLayout="row" fxLayoutAlign="center"> 
+            <button kendoButton icon="home" color="primary" rounded="full" size="large" >
+            </button>
+        </h1>
+<# 
+    if(localize) {
+#>
+        <h2 fxLayout="row" fxLayoutAlign="center" i18n="Home Page@@<#= homeComponentClassName#>.Home-Page"> Home Page </h2>
+<# 
+    } else {
+#>
+        <h2 fxLayout="row" fxLayoutAlign="center" > Home Page </h2>
+<# 
+    }
+#>
+        <router-outlet></router-outlet>
+    </div>
+</div>
+
+<#+
+
+    string GetComponentClassName(ModelViewSerializable model, string fileType) {
+        string result="";
+        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
+            return result;
+        }
+        if (model.CommonStaffs == null) {
+            return result;
+        }
+        CommonStaffSerializable refItem= 
+            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+        if (refItem == null) {
+            return result;
+        }
+        if(string.IsNullOrEmpty(refItem.FileName)) {
+            return result;
+        }
+        string fn = refItem.FileName.Replace(".component","Component");
+        StringBuilder sb = new StringBuilder();
+        bool toUpper = true;
+        foreach (char c in fn)
+        {
+            if( c == '-' )
+            {
+                toUpper = true;
+            } else
+            {
+                if (toUpper)
+                {
+                    sb.Append(Char.ToUpper(c));
+                    toUpper = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+#>
+

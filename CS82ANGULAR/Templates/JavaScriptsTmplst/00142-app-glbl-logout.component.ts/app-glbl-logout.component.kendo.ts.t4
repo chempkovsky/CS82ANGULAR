@@ -12,6 +12,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#
+    bool localize = Context.Localize;
 
     string appSettingServiceFolder          = "00015-app-glbl-settings.service.ts";
     string appRegisterInterfaceFolder       = "00118-app-glbl-register.interface.ts";
@@ -23,80 +24,86 @@
     string appLoginCssComponentFolder       = "00140-app-glbl-login.component.css";
     string appLoginComponentFolder          = "00140-app-glbl-login.component.ts";
 
+
+    string appLogoutCssComponentFolder      = "00142-app-glbl-logout.component.css";
+    string appLogoutHtmlComponentFolder     = "00142-app-glbl-logout.component.html";
+    string appLogoutComponentFolder         = "00142-app-glbl-logout.component.ts";
+
     string appRegisterModelClassName        = GetModelClassName(Model, appRegisterInterfaceFolder);
     string appLoginModelClassName           = GetModelClassName(Model, appLoginInterfaceFolder);
     string appSettingServiceClassName       = GetServiceClassName(Model, appSettingServiceFolder);
     string appLoginServiceClassName         = GetServiceClassName(Model, appLoginServiceFolder);
     string appLoginComponentClassName       = GetComponentClassName(Model, appLoginComponentFolder);
+    string appLogoutComponentClassName      = GetComponentClassName(Model, appLogoutComponentFolder);
 
-    string appLoginComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, appLoginComponentFolder);
+    string appLogoutComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, appLogoutComponentFolder);
 
     string AppearancePropName           = "appearance";
     string ShowErrorMethodName          = "showError";
     string securityServiceName          = "scrtSvr";
     string registerMethodName           = "register";
     string loginMethodName              = "login";
+    string logoutMethodName             = "logout";
     string AppSettingServicePropName    = "appGlblSettings";
     string getAuthIntoMethodName        = "getAuthInto";
     string setAuthIntoMethodName        = "setAuthInto";
-
+    string vwModelsPropName             = "vwModels";
                                 
 #>
 import { Component } from '@angular/core';
-import { FormControl, Validators, ValidatorFn, FormGroup, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DropDownFillMode } from '@progress/kendo-angular-dropdowns';
+import { InputFillMode } from '@progress/kendo-angular-inputs';
+import { DateInputFillMode } from '@progress/kendo-angular-dateinputs';
 
-import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, appLoginComponentFolder)#>';
-import { <#= appLoginServiceClassName #> } from '<#= GetFolderName(Model, appLoginServiceFolder, appLoginComponentFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, appLogoutComponentFolder)#>';
+import { <#= appLoginServiceClassName #> } from '<#= GetFolderName(Model, appLoginServiceFolder, appLogoutComponentFolder)#>';
 
 
 @Component({
-  selector: 'app-<#= appLoginComponentSelectorCommonPart #>',
-  templateUrl: '<#= GetFolderName(Model, appLoginHtmlComponentFolder, appLoginComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderName(Model, appLoginCssComponentFolder, appLoginComponentFolder) #>.css']
+  selector: 'app-<#= appLogoutComponentSelectorCommonPart #>',
+  templateUrl: '<#= GetFolderName(Model, appLogoutHtmlComponentFolder, appLogoutComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderName(Model, appLogoutCssComponentFolder, appLogoutComponentFolder) #>.css']
 })
-export class <#= appLoginComponentClassName #> {
-    title: string = 'Sign in';
-    cnfPwdhide: boolean = true;
-    pwdhide: boolean = true;
-    public appearance: string = 'outline';
-    loginFormGroup: FormGroup;
+export class <#= appLogoutComponentClassName #> {
+<# 
+    if(localize) {
+#>
+    title: string = $localize`:Do you want to Sign Out@@<#= appLogoutComponentClassName #>.Sign Out:Do you want to Sign Out?`;
+<# 
+    } else {
+#>
+    title: string = 'Do you want to Sign Out?';
+<# 
+    }
+#>
+
+    public <#= AppearancePropName #>: DropDownFillMode|InputFillMode|DateInputFillMode = 'outline';
 
     constructor(private <#= securityServiceName #>: <#= appLoginServiceClassName #>, protected router: Router, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #> ) {
-        this.appearance = this.<#= AppSettingServicePropName #>.appearance;
-
-        this.loginFormGroup =  new FormGroup({});
-        let locValidators: ValidatorFn[]; 
-
-        locValidators = [ Validators.required,Validators.minLength(3) ];
-        this.loginFormGroup.addControl('username', new FormControl({ value: null, disabled: false}, locValidators));
-
-        locValidators = [ Validators.required,Validators.minLength(6) ];
-        this.loginFormGroup.addControl('password', new FormControl({ value: null, disabled: false}, locValidators));
-
+        this.appearance = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
     } 
-    getErrorMessage(fc: AbstractControl): string {
-        return this.<#= AppSettingServicePropName #>.getValidationErrorMessage(fc);
-    } 
-
     doSubmit() {
-        if(typeof this.loginFormGroup === 'undefined') return;
-        if(this.loginFormGroup === null) return;
-        if (this.loginFormGroup.invalid) {
-            this.loginFormGroup.markAllAsTouched();
-            return;
-        }
-        this.<#= securityServiceName #>.<#= loginMethodName #>(this.loginFormGroup.controls['username'].value, this.loginFormGroup.controls['password'].value)
+        this.<#= AppSettingServicePropName #>.perms = [0,0,0,0,  0,0,0,0,  0,0,0,0,  0,0,  1,0,0];
+        this.<#= AppSettingServicePropName #>.<#= setAuthIntoMethodName #>(null);
+        this.<#= AppSettingServicePropName #>.userName = null;
+        this.<#= AppSettingServicePropName #>.<#= vwModelsPropName #> = {};
+        this.router.navigate(['/']);
+/*
+        this.<#= securityServiceName #>.<#= logoutMethodName #>()
         .subscribe({
             next: (respdata: any ) => { // success path
-                this.<#= AppSettingServicePropName #>.<#= setAuthIntoMethodName #>(respdata);
-                this.<#= AppSettingServicePropName #>.userName = this.loginFormGroup.controls['username'].value;
+                this.<#= AppSettingServicePropName #>.perms = [0,0,0,0,  0,0,0,0,  0,0,0,0,  0,0,  1,0,0];
+                this.<#= AppSettingServicePropName #>.<#= setAuthIntoMethodName #>(null);
+                this.<#= AppSettingServicePropName #>.userName = null;
+                this.<#= AppSettingServicePropName #>.<#= vwModelsPropName #> = {};
                 this.router.navigate(['/']);
             },
             error: (error) => { // error path
                 this.appGlblSettings.showError('http', error)
             }
         });
+*/
     }
     onCancel(){
         this.router.navigate(['/']);

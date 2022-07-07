@@ -1,0 +1,62 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+
+ <div class="custom-application-wrapper">
+    <div class="custom-application-toolbar">
+      <div>
+          <button
+            kendoButton
+            icon="menu"
+            fillMode="flat"
+            (click)="appdrawer.toggle()"
+          ></button>
+          <span class="custom-application-caption">{{apptitle}}</span>
+      </div>
+
+        <span fxFlex="1 1 auto"></span>
+        <div>
+          <kendo-label class="custom-application-caption"> {{ userName }} </kendo-label>
+          <kendo-dropdownbutton   icon="cog" fillMode="flat" [data]="cogMenuItems" style="margin-right: 20px;">
+            <ng-template kendoDropDownButtonItemTemplate let-m>
+              <div [routerLink]="m.path">
+                <span class="k-icon {{ m.icon }}"></span>
+                <span style="margin-left: 5px;">{{ m.text  }}</span>
+              </div>
+            </ng-template> 
+          </kendo-dropdownbutton>          
+        </div>
+  </div>
+  <kendo-drawer-container class="custom-application-drawer-container">
+      <kendo-drawer 
+          #appdrawer
+          [items]="mainMenuItems"
+          mode="push"
+          [autoCollapse]="false"
+          [mini]="true"
+          [expanded]="true"
+          position="start"
+          (select)="onSelectMenuItem($event)"
+        >
+        <ng-template kendoDrawerItemTemplate let-item>
+          <div class="k-drawer-link" [routerLink]="item.path">
+            <span class="k-icon {{ item.icon }}"></span>
+            <span style="margin-left: 5px;">{{ item.text }}</span>
+          </div>
+        </ng-template>        
+      </kendo-drawer>
+      <kendo-drawer-content>
+          <router-outlet></router-outlet> 
+      </kendo-drawer-content>
+  </kendo-drawer-container>      
+</div>

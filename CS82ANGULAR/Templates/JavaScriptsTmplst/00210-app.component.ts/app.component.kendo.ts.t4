@@ -24,8 +24,8 @@
 
 #>
 
-import { Component, OnInit } from '@angular/core';
-import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
+import { Component } from '@angular/core';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, appComponentFolder)#>';
@@ -37,30 +37,33 @@ import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appS
   templateUrl: '<#= GetFolderName(Model, appHtmlComponentFolder, appComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderName(Model, appCssComponentFolder, appComponentFolder) #>.css']
 })
-export class AppComponent implements OnInit {
-    apptitle = 'BLitApp';
-    isSideBarCollapsed: boolean = false;
+export class AppComponent {
+    apptitle = 'LitApp';
+
+    isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
+    .pipe(map(result => result.matches), shareReplay());
 
     constructor(private breakpointObserver: BreakpointObserver, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {
     //<#= AppSettingServicePropName #>.appearance = 'fill';
-    }
-    ngOnInit() {
-    this.breakpointObserver
-        .observe(Breakpoints.Handset)
-        .subscribe({
-            next: (state: BreakpointState) => {
-                if (state.matches) {
-                    this.isSideBarCollapsed = true;
-                } else {
-                    this.isSideBarCollapsed = false;
-                }
-            }
-        });
     }
 
     get userName(): string|null {
         return this.<#= AppSettingServicePropName #>.userName;
     }  
+
+    mainMenuItems: Array<{id?: number | string, parentId?: number | string, text?: string, icon?: string, disabled?: boolean, selected?: boolean, separator?: boolean, path?: string}> = [
+      { text: "Inbox", icon: "k-i-home", selected: false, path: "/home" },
+      { separator: true },
+    ]
+
+    cogMenuItems: Array<{id?: number | string, text?: string, icon?: string, disabled?: boolean, path: string}> = [
+      { text: "Home", icon: "k-i-home", path: "/home" },
+      { text: "Sign in", icon: "k-i-login", path: "/authentication/login" },
+      { text: "Sign out", icon: "k-i-logout", path: "/authentication/logout" },
+      { text: "Registration", icon: "k-i-user", path: "/authentication/register" },
+      { text: "Change Password", icon: "k-i-edit", path: "/authentication/changepassword" },
+    ]
+
 }
 
 <#+
