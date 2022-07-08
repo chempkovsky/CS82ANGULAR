@@ -6,13 +6,13 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
-<#@ import namespace="CS2ANGULAR" #>
-<#@ import namespace="CS2ANGULAR.Model" #>
-<#@ import namespace="CS2ANGULAR.Model.Serializable" #>
-<#@ parameter type="CS2ANGULAR.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
-<#@ parameter type="CS2ANGULAR.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
-<#@ parameter type="CS2ANGULAR.Model.Serializable.FeatureSerializable" name="Feature" #>
-<#@ parameter type="CS2ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureSerializable" name="Feature" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 
 <#
     string containerMenuItemsPropName           = "contMenuItems";
@@ -177,7 +177,7 @@ export class <#= featureClassName #>  {
         foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
             curItem++;
 #>
-            [  {id: '<#= curItem #>', caption: 'expand(collapse)', iconName: 'expand', iconColor: 'primary', enabled: true } ],
+            [  {id: '<#= curItem #>', caption: 'expand(collapse)', iconName: 'fullscreen', iconColor: 'primary', enabled: true } ],
 <#
         }
     }
@@ -194,7 +194,8 @@ export class <#= featureClassName #>  {
     constructor(private breakpointObserver: BreakpointObserver, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {
         breakpointObserver.observe([
             Breakpoints.Medium,
-            Breakpoints.Large
+            Breakpoints.Large,
+            Breakpoints.XLarge
           ]).subscribe(result => {
             if (result.matches) {
                 this.curBreakpoint = 1;
@@ -514,7 +515,7 @@ export class <#= featureClassName #>  {
         return context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
     }
 
-    string GetComponentSelectorCommonPart(CS2ANGULAR.Model.Serializable.ModelViewSerializable model, string fileType)
+    string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType)
     {
         string result = "";
         if ((model == null) || string.IsNullOrEmpty(fileType))
@@ -560,7 +561,7 @@ export class <#= featureClassName #>  {
         }
         return allowedFileTypes.Items.Where(i => i.FileType == fileType).FirstOrDefault();
     }
-    string GetCommonServiceClassName(CS2ANGULAR.Model.Serializable.DbContextSerializable context, string fileType) {
+    string GetCommonServiceClassName(DbContextSerializable context, string fileType) {
         string result="";
         if ((context == null) || string.IsNullOrEmpty(fileType)) {
             return result;

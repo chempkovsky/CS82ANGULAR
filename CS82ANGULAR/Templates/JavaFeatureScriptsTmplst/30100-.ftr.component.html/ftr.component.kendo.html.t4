@@ -6,13 +6,13 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
-<#@ import namespace="CS2ANGULAR" #>
-<#@ import namespace="CS2ANGULAR.Model" #>
-<#@ import namespace="CS2ANGULAR.Model.Serializable" #>
-<#@ parameter type="CS2ANGULAR.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
-<#@ parameter type="CS2ANGULAR.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
-<#@ parameter type="CS2ANGULAR.Model.Serializable.FeatureSerializable" name="Feature" #>
-<#@ parameter type="CS2ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureSerializable" name="Feature" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 
 <#
     string containerMenuItemsPropName           = "contMenuItems";
@@ -60,7 +60,9 @@
             if (isRouted) {
 #>
     <div [style.grid-column-end]="'span '+ colSpan[<#= curItem #>][0]"   [style.grid-row-end]="'span '+ rowSpan[<#= curItem #>][0]"  [hidden]="colSpan[<#= curItem #>][0] === 0"  *ngIf="isVisible[<#= curItem #>]">
+        <kendo-card width>
             <router-outlet (activate)="<#= onActivateMethodName #>($event)"  (deactivate)= "<#= onDeActivateMethodName #>($event)" ></router-outlet>
+        </kendo-card>
     </div>
 
 <#
@@ -69,11 +71,13 @@
 #>
 
     <div [style.grid-column-end]="'span '+ colSpan[<#= curItem #>][0]"   [style.grid-row-end]="'span '+ rowSpan[<#= curItem #>][0]"  [hidden]="colSpan[<#= curItem #>][0] === 0"  *ngIf="isVisible[<#= curItem #>]">
-           <app-<#= selectorCommonPart #>
+        <kendo-card width>
+            <app-<#= selectorCommonPart #>
                 [<#= containerMenuItemsSelector #>]="<#= containerMenuItemsPropName #>[<#= curItem #>]"
                 (<#= onContainerMenuItemClickSelector #>)="<#= onContainerMenuItemClickMethodName #>($event)"
                 [<#= MaxHeightPropSelector #>]="<#= MaxHeightPropName #>[<#= curItem #>][0]"  
                 [<#= FilterMaxHeightPropSelector #>]="<#= FilterMaxHeightPropName #>[<#= curItem #>][0]"></app-<#= selectorCommonPart #>>
+        </kendo-card>
     </div>
 
 <#
@@ -81,6 +85,7 @@
         }
     }
 #>
+
   </div>
 </div>
 
@@ -96,7 +101,7 @@
             return context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
         }
 
-        string GetComponentSelectorCommonPart(CS2ANGULAR.Model.Serializable.ModelViewSerializable model, string fileType)
+        string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType)
         {
             string result = "";
             if ((model == null) || string.IsNullOrEmpty(fileType))
