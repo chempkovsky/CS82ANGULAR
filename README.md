@@ -4,7 +4,7 @@
       - tested on ANGULAR 13
       - tested on ANGULAR 14
     - **Backend** based on net.core 6.
-    - For the **Frontend** the developert can use  
+    - For the **Frontend** the developer can choose
       - [Material Design components for Angular](https://material.angular.io)
       - [Kendo UI for Angular](https://www.telerik.com/kendo-angular-ui)
 - Please refer to the [CS82ANGULAR wiki](https://github.com/chempkovsky/CS82ANGULAR/wiki) for details.
