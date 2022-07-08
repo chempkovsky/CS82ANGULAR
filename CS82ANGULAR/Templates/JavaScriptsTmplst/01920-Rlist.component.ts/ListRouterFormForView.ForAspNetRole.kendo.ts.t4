@@ -56,6 +56,8 @@
     string ViewNameParamName            = "view";
     string NavigationParamName          = "nav";
     string NavigationAddOnName          = "addon";
+    string permissionPropName           = "permission";
+    string accessDeniedPropName         = "accessdenied";
 
     // WebApi service's method names
 
@@ -250,6 +252,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         '<#= ActionParamViewMode #>': $localize`:View Item@@<#= componentClassName #>.<#= ActionParamViewMode #>:View Item`,
         '<#= ActionParamAddMode #>': $localize`:Add Item@@<#= componentClassName #>.<#= ActionParamAddMode #>:Add Item`,
         '<#= ActionParamDeleteSelMode #>': $localize`:Delete Selected@@<#= componentClassName #>.<#= ActionParamDeleteSelMode #>:Delete Selected`,
+        '<#= permissionPropName #>': $localize`:Permission@@<#= componentClassName #>.<#= permissionPropName #>:Permission`,
+        '<#= accessDeniedPropName #>': $localize`:Access denied@@<#= componentClassName #>.<#= accessDeniedPropName #>:Access denied`,
 <#
         foreach(string detailViewName in detailViewNames) {
             if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
@@ -302,6 +306,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         '<#= ActionParamViewMode #>': 'View Item',
         '<#= ActionParamAddMode #>': 'Add Item',
         '<#= ActionParamDeleteSelMode #>': 'Delete Selected',
+        '<#= permissionPropName #>': 'Permission',
+        '<#= accessDeniedPropName #>': 'Access denied',
 <#
         foreach(string detailViewName in detailViewNames) {
             if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
@@ -395,12 +401,12 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         }
     rowMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
          {id: '<#= ActionParamUpdateMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'], iconName: 'edit', iconColor: 'primary', enabled: true},
-         {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'delete_forever', iconColor: 'warn', enabled: true},
+         {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'delete', iconColor: 'warning', enabled: true},
          {id: '<#= ActionParamViewMode #>',   caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'preview', iconColor: 'primary', enabled: true},
       ];
     tableMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
-         {id: '<#= ActionParamAddMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'], iconName: 'create', iconColor: 'primary', enabled: true},
-         {id: '<#= ActionParamDeleteSelMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'], iconName: 'delete_forever', iconColor: 'warn', enabled: true},
+         {id: '<#= ActionParamAddMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'], iconName: 'plus', iconColor: 'primary', enabled: true},
+         {id: '<#= ActionParamDeleteSelMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'], iconName: 'delete', iconColor: 'warning', enabled: true},
       ];
     constructor(protected route: ActivatedRoute, protected router: Router, protected  <#= formRootService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
 <#
@@ -568,7 +574,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             msk = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= viewToNavigate.ViewName #>');
             if((msk & 1) === 1) {
                 this.rowMenuItemsData.push(
-                 { id: '<#= id #>', caption: this.<#= frasesPropName #>['<#= viewToNavigate.ViewName +"__"+ detailView.ViewName #>'], iconName: 'arrow_forward', iconColor: 'primary', enabled: true, 
+                 { id: '<#= id #>', caption: this.<#= frasesPropName #>['<#= viewToNavigate.ViewName +"__"+ detailView.ViewName #>'], iconName: 'arrow-right', iconColor: 'primary', enabled: true, 
                     data: {
                         <#= ViewNameParamName #>: '<#= viewToNavigate.ViewName #>',
                         <#= NavigationParamName #>: '<#= foreignKey.NavigationName #>',
@@ -587,7 +593,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             msk = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= detailViewName #>');
             if((msk & 1) === 1) {
                 this.rowMenuItemsData.push(
-                 { id: '<#= id #>', caption: this.<#= frasesPropName #>['<#=detailView.ViewName + foreignKey.NavigationName #>'], iconName: 'arrow_forward', iconColor: 'primary', enabled: true, 
+                 { id: '<#= id #>', caption: this.<#= frasesPropName #>['<#=detailView.ViewName + foreignKey.NavigationName #>'], iconName: 'arrow-right', iconColor: 'primary', enabled: true, 
                     data: {
                         <#= ViewNameParamName #>: '<#= detailViewName #>',
                         <#= NavigationParamName #>: '<#= foreignKey.NavigationName #>',
@@ -760,6 +766,12 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     }
 
     rowCommand(v: <#= eventEmitterDataModelClassName #>) {
+        let id = this.rowMenuItemsData.findIndex(e => { return e.id === v.id; });
+        if(id < 0) return;
+        if (!(this.rowMenuItemsData[id].enabled)) {
+            this.<#= AppSettingServicePropName #>.showError(this.<#= frasesPropName #>['<#= permissionPropName #>'], this.<#= frasesPropName #>['<#= accessDeniedPropName #>']);
+            return;
+        }
         let qp: string[] = [];
 <#
         if(primKeys != null) {
@@ -840,7 +852,13 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 */
     }
     tableCommand(v: <#= eventEmitterDataModelClassName #>) {
-        if(v.id === '<#= ActionParamDeleteMode #>') {
+        let id = this.tableMenuItemsData.findIndex(e => { return e.id === v.id; });
+        if(id < 0) return;
+        if (!(this.tableMenuItemsData[id].enabled)) {
+            this.<#= AppSettingServicePropName #>.showError(this.<#= frasesPropName #>['<#= permissionPropName #>'], this.<#= frasesPropName #>['<#= accessDeniedPropName #>']);
+            return;
+        }
+        if(v.id === '<#= ActionParamDeleteSelMode #>') {
             this.onDeleteMultiple( v.sender );
         } else if(v.id === '<#= ActionParamAddMode #>') {
             let qp: string[] = [];

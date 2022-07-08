@@ -115,7 +115,7 @@
  ></app-<#= componentSelectorCommonPart #>>
 
 <div fxLayout="row"  *ngIf="<#= ShowDetailsPropName #>">
-  <kendo-formfield fxFlex="100" >
+ <!--   <kendo-formfield fxFlex="100" > -->
     <kendo-dropdownlist 
         [fillMode]="<#= AppearancePropName #>" 
         valueField
@@ -125,7 +125,7 @@
         (selectionChange)="<#= OnDetailChangedMethodName #>($event)"
       >
     </kendo-dropdownlist>
-  </kendo-formfield>
+<!--     </kendo-formfield> -->
 </div>
 
  <!-- <router-outlet name='<#=  DlOutletNamePrefix + Model.ViewName #>'></router-outlet>  -->

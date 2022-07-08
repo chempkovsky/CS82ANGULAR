@@ -174,6 +174,8 @@
     string multiSelectedRowPropName     = "multiSelectedRow";
     string onMultiSelectedRowPropName   = "onMultiSelectedRow";
     string currentMultiRowPropName      = "currentMultiRow";
+    string permissionPropName           = "permission";
+    string accessDeniedPropName         = "accessdenied";
 
     string ActionColumnDefProperty      = "menuAction";
     string SelectColumnDefProperty      = "selectAction";
@@ -294,6 +296,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         '<#= ActionParamViewMode #>': $localize`:View Item@@<#= componentClassName #>.<#= ActionParamViewMode #>:View Item`,
         '<#= ActionParamAddMode #>': $localize`:Add Item@@<#= componentClassName #>.<#= ActionParamAddMode #>:Add Item`,
         '<#= ActionParamDeleteSelMode #>': $localize`:Delete Selected@@<#= componentClassName #>.<#= ActionParamDeleteSelMode #>:Delete Selected`,
+        '<#= permissionPropName #>': $localize`:Permission@@<#= componentClassName #>.<#= permissionPropName #>:Permission`,
+        '<#= accessDeniedPropName #>': $localize`:Access denied@@<#= componentClassName #>.<#= accessDeniedPropName #>:Access denied`,
     }
 <# 
     } else {
@@ -305,6 +309,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         '<#= ActionParamViewMode #>': 'View Item',
         '<#= ActionParamAddMode #>': 'Add Item',
         '<#= ActionParamDeleteSelMode #>': 'Delete Selected',
+        '<#= permissionPropName #>': 'Permission',
+        '<#= accessDeniedPropName #>': 'Access denied',
     }
 <#
    }
@@ -732,6 +738,12 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     }
 
     rowCommand(v: <#= eventEmitterDataModelClassName #>) {
+        let id = this.rowMenuItemsData.findIndex(e => { return e.id === v.id; });
+        if(id < 0) return;
+        if (!(this.rowMenuItemsData[id].enabled)) {
+            this.<#= AppSettingServicePropName #>.showError(this.<#= frasesPropName #>['<#= permissionPropName #>'], this.<#= frasesPropName #>['<#= accessDeniedPropName #>']);
+            return;
+        }
         if(v.id === '<#= ActionParamUpdateMode #>') {
             this.onEdit(v.value);
         } else if(v.id === '<#= ActionParamDeleteMode #>') {
@@ -743,6 +755,12 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         }
     }
     tableCommand(v: <#= eventEmitterDataModelClassName #>) {
+        let id = this.tableMenuItemsData.findIndex(e => { return e.id === v.id; });
+        if(id < 0) return;
+        if (!(this.tableMenuItemsData[id].enabled)) {
+            this.<#= AppSettingServicePropName #>.showError(this.<#= frasesPropName #>['<#= permissionPropName #>'], this.<#= frasesPropName #>['<#= accessDeniedPropName #>']);
+            return;
+        }
         if(v.id === '<#= ActionParamAddMode #>') {
            this.onAdd( v.sender );
         } else if (v.id === '<#= ActionParamDeleteMode #>') {

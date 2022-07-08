@@ -124,10 +124,19 @@
 #>
 //
 // How to use:
-//
-//  <li [ngbNavItem] > <a ngbNavLink [routerLink]="['<#= node.Item2 #>']" routerLinkActive="active">List of <#= Model.ViewName #></a>/li>                  
-//
-//  <a mat-list-item [routerLink]="['<#= node.Item2 #>']" routerLinkActive="active">List of <#= Model.ViewName #></a>
+//  1.
+//  <li [ngbNavItem] > <a ngbNavLink [routerLink]="['<#= node.Item2 #>']" routerLinkActive="active">List of <#= Model.PluralTitle #></a>/li>                  
+//  2.
+//  <a mat-list-item [routerLink]="['<#= node.Item2 #>']" routerLinkActive="active">List of <#= Model.PluralTitle #></a>
+//  3.
+//  mainMenuItems: Array<{id?: number | string, parentId?: number | string, text?: string, icon?: string, disabled?: boolean, selected?: boolean, separator?: boolean, path?: string}> = [
+//      { text: "Home", icon: "k-i-home", selected: false, path: "/home" },
+//      ...
+//      { text: "List of <#= Model.PluralTitle #>", icon: "k-i-grid", selected: false, path: '<#= node.Item2 #>' },
+//      ...
+//  // never leave separator as the last element of an array
+//  //      { separator: true },
+//  ]
 //
 <#
     }

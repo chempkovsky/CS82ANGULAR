@@ -56,6 +56,8 @@
     string ViewNameParamName            = "view";
     string NavigationParamName          = "nav";
     string NavigationAddOnName          = "addon";
+    string permissionPropName           = "permission";
+    string accessDeniedPropName         = "accessdenied";
 
     // WebApi service's method names
 
@@ -246,6 +248,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         '<#= ActionParamViewMode #>': $localize`:View Item@@<#= componentClassName #>.<#= ActionParamViewMode #>:View Item`,
         '<#= ActionParamAddMode #>': $localize`:Add Item@@<#= componentClassName #>.<#= ActionParamAddMode #>:Add Item`,
         '<#= ActionParamDeleteSelMode #>': $localize`:Delete Selected@@<#= componentClassName #>.<#= ActionParamDeleteSelMode #>:Delete Selected`,
+        '<#= permissionPropName #>': $localize`:Permission@@<#= componentClassName #>.<#= permissionPropName #>:Permission`,
+        '<#= accessDeniedPropName #>': $localize`:Access denied@@<#= componentClassName #>.<#= accessDeniedPropName #>:Access denied`,
 <#
         foreach(string detailViewName in detailViewNames) {
             if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
@@ -299,6 +303,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         '<#= ActionParamViewMode #>': 'View Item',
         '<#= ActionParamAddMode #>': 'Add Item',
         '<#= ActionParamDeleteSelMode #>': 'Delete Selected',
+        '<#= permissionPropName #>': 'Permission',
+        '<#= accessDeniedPropName #>': 'Access denied',
 <#
         foreach(string detailViewName in detailViewNames) {
             if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
@@ -753,6 +759,12 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     }
 
     rowCommand(v: <#= eventEmitterDataModelClassName #>) {
+        let id = this.rowMenuItemsData.findIndex(e => { return e.id === v.id; });
+        if(id < 0) return;
+        if (!(this.rowMenuItemsData[id].enabled)) {
+            this.<#= AppSettingServicePropName #>.showError(this.<#= frasesPropName #>['<#= permissionPropName #>'], this.<#= frasesPropName #>['<#= accessDeniedPropName #>']);
+            return;
+        }
         let qp: string[] = [];
 <#
         if(primKeys != null) {
@@ -833,7 +845,13 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 */
     }
     tableCommand(v: <#= eventEmitterDataModelClassName #>) {
-        if(v.id === '<#= ActionParamDeleteMode #>') {
+        let id = this.tableMenuItemsData.findIndex(e => { return e.id === v.id; });
+        if(id < 0) return;
+        if (!(this.tableMenuItemsData[id].enabled)) {
+            this.<#= AppSettingServicePropName #>.showError(this.<#= frasesPropName #>['<#= permissionPropName #>'], this.<#= frasesPropName #>['<#= accessDeniedPropName #>']);
+            return;
+        }
+        if(v.id === '<#= ActionParamDeleteSelMode #>') {
             this.onDeleteMultiple( v.sender );
         } else if(v.id === '<#= ActionParamAddMode #>') {
             let qp: string[] = [];
