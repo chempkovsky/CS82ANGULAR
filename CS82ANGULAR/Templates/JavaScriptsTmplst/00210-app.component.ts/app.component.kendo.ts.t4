@@ -24,7 +24,7 @@
 
 #>
 
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
@@ -33,6 +33,7 @@ import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appS
 
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-root',
   templateUrl: '<#= GetFolderName(Model, appHtmlComponentFolder, appComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderName(Model, appCssComponentFolder, appComponentFolder) #>.css']

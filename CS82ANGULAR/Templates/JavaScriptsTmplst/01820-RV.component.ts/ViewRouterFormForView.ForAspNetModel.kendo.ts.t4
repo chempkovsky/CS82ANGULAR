@@ -411,7 +411,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 
     public <#= OnDetailChangedMethodName #>(v: {caption: string, vw: string|null, nv: string|null, addon: string|null}|null) {
         if(v) {
-            this.<#= SelectedDetailPropName #> = v.value;
+            this.<#= SelectedDetailPropName #> = v;
         } else {
             this.<#= SelectedDetailPropName #> = this.<#= DetailViewsPropName #>[0];
         }
