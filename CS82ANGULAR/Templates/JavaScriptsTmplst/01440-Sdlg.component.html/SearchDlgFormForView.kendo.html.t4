@@ -11,6 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 
 <#
     bool localize = Context.Localize;
@@ -72,63 +73,3 @@
 
 </kendo-dialog-actions>
 
-<#+
-    string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType) {
-        string result="";
-        if ((model == null) || string.IsNullOrEmpty(fileType)) {
-            return result;
-        }
-        if (model.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-        if (refItem == null) {
-            return result;
-        }
-        if(string.IsNullOrEmpty(refItem.FileName)) {
-            return result;
-        }
-        return refItem.FileName.Replace(".component","");
-    }
-    string GetComponentClassName(ModelViewSerializable model, string fileType) {
-        string result="";
-        if ((model == null) || string.IsNullOrEmpty(fileType) ) {
-            return result;
-        }
-        if (model.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-        if (refItem == null) {
-            return result;
-        }
-        if(string.IsNullOrEmpty(refItem.FileName)) {
-            return result;
-        }
-        string fn = refItem.FileName.Replace(".component","Component");
-        StringBuilder sb = new StringBuilder();
-        bool toUpper = true;
-        foreach (char c in fn)
-        {
-            if( c == '-' )
-            {
-                toUpper = true;
-            } else
-            {
-                if (toUpper)
-                {
-                    sb.Append(Char.ToUpper(c));
-                    toUpper = false;
-                }
-                else
-                {
-                    sb.Append(c);
-                }
-            }
-        }
-        return sb.ToString();
-    }
-
-#>

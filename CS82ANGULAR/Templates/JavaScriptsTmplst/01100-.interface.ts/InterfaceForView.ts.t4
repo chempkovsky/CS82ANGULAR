@@ -11,13 +11,14 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 
 export interface <#= GetInterfaceName(Model) #> {
 <#  
     if (Model.ScalarProperties != null) {
         foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
 #>
-      <#=                GetTypeScriptPropertyName(prop, Model) #>: <#= GetPropertyTypeScriptTypeName(prop) #>;    // <#= GetPropertyTypeName(prop) #>
+      <#=                GetTypeScriptPropertyName(prop, Model) #>: <#= GetPropertyTypeScriptTypeName(prop) #>|null;    // <#= GetPropertyTypeName(prop) #>
 <#
         }
     }
@@ -25,65 +26,3 @@ export interface <#= GetInterfaceName(Model) #> {
 }
 
 
-<#+
-
-    string GetInterfaceName(ModelViewSerializable model) {
-        return "I"+model.ViewName;
-    }
-    string GetPropertyTypeScriptTypeName(ModelViewPropertyOfVwSerializable prop) {
-        string result = "";
-        switch(prop.UnderlyingTypeName.ToLower()) {
-            case "system.boolean": 
-                result =  "boolean";
-                break;
-            case "system.guid":
-            case "system.string":
-                result =  "string";
-                break;
-            default:
-                result =  "number";
-                break;
-        }
-        if(prop.IsNullable || (!prop.IsRequiredInView)) {
-            return result + " | null";
-        } else {
-            return result + " | any"; // this is impartant line of code
-        }
-        return result;
-    }
-    string GetPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
-    {
-        if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
-            return prop.UnderlyingTypeName;
-        }
-        if(prop.IsNullable || (!prop.IsRequiredInView)) {
-            return prop.UnderlyingTypeName + " ?";
-        }
-        return prop.UnderlyingTypeName;
-    }
-    public string FirstLetterToUpper(string str)
-    {
-        if (str == null)
-            return null;
-        if (str.Length > 1)
-            return char.ToUpper(str[0]) + str.Substring(1);
-        return str.ToUpper();
-    }
-    public string FirstLetterToLower(string str)
-    {
-        if (str == null)
-            return null;
-        if (str.Length > 1)
-            return char.ToLower(str[0]) + str.Substring(1);
-        return str.ToUpper();
-    }
-    string GetTypeScriptPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
-        if (model.GenerateJSonAttribute) {
-            return prop.JsonPropertyName;
-        } else {
-            return FirstLetterToLower(prop.ViewPropertyName);
-        }
-    }
-
-
-#>

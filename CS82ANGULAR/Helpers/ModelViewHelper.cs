@@ -904,8 +904,6 @@ namespace CS82ANGULAR.Helpers
             destModelView.PluralTitle = srcModelView.PluralTitle;
             destModelView.GenerateJSonAttribute = srcModelView.GenerateJSonAttribute;
             destModelView.PageViewName = srcModelView.PageViewName;
-            destModelView.Title = srcModelView.Title;
-            destModelView.PluralTitle = srcModelView.PluralTitle;
             if (srcModelView.ScalarProperties != null)
             {
                 if (destModelView.ScalarProperties == null)

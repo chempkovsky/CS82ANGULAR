@@ -11,6 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
     string OperatorSufix = "Oprtr";
 #>
@@ -33,75 +34,3 @@ export interface <#= GetInterfaceFilterName(Model) #> {
 }
 
 
-<#+
-
-    string GetInterfaceFilterName(ModelViewSerializable model) {
-        return "I"+model.ViewName + "Filter";
-    }
-    string GetInterfacePageName(ModelViewSerializable model) {
-        return "I"+model.PageViewName;
-    }
-    string GetInterfaceName(ModelViewSerializable model) {
-        return "I"+model.ViewName;
-    }
-    string GetPropertyTypeScriptTypeName(ModelViewPropertyOfVwSerializable prop) {
-        string result = "";
-        switch(prop.UnderlyingTypeName.ToLower()) {
-            case "system.boolean": 
-                result =  "boolean";
-                break;
-            case "system.guid":
-            case "system.string":
-                result =  "string";
-                break;
-            default:
-                result =  "number";
-                break;
-        }
-        if(prop.IsNullable || (!prop.IsRequiredInView)) {
-            return result + " | null";
-        }
-        return result;
-    }
-    string GetPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
-    {
-        if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
-            return prop.UnderlyingTypeName;
-        }
-        if(prop.IsNullable || (!prop.IsRequiredInView)) {
-            return prop.UnderlyingTypeName + " ?";
-        }
-        return prop.UnderlyingTypeName;
-    }
-    public string FirstLetterToUpper(string str)
-    {
-        if (str == null)
-            return null;
-        if (str.Length > 1)
-            return char.ToUpper(str[0]) + str.Substring(1);
-        return str.ToUpper();
-    }
-    public string FirstLetterToLower(string str)
-    {
-        if (str == null)
-            return null;
-        if (str.Length > 1)
-            return char.ToLower(str[0]) + str.Substring(1);
-        return str.ToUpper();
-    }
-    string GetTypeScriptPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
-        if (model.GenerateJSonAttribute) {
-            return prop.JsonPropertyName;
-        } else {
-            return FirstLetterToLower(prop.ViewPropertyName);
-        }
-    }
-    string GetFilterPropertyOperatorName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model, string operatorSufix) {
-        if (model.GenerateJSonAttribute) {
-            return prop.JsonPropertyName + operatorSufix;
-        } else {
-            return FirstLetterToLower(prop.ViewPropertyName) + operatorSufix;
-        }
-    }
-
-#>

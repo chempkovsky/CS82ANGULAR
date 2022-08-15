@@ -11,7 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
-
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
     bool localize = Context.Localize;
 
@@ -130,25 +130,3 @@
  <!-- <router-outlet name='<#=  LOutletNamePrefix + Model.ViewName #>'></router-outlet>  -->
  <router-outlet></router-outlet>
 
-<#+
-
-    string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType) {
-        string result="";
-        if ((model == null) || string.IsNullOrEmpty(fileType)) {
-            return result;
-        }
-        if (model.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-        if (refItem == null) {
-            return result;
-        }
-        if(string.IsNullOrEmpty(refItem.FileName)) {
-            return result;
-        }
-        return refItem.FileName.Replace(".component","");
-    }
-
-#>

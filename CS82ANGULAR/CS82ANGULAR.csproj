@@ -127,6 +127,7 @@
     <Compile Include="Model\SolutionCodeElement.cs" />
     <Compile Include="Model\SolutionProject.cs" />
     <Compile Include="Model\TemplateCode.cs" />
+    <Compile Include="Model\ViewLevelTemplateCode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CS82ANGULARPackage.cs" />
     <Compile Include="TemplateProcessingHelpers\TPCallback.cs" />
@@ -2413,6 +2414,10 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\BatchJavaScriptsTmplst\00000-ContextLevelTmplts\00230-appCompAndModule.kendo.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\CommonScripts\ViewLevel.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

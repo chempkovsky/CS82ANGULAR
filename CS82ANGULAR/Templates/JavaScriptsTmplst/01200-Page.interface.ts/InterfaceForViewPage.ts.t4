@@ -12,6 +12,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
 
     string viewInterfaceFolder      = "01100-.interface.ts";
@@ -34,105 +35,3 @@ export interface <#= GetInterfacePageName(Model) #> {
 }
 
 
-<#+
-    string GetInterfacePageName(ModelViewSerializable model) {
-        return "I"+model.PageViewName;
-    }
-    string GetInterfaceName(ModelViewSerializable model) {
-        return "I"+model.ViewName;
-    }
-    string GetPropertyTypeScriptTypeName(ModelViewPropertyOfVwSerializable prop) {
-        string result = "";
-        switch(prop.UnderlyingTypeName.ToLower()) {
-            case "system.boolean": 
-                result =  "boolean";
-                break;
-            case "system.guid":
-            case "system.string":
-                result =  "string";
-                break;
-            default:
-                result =  "number";
-                break;
-        }
-        if(prop.IsNullable || (!prop.IsRequiredInView)) {
-            return result + " | null";
-        }
-        return result;
-    }
-    string GetPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
-    {
-        if("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase)) {
-            return prop.UnderlyingTypeName;
-        }
-        if(prop.IsNullable || (!prop.IsRequiredInView)) {
-            return prop.UnderlyingTypeName + " ?";
-        }
-        return prop.UnderlyingTypeName;
-    }
-    string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder) {
-        string result="./";
-        if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
-            return result;
-        }
-        if (model.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
-        CommonStaffSerializable curItem= 
-            model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
-        if ((refItem == null) || (curItem == null)) {
-            return result;
-        }
-        string[] refFolders  = new string[] {};
-        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
-            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-        }
-        string[] currFolders = new string[]{};
-        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
-            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-        }
-        int refLen = refFolders.Length;
-        int currLen = currFolders.Length;
-        int minLen = refLen < currLen ? refLen : currLen;
-        int cnt= 0;
-        for(int i = 0; i < minLen; i++) {
-            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
-            cnt++;
-        }
-        if(currLen > cnt) {
-            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
-        }
-        if(refLen > cnt) {
-            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
-        }
-        result += refItem.FileName;
-        return result;
-    }
-    public string FirstLetterToUpper(string str)
-    {
-        if (str == null)
-            return null;
-        if (str.Length > 1)
-            return char.ToUpper(str[0]) + str.Substring(1);
-        return str.ToUpper();
-    }
-    public string FirstLetterToLower(string str)
-    {
-        if (str == null)
-            return null;
-        if (str.Length > 1)
-            return char.ToLower(str[0]) + str.Substring(1);
-        return str.ToUpper();
-    }
-
-    string GetTypeScriptPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model) {
-        if (model.GenerateJSonAttribute) {
-            return prop.JsonPropertyName;
-        } else {
-            return FirstLetterToLower(prop.ViewPropertyName);
-        }
-    }
-
-#>
