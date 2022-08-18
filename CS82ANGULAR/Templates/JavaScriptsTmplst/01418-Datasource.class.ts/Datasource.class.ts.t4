@@ -143,19 +143,9 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
     if (Model.ScalarProperties != null) {
         List<ModelViewPropertyOfVwSerializable> primKeyProps = GetModelPrimaryKeyProps(Model);
         foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
-            string IsInPrimKey = "false";
-            if(primKeyProps != null) {
-                if (primKeyProps.Any(k => k == prop)) {
-                    IsInPrimKey = "true";
-                }
-            }
-            string IsDatabaseGenerated = IsDatabaseGeneratedProperty(prop, Model) ? "true" : "false";
-            string IsRequiredInView = prop.IsRequiredInView ? "true" : "false";
-            string fk = string.IsNullOrEmpty( prop.ForeignKeyName ) ? "" : prop.ForeignKeyName;
-            string fkchain = string.IsNullOrEmpty( prop.ForeignKeyNameChain ) ? "" : prop.ForeignKeyNameChain;
             string defVal = IsBooleanTypeName(prop) ? "false" : "undefined";
 #>
-      '<#= GetTypeScriptPropertyName(prop, Model) #>': <#= defVal #>,  // <#= GetPropertyTypeScriptTypeName(prop) #>, <#= GetPropertyTypeName(prop) #>
+      { "<#= GetTypeScriptPropertyName(prop, Model) #>", <#= defVal #> },  //  <#= GetPropertyTypeName(prop) #>
 <#
 
         }
@@ -275,7 +265,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         return this.<#= formRootService #>.required<#= ValueSuffix #>(key);
     }
     public dbgenerated<#= ValueSuffix #>(key: string): boolean {
-        return this.<#= formRootService #>.required<#= ValueSuffix #>(key);
+        return this.<#= formRootService #>.dbgenerated<#= ValueSuffix #>(key);
     }
     public isInPrimkey<#= ValueSuffix #>(key: string): boolean {
         return this.<#= formRootService #>.isInPrimkey<#= ValueSuffix #>(key);
@@ -320,7 +310,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
             return dest === null;
         }
         if(dest === null) {
-            return true;
+            return false;
         }
         return src === dest;
     }

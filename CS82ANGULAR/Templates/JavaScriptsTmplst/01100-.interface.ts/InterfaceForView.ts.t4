@@ -18,7 +18,7 @@ export interface <#= GetInterfaceName(Model) #> {
     if (Model.ScalarProperties != null) {
         foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
 #>
-      <#=                GetTypeScriptPropertyName(prop, Model) #>: <#= GetPropertyTypeScriptTypeName(prop) #>|null;    // <#= GetPropertyTypeName(prop) #>
+      <#=                GetTypeScriptPropertyName(prop, Model) #>: <#= GetPropertyTypeScriptTypeNameEx(prop) #>|null;    // <#= GetPropertyTypeName(prop) #>
 <#
         }
     }

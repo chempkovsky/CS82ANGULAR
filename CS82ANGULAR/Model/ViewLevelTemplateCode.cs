@@ -2220,6 +2220,24 @@ namespace CS82ANGULAR.Model
             }
             return result;
         }
+        string GetPropertyTypeScriptTypeNameEx(ModelViewPropertyOfVwSerializable prop)
+        {
+            string result = "";
+            switch (prop.UnderlyingTypeName.ToLower())
+            {
+                case "system.boolean":
+                    result = "boolean";
+                    break;
+                case "system.guid":
+                case "system.string":
+                    result = "string";
+                    break;
+                default:
+                    result = "number";
+                    break;
+            }
+            return result;
+        }
         string GetJavaScriptToStringMethod(ModelViewPropertyOfVwSerializable prop)
         {
             string result = "";
