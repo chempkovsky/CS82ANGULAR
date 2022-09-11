@@ -1448,11 +1448,11 @@ namespace CS82ANGULAR.Model
                     if (ui > k) return null;
                     if (result == "")
                     {
-                        result = sp.ViewPropertyName;
+                        result = "\'" + sp.ViewPropertyName + "\'";
                     }
                     else
                     {
-                        result = result + "," + sp.ViewPropertyName;
+                        result = result + ", \'" + sp.ViewPropertyName + "\'";
                     }
                 }
             }
