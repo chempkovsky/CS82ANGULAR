@@ -896,7 +896,7 @@ namespace <#= webApiServiceNameSpace #> {
         }
         return result;
     }
-    String WebApiRoutePrefix(ModelViewSerializable model) {
+    String GetWebApiRoutePrefix(ModelViewSerializable model) {
         string result = model.WebApiRoutePrefix;
         if( string.IsNullOrEmpty( result ) ) {
             result = "";
