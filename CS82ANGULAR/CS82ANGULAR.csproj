@@ -82,6 +82,7 @@
     <Compile Include="Model\BatchProcess\BatchItem.cs" />
     <Compile Include="Model\BatchProcess\BatchSettings.cs" />
     <Compile Include="Model\BatchProcess\GeneratorBatchStep.cs" />
+    <Compile Include="Model\ContextLevelTemplateCode.cs" />
     <Compile Include="Model\FeatureItem.cs" />
     <Compile Include="Model\InfoSourceEnum.cs" />
     <Compile Include="Model\InputTypeEnum.cs" />
@@ -2418,6 +2419,10 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\JavaScriptsTmplst\00600-view-model-datasource.interface.ts\view-model-datasource.interface.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\CommonScripts\ContextLevel.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
