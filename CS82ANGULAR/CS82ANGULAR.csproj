@@ -980,6 +980,7 @@
     </Content>
     <Content Include="Templates\NodejsSripts\updater_of_public-api.ts.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\ViewModelTmplst\ViewModel.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -2432,7 +2433,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Templates\NodejsSripts\updater_of_webpack.config.js">
+    <Content Include="Templates\NodejsSripts\updater_of_webpack.config.js.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
