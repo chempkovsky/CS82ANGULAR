@@ -11,6 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
     bool localize = Context.Localize;
@@ -100,20 +101,20 @@ import { DropDownFillMode } from '@progress/kendo-angular-dropdowns';
 import { InputFillMode } from '@progress/kendo-angular-inputs';
 import { DateInputFillMode } from '@progress/kendo-angular-dateinputs';
 
-import { <#= filterModelClassName #> } from '<#= GetFolderName(Model, filterModelFolder, filterComponentFolder)#>';
-import { <#= filterDefModelClassName #> } from '<#= GetFolderName(Model, filterDefModelFolder, filterComponentFolder)#>';
-import { <#= filterOperatorModelClassName #> } from '<#= GetFolderName(Model, filterOperatorModelFolder, filterComponentFolder)#>';
-import { <#= filterResultModelClassName #> } from '<#= GetFolderName(Model, filterResultModelFolder, filterComponentFolder)#>';
-import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, filterComponentFolder)#>';
-import { <#= menuItemDataModelClassName #> } from '<#= GetFolderName(Model, menuItemDataModelFolder, filterComponentFolder)#>';
-import { <#= eventEmitterDataModelClassName #> } from '<#= GetFolderName(Model, eventEmitterDataModelFolder, filterComponentFolder)#>';
-import { <#= eventEmitterPubModelClassName #> } from '<#= GetFolderName(Model, eventEmitterPubModelFolder, filterComponentFolder)#>';
+import { <#= filterModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterModelFolder, filterComponentFolder)#>';
+import { <#= filterDefModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterDefModelFolder, filterComponentFolder)#>';
+import { <#= filterOperatorModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterOperatorModelFolder, filterComponentFolder)#>';
+import { <#= filterResultModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterResultModelFolder, filterComponentFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, filterComponentFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, menuItemDataModelFolder, filterComponentFolder)#>';
+import { <#= eventEmitterDataModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, eventEmitterDataModelFolder, filterComponentFolder)#>';
+import { <#= eventEmitterPubModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, eventEmitterPubModelFolder, filterComponentFolder)#>';
 
 
 @Component({
   selector: 'app-<#= filterComponentSelectorCommonPart #>',
-  templateUrl: '<#= GetFolderName(Model, filterComponentHtmlFolder, filterComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderName(Model, filterComponentCssFolder, filterComponentFolder) #>.css']
+  templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterComponentHtmlFolder, filterComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterComponentCssFolder, filterComponentFolder) #>.css']
 })
 export class <#= filterComponentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #> {
     protected isOnInitCalled: boolean = false;

@@ -11,6 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
 
@@ -44,15 +45,15 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { <#= materialModuleClassName #> } from '<#= GetFolderName(Model, materialModuleFolder, securityModuleFolder)#>';
-import { <#= flexModuleClassName #> } from '<#= GetFolderName(Model, flexModuleFolder, securityModuleFolder)#>';
-import { <#= securityRoutingModuleClassName #> } from '<#= GetFolderName(Model, securityRoutingModuleFolder, securityModuleFolder)#>';
+import { <#= materialModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, materialModuleFolder, securityModuleFolder)#>';
+import { <#= flexModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, flexModuleFolder, securityModuleFolder)#>';
+import { <#= securityRoutingModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, securityRoutingModuleFolder, securityModuleFolder)#>';
 
-import { <#= appChangePasswordComponentClassName #> } from '<#= GetFolderName(Model, appChangePasswordComponentFolder, securityModuleFolder)#>';
-import { <#= appLogoutComponentClassName #> } from '<#= GetFolderName(Model, appLogoutComponentFolder, securityModuleFolder)#>';
-import { <#= appLoginComponentClassName #> } from '<#= GetFolderName(Model, appLoginComponentFolder, securityModuleFolder)#>';
-import { <#= appRegisterComponentClassName #> } from '<#= GetFolderName(Model, appRegisterComponentFolder, securityModuleFolder)#>';
-import { <#= securityDashboardComponentClassName #> } from '<#= GetFolderName(Model, securityDashboardComponentFolder, securityModuleFolder)#>';
+import { <#= appChangePasswordComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appChangePasswordComponentFolder, securityModuleFolder)#>';
+import { <#= appLogoutComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLogoutComponentFolder, securityModuleFolder)#>';
+import { <#= appLoginComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginComponentFolder, securityModuleFolder)#>';
+import { <#= appRegisterComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appRegisterComponentFolder, securityModuleFolder)#>';
+import { <#= securityDashboardComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, securityDashboardComponentFolder, securityModuleFolder)#>';
 
 
 //

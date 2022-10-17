@@ -12,6 +12,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
 
@@ -28,7 +29,7 @@
 import { Directive, HostListener, ElementRef, OnInit, Input, forwardRef } from "@angular/core";
 // import { MAT_INPUT_VALUE_ACCESSOR } from '@angular/material/input';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
-import { <#= toBinaryPipeClassName #> } from '<#= GetFolderName(Model, toBinaryPipeFolder, toBinaryFormatterDirectiveFolder) #>';
+import { <#= toBinaryPipeClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, toBinaryPipeFolder, toBinaryFormatterDirectiveFolder) #>';
 
  @Directive({ 
    selector: '[<#= toBinaryFormatterDirectiveSelectorName #>]',

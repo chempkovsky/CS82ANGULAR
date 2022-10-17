@@ -374,6 +374,7 @@ namespace CS82ANGULAR.ViewModel
                 uniqueKeyProperties.Add(itm.PropName);
             }
             string tempatePath = Path.Combine(TemplateFolder, SelectedTemplate);
+            textTemplatingSessionHost.Session["AngularJsonFile"] = AngularJsonHelper.GetAngularJson();
             textTemplatingSessionHost.Session["UniqueKeyProperties"] = uniqueKeyProperties;
             textTemplatingSessionHost.Session["UniqueKeyName"] = UniqueKeyName;
             string result = textTemplating.ProcessTemplate(tempatePath, T4TempateText, tpCallback);

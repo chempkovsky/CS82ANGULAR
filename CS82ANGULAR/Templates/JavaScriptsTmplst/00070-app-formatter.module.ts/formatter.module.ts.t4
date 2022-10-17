@@ -11,6 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
 
@@ -31,9 +32,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { <#= materialModuleClassName #> } from '<#= GetFolderName(Model, materialModuleFolder, formatterModuleFolder)#>';
-import { <#= toBinaryPipeClassName #> } from '<#= GetFolderName(Model, toBinaryPipeFolder, formatterModuleFolder)#>';
-import { <#= toBinaryFormatterDirectiveClassName #> } from '<#= GetFolderName(Model, toBinaryFormatterDirectiveFolder, formatterModuleFolder)#>';
+import { <#= materialModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, materialModuleFolder, formatterModuleFolder)#>';
+import { <#= toBinaryPipeClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, toBinaryPipeFolder, formatterModuleFolder)#>';
+import { <#= toBinaryFormatterDirectiveClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, toBinaryFormatterDirectiveFolder, formatterModuleFolder)#>';
 
 @NgModule({
     declarations: [

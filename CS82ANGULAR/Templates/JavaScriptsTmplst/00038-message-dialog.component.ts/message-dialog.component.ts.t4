@@ -11,6 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
 
@@ -27,14 +28,14 @@
 
 import { Component,  Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import { <#= messageDialogDataModelClassName #> } from '<#= GetFolderName(Model, messageDialogDataModelFolder, messageDialogComponentFolder)#>';
+import { <#= messageDialogDataModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, messageDialogDataModelFolder, messageDialogComponentFolder)#>';
 
 
 
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
-  templateUrl: '<#= GetFolderName(Model, messageDialogComponentHtmlFolder, messageDialogComponentFolder)#>.html',
-  styleUrls: ['<#= GetFolderName(Model, messageDialogComponentCssFolder, messageDialogComponentFolder)#>.css']
+  templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, messageDialogComponentHtmlFolder, messageDialogComponentFolder)#>.html',
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, messageDialogComponentCssFolder, messageDialogComponentFolder)#>.css']
 })
 export class <#= messageDialogComponentClassName #>  {
     constructor(public dialogRef: MatDialogRef<MessageDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: <#= messageDialogDataModelClassName #> ) { }

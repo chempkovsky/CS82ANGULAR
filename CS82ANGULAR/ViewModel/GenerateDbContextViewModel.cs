@@ -3,6 +3,7 @@ using System.IO;
 using EnvDTE80;
 using Microsoft.VisualStudio.TextTemplating;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
+using CS82ANGULAR.Helpers;
 
 namespace CS82ANGULAR.ViewModel
 {
@@ -22,6 +23,7 @@ namespace CS82ANGULAR.ViewModel
             ITextTemplatingSessionHost textTemplatingSessionHost = (ITextTemplatingSessionHost)textTemplating;
             textTemplatingSessionHost.Session = textTemplatingSessionHost.CreateSession();
             TPCallback tpCallback = new TPCallback();
+            textTemplatingSessionHost.Session["AngularJsonFile"] = AngularJsonHelper.GetAngularJson();
             textTemplatingSessionHost.Session["DestinationNameSpace"] = DestinationNameSpace;
             textTemplatingSessionHost.Session["DestinationClassName"] = DestinationClassName;
 

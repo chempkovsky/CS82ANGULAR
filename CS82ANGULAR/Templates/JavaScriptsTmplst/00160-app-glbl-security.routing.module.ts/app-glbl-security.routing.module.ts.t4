@@ -11,6 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
 
@@ -36,11 +37,11 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { <#= appChangePasswordComponentClassName #> } from '<#= GetFolderName(Model, appChangePasswordComponentFolder, securityRoutingModuleFolder)#>';
-import { <#= appLogoutComponentClassName #> } from '<#= GetFolderName(Model, appLogoutComponentFolder, securityRoutingModuleFolder)#>';
-import { <#= appLoginComponentClassName #> } from '<#= GetFolderName(Model, appLoginComponentFolder, securityRoutingModuleFolder)#>';
-import { <#= appRegisterComponentClassName #> } from '<#= GetFolderName(Model, appRegisterComponentFolder, securityRoutingModuleFolder)#>';
-import { <#= securityDashboardComponentClassName #> } from '<#= GetFolderName(Model, securityDashboardComponentFolder, securityRoutingModuleFolder)#>';
+import { <#= appChangePasswordComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appChangePasswordComponentFolder, securityRoutingModuleFolder)#>';
+import { <#= appLogoutComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLogoutComponentFolder, securityRoutingModuleFolder)#>';
+import { <#= appLoginComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginComponentFolder, securityRoutingModuleFolder)#>';
+import { <#= appRegisterComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appRegisterComponentFolder, securityRoutingModuleFolder)#>';
+import { <#= securityDashboardComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, securityDashboardComponentFolder, securityRoutingModuleFolder)#>';
 
 const routes: Routes = [
     { path: '',   redirectTo: '/login', pathMatch: 'full' },

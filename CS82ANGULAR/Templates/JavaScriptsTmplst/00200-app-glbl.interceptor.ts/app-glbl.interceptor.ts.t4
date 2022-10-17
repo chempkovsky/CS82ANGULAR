@@ -11,6 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
 
@@ -45,7 +46,7 @@ The following should be added to the file 'app.module.ts':
 
 import { Injectable } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler } from '@angular/common/http';
-import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, appInterceptorFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, appInterceptorFolder)#>';
 
 @Injectable()
 export class <#= appInterceptorClassName #> implements HttpInterceptor {

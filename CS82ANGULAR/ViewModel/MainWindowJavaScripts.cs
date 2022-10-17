@@ -107,6 +107,10 @@ namespace CS82ANGULAR.ViewModel
                         dataContext.UiCommandButtonVisibility = Visibility.Collapsed;
                         dataContext.UiCommandCaption3 = "NameSpace: " + (InvitationUC.DataContext as InvitationViewModel).DefaultProjectNameSpace;
                         string folder = (InvitationUC.DataContext as InvitationViewModel).DestinationFolder;
+                        string pathForAngularJson = (InvitationUC.DataContext as InvitationViewModel).DestinationProjectRootFolder;
+                        if (!string.IsNullOrEmpty(folder))
+                            pathForAngularJson = Path.Combine(pathForAngularJson, folder);
+                        AngularJsonHelper.GetAngularJson().ReadAngularJson(pathForAngularJson);
                         if (!string.IsNullOrEmpty(folder))
                         {
                             dataContext.UiCommandCaption3 = dataContext.UiCommandCaption3 + "." + folder.Replace("\\", ".");

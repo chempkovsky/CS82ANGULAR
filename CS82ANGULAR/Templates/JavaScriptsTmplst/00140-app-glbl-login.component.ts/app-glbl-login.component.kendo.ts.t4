@@ -11,6 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
     bool localize = Context.Localize;
@@ -52,14 +53,14 @@ import { DropDownFillMode } from '@progress/kendo-angular-dropdowns';
 import { InputFillMode } from '@progress/kendo-angular-inputs';
 import { DateInputFillMode } from '@progress/kendo-angular-dateinputs';
 
-import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, appLoginComponentFolder)#>';
-import { <#= appLoginServiceClassName #> } from '<#= GetFolderName(Model, appLoginServiceFolder, appLoginComponentFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, appLoginComponentFolder)#>';
+import { <#= appLoginServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginServiceFolder, appLoginComponentFolder)#>';
 
 
 @Component({
   selector: 'app-<#= appLoginComponentSelectorCommonPart #>',
-  templateUrl: '<#= GetFolderName(Model, appLoginHtmlComponentFolder, appLoginComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderName(Model, appLoginCssComponentFolder, appLoginComponentFolder) #>.css']
+  templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginHtmlComponentFolder, appLoginComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginCssComponentFolder, appLoginComponentFolder) #>.css']
 })
 export class <#= appLoginComponentClassName #> {
 <# 

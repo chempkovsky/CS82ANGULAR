@@ -11,6 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
     bool localize = Context.Localize;
@@ -50,14 +51,14 @@ import { FormControl, Validators, ValidatorFn, FormGroup, AbstractControl } from
 import { Router } from '@angular/router';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
 
-import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, appLoginComponentFolder)#>';
-import { <#= appLoginServiceClassName #> } from '<#= GetFolderName(Model, appLoginServiceFolder, appLoginComponentFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, appLoginComponentFolder)#>';
+import { <#= appLoginServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginServiceFolder, appLoginComponentFolder)#>';
 
 
 @Component({
   selector: 'app-<#= appLoginComponentSelectorCommonPart #>',
-  templateUrl: '<#= GetFolderName(Model, appLoginHtmlComponentFolder, appLoginComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderName(Model, appLoginCssComponentFolder, appLoginComponentFolder) #>.css']
+  templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginHtmlComponentFolder, appLoginComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginCssComponentFolder, appLoginComponentFolder) #>.css']
 })
 export class <#= appLoginComponentClassName #> {
 <# 

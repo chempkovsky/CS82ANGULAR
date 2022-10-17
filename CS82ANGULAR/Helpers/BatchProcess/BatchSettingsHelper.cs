@@ -45,6 +45,7 @@ namespace CS82ANGULAR.Helpers.BatchProcess
             ITextTemplatingSessionHost textTemplatingSessionHost = (ITextTemplatingSessionHost)textTemplating;
             textTemplatingSessionHost.Session = textTemplatingSessionHost.CreateSession();
             TPCallback tpCallback = new TPCallback();
+            textTemplatingSessionHost.Session["AngularJsonFile"] = AngularJsonHelper.GetAngularJson();
             textTemplatingSessionHost.Session["Model"] = model;
             textTemplatingSessionHost.Session["Context"] = SerializableDbContext;
             textTemplatingSessionHost.Session["DefaultProjectNameSpace"] = string.IsNullOrEmpty(defaultProjectNameSpace) ? "" : defaultProjectNameSpace;

@@ -11,6 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
 
@@ -72,23 +73,23 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 //import { BrowserModule } from '@angular/platform-browser';
 
-import { <#= materialModuleClassName #> } from '<#= GetFolderName(Model, materialModuleFolder, filterModuleFolder)#>';
-import { <#= flexModuleClassName #> } from '<#= GetFolderName(Model, flexModuleFolder, filterModuleFolder)#>';
+import { <#= materialModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, materialModuleFolder, filterModuleFolder)#>';
+import { <#= flexModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, flexModuleFolder, filterModuleFolder)#>';
 
-// import { <#= uniqFilterDefModelClassName #> } from '<#= GetFolderName(Model, uniqFilterDefModelFolder, filterModuleFolder)#>';
-// import { <#= uniqFilterModelClassName #> } from '<#= GetFolderName(Model, uniqFilterModelFolder, filterModuleFolder)#>';
-// import { <#= filterModelClassName #> } from '<#= GetFolderName(Model, filterModelFolder, filterModuleFolder)#>';
-// import { <#= filterDefModelClassName #> } from '<#= GetFolderName(Model, filterDefModelFolder, filterModuleFolder)#>';
-// import { <#= filterOperatorModelClassName #> } from '<#= GetFolderName(Model, filterOperatorModelFolder, filterModuleFolder)#>';
-// import { <#= filterResultModelClassName #> } from '<#= GetFolderName(Model, filterResultModelFolder, filterModuleFolder)#>';
-// import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, filterModuleFolder)#>';
+// import { <#= uniqFilterDefModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterDefModelFolder, filterModuleFolder)#>';
+// import { <#= uniqFilterModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterModelFolder, filterModuleFolder)#>';
+// import { <#= filterModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterModelFolder, filterModuleFolder)#>';
+// import { <#= filterDefModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterDefModelFolder, filterModuleFolder)#>';
+// import { <#= filterOperatorModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterOperatorModelFolder, filterModuleFolder)#>';
+// import { <#= filterResultModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterResultModelFolder, filterModuleFolder)#>';
+// import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, filterModuleFolder)#>';
 
-import { <#= filterComponentClassName #> } from '<#= GetFolderName(Model, filterComponentFolder, filterModuleFolder)#>';
-import { <#= uniqFilterComponentClassName #> } from '<#= GetFolderName(Model, uniqFilterComponentFolder, filterModuleFolder)#>';
+import { <#= filterComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterComponentFolder, filterModuleFolder)#>';
+import { <#= uniqFilterComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterComponentFolder, filterModuleFolder)#>';
 
-import { <#= columnSelectorComponentClassName #> } from '<#= GetFolderName(Model, columnSelectorComponentFolder, filterModuleFolder)#>';
-import { <#= columnSelectorDlgComponentClassName #> } from '<#= GetFolderName(Model, columnSelectorDlgComponentFolder, filterModuleFolder)#>';
-import { <#= messageDialogComponentClassName #> } from '<#= GetFolderName(Model, messageDialogComponentFolder, filterModuleFolder)#>';
+import { <#= columnSelectorComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentFolder, filterModuleFolder)#>';
+import { <#= columnSelectorDlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorDlgComponentFolder, filterModuleFolder)#>';
+import { <#= messageDialogComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, messageDialogComponentFolder, filterModuleFolder)#>';
 
 
 

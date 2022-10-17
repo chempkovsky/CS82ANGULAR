@@ -11,6 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
     bool localize = Context.Localize;
@@ -125,13 +126,13 @@ import { InputFillMode } from '@progress/kendo-angular-inputs';
 import { DateInputFillMode } from '@progress/kendo-angular-dateinputs';
 import { debounceTime, Observable, of, switchMap } from 'rxjs';
 
-import { <#= uniqFilterModelClassName #> } from '<#= GetFolderName(Model, uniqFilterModelFolder, uniqFilterComponentFolder)#>';
-import { <#= uniqFilterDefModelClassName #> } from '<#= GetFolderName(Model, uniqFilterDefModelFolder, uniqFilterComponentFolder)#>';
-import { <#= filterResultModelClassName #> } from '<#= GetFolderName(Model, filterResultModelFolder, uniqFilterComponentFolder)#>';
-import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, uniqFilterComponentFolder)#>';
-import { <#= menuItemDataModelClassName #> } from '<#= GetFolderName(Model, menuItemDataModelFolder, uniqFilterComponentFolder)#>';
-import { <#= eventEmitterDataModelClassName #> } from '<#= GetFolderName(Model, eventEmitterDataModelFolder, uniqFilterComponentFolder)#>';
-import { <#= eventEmitterPubModelClassName #> } from '<#= GetFolderName(Model, eventEmitterPubModelFolder, uniqFilterComponentFolder)#>';
+import { <#= uniqFilterModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterModelFolder, uniqFilterComponentFolder)#>';
+import { <#= uniqFilterDefModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterDefModelFolder, uniqFilterComponentFolder)#>';
+import { <#= filterResultModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterResultModelFolder, uniqFilterComponentFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, uniqFilterComponentFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, menuItemDataModelFolder, uniqFilterComponentFolder)#>';
+import { <#= eventEmitterDataModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, eventEmitterDataModelFolder, uniqFilterComponentFolder)#>';
+import { <#= eventEmitterPubModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, eventEmitterPubModelFolder, uniqFilterComponentFolder)#>';
 
 
 
@@ -139,8 +140,8 @@ import { <#= eventEmitterPubModelClassName #> } from '<#= GetFolderName(Model, e
 
 @Component({
   selector: 'app-<#= filterComponentSelectorCommonPart #>',
-  templateUrl: '<#= GetFolderName(Model, uniqFilterComponentHtmlFolder, uniqFilterComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderName(Model, uniqFilterComponentCssFolder, uniqFilterComponentFolder) #>.css']
+  templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterComponentHtmlFolder, uniqFilterComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterComponentCssFolder, uniqFilterComponentFolder) #>.css']
 })
 export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #> {
     protected isOnInitCalled: boolean = false;

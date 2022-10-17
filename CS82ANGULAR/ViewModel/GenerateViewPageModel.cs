@@ -4,6 +4,7 @@ using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.TextTemplating;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
+using CS82ANGULAR.Helpers;
 
 namespace CS82ANGULAR.ViewModel
 {
@@ -23,7 +24,9 @@ namespace CS82ANGULAR.ViewModel
             ITextTemplatingSessionHost textTemplatingSessionHost = (ITextTemplatingSessionHost)textTemplating;
             textTemplatingSessionHost.Session = textTemplatingSessionHost.CreateSession();
             TPCallback tpCallback = new TPCallback();
+            textTemplatingSessionHost.Session["AngularJsonFile"] = AngularJsonHelper.GetAngularJson();
             textTemplatingSessionHost.Session["Model"] = GeneratedModelView;
+            textTemplatingSessionHost.Session["AngularJsonFile"] = AngularJsonHelper.GetAngularJson();
             if (string.IsNullOrEmpty(GenText))
             {
                 this.GenerateText = textTemplating.ProcessTemplate(T4TempatePath, File.ReadAllText(T4TempatePath), tpCallback);

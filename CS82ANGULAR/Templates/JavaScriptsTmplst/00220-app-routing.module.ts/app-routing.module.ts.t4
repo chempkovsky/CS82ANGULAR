@@ -11,6 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
     string AppSettingServicePropName                = "appGlblSettings";
@@ -41,12 +42,12 @@ import { Routes, RouterModule } from '@angular/router';
 <#
     if(! string.IsNullOrEmpty(homeComponentClassName)) {
 #>
-import { <#= homeComponentClassName #> } from '<#= GetFolderName(Model, homeComponentFolder, appRoutingModuleFolder)#>';
+import { <#= homeComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, homeComponentFolder, appRoutingModuleFolder)#>';
 <#
     }
     if(! string.IsNullOrEmpty(pagenotfoundComponentClassName)) {
 #>
-import { <#= pagenotfoundComponentClassName #> } from '<#= GetFolderName(Model, pagenotfoundComponentFolder, appRoutingModuleFolder)#>';
+import { <#= pagenotfoundComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, pagenotfoundComponentFolder, appRoutingModuleFolder)#>';
 <#
     }
 #>

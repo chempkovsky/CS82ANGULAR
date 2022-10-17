@@ -11,6 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
 
@@ -28,8 +29,8 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-<#= homeComponentSelectorCommonPart #>',
-  templateUrl: '<#= GetFolderName(Model, homeComponentHtmlFolder, homeComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderName(Model, homeComponentCssFolder, homeComponentFolder) #>.css']
+  templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, homeComponentHtmlFolder, homeComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, homeComponentCssFolder, homeComponentFolder) #>.css']
 })
 export class <#= homeComponentClassName #>  {
 }

@@ -4,6 +4,7 @@ using System.IO;
 using EnvDTE80;
 using Microsoft.VisualStudio.TextTemplating;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
+using CS82ANGULAR.Helpers;
 
 namespace CS82ANGULAR.ViewModel
 {
@@ -29,7 +30,7 @@ namespace CS82ANGULAR.ViewModel
             ITextTemplatingSessionHost textTemplatingSessionHost = (ITextTemplatingSessionHost)textTemplating;
             textTemplatingSessionHost.Session = textTemplatingSessionHost.CreateSession();
             TPCallback tpCallback = new TPCallback();
-
+            textTemplatingSessionHost.Session["AngularJsonFile"] = AngularJsonHelper.GetAngularJson();
             textTemplatingSessionHost.Session["Model"] = GeneratedModelView;
             textTemplatingSessionHost.Session["Context"] = SerializableDbContext;
             textTemplatingSessionHost.Session["DefaultProjectNameSpace"] = string.IsNullOrEmpty(defaultProjectNameSpace) ? "" : defaultProjectNameSpace;
@@ -64,7 +65,7 @@ namespace CS82ANGULAR.ViewModel
             ITextTemplatingSessionHost textTemplatingSessionHost = (ITextTemplatingSessionHost)textTemplating;
             textTemplatingSessionHost.Session = textTemplatingSessionHost.CreateSession();
             TPCallback tpCallback = new TPCallback();
-
+            textTemplatingSessionHost.Session["AngularJsonFile"] = AngularJsonHelper.GetAngularJson();
             textTemplatingSessionHost.Session["AllowedFileTypes"] = AllowedFileTypes;
             textTemplatingSessionHost.Session["Feature"] = GeneratedFeature;
             textTemplatingSessionHost.Session["FeatureContext"] = SerializableFeatureContext;

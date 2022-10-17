@@ -12,6 +12,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
 
@@ -28,8 +29,8 @@
 #>
 
 import { EventEmitter } from  '@angular/core';
-import { <#= eventEmitterDataModelClassName #> } from '<#= GetFolderName(Model, eventEmitterDataModelFolder, eventEmitterPubModelFolder)#>';
-import { <#= menuItemDataModelClassName #> } from '<#= GetFolderName(Model, menuItemDataModelFolder, eventEmitterPubModelFolder)#>';
+import { <#= eventEmitterDataModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, eventEmitterDataModelFolder, eventEmitterPubModelFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, menuItemDataModelFolder, eventEmitterPubModelFolder)#>';
 
 export interface <#= eventEmitterPubModelClassName #> {
     onContMenuItemEmitter : EventEmitter<<#= eventEmitterDataModelClassName #>> ;

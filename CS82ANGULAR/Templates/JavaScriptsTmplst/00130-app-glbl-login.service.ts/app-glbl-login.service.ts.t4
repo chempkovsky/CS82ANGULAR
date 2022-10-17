@@ -11,6 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
 
@@ -36,10 +37,10 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, appLoginServiceFolder)#>';
-import { <#= appRegisterModelClassName #> } from '<#= GetFolderName(Model, appRegisterInterfaceFolder, appLoginServiceFolder)#>';
-import { <#= appLoginModelClassName #> } from '<#= GetFolderName(Model, appLoginInterfaceFolder, appLoginServiceFolder)#>';
-import { <#= appChangePasswordModelClassName #> } from '<#= GetFolderName(Model, appChangePasswordInterfaceFolder, appLoginServiceFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, appLoginServiceFolder)#>';
+import { <#= appRegisterModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appRegisterInterfaceFolder, appLoginServiceFolder)#>';
+import { <#= appLoginModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginInterfaceFolder, appLoginServiceFolder)#>';
+import { <#= appChangePasswordModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appChangePasswordInterfaceFolder, appLoginServiceFolder)#>';
 
 
 @Injectable({

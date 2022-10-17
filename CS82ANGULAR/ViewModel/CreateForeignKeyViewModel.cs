@@ -617,6 +617,7 @@ namespace CS82ANGULAR.ViewModel
             }
             string tempatePath = ""; //Path.Combine(TemplateFolder, SelectedTemplate);
 
+            textTemplatingSessionHost.Session["AngularJsonFile"] = AngularJsonHelper.GetAngularJson();
             textTemplatingSessionHost.Session["DetailClassFullName"] = detailCodeClassFullName;
             textTemplatingSessionHost.Session["MasterClassFullName"] = masterCodeClassFullName;
             textTemplatingSessionHost.Session["IsRequired"] = (ForeignKeyTypes[ForeignKeyTypesIndex] == NavigationTypeEnum.OneToMany) ||

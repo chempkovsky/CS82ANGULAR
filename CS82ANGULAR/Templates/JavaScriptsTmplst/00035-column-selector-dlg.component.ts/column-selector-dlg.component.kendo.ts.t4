@@ -11,6 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
     bool localize = Context.Localize;
@@ -29,13 +30,13 @@
 import { Component, ViewChild, Input } from '@angular/core';
 import { DialogRef, DialogContentBase } from "@progress/kendo-angular-dialog";
 
-import { <#= GetModelClassName(Model, columnSelectorItemInterfaceFolder) #> } from '<#= GetFolderName(Model, columnSelectorItemInterfaceFolder, columnSelectorDlgComponentFolder)#>';
-import { <#= GetComponentClassName(Model, columnSelectorComponentFolder) #> } from '<#= GetFolderName(Model, columnSelectorComponentFolder, columnSelectorDlgComponentFolder)#>';
+import { <#= GetModelClassName(Model, columnSelectorItemInterfaceFolder) #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorItemInterfaceFolder, columnSelectorDlgComponentFolder)#>';
+import { <#= GetComponentClassName(Model, columnSelectorComponentFolder) #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentFolder, columnSelectorDlgComponentFolder)#>';
 
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
-  templateUrl: '<#= GetFolderName(Model, columnSelectorDlgHtmlComponentFolder, columnSelectorDlgComponentFolder)#>.html',
-  styleUrls: ['<#= GetFolderName(Model, columnSelectorDlgCssComponentFolder, columnSelectorDlgComponentFolder)#>.css']
+  templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorDlgHtmlComponentFolder, columnSelectorDlgComponentFolder)#>.html',
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorDlgCssComponentFolder, columnSelectorDlgComponentFolder)#>.css']
 })
 
 export class <#= GetComponentClassName(Model, columnSelectorDlgComponentFolder) #> extends DialogContentBase { 

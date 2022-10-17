@@ -11,6 +11,7 @@
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
     bool localize = Context.Localize;
@@ -51,15 +52,15 @@ import { DropDownFillMode } from '@progress/kendo-angular-dropdowns';
 import { InputFillMode } from '@progress/kendo-angular-inputs';
 import { DateInputFillMode } from '@progress/kendo-angular-dateinputs';
 
-import { <#= appSettingServiceClassName #> } from '<#= GetFolderName(Model, appSettingServiceFolder, appChangePasswordComponentFolder)#>';
-import { <#= appLoginServiceClassName #> } from '<#= GetFolderName(Model, appLoginServiceFolder, appChangePasswordComponentFolder)#>';
-import { <#= appChangePasswordModelClassName #> } from '<#= GetFolderName(Model, appChangePasswordInterfaceFolder, appChangePasswordComponentFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, appChangePasswordComponentFolder)#>';
+import { <#= appLoginServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginServiceFolder, appChangePasswordComponentFolder)#>';
+import { <#= appChangePasswordModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appChangePasswordInterfaceFolder, appChangePasswordComponentFolder)#>';
 
 
 @Component({
   selector: 'app-<#= appChangePasswordComponentSelectorCommonPart #>',
-  templateUrl: '<#= GetFolderName(Model, appChangePasswordHtmlComponentFolder, appChangePasswordComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderName(Model, appChangePasswordCssComponentFolder, appChangePasswordComponentFolder) #>.css']
+  templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appChangePasswordHtmlComponentFolder, appChangePasswordComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appChangePasswordCssComponentFolder, appChangePasswordComponentFolder) #>.css']
 })
 export class <#= appChangePasswordComponentClassName #> {
 <# 

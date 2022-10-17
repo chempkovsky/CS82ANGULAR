@@ -51,6 +51,7 @@
     <Compile Include="Commands\CrtJavaScriptsCommand.cs" />
     <Compile Include="Commands\CrtViewModelCommand.cs" />
     <Compile Include="Commands\CrtWebApiServiceCommand.cs" />
+    <Compile Include="Helpers\AngularJsonHelper.cs" />
     <Compile Include="Helpers\BatchProcess\BatchSettingsHelper.cs" />
     <Compile Include="Helpers\CodeClassHelper.cs" />
     <Compile Include="Helpers\ContextChangedNotificationService.cs" />
@@ -79,6 +80,8 @@
     <Compile Include="Model\AnalyzeOnModelCreating\FluentAPIMethodNode.cs" />
     <Compile Include="Model\AnalyzeOnModelCreating\FluentAPINavigationProperty.cs" />
     <Compile Include="Model\AnalyzeOnModelCreating\FluentAPIProperty.cs" />
+    <Compile Include="Model\AngularJson.cs" />
+    <Compile Include="Model\AngularProject.cs" />
     <Compile Include="Model\BatchProcess\BatchItem.cs" />
     <Compile Include="Model\BatchProcess\BatchSettings.cs" />
     <Compile Include="Model\BatchProcess\GeneratorBatchStep.cs" />
@@ -974,6 +977,9 @@
     <Content Include="Templates\JavaScriptsTmplst\02150-Sc.module.ts\Readme.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\NodejsSripts\updater_of_public-api.ts.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Templates\ViewModelTmplst\ViewModel.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -2423,6 +2429,10 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\CommonScripts\ContextLevel.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\NodejsSripts\updater_of_webpack.config.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
