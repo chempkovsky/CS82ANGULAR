@@ -82,6 +82,11 @@
     <Compile Include="Model\AnalyzeOnModelCreating\FluentAPIProperty.cs" />
     <Compile Include="Model\AngularJson.cs" />
     <Compile Include="Model\AngularProject.cs" />
+    <Compile Include="Model\AngularPublicApiExportItem.cs" />
+    <Compile Include="Model\AngularPublicApiExportSpecifier.cs" />
+    <Compile Include="Model\AngularPublicApiJson.cs" />
+    <Compile Include="Model\AngularWebpackConfigExposeItem.cs" />
+    <Compile Include="Model\AngularWebpackConfigJson.cs" />
     <Compile Include="Model\BatchProcess\BatchItem.cs" />
     <Compile Include="Model\BatchProcess\BatchSettings.cs" />
     <Compile Include="Model\BatchProcess\GeneratorBatchStep.cs" />
@@ -975,6 +980,14 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Templates\JavaScriptsTmplst\02150-Sc.module.ts\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\NodejsSripts\reader_of_public-api.ts.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\NodejsSripts\reader_of_webpack.config.js.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
