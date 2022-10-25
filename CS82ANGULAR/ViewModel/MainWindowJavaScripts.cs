@@ -1,6 +1,7 @@
 ﻿using CS82ANGULAR.Helpers;
 using CS82ANGULAR.Model;
 using CS82ANGULAR.Model.Serializable;
+using CS82ANGULAR.Model.Serializable.Angular;
 using CS82ANGULAR.View;
 using EnvDTE80;
 using Microsoft.VisualStudio;
@@ -9,6 +10,7 @@ using Microsoft.VisualStudio.TextTemplating.VSHost;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -92,7 +94,8 @@ namespace CS82ANGULAR.ViewModel
         #endregion
 
         #region NextBtnCommand
-        public override void NextBtnCommandAction(Object param)
+        [SuppressMessage("", "VSTHRD100")]
+        public override async void NextBtnCommandAction(Object param)
         {
             switch (CurrentUiStepId)
             {
@@ -110,6 +113,7 @@ namespace CS82ANGULAR.ViewModel
                         string pathForAngularJson = (InvitationUC.DataContext as InvitationViewModel).DestinationProjectRootFolder;
                         if (!string.IsNullOrEmpty(folder))
                             pathForAngularJson = Path.Combine(pathForAngularJson, folder);
+                        AngularJsonHelper.SetT4RootFolder(TemplatePathHelper.GetTemplatePath() );
                         AngularJsonHelper.GetAngularJson().ReadAngularJson(pathForAngularJson);
                         if (!string.IsNullOrEmpty(folder))
                         {
@@ -124,6 +128,7 @@ namespace CS82ANGULAR.ViewModel
                     break;
                 case 1:
                     CurrentUiStepId = 2;
+                    AngularJsonHelper.SetBabelFolderPath((SelectDbContextUC.DataContext as SelectDbContextViewModel).SelectedBabelFolder);
                     PrevBtnEnabled = true;
                     NextBtnEnabled = false;
                     if (CreateWebApiUC == null)
@@ -416,8 +421,8 @@ namespace CS82ANGULAR.ViewModel
                     try
                     {
 
-                        (GenerateUC.DataContext as GenerateCommonStaffViewModel)
-                            .DoGenerateViewModel(Dte, TextTemplating,
+                        await (GenerateUC.DataContext as GenerateCommonStaffViewModel)
+                            .DoGenerateViewModelAsync(Dte, TextTemplating,
                             (T4EditorUC.DataContext as T4EditorViewModel).T4TempatePath,
                             (CreateWebApiUC.DataContext as CreateWebApiViewModel).SerializableDbContext,
                             (CreateWebApiUC.DataContext as CreateWebApiViewModel).GetSelectedModelCommonShallowCopy(

@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
 using Newtonsoft.Json;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -79,7 +80,8 @@ namespace CS82ANGULAR.ViewModel
         }
         #endregion
         #region NextBtnCommand
-        public override void NextBtnCommandAction(Object param)
+        [SuppressMessage("", "VSTHRD100")]
+        public override async void NextBtnCommandAction(Object param)
         {
             switch (CurrentUiStepId)
             {
@@ -166,8 +168,8 @@ namespace CS82ANGULAR.ViewModel
 
                     try
                     {
-                        (GenerateUC.DataContext as GenerateCommonStaffViewModel)
-                            .DoGenerateViewModel(Dte, TextTemplating,
+                        await (GenerateUC.DataContext as GenerateCommonStaffViewModel)
+                            .DoGenerateViewModelAsync(Dte, TextTemplating,
                             (T4EditorUC.DataContext as T4EditorViewModel).T4TempatePath,
                             (CreateWebApiUC.DataContext as CreateWebApiViewModel).SerializableDbContext,
                             (CreateWebApiUC.DataContext as CreateWebApiViewModel).GetSelectedModelShallowCopy());

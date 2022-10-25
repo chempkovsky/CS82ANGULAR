@@ -12,7 +12,9 @@ using System.Linq;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Collections.ObjectModel;
-
+using CS82ANGULAR.Model.Serializable.Angular;
+using System.Threading.Tasks;
+using System;
 
 namespace CS82ANGULAR.Helpers.BatchProcess
 {
@@ -28,7 +30,7 @@ namespace CS82ANGULAR.Helpers.BatchProcess
             string jsonString = System.IO.File.ReadAllText(fileName);
             return ReadBatchSettingsFromString(jsonString);
         }
-        public static GeneratorBatchStep DoGenerateViewModel(DTE2 Dte, ITextTemplating textTemplating, string T4TempatePath, DbContextSerializable SerializableDbContext, ModelViewSerializable model, string defaultProjectNameSpace = null)
+        public static async Task<GeneratorBatchStep> DoGenerateViewModelAsync(DTE2 Dte, ITextTemplating textTemplating, string T4TempatePath, DbContextSerializable SerializableDbContext, ModelViewSerializable model, string defaultProjectNameSpace = null)
         {
             GeneratorBatchStep result = new GeneratorBatchStep()
             {
@@ -40,6 +42,20 @@ namespace CS82ANGULAR.Helpers.BatchProcess
             if ((model == null) || (SerializableDbContext == null))
             {
                 result.GenerateError = "Model and/or Context is not defined";
+                return result;
+            }
+            try
+            {
+                await AngularJsonHelper.GetAngularJson().ReadPublicApiTsAndWebpackConfigJsAsync();
+            } catch (Exception e)
+            {
+                result.GenerateError = e.Message;
+                Exception innerExcpt = e.InnerException;
+                while (innerExcpt != null)
+                {
+                    result.GenerateError += "\n" + innerExcpt;
+                    innerExcpt = innerExcpt.InnerException;
+                }
                 return result;
             }
             ITextTemplatingSessionHost textTemplatingSessionHost = (ITextTemplatingSessionHost)textTemplating;

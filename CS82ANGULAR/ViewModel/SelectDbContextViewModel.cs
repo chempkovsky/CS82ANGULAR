@@ -27,6 +27,7 @@ namespace CS82ANGULAR.ViewModel
             SelectProjectCaption = "Select DbContext Project:";
             SelectClassCaption = "Select DbContext Class:";
             SelectedProppertyNameVisibility = Visibility.Collapsed;
+            SelectedBabelFolderVisibility = Visibility.Visible;
             DefineUiCaptions();
         }
         public virtual void DefineUiCaptions()

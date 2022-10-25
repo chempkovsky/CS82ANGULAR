@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
 using Newtonsoft.Json;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Windows;
 
@@ -89,7 +90,8 @@ namespace CS82ANGULAR.ViewModel
         #endregion
 
         #region NextBtnCommand
-        public override void NextBtnCommandAction(Object param)
+        [SuppressMessage("", "VSTHRD100")]
+        public override async void NextBtnCommandAction(Object param)
         {
             switch (CurrentUiStepId)
             {
@@ -109,6 +111,12 @@ namespace CS82ANGULAR.ViewModel
                             dataContext.UiCommandCaption3 = dataContext.UiCommandCaption3 + "." + folder.Replace("\\", ".");
                         }
                         SelectDbContextUC = new UserControlSelectSource(dataContext);
+                        string pathForAngularJson = (InvitationUC.DataContext as InvitationViewModel).DestinationProjectRootFolder;
+                        if (!string.IsNullOrEmpty(folder))
+                            pathForAngularJson = Path.Combine(pathForAngularJson, folder);
+                        AngularJsonHelper.SetT4RootFolder(TemplatePathHelper.GetTemplatePath());
+                        AngularJsonHelper.GetAngularJson().ReadAngularJson(pathForAngularJson);
+
                         dataContext.IsReady.IsReadyEvent += CallBack_IsReady;
                     }
                     (SelectDbContextUC.DataContext as SelectDbContextViewModel).DoAnaliseDbContext();
@@ -117,6 +125,7 @@ namespace CS82ANGULAR.ViewModel
                     break;
                 case 1:
                     CurrentUiStepId = 2;
+                    AngularJsonHelper.SetBabelFolderPath((SelectDbContextUC.DataContext as SelectDbContextViewModel).SelectedBabelFolder);
                     if (FeatureUC == null)
                     {
                         FeatureViewModel dataContext = new FeatureViewModel(this.Dte);
@@ -200,8 +209,8 @@ namespace CS82ANGULAR.ViewModel
                     (GenerateUC.DataContext as GenerateCommonStaffViewModel).GenText = (T4EditorUC.DataContext as T4EditorViewModel).T4TempateText;
                     try
                     {
-                        (GenerateUC.DataContext as GenerateCommonStaffViewModel)
-                            .DoGenerateFeature(Dte, TextTemplating,
+                        await (GenerateUC.DataContext as GenerateCommonStaffViewModel)
+                            .DoGenerateFeatureAsync(Dte, TextTemplating,
                             (T4EditorUC.DataContext as T4EditorViewModel).T4TempatePath,
                             (SelectFeatureFolderUC.DataContext as SelectFeatureFolderViewModel).SerializableDbContext,
                             (SelectFeatureFolderUC.DataContext as SelectFeatureFolderViewModel).SerializableFeatureContext,

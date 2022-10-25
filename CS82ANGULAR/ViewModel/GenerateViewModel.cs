@@ -7,6 +7,8 @@ using EnvDTE80;
 using System.IO;
 using Microsoft.VisualStudio.TextTemplating;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
+using System;
+using System.Threading.Tasks;
 
 namespace CS82ANGULAR.ViewModel
 {
@@ -25,12 +27,20 @@ namespace CS82ANGULAR.ViewModel
 
             GeneratedModelView = new ModelViewSerializable();
             modelView.ModelViewAssingTo(GeneratedModelView);
-
-
+            //try
+            //{
+            //    await AngularJsonHelper.GetAngularJson().ReadPublicApiTsAndWebpackConfigJsAsync();
+            //}
+            //catch (Exception e)
+            //{
+            //    this.GenerateError = e.Message;
+            //    IsReady.DoNotify(this, string.IsNullOrEmpty(this.GenerateError));
+            //    return;
+            //}
             ITextTemplatingSessionHost textTemplatingSessionHost = (ITextTemplatingSessionHost)textTemplating;
             textTemplatingSessionHost.Session = textTemplatingSessionHost.CreateSession();
             TPCallback tpCallback = new TPCallback();
-            textTemplatingSessionHost.Session["AngularJsonFile"] = AngularJsonHelper.GetAngularJson();
+//            textTemplatingSessionHost.Session["AngularJsonFile"] = AngularJsonHelper.GetAngularJson();
             textTemplatingSessionHost.Session["Model"] = GeneratedModelView;
             textTemplatingSessionHost.Session["AngularJsonFile"] = AngularJsonHelper.GetAngularJson();
             if (string.IsNullOrEmpty(GenText))

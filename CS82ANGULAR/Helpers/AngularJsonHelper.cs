@@ -1,17 +1,53 @@
-﻿using CS82ANGULAR.Model;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.IO;
 using System.Collections.Generic;
+using CS82ANGULAR.Model.Serializable.Angular;
+using System.Windows.Controls;
+using Jering.Javascript.NodeJS;
+using System.Threading.Tasks;
 
 namespace CS82ANGULAR.Helpers
 {
     public static class AngularJsonHelper
     {
         private static AngularJson angularJson = new AngularJson();
+        private static string BabelFolderPath = null;
+        private static string PublicApiTsFileName = "public-api.ts";
+        private static string WebpackConfigJs = "webpack.config.js";
+        private static string PublicApiTsReader = "reader_of_public-api.ts.js";
+        private static string WebpackConfigJsReader = "reader_of_webpack.config.js.js";
+        private static string NodejsSriptsFolder = "NodejsSripts";
+        private static string T4RootFolder = null;
+
         public static AngularJson GetAngularJson()
         {
             return angularJson;
+        }
+        public static string GetBabelFolderPath()
+        {
+            return BabelFolderPath;
+        }
+        public static void SetBabelFolderPath(string aPath)
+        {
+            BabelFolderPath = aPath;
+        }
+
+        public static string GetNodejsSriptsFolder()
+        {
+            return NodejsSriptsFolder; 
+        }
+        public static void SetNodejsSriptsFolder(string aPath)
+        {
+            NodejsSriptsFolder = aPath;
+        }
+        public static string GetT4RootFolder()
+        {
+            return T4RootFolder;
+        }
+        public static void SetT4RootFolder(string aPath)
+        {
+            T4RootFolder = aPath;
         }
         public static void ClearAngularJson(this AngularJson angularJson)
         {
@@ -65,7 +101,8 @@ namespace CS82ANGULAR.Helpers
                         {
                             if (string.IsNullOrEmpty(p.ProjectRoot)) p.ProjectRoot = "";
                             if (string.IsNullOrEmpty(p.SourceRoot)) p.SourceRoot = "";
-                            p.AbsoluteSourceRoot = Path.Combine(angularJson.AngularJsonPath, p.SourceRoot.Replace("/","\\"));
+                            p.AbsoluteProjectRoot = Path.Combine(angularJson.AngularJsonPath, p.ProjectRoot.Replace("/","\\"));
+                            p.AbsoluteSourceRoot = Path.Combine(angularJson.AngularJsonPath, p.SourceRoot.Replace("/", "\\"));
                         }
                     } 
                     catch
@@ -86,6 +123,37 @@ namespace CS82ANGULAR.Helpers
             }
             angularJson.ClearAngularJson();
         }
-
+        public static async Task ReadPublicApiTsAndWebpackConfigJsAsync(this AngularJson angularJson)
+        {
+            if (angularJson is null) return;
+            if (angularJson.Projects is null) return;
+            if(angularJson.Projects.Count < 1) return;
+            foreach (AngularProject prj in angularJson.Projects)
+            {
+                prj.WebpackConfigJson = null;
+                prj.PublicApiJson = null;
+            }
+            string WebpackConfigJsReaderCode = File.ReadAllText(Path.Combine(T4RootFolder, NodejsSriptsFolder, WebpackConfigJsReader));
+            string PublicApiTsReaderCode = File.ReadAllText(Path.Combine(T4RootFolder, NodejsSriptsFolder, PublicApiTsReader));
+            StaticNodeJSService.Configure<NodeJSProcessOptions>(options => options.ProjectPath = BabelFolderPath);
+            
+            foreach (AngularProject prj in angularJson.Projects)
+            {
+                if (prj.ProjectType == "application")
+                {
+                    string wpcjs = Path.Combine(prj.AbsoluteProjectRoot, WebpackConfigJs);
+                    string wpcjsText = File.ReadAllText(wpcjs);
+                    string wpcjsResult = await StaticNodeJSService.InvokeFromStringAsync<string>(WebpackConfigJsReaderCode, args: new object[] { wpcjsText });
+                    prj.WebpackConfigJson = JsonConvert.DeserializeObject<AngularWebpackConfigJson>(wpcjsResult);
+                }
+                else if (prj.ProjectType == "library")
+                {
+                    string pats = Path.Combine(prj.AbsoluteSourceRoot, PublicApiTsFileName);
+                    string patsText = File.ReadAllText(pats);
+                    string patsResult = await StaticNodeJSService.InvokeFromStringAsync<string>(PublicApiTsReaderCode, args: new object[] { patsText });
+                    prj.PublicApiJson = JsonConvert.DeserializeObject<AngularPublicApiJson>(patsResult);
+                }
+            }
+        }
     }
 }

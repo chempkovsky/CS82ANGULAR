@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CS82ANGULAR.Model
+namespace CS82ANGULAR.Model.Serializable.Angular
 {
     [Serializable]
     public class AngularWebpackConfigJson

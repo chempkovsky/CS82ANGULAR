@@ -25,8 +25,10 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="20"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition />
@@ -65,6 +67,9 @@
         <TextBlock Grid.Row="9" Grid.Column="1" Text="{Binding SelectedProppertyNameCaption}" Style="{StaticResource TextBlockStyle}" Visibility="{Binding SelectedProppertyNameVisibility}"/>
         <TextBox Grid.Row="10" Grid.Column="1" Margin="20 0 0 0" Width="600" Text="{Binding SelectedProppertyName}" IsReadOnly="True" Visibility="{Binding SelectedProppertyNameVisibility}"  />
 
-        <ContentControl Grid.Row="12" Grid.Column="1" Content="{Binding ActionUserControl}" />
+        <TextBlock Grid.Row="11" Grid.Column="1" Text="{Binding SelectedBabelFolderCaption}" Style="{StaticResource TextBlockStyle}" Visibility="{Binding SelectedBabelFolderVisibility}"/>
+        <TextBox Grid.Row="12" Grid.Column="1" Margin="20 0 0 0" Width="600" Text="{Binding SelectedBabelFolder}" IsReadOnly="False"  Visibility="{Binding SelectedBabelFolderVisibility}"/>
+
+        <ContentControl Grid.Row="14" Grid.Column="1" Content="{Binding ActionUserControl}" />
     </Grid>
 </UserControl>

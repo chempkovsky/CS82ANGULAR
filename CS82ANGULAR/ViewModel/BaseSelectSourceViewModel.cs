@@ -71,6 +71,11 @@ namespace CS82ANGULAR.ViewModel
         public string SelectedNameSpaceCaption { get; set; } = "Selected NameSpace:";
         public string SelectedProppertyNameCaption { get; set; } = "Selected Property Name:";
         public Visibility SelectedProppertyNameVisibility { get; set; } = Visibility.Collapsed;
+
+        public string SelectedBabelFolderCaption { get; set; } = @"Select @babel/core project Folder:";
+        public Visibility SelectedBabelFolderVisibility { get; set; } = Visibility.Collapsed;
+        public string SelectedBabelFolder { get; set; } = @"c:\babelcore";
+
         public UserControl ActionUserControl { get; set; } = null;
         #endregion
 

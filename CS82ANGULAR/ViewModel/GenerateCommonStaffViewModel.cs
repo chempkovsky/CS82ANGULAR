@@ -5,6 +5,8 @@ using EnvDTE80;
 using Microsoft.VisualStudio.TextTemplating;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
 using CS82ANGULAR.Helpers;
+using System;
+using System.Threading.Tasks;
 
 namespace CS82ANGULAR.ViewModel
 {
@@ -18,7 +20,7 @@ namespace CS82ANGULAR.ViewModel
 
 
 
-        public void DoGenerateViewModel(DTE2 Dte, ITextTemplating textTemplating, string T4TempatePath, DbContextSerializable SerializableDbContext, ModelViewSerializable model, string defaultProjectNameSpace = null)
+        public async Task DoGenerateViewModelAsync(DTE2 Dte, ITextTemplating textTemplating, string T4TempatePath, DbContextSerializable SerializableDbContext, ModelViewSerializable model, string defaultProjectNameSpace = null)
         {
 
             this.GenerateText = "";
@@ -26,7 +28,22 @@ namespace CS82ANGULAR.ViewModel
             IsReady.DoNotify(this, false);
             if ((model == null) || (SerializableDbContext == null)) return;
             GeneratedModelView = model;
-
+            try
+            {
+                await AngularJsonHelper.GetAngularJson().ReadPublicApiTsAndWebpackConfigJsAsync();
+            }
+            catch (Exception e)
+            {
+                this.GenerateError = e.Message;
+                Exception innerExcpt = e.InnerException;
+                while (innerExcpt != null)
+                {
+                    this.GenerateError += "\n" + innerExcpt;
+                    innerExcpt = innerExcpt.InnerException;
+                }
+                IsReady.DoNotify(this, string.IsNullOrEmpty(this.GenerateError));
+                return;
+            }
             ITextTemplatingSessionHost textTemplatingSessionHost = (ITextTemplatingSessionHost)textTemplating;
             textTemplatingSessionHost.Session = textTemplatingSessionHost.CreateSession();
             TPCallback tpCallback = new TPCallback();
@@ -53,7 +70,7 @@ namespace CS82ANGULAR.ViewModel
             }
             IsReady.DoNotify(this, string.IsNullOrEmpty(this.GenerateError));
         }
-        public void DoGenerateFeature(DTE2 Dte, ITextTemplating textTemplating, string T4TempatePath, DbContextSerializable SerializableDbContext, FeatureContextSerializable SerializableFeatureContext, FeatureSerializable feature, AllowedFileTypesSerializable AllowedFileTypes, string defaultProjectNameSpace = null)
+        public async Task DoGenerateFeatureAsync(DTE2 Dte, ITextTemplating textTemplating, string T4TempatePath, DbContextSerializable SerializableDbContext, FeatureContextSerializable SerializableFeatureContext, FeatureSerializable feature, AllowedFileTypesSerializable AllowedFileTypes, string defaultProjectNameSpace = null)
         {
 
             this.GenerateText = "";
@@ -61,6 +78,22 @@ namespace CS82ANGULAR.ViewModel
             IsReady.DoNotify(this, false);
             if ((feature == null) || (SerializableDbContext == null) || (SerializableFeatureContext == null)) return;
             GeneratedFeature = feature;
+            try
+            {
+                await AngularJsonHelper.GetAngularJson().ReadPublicApiTsAndWebpackConfigJsAsync();
+            }
+            catch (Exception e)
+            {
+                this.GenerateError = e.Message;
+                Exception innerExcpt = e.InnerException;
+                while (innerExcpt != null)
+                {
+                    this.GenerateError += "\n" + innerExcpt;
+                    innerExcpt = innerExcpt.InnerException;
+                }
+                IsReady.DoNotify(this, string.IsNullOrEmpty(this.GenerateError));
+                return;
+            }
 
             ITextTemplatingSessionHost textTemplatingSessionHost = (ITextTemplatingSessionHost)textTemplating;
             textTemplatingSessionHost.Session = textTemplatingSessionHost.CreateSession();

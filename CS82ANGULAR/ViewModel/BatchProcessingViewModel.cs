@@ -16,7 +16,8 @@ using EnvDTE80;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
-
+using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CS82ANGULAR.ViewModel
 {
@@ -219,9 +220,11 @@ namespace CS82ANGULAR.ViewModel
         {
             return !(string.IsNullOrEmpty(CurrentBatchSetting) || (SerializableDbContext == null) || (SerializableModel == null));
         }
-        public virtual void StartBtnCommandBatchAction(Object param)
+
+        [SuppressMessage("", "VSTHRD100")]
+        public async void StartBtnCommandBatchAction(Object param)
         {
-            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+            //Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             IVsThreadedWaitDialog2 aDialog = null;
             bool aDialogStarted = false;
             if (this.DialogFactory != null)
@@ -294,7 +297,7 @@ namespace CS82ANGULAR.ViewModel
                                                                     batchItem.GeneratorType, FileName, batchItem.GeneratorSript);
                     }
                     sb.AppendLine("        Batch Item: Generating Code");
-                    GeneratorBatchStep generatorBatchStep = BatchSettingsHelper.DoGenerateViewModel(Dte, TextTemplating, tmpltPath, SerializableDbContext, ShallowCopy, DefaultProjectNameSpace);
+                    GeneratorBatchStep generatorBatchStep = await BatchSettingsHelper.DoGenerateViewModelAsync(Dte, TextTemplating, tmpltPath, SerializableDbContext, ShallowCopy, DefaultProjectNameSpace);
                     if (!string.IsNullOrEmpty(generatorBatchStep.GenerateError))
                     {
                         throw new Exception(generatorBatchStep.GenerateError);

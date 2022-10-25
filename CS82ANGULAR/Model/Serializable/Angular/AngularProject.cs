@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using System;
 
-namespace CS82ANGULAR.Model
+namespace CS82ANGULAR.Model.Serializable.Angular
 {
+    [Serializable]
     public class AngularProject
     {
         public string ProjectPath { get; set; }
@@ -14,6 +12,9 @@ namespace CS82ANGULAR.Model
         public string ProjectRoot { get; set; }
         public string SourceRoot { get; set; }
         public string ProjectPrefix { get; set; }
+        public string AbsoluteProjectRoot { get; set; }
         public string AbsoluteSourceRoot { get; set; }
+        public AngularPublicApiJson PublicApiJson { get; set; }
+        public AngularWebpackConfigJson WebpackConfigJson { get; set; }
     }
 }

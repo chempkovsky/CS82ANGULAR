@@ -80,13 +80,13 @@
     <Compile Include="Model\AnalyzeOnModelCreating\FluentAPIMethodNode.cs" />
     <Compile Include="Model\AnalyzeOnModelCreating\FluentAPINavigationProperty.cs" />
     <Compile Include="Model\AnalyzeOnModelCreating\FluentAPIProperty.cs" />
-    <Compile Include="Model\AngularJson.cs" />
-    <Compile Include="Model\AngularProject.cs" />
-    <Compile Include="Model\AngularPublicApiExportItem.cs" />
-    <Compile Include="Model\AngularPublicApiExportSpecifier.cs" />
-    <Compile Include="Model\AngularPublicApiJson.cs" />
-    <Compile Include="Model\AngularWebpackConfigExposeItem.cs" />
-    <Compile Include="Model\AngularWebpackConfigJson.cs" />
+    <Compile Include="Model\Serializable\Angular\AngularJson.cs" />
+    <Compile Include="Model\Serializable\Angular\AngularProject.cs" />
+    <Compile Include="Model\Serializable\Angular\AngularPublicApiExportItem.cs" />
+    <Compile Include="Model\Serializable\Angular\AngularPublicApiExportSpecifier.cs" />
+    <Compile Include="Model\Serializable\Angular\AngularPublicApiJson.cs" />
+    <Compile Include="Model\Serializable\Angular\AngularWebpackConfigExposeItem.cs" />
+    <Compile Include="Model\Serializable\Angular\AngularWebpackConfigJson.cs" />
     <Compile Include="Model\BatchProcess\BatchItem.cs" />
     <Compile Include="Model\BatchProcess\BatchSettings.cs" />
     <Compile Include="Model\BatchProcess\GeneratorBatchStep.cs" />
@@ -2465,6 +2465,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Jering.Javascript.NodeJS">
+      <Version>6.3.1</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp">
       <Version>4.0.1</Version>
     </PackageReference>
