@@ -31,8 +31,8 @@
 import { Component, ViewChild, Input } from '@angular/core';
 import { DialogRef, DialogContentBase } from "@progress/kendo-angular-dialog";
 
-import { <#= GetModelClassName(Model, columnSelectorItemInterfaceFolder) #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorItemInterfaceFolder, columnSelectorDlgComponentFolder)#>';
-import { <#= GetComponentClassName(Model, columnSelectorComponentFolder) #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentFolder, columnSelectorDlgComponentFolder)#>';
+import { <#= GetModelClassNameWithAnglr(AngularJsonFile, Model, columnSelectorItemInterfaceFolder, columnSelectorDlgComponentFolder) #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorItemInterfaceFolder, columnSelectorDlgComponentFolder)#>';
+import { <#= GetComponentClassNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentFolder, columnSelectorDlgComponentFolder) #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentFolder, columnSelectorDlgComponentFolder)#>';
 
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
@@ -40,10 +40,10 @@ import { <#= GetComponentClassName(Model, columnSelectorComponentFolder) #> } fr
   styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorDlgCssComponentFolder, columnSelectorDlgComponentFolder)#>.css']
 })
 
-export class <#= GetComponentClassName(Model, columnSelectorDlgComponentFolder) #> extends DialogContentBase { 
-    @ViewChild(<#= GetComponentClassName(Model, columnSelectorComponentFolder) #>) childForm: <#= GetComponentClassName(Model, columnSelectorComponentFolder) #>|any;
+export class <#= columnSelectorDlgComponentClassName #> extends DialogContentBase { 
+    @ViewChild(<#= GetComponentClassNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentFolder, columnSelectorDlgComponentFolder) #>) childForm: <#= GetComponentClassNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentFolder, columnSelectorDlgComponentFolder) #>|any;
     @Input('data')
-    public data: Array<<#=  GetModelClassName(Model, columnSelectorItemInterfaceFolder) #>> = [];
+    public data: Array<<#=  GetModelClassNameWithAnglr(AngularJsonFile, Model, columnSelectorItemInterfaceFolder, columnSelectorDlgComponentFolder) #>> = [];
     constructor(public dialogRef: DialogRef) { 
         super(dialogRef);
     }

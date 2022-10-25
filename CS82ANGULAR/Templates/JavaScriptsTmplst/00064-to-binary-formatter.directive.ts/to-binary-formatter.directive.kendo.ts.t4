@@ -20,11 +20,11 @@
     string toBinaryPipeFolder                       = "00062-to-binary.pipe.ts";
     string toBinaryFormatterDirectiveFolder         = "00064-to-binary-formatter.directive.ts";
 
-    string toBinaryPipeClassName                    = GetPipeClassName(Model, toBinaryPipeFolder);
-    string toBinaryPipeSelectorName                 = GetPipeSelectorName(Model, toBinaryPipeFolder);
-
     string toBinaryFormatterDirectiveClassName      = GetDirectiveClassName(Model, toBinaryFormatterDirectiveFolder);
     string toBinaryFormatterDirectiveSelectorName   = GetDirectiveSelectorName(Model, toBinaryFormatterDirectiveFolder);
+
+    string toBinaryPipeClassName                    = GetPipeClassNameWithAnglr(AngularJsonFile, Model, toBinaryPipeFolder, toBinaryFormatterDirectiveFolder);
+
 #>
 
 import { Directive, HostListener, ElementRef, OnInit, Input, forwardRef } from "@angular/core";

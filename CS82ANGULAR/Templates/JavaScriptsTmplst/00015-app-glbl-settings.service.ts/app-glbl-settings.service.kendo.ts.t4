@@ -21,7 +21,7 @@
     string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
     string appSettingServiceClassName   = GetServiceClassName(Model, appSettingServiceFolder);
     string appConfigServiceFolder       = "00014-app-config.service.ts";
-    string appConfigServiceClassName    = GetServiceClassName(Model, appConfigServiceFolder);
+    string appConfigServiceClassName    = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appConfigServiceFolder, appSettingServiceFolder);
 
 
     string AppearancePropName           = "appearance";

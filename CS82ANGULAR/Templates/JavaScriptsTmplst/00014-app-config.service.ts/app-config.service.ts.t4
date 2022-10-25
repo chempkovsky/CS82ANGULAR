@@ -24,7 +24,7 @@
     string permissionWebApiPropName     = "permissionWebApi";
 
     string appConfigFolder              = "00013-app-config.interface.ts";
-    string appConfigClassName           = GetModelClassName(Model, appConfigFolder);
+    string appConfigClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, appConfigFolder, appConfigServiceFolder);
 
 
 

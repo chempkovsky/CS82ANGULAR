@@ -21,13 +21,11 @@
     string toBinaryFormatterDirectiveFolder         = "00064-to-binary-formatter.directive.ts";
     string formatterModuleFolder                    = "00070-app-formatter.module.ts";
 
-    string toBinaryPipeClassName                    = GetPipeClassName(Model, toBinaryPipeFolder);
-    string toBinaryPipeSelectorName                 = GetPipeSelectorName(Model, toBinaryPipeFolder);
-
-    string toBinaryFormatterDirectiveClassName      = GetDirectiveClassName(Model, toBinaryFormatterDirectiveFolder);
-    string toBinaryFormatterDirectiveSelectorName   = GetDirectiveSelectorName(Model, toBinaryFormatterDirectiveFolder);
     string formatterModuleClassName                 = GetModuleClassName(Model, formatterModuleFolder);
-    string materialModuleClassName                  = GetModuleClassName(Model, materialModuleFolder);
+
+    string toBinaryPipeClassName                    = GetPipeClassNameWithAnglr(AngularJsonFile, Model, toBinaryPipeFolder, formatterModuleFolder);
+    string toBinaryFormatterDirectiveClassName      = GetDirectiveClassNameWithAnglr(AngularJsonFile, Model, toBinaryFormatterDirectiveFolder, formatterModuleFolder);
+    string materialModuleClassName                  = GetModuleClassNameWithAnglr(AngularJsonFile, Model, materialModuleFolder, formatterModuleFolder);
 #>
 
 import { NgModule } from '@angular/core';

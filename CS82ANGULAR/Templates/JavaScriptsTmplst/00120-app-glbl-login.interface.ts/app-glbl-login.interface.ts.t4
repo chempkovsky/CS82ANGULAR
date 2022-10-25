@@ -15,7 +15,7 @@
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
 
-    string appLoginInterfaceFolder          = "00120-app-glbl-login.interface.ts";
+    string appLoginInterfaceFolder      = "00120-app-glbl-login.interface.ts";
     string appLoginModelClassName       = GetModelClassName(Model, appLoginInterfaceFolder);
 
 #>

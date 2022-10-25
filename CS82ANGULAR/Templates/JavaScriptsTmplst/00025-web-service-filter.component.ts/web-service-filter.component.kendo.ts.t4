@@ -72,19 +72,19 @@
     string eventEmitterDataModelFolder = "00018-event-emitter-data.interface.ts";
     string eventEmitterPubModelFolder = "00019-event-emitter-pub.interface.ts";
 
-                                
-    string filterModelClassName = GetModelClassName(Model, filterModelFolder);
-    string filterDefModelClassName = GetModelClassName(Model, filterDefModelFolder);
-    string filterOperatorModelClassName = GetModelClassName(Model, filterOperatorModelFolder);
-    string filterResultModelClassName = GetModelClassName(Model, filterResultModelFolder);
     string filterComponentClassName = GetComponentClassName(Model, filterComponentFolder);
-    string menuItemDataModelClassName = GetModelClassName(Model, menuItemDataModelFolder);
-    string eventEmitterDataModelClassName = GetModelClassName(Model, eventEmitterDataModelFolder);
-    string eventEmitterPubModelClassName    = GetModelClassName(Model, eventEmitterPubModelFolder);
+                                
+    string filterModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterModelFolder, filterComponentFolder);
+    string filterDefModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterDefModelFolder, filterComponentFolder);
+    string filterOperatorModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterOperatorModelFolder, filterComponentFolder);
+    string filterResultModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterResultModelFolder, filterComponentFolder);
+    string menuItemDataModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, menuItemDataModelFolder, filterComponentFolder);
+    string eventEmitterDataModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, eventEmitterDataModelFolder, filterComponentFolder);
+    string eventEmitterPubModelClassName    = GetModelClassNameWithAnglr(AngularJsonFile, Model, eventEmitterPubModelFolder, filterComponentFolder);
 
     string filterComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, filterComponentFolder);
     
-    string appSettingServiceClassName   = GetServiceClassName(Model, appSettingServiceFolder);
+    string appSettingServiceClassName   = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, filterComponentFolder);
 
     string OnBackBtnMethodName          = "onBackBtnMd";
     string OnBackBtnPropName            = "onBackBtn";

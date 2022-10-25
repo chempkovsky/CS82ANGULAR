@@ -21,9 +21,10 @@
     string messageDialogComponentFolder         = "00038-message-dialog.component.ts";
     string messageDialogDataModelFolder         = "00037-message-dialog.interface.ts";
 
-    string messageDialogDataModelClassName      = GetModelClassName(Model, messageDialogDataModelFolder);
     string componentSelectorCommonPart          = GetComponentSelectorCommonPart(Model, messageDialogComponentFolder);
     string messageDialogComponentClassName      = GetComponentClassName(Model, messageDialogComponentFolder);
+
+    string messageDialogDataModelClassName      = GetModelClassNameWithAnglr(AngularJsonFile, Model, messageDialogDataModelFolder, messageDialogComponentFolder);
 
 #>
 

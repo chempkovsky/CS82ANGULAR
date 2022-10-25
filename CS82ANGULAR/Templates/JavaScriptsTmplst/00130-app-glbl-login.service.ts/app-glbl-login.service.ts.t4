@@ -22,11 +22,13 @@
     string appLoginServiceFolder            = "00130-app-glbl-login.service.ts";
     string appChangePasswordInterfaceFolder = "00122-app-glbl-chngpswd.interface.ts";
 
-    string appRegisterModelClassName        = GetModelClassName(Model, appRegisterInterfaceFolder);
-    string appLoginModelClassName           = GetModelClassName(Model, appLoginInterfaceFolder);
-    string appChangePasswordModelClassName  = GetModelClassName(Model, appChangePasswordInterfaceFolder);
-    string appSettingServiceClassName       = GetServiceClassName(Model, appSettingServiceFolder);
     string appLoginServiceClassName         = GetServiceClassName(Model, appLoginServiceFolder);
+
+
+    string appRegisterModelClassName        = GetModelClassNameWithAnglr(AngularJsonFile, Model, appRegisterInterfaceFolder, appLoginServiceFolder);
+    string appLoginModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, appLoginInterfaceFolder, appLoginServiceFolder);
+    string appChangePasswordModelClassName  = GetModelClassNameWithAnglr(AngularJsonFile, Model, appChangePasswordInterfaceFolder, appLoginServiceFolder);
+    string appSettingServiceClassName       = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, appLoginServiceFolder);
 
     string AppearancePropName           = "appearance";
     string ShowErrorMethodName          = "showError";

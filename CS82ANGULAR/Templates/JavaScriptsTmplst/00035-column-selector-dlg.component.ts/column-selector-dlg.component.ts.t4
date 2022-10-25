@@ -28,11 +28,11 @@
 
 #>
 
-import { Component, ViewChild, Inject } from '@angular/core';
-import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { Component, ViewChild, Inject  } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
-import { <#= GetModelClassName(Model, columnSelectorItemInterfaceFolder) #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorItemInterfaceFolder, columnSelectorDlgComponentFolder)#>';
-import { <#= GetComponentClassName(Model, columnSelectorComponentFolder) #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentFolder, columnSelectorDlgComponentFolder)#>';
+import { <#= GetModelClassNameWithAnglr(AngularJsonFile, Model, columnSelectorItemInterfaceFolder, columnSelectorDlgComponentFolder) #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorItemInterfaceFolder, columnSelectorDlgComponentFolder)#>';
+import { <#= GetComponentClassNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentFolder, columnSelectorDlgComponentFolder) #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentFolder, columnSelectorDlgComponentFolder)#>';
 
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
@@ -40,9 +40,9 @@ import { <#= GetComponentClassName(Model, columnSelectorComponentFolder) #> } fr
   styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorDlgCssComponentFolder, columnSelectorDlgComponentFolder)#>.css']
 })
 
-export class <#= GetComponentClassName(Model, columnSelectorDlgComponentFolder) #> { 
+export class <#= columnSelectorDlgComponentClassName #> { 
     @ViewChild(<#= GetComponentClassName(Model, columnSelectorComponentFolder) #>) childForm: <#= GetComponentClassName(Model, columnSelectorComponentFolder) #>|any;
-    constructor(public dialogRef: MatDialogRef<<#= GetComponentClassName(Model, columnSelectorDlgComponentFolder) #>>, @Inject(MAT_DIALOG_DATA) public data: Array<<#=  GetModelClassName(Model, columnSelectorItemInterfaceFolder) #>>) { }
+    constructor(public dialogRef: MatDialogRef<<#= columnSelectorDlgComponentClassName #>>, @Inject(MAT_DIALOG_DATA) public data: Array<<#=  GetModelClassNameWithAnglr(AngularJsonFile, Model, columnSelectorItemInterfaceFolder, columnSelectorDlgComponentFolder) #>>) { }
     onCancel() {
         this.dialogRef.close(null);
     }

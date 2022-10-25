@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Menu;
 
 namespace CS82ANGULAR.Model
 {
@@ -24,12 +25,92 @@ namespace CS82ANGULAR.Model
             }
             foreach (AngularProject prj in anglJson.Projects)
             {
-                if (aPath.StartsWith(prj.AbsoluteSourceRoot, StringComparison.OrdinalIgnoreCase))
+                if (aPath.StartsWith(prj.AbsoluteSourceRoot + "\\" + prj.ProjectPrefix + "\\", StringComparison.OrdinalIgnoreCase))
                 {
                     return prj;
                 }
             }
             return null;
+        }
+        string GetNameByAngularJson(string srcName, AngularJson anglJson, CommonStaffSerializable refItem, CommonStaffSerializable curItem)
+        {
+            if ((anglJson != null) && (refItem != null) && (curItem != null) && (!string.IsNullOrEmpty(srcName)))
+            {
+                AngularProject refAngularProject = GetAngularProjectByRefItem(anglJson, refItem);
+                AngularProject curAngularProject = GetAngularProjectByRefItem(anglJson, curItem);
+                if ((refAngularProject != null) && (curAngularProject != null))
+                {
+                    if (refAngularProject != curAngularProject)
+                    {
+                        if (refAngularProject.ProjectType == "library")
+                        {
+                            string libFl = (".\\" + refItem.FileFolder + "\\" + refItem.FileName).Replace("\\", "/");
+                            if (refAngularProject.PublicApiJson != null)
+                            {
+                                if (refAngularProject.PublicApiJson.exportItems != null)
+                                {
+                                    AngularPublicApiExportItem exportItem =
+                                        refAngularProject.PublicApiJson.exportItems
+                                        .Where(expItm => expItm.exportType == "ExportAllDeclaration" && libFl.Equals(expItm.exportSource, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                                    if (exportItem != null)
+                                    {
+                                        return srcName;
+                                    }
+                                    exportItem =
+                                                                        refAngularProject.PublicApiJson.exportItems
+                                                                        .Where(expItm => expItm.exportType == "ExportDefaultDeclaration" && libFl.Equals(expItm.exportSource, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                                    if (exportItem != null)
+                                    {
+                                        return srcName;
+                                    }
+                                    exportItem =
+                                        refAngularProject.PublicApiJson.exportItems
+                                        .Where(expItm => expItm.exportType == "ExportNamedDeclaration" && expItm.exportSubtype == "ExportSpecifier" && libFl.Equals(expItm.exportSource, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                                    if (exportItem != null)
+                                    {
+                                        if (exportItem.exportSpecifiers != null)
+                                        {
+                                            AngularPublicApiExportSpecifier exportSpecifier =
+                                                exportItem.exportSpecifiers.Where(expSpec => expSpec.localNm == srcName).FirstOrDefault();
+                                            if (exportSpecifier != null)
+                                            {
+                                                return exportSpecifier.exportedNm;
+                                            }
+                                        }
+                                    }
+                                    // 
+                                    // We ignore ExportNamespaceSpecifier:
+                                    // https://www.typescriptlang.org/docs/handbook/namespaces-and-modules.html#needless-namespacing
+                                    //
+                                    //exportItem =
+                                    //    refAngularProject.PublicApiJson.exportItems
+                                    //    .Where(expItm => expItm.exportType == "ExportNamedDeclaration" && expItm.exportSubtype == "ExportNamespaceSpecifier" && libFl.Equals(expItm.exportSource, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+
+                                }
+                            }
+
+                        }
+                        else if (refAngularProject.ProjectType == "application")
+                        {
+                            string appFl = (".\\" + refAngularProject.SourceRoot + "\\" + refItem.FileFolder + "\\" + refItem.FileName).Replace("\\", "/");
+                            if (refAngularProject.WebpackConfigJson != null)
+                            {
+                                if (refAngularProject.WebpackConfigJson.exposeItems != null)
+                                {
+                                    AngularWebpackConfigExposeItem exposeItm =
+                                        refAngularProject.WebpackConfigJson.exposeItems
+                                        .Where(itm => appFl.Equals(itm.exposeValue, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                                    if (exposeItm != null)
+                                    {
+                                        return exposeItm.exposeKey;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return srcName;
         }
         string GetServiceClassName(ModelViewSerializable model, string fileType)
         {
@@ -75,6 +156,28 @@ namespace CS82ANGULAR.Model
                 }
             }
             return sb.ToString();
+        }
+        string GetServiceClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = "";
+            if ((model == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            string serviceClassName = GetServiceClassName(model, fileType);
+            return GetNameByAngularJson(serviceClassName, anglJson, refItem, curItem);
         }
         string GetModuleClassName(ModelViewSerializable model, string fileType)
         {
@@ -122,6 +225,28 @@ namespace CS82ANGULAR.Model
             }
             return sb.ToString();
         }
+        string GetModuleClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = "";
+            if ((model == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            string moduleClassName = GetModuleClassName(model, fileType);
+            return GetNameByAngularJson(moduleClassName, anglJson, refItem, curItem);
+        }
         string GetModelClassName(ModelViewSerializable model, string fileType)
         {
             string result = "";
@@ -167,6 +292,28 @@ namespace CS82ANGULAR.Model
 
             }
             return "I" + sb.ToString();
+        }
+        string GetModelClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = "";
+            if ((model == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            string modelClassName = GetModelClassName(model, fileType);
+            return GetNameByAngularJson(modelClassName, anglJson, refItem, curItem);
         }
         string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder)
         {
@@ -325,6 +472,28 @@ namespace CS82ANGULAR.Model
             }
             return sb.ToString();
         }
+        string GetComponentClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = "";
+            if ((model == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            string componentClassName = GetComponentClassName(model, fileType);
+            return GetNameByAngularJson(componentClassName, anglJson, refItem, curItem);
+        }
         string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType)
         {
             string result = "";
@@ -447,6 +616,28 @@ namespace CS82ANGULAR.Model
             }
             return sb.ToString();
         }
+        string GetPipeClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = "";
+            if ((model == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            string pipeClassName = GetPipeClassName(model, fileType);
+            return GetNameByAngularJson(pipeClassName, anglJson, refItem, curItem);
+        }
         string GetPipeSelectorName(ModelViewSerializable model, string fileType)
         {
             string result = "";
@@ -536,6 +727,28 @@ namespace CS82ANGULAR.Model
                 }
             }
             return sb.ToString();
+        }
+        string GetDirectiveClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = "";
+            if ((model == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            string directiveClassName = GetDirectiveClassName(model, fileType);
+            return GetNameByAngularJson(directiveClassName, anglJson, refItem, curItem);
         }
         string GetDirectiveSelectorName(ModelViewSerializable model, string fileType)
         {

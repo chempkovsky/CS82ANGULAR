@@ -27,11 +27,11 @@
     string columnSelectorComponentHtmlFolder    = "00033-column-selector.component.html";
     string columnSelectorComponentFolder        = "00033-column-selector.component.ts";
                                     
-    
-    string columnSelectorComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, columnSelectorComponentFolder);
-    string columnSelectorItemModelClassName = GetModelClassName(Model, columnSelectorItemInterfaceFolder);
-    string appSettingServiceClassName   = GetServiceClassName(Model, appSettingServiceFolder);
     string columnSelectorComponentClassName = GetComponentClassName(Model, columnSelectorComponentFolder);
+    string columnSelectorComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, columnSelectorComponentFolder);
+
+    string columnSelectorItemModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, columnSelectorItemInterfaceFolder, columnSelectorComponentFolder);
+    string appSettingServiceClassName   = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, columnSelectorComponentFolder);
 
 #>
 

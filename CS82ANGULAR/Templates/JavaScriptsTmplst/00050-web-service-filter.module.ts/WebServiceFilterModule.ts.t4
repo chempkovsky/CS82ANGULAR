@@ -47,26 +47,27 @@
     string messageDialogDataModelFolder         = "00037-message-dialog.interface.ts";
 
 
-    string filterModuleFolder           = "00050-web-service-filter.module.ts";
+    string filterModuleFolder                   = "00050-web-service-filter.module.ts";
 
-    string materialModuleClassName = GetModuleClassName(Model, materialModuleFolder);
-    string flexModuleClassName = GetModuleClassName(Model, flexModuleFolder);
+    string appModuleClassName   = GetModuleClassName(Model, filterModuleFolder);
 
-    string filterModelClassName = GetModelClassName(Model, filterModelFolder);
-    string filterDefModelClassName = GetModelClassName(Model, filterDefModelFolder);
-    string filterOperatorModelClassName = GetModelClassName(Model, filterOperatorModelFolder);
-    string filterResultModelClassName = GetModelClassName(Model, filterResultModelFolder);
-    string uniqFilterModelClassName = GetModelClassName(Model, uniqFilterModelFolder);
-    string uniqFilterDefModelClassName = GetModelClassName(Model, uniqFilterDefModelFolder);
+    string materialModuleClassName = GetModuleClassNameWithAnglr(AngularJsonFile, Model, materialModuleFolder, filterModuleFolder);
+    string flexModuleClassName = GetModuleClassNameWithAnglr(AngularJsonFile, Model, flexModuleFolder, filterModuleFolder);
+
+    string filterModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterModelFolder, filterModuleFolder);
+    string filterDefModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterDefModelFolder, filterModuleFolder);
+    string filterOperatorModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterOperatorModelFolder, filterModuleFolder);
+    string filterResultModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterResultModelFolder, filterModuleFolder);
+    string uniqFilterModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, uniqFilterModelFolder, filterModuleFolder);
+    string uniqFilterDefModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, uniqFilterDefModelFolder, filterModuleFolder);
     
 
-    string filterComponentClassName = GetComponentClassName(Model, filterComponentFolder);
-    string uniqFilterComponentClassName = GetComponentClassName(Model, uniqFilterComponentFolder);
-    string appSettingServiceClassName   = GetServiceClassName(Model, appSettingServiceFolder);
-    string appModuleClassName   = GetModuleClassName(Model, filterModuleFolder);
-    string columnSelectorComponentClassName = GetComponentClassName(Model, columnSelectorComponentFolder);
-    string columnSelectorDlgComponentClassName = GetComponentClassName(Model, columnSelectorDlgComponentFolder);
-    string messageDialogComponentClassName      = GetComponentClassName(Model, messageDialogComponentFolder);
+    string filterComponentClassName = GetComponentClassNameWithAnglr(AngularJsonFile, Model, filterComponentFolder, filterModuleFolder);
+    string uniqFilterComponentClassName = GetComponentClassNameWithAnglr(AngularJsonFile, Model, uniqFilterComponentFolder, filterModuleFolder);
+    string appSettingServiceClassName   = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, filterModuleFolder);
+    string columnSelectorComponentClassName = GetComponentClassNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentFolder, filterModuleFolder);
+    string columnSelectorDlgComponentClassName = GetComponentClassNameWithAnglr(AngularJsonFile, Model, columnSelectorDlgComponentFolder, filterModuleFolder);
+    string messageDialogComponentClassName      = GetComponentClassNameWithAnglr(AngularJsonFile, Model, messageDialogComponentFolder, filterModuleFolder);
 
 #>
 

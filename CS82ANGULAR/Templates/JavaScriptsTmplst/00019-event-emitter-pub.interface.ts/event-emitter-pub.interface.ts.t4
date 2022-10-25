@@ -22,10 +22,10 @@
     string eventEmitterDataModelFolder      = "00018-event-emitter-data.interface.ts";
     string eventEmitterPubModelFolder       = "00019-event-emitter-pub.interface.ts";
 
-    string eventEmitterDataModelClassName   = GetModelClassName(Model, eventEmitterDataModelFolder);
-    string menuItemDataModelClassName       = GetModelClassName(Model, menuItemDataModelFolder);
     string eventEmitterPubModelClassName    = GetModelClassName(Model, eventEmitterPubModelFolder);
 
+    string eventEmitterDataModelClassName   = GetModelClassNameWithAnglr(AngularJsonFile, Model, eventEmitterDataModelFolder, eventEmitterPubModelFolder);
+    string menuItemDataModelClassName       = GetModelClassNameWithAnglr(AngularJsonFile, Model, menuItemDataModelFolder, eventEmitterPubModelFolder);
 
 #>
 

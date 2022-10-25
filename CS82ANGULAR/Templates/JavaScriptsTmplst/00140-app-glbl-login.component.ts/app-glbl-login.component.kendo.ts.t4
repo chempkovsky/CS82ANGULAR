@@ -27,13 +27,11 @@
     string appLoginCssComponentFolder       = "00140-app-glbl-login.component.css";
     string appLoginComponentFolder          = "00140-app-glbl-login.component.ts";
 
-    string appRegisterModelClassName        = GetModelClassName(Model, appRegisterInterfaceFolder);
-    string appLoginModelClassName           = GetModelClassName(Model, appLoginInterfaceFolder);
-    string appSettingServiceClassName       = GetServiceClassName(Model, appSettingServiceFolder);
-    string appLoginServiceClassName         = GetServiceClassName(Model, appLoginServiceFolder);
     string appLoginComponentClassName       = GetComponentClassName(Model, appLoginComponentFolder);
-
     string appLoginComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, appLoginComponentFolder);
+
+    string appSettingServiceClassName       = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, appLoginComponentFolder);
+    string appLoginServiceClassName         = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appLoginServiceFolder, appLoginComponentFolder);
 
     string AppearancePropName           = "appearance";
     string ShowErrorMethodName          = "showError";

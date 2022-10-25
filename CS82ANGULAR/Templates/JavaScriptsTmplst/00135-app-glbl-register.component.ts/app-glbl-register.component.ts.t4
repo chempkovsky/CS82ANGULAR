@@ -18,21 +18,17 @@
     bool localize = Context.Localize;
 
     string appSettingServiceFolder          = "00015-app-glbl-settings.service.ts";
-    string appRegisterInterfaceFolder       = "00118-app-glbl-register.interface.ts";
-    string appLoginInterfaceFolder          = "00120-app-glbl-login.interface.ts";
     string appLoginServiceFolder            = "00130-app-glbl-login.service.ts";
 
     string appRegisterHtmlComponentFolder   = "00135-app-glbl-register.component.html";
     string appRegisterCssComponentFolder    = "00135-app-glbl-register.component.css";
     string appRegisterComponentFolder       = "00135-app-glbl-register.component.ts";
 
-    string appRegisterModelClassName        = GetModelClassName(Model, appRegisterInterfaceFolder);
-    string appLoginModelClassName           = GetModelClassName(Model, appLoginInterfaceFolder);
-    string appSettingServiceClassName       = GetServiceClassName(Model, appSettingServiceFolder);
-    string appLoginServiceClassName         = GetServiceClassName(Model, appLoginServiceFolder);
     string appRegisterComponentClassName    = GetComponentClassName(Model, appRegisterComponentFolder);
-
     string appRegisterComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, appRegisterComponentFolder);
+
+    string appSettingServiceClassName       = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, appRegisterComponentFolder);
+    string appLoginServiceClassName         = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appLoginServiceFolder, appRegisterComponentFolder);
 
     string loginMethodName              = "login";
     string AppearancePropName           = "appearance";

@@ -74,18 +74,18 @@
     string eventEmitterDataModelFolder  = "00018-event-emitter-data.interface.ts";
     string eventEmitterPubModelFolder   = "00019-event-emitter-pub.interface.ts";
 
-                                
-    string uniqFilterModelClassName = GetModelClassName(Model, uniqFilterModelFolder);
-    string uniqFilterDefModelClassName = GetModelClassName(Model, uniqFilterDefModelFolder);
-    string filterResultModelClassName = GetModelClassName(Model, filterResultModelFolder);
     string uniqFilterComponentClassName = GetComponentClassName(Model, uniqFilterComponentFolder);
-    string menuItemDataModelClassName = GetModelClassName(Model, menuItemDataModelFolder);
-    string eventEmitterDataModelClassName = GetModelClassName(Model, eventEmitterDataModelFolder);
-    string eventEmitterPubModelClassName    = GetModelClassName(Model, eventEmitterPubModelFolder);
-
     string filterComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, uniqFilterComponentFolder);
+                                
+    string uniqFilterModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, uniqFilterModelFolder, uniqFilterComponentFolder);
+    string uniqFilterDefModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, uniqFilterDefModelFolder, uniqFilterComponentFolder);
+    string filterResultModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterResultModelFolder, uniqFilterComponentFolder);
+    string menuItemDataModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, menuItemDataModelFolder, uniqFilterComponentFolder);
+    string eventEmitterDataModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, eventEmitterDataModelFolder, uniqFilterComponentFolder);
+    string eventEmitterPubModelClassName    = GetModelClassNameWithAnglr(AngularJsonFile, (Model, eventEmitterPubModelFolder, uniqFilterComponentFolder);
+
     
-    string appSettingServiceClassName   = GetServiceClassName(Model, appSettingServiceFolder);
+    string appSettingServiceClassName   = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, uniqFilterComponentFolder);
 
     string OnBackBtnMethodName          = "onBackBtnMd";
     string OnBackBtnPropName            = "onBackBtn";

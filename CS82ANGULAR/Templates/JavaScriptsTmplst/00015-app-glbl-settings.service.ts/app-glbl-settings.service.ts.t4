@@ -21,7 +21,7 @@
     string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
     string appSettingServiceClassName   = GetServiceClassName(Model, appSettingServiceFolder);
     string appConfigServiceFolder       = "00014-app-config.service.ts";
-    string appConfigServiceClassName    = GetServiceClassName(Model, appConfigServiceFolder);
+    string appConfigServiceClassName    = GetServiceClassNameWithAnglr(AngularJsonFile,Model, appConfigServiceFolder, appSettingServiceFolder);
 
 
     string AppearancePropName           = "appearance";
@@ -54,7 +54,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot, CanActivateChild, Route } from '@angular/router';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
-import { <#= appConfigServiceClassName #> } from '<#= GetFolderName(Model, appConfigServiceFolder, appSettingServiceFolder)#>';
+import { <#= appConfigServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appConfigServiceFolder, appSettingServiceFolder) #>';
 import { HttpParameterCodec } from '@angular/common/http';
 
 @Injectable({
