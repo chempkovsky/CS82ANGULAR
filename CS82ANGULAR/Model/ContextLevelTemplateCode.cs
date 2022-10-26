@@ -3,6 +3,7 @@ using CS82ANGULAR.Model.Serializable.Angular;
 using CS82ANGULAR.TemplateProcessingHelpers;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace CS82ANGULAR.Model
             }
             foreach (AngularProject prj in anglJson.Projects)
             {
-                if (aPath.StartsWith(prj.AbsoluteSourceRoot + "\\" + prj.ProjectPrefix + "\\", StringComparison.OrdinalIgnoreCase))
+                if (aPath.StartsWith(prj.AbsoluteSourceRoot + "\\" + prj.ProjectPrefix, StringComparison.OrdinalIgnoreCase))
                 {
                     return prj;
                 }
@@ -45,7 +46,10 @@ namespace CS82ANGULAR.Model
                     {
                         if (refAngularProject.ProjectType == "library")
                         {
-                            string libFl = (".\\" + refItem.FileFolder + "\\" + refItem.FileName).Replace("\\", "/");
+                            // string libFl = (".\\" + refItem.FileFolder + "\\" + refItem.FileName).Replace("\\", "/");
+                            string libFl = Path.Combine(refItem.FileProject, refItem.FileFolder, refItem.FileName).Replace(refAngularProject.AbsoluteSourceRoot, "");
+                            if (!libFl.StartsWith("\\")) libFl = "\\" + libFl;
+                            libFl = ("." + libFl).Replace("\\", "/");
                             if (refAngularProject.PublicApiJson != null)
                             {
                                 if (refAngularProject.PublicApiJson.exportItems != null)
@@ -57,9 +61,8 @@ namespace CS82ANGULAR.Model
                                     {
                                         return srcName;
                                     }
-                                    exportItem =
-                                                                        refAngularProject.PublicApiJson.exportItems
-                                                                        .Where(expItm => expItm.exportType == "ExportDefaultDeclaration" && libFl.Equals(expItm.exportSource, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                                    exportItem = refAngularProject.PublicApiJson.exportItems
+                                                    .Where(expItm => expItm.exportType == "ExportDefaultDeclaration" && libFl.Equals(expItm.exportSource, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
                                     if (exportItem != null)
                                     {
                                         return srcName;
@@ -93,7 +96,11 @@ namespace CS82ANGULAR.Model
                         }
                         else if (refAngularProject.ProjectType == "application")
                         {
-                            string appFl = (".\\" + refAngularProject.SourceRoot + "\\" + refItem.FileFolder + "\\" + refItem.FileName).Replace("\\", "/");
+                            // string appFl = (".\\" + refAngularProject.SourceRoot + "\\" + refItem.FileFolder + "\\" + refItem.FileName).Replace("\\", "/");
+                            string appFl = Path.Combine(refItem.FileProject, refItem.FileFolder, refItem.FileName).Replace(anglJson.AngularJsonPath, "");
+                            if (!appFl.StartsWith("\\")) appFl = "\\" + appFl;
+                            appFl = ("." + appFl).Replace("\\", "/");
+
                             if (refAngularProject.WebpackConfigJson != null)
                             {
                                 if (refAngularProject.WebpackConfigJson.exposeItems != null)

@@ -114,6 +114,7 @@ namespace CS82ANGULAR.ViewModel
                         if (!string.IsNullOrEmpty(folder))
                             pathForAngularJson = Path.Combine(pathForAngularJson, folder);
                         AngularJsonHelper.SetT4RootFolder(TemplatePathHelper.GetTemplatePath() );
+                        ExportFileModifier.SetT4RootFolderEFM(TemplatePathHelper.GetTemplatePath());
                         AngularJsonHelper.GetAngularJson().ReadAngularJson(pathForAngularJson);
                         if (!string.IsNullOrEmpty(folder))
                         {
@@ -129,6 +130,7 @@ namespace CS82ANGULAR.ViewModel
                 case 1:
                     CurrentUiStepId = 2;
                     AngularJsonHelper.SetBabelFolderPath((SelectDbContextUC.DataContext as SelectDbContextViewModel).SelectedBabelFolder);
+                    ExportFileModifier.SetBabelFolderPathEFM((SelectDbContextUC.DataContext as SelectDbContextViewModel).SelectedBabelFolder);
                     PrevBtnEnabled = true;
                     NextBtnEnabled = false;
                     if (CreateWebApiUC == null)

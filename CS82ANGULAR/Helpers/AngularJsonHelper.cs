@@ -141,16 +141,28 @@ namespace CS82ANGULAR.Helpers
                 if (prj.ProjectType == "application")
                 {
                     string wpcjs = Path.Combine(prj.AbsoluteProjectRoot, WebpackConfigJs);
-                    string wpcjsText = File.ReadAllText(wpcjs);
-                    string wpcjsResult = await StaticNodeJSService.InvokeFromStringAsync<string>(WebpackConfigJsReaderCode, args: new object[] { wpcjsText });
-                    prj.WebpackConfigJson = JsonConvert.DeserializeObject<AngularWebpackConfigJson>(wpcjsResult);
+                    if (File.Exists(wpcjs))
+                    {
+                        string wpcjsText = File.ReadAllText(wpcjs);
+                        string wpcjsResult = await StaticNodeJSService.InvokeFromStringAsync<string>(WebpackConfigJsReaderCode, args: new object[] { wpcjsText });
+                        prj.WebpackConfigJson = JsonConvert.DeserializeObject<AngularWebpackConfigJson>(wpcjsResult);
+                    } else
+                    {
+                        prj.WebpackConfigJson = null;
+                    }
                 }
                 else if (prj.ProjectType == "library")
                 {
                     string pats = Path.Combine(prj.AbsoluteSourceRoot, PublicApiTsFileName);
-                    string patsText = File.ReadAllText(pats);
-                    string patsResult = await StaticNodeJSService.InvokeFromStringAsync<string>(PublicApiTsReaderCode, args: new object[] { patsText });
-                    prj.PublicApiJson = JsonConvert.DeserializeObject<AngularPublicApiJson>(patsResult);
+                    if (File.Exists(pats))
+                    {
+                        string patsText = File.ReadAllText(pats);
+                        string patsResult = await StaticNodeJSService.InvokeFromStringAsync<string>(PublicApiTsReaderCode, args: new object[] { patsText });
+                        prj.PublicApiJson = JsonConvert.DeserializeObject<AngularPublicApiJson>(patsResult);
+                    } else
+                    {
+                        prj.PublicApiJson = null;
+                    }
                 }
             }
         }

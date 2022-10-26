@@ -68,6 +68,15 @@ namespace CS82ANGULAR.ViewModel
                     this.GenerateError += tpError.ToString() + "\n";
                 }
             }
+            if (string.IsNullOrEmpty(this.GenerateError))
+            {
+                if (string.Compare(this.FileExtension, ".jsonefm2txt", true) == 0)
+                {
+                    this.FileExtension = ".txt";
+                    this.GenerateText = await ExportFileModifier.ExecuteJsonScriptEFMAsync(AngularJsonHelper.GetAngularJson(), model, this.GenerateText);
+                }
+            }
+
             IsReady.DoNotify(this, string.IsNullOrEmpty(this.GenerateError));
         }
         public async Task DoGenerateFeatureAsync(DTE2 Dte, ITextTemplating textTemplating, string T4TempatePath, DbContextSerializable SerializableDbContext, FeatureContextSerializable SerializableFeatureContext, FeatureSerializable feature, AllowedFileTypesSerializable AllowedFileTypes, string defaultProjectNameSpace = null)
@@ -119,6 +128,15 @@ namespace CS82ANGULAR.ViewModel
                 foreach (TPError tpError in tpCallback.ProcessingErrors)
                 {
                     this.GenerateError += tpError.ToString() + "\n";
+                }
+            }
+            if (string.IsNullOrEmpty(this.GenerateError))
+            {
+                if (string.Compare(this.FileExtension, ".jsonefm2txt", true) == 0)
+                {
+                    this.FileExtension = ".txt";
+                    // this.GenerateText = await ExportFileModifier.ExecuteJsonScriptEFMAsync(AngularJsonHelper.GetAngularJson(), model, this.GenerateText);
+                    throw new Exception("Not implemented yet");
                 }
             }
             IsReady.DoNotify(this, string.IsNullOrEmpty(this.GenerateError));

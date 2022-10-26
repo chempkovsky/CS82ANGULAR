@@ -115,6 +115,7 @@ namespace CS82ANGULAR.ViewModel
                         if (!string.IsNullOrEmpty(folder))
                             pathForAngularJson = Path.Combine(pathForAngularJson, folder);
                         AngularJsonHelper.SetT4RootFolder(TemplatePathHelper.GetTemplatePath());
+                        ExportFileModifier.SetT4RootFolderEFM(TemplatePathHelper.GetTemplatePath());
                         AngularJsonHelper.GetAngularJson().ReadAngularJson(pathForAngularJson);
 
                         dataContext.IsReady.IsReadyEvent += CallBack_IsReady;
@@ -126,6 +127,7 @@ namespace CS82ANGULAR.ViewModel
                 case 1:
                     CurrentUiStepId = 2;
                     AngularJsonHelper.SetBabelFolderPath((SelectDbContextUC.DataContext as SelectDbContextViewModel).SelectedBabelFolder);
+                    ExportFileModifier.SetBabelFolderPathEFM((SelectDbContextUC.DataContext as SelectDbContextViewModel).SelectedBabelFolder);
                     if (FeatureUC == null)
                     {
                         FeatureViewModel dataContext = new FeatureViewModel(this.Dte);

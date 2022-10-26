@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System;
+using CS82ANGULAR.Model.Serializable.Angular;
 
 namespace CS82ANGULAR.Helpers.BatchProcess
 {
@@ -73,6 +74,16 @@ namespace CS82ANGULAR.Helpers.BatchProcess
                     result.GenerateError += tpError.ToString() + "\n";
                 }
             }
+            if (string.IsNullOrEmpty(result.GenerateError))
+            {
+                if (string.Compare(result.FileExtension, ".jsonefm2txt", true) == 0)
+                {
+                    result.FileExtension = ".txt";
+                    result.GenerateText = await ExportFileModifier.ExecuteJsonScriptEFMAsync(AngularJsonHelper.GetAngularJson(), model, result.GenerateText);
+                }
+            }
+
+
             return result;
         }
         public static string GetHyphenedName(string src)

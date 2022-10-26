@@ -59,6 +59,16 @@ namespace CS82ANGULAR.ViewModel
                     this.GenerateError = tpError.ToString() + "\n";
                 }
             }
+            if (string.IsNullOrEmpty(this.GenerateError))
+            {
+                if (string.Compare(this.FileExtension, ".jsonefm2txt", true) == 0)
+                {
+                    this.FileExtension = ".txt";
+                    //this.GenerateText = await ExportFileModifier.ExecuteJsonScriptEFMAsync(AngularJsonHelper.GetAngularJson(), model, this.GenerateText);
+                    throw new Exception("Not implemented yet");
+                }
+            }
+
             IsReady.DoNotify(this, string.IsNullOrEmpty(this.GenerateError));
         }
     }

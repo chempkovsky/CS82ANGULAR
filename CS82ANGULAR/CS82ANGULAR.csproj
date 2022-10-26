@@ -57,6 +57,7 @@
     <Compile Include="Helpers\ContextChangedNotificationService.cs" />
     <Compile Include="Helpers\EnumBindingSourceExtension.cs" />
     <Compile Include="Helpers\EnumDescriptionTypeConverter.cs" />
+    <Compile Include="Helpers\ExportFileModifier.cs" />
     <Compile Include="Helpers\FeatureViewModelHelper.cs" />
     <Compile Include="Helpers\FluentAPIEntityNodeHelper.cs" />
     <Compile Include="Helpers\FluentAPIForeignKeyHelper.cs" />
@@ -111,6 +112,8 @@
     <Compile Include="Model\NavigationTypeEnum.cs" />
     <Compile Include="Model\Serializable\AllowedFileTypeSerializable.cs" />
     <Compile Include="Model\Serializable\AllowedFileTypesSerializable.cs" />
+    <Compile Include="Model\Serializable\Angular\FileModifierItemSerializable.cs" />
+    <Compile Include="Model\Serializable\Angular\FileModifierSerializable.cs" />
     <Compile Include="Model\Serializable\CommonStaffSerializable.cs" />
     <Compile Include="Model\Serializable\DbContextSerializable.cs" />
     <Compile Include="Model\Serializable\FeatureContextSerializable.cs" />
@@ -1331,14 +1334,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00170-app-glbl-security.module.ts\app-glbl-security.module.ngb-awesome.ts.t4">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00170-app-glbl-security.module.ts\app-glbl-security.module.ngb.ts.t4">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Content Include="Templates\JavaScriptsTmplst\00170-app-glbl-security.module.ts\app-glbl-security.module.ts.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -1404,14 +1399,6 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\JavaScriptsTmplst\00220-app-routing.module.ts\app-routing.module.ts.t4">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00230-app.module.ts\app.module.ngb-awesome.ts.t4">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Templates\JavaScriptsTmplst\00230-app.module.ts\app.module.ngb.ts.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -2447,6 +2434,10 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\NodejsSripts\updater_of_webpack.config.js.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\00010-app-material.module.txt\app-material.module.txt.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

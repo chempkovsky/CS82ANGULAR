@@ -1,5 +1,5 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
-<#@ output extension="ts" #>
+<#@ output extension="jsonefm2txt" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
@@ -17,14 +17,19 @@
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
 
-    string appLoginInterfaceFolder      = "00120-app-glbl-login.interface.ts";
-    string appLoginModelClassName       = GetModelClassName(Model, appLoginInterfaceFolder);
+    string materialModuleFolder = "00010-app-material.module.ts";
 
 #>
 
-export interface <#= appLoginModelClassName #> {
-   username: string; 
-   password: string;
-   grant_type: string;
+{
+    "FileModifierItems": [
+        {
+            "Description": [
+                'update public-api.ts or webpack.config.js',
+                'with export data'
+            ],
+            "MethodName": "UpdateExport",
+            "InvocationParams": ['<#= materialModuleFolder #>']
+        }
+    ]
 }
-
