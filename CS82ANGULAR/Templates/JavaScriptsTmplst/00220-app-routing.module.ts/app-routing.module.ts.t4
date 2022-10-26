@@ -15,27 +15,18 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
-    string AppSettingServicePropName                = "appGlblSettings";
-    string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
-    string appSettingServiceClassName               = GetServiceClassName(Model, appSettingServiceFolder);
-
-    string appHtmlComponentFolder                   = "00210-app.component.html";
-    string appCssComponentFolder                    = "00210-app.component.css";
-    string appComponentFolder                       = "00210-app.component.ts";
-    string appComponentClassName                    = GetComponentClassName(Model, appComponentFolder);
-
-    string securityModuleFolder                     = "00170-app-glbl-security.module.ts";
-    string securityModuleClassName                  = GetModuleClassName(Model, securityModuleFolder);
 
     string appRoutingModuleFolder                   = "00220-app-routing.module.ts";
     string appRoutingModuleClassName                = GetModuleClassName(Model, appRoutingModuleFolder);    
 
+    string securityModuleFolder                     = "00170-app-glbl-security.module.ts";
+    string securityModuleClassName                  = GetModuleClassNameWithAnglr(AngularJsonFile, Model, securityModuleFolder, appRoutingModuleFolder);
 
     string pagenotfoundComponentFolder              = "00185-app-glbl-pagenotfound.component.ts";
-    string pagenotfoundComponentClassName           = GetComponentClassName(Model, pagenotfoundComponentFolder);
+    string pagenotfoundComponentClassName           = GetComponentClassNameWithAnglr(AngularJsonFile, Model, pagenotfoundComponentFolder, appRoutingModuleFolder);
 
     string homeComponentFolder                      = "00180-app-glbl-home.component.ts";
-    string homeComponentClassName                   = GetComponentClassName(Model, homeComponentFolder);
+    string homeComponentClassName                   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, homeComponentFolder, appRoutingModuleFolder);
 #>
 
 import { NgModule } from '@angular/core';
@@ -54,7 +45,10 @@ import { <#= pagenotfoundComponentClassName #> } from '<#= GetFolderNameWithAngl
 #>
 
 const routes: Routes = [
-  { path: 'authentication', loadChildren: () => import('<#= GetModuleFileName(Model, securityModuleFolder) #>').then(m => m.<#= securityModuleClassName #>) },  
+  // { path: 'authentication', loadChildren: () => import('<#= GetModuleFileName(Model, securityModuleFolder) #>').then(m => m.<#= securityModuleClassName #>) },  
+  { path: 'authentication', loadChildren: () => <#= GenerateLoadChildrenImportWithAnglr(AngularJsonFile, Model, securityModuleFolder, appRoutingModuleFolder) #> },  
+
+  
 
 <#
     if(! string.IsNullOrEmpty(homeComponentClassName)) {

@@ -32,14 +32,12 @@
     string appLogoutHtmlComponentFolder     = "00142-app-glbl-logout.component.html";
     string appLogoutComponentFolder         = "00142-app-glbl-logout.component.ts";
 
-    string appRegisterModelClassName        = GetModelClassName(Model, appRegisterInterfaceFolder);
-    string appLoginModelClassName           = GetModelClassName(Model, appLoginInterfaceFolder);
-    string appSettingServiceClassName       = GetServiceClassName(Model, appSettingServiceFolder);
-    string appLoginServiceClassName         = GetServiceClassName(Model, appLoginServiceFolder);
-    string appLoginComponentClassName       = GetComponentClassName(Model, appLoginComponentFolder);
     string appLogoutComponentClassName      = GetComponentClassName(Model, appLogoutComponentFolder);
-
     string appLogoutComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, appLogoutComponentFolder);
+
+    string appSettingServiceClassName       = GetServiceClassNameWithAnglr(AngularJsonFile,Model, appSettingServiceFolder, appLogoutComponentFolder);
+    string appLoginServiceClassName         = GetServiceClassNameWithAnglr(AngularJsonFile,Model, appLoginServiceFolder, appLogoutComponentFolder);
+
 
     string AppearancePropName           = "appearance";
     string ShowErrorMethodName          = "showError";

@@ -1,5 +1,6 @@
 ﻿using CS82ANGULAR.Model.Serializable;
 using CS82ANGULAR.Model.Serializable.Angular;
+using CS82ANGULAR.TemplateProcessingHelpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -571,6 +572,28 @@ namespace CS82ANGULAR.Model
             }
             return sb.ToString();
         }
+        string GetEnumClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = "";
+            if ((model == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            string enumClassName = GetEnumClassName(model, fileType);
+            return GetNameByAngularJson(enumClassName, anglJson, refItem, curItem);
+        }
         string GetPipeClassName(ModelViewSerializable model, string fileType)
         {
             string result = "";
@@ -840,6 +863,28 @@ namespace CS82ANGULAR.Model
             }
             return sb.ToString();
         }
+        string GetInterceptorClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = "";
+            if ((model == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            string interceptorClassName = GetInterceptorClassName(model, fileType);
+            return GetNameByAngularJson(interceptorClassName, anglJson, refItem, curItem);
+        }
         string GetModuleFileName(ModelViewSerializable model, string fileType)
         {
             string result = "./";
@@ -1011,7 +1056,57 @@ namespace CS82ANGULAR.Model
             }
             return DefaultProjectNameSpace + "." + result;
         }
-
-
+        string GenerateLoadChildrenImportWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = "import('').then(m => m.)";
+            if ((anglJson == null) || (model == null) || string.IsNullOrEmpty(currFolder) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            AngularProject refAngularProject = GetAngularProjectByRefItem(anglJson, refItem);
+            AngularProject curAngularProject = GetAngularProjectByRefItem(anglJson, curItem);
+            if ((refAngularProject != null) && (curAngularProject != null))
+            {
+                if (refAngularProject != curAngularProject)
+                {
+                    if (refAngularProject.ProjectType == "library")
+                    {
+                        return "import('" + refAngularProject.ProjectName + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
+                    } else if (refAngularProject.ProjectType == "application")
+                    {
+                        string aliasNm = null;
+                        string appFl = (".\\" + refAngularProject.SourceRoot + "\\" + refItem.FileFolder + "\\" + refItem.FileName).Replace("\\", "/");
+                        if (refAngularProject.WebpackConfigJson != null)
+                        {
+                            if (refAngularProject.WebpackConfigJson.exposeItems != null)
+                            {
+                                AngularWebpackConfigExposeItem exposeItm =
+                                    refAngularProject.WebpackConfigJson.exposeItems
+                                    .Where(itm => appFl.Equals(itm.exposeValue, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                                if (exposeItm != null)
+                                {
+                                    aliasNm = exposeItm.exposeKey;
+                                }
+                            }
+                        }
+                        if(string.IsNullOrEmpty(aliasNm)) aliasNm = GetModuleFileName(model, fileType);
+                        return "loadRemoteModule({type: 'manifest', remoteName: '" + refAngularProject.ProjectName + "', exposedModule: '"+ aliasNm + "'}).then(m => m." + GetModuleClassName(model, fileType) + ")";
+                    }
+                }
+            }
+            return "import('" + GetModuleFileName(model, fileType) + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
+        }
     }
 }

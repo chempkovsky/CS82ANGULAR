@@ -29,17 +29,18 @@
     string securityRoutingModuleFolder              = "00160-app-glbl-security.routing.module.ts";
     string securityModuleFolder                     = "00170-app-glbl-security.module.ts";
 
-    string appChangePasswordComponentClassName      = GetComponentClassName(Model, appChangePasswordComponentFolder);
-    string appLogoutComponentClassName              = GetComponentClassName(Model, appLogoutComponentFolder);
-    string appLoginComponentClassName               = GetComponentClassName(Model, appLoginComponentFolder);
-    string appRegisterComponentClassName            = GetComponentClassName(Model, appRegisterComponentFolder);
-    string securityDashboardComponentClassName      = GetComponentClassName(Model, securityDashboardComponentFolder);
-    string securityRoutingModuleClassName           = GetModuleClassName(Model, securityRoutingModuleFolder);
-    string materialModuleClassName                  = GetModuleClassName(Model, materialModuleFolder);
-    string flexModuleClassName                      = GetModuleClassName(Model, flexModuleFolder);
-
-
     string securityModuleClassName                  = GetModuleClassName(Model, securityModuleFolder);
+
+    string appChangePasswordComponentClassName      = GetComponentClassNameWithAnglr(AngularJsonFile, Model, appChangePasswordComponentFolder, securityModuleFolder);
+    string appLogoutComponentClassName              = GetComponentClassNameWithAnglr(AngularJsonFile, Model, appLogoutComponentFolder, securityModuleFolder);
+    string appLoginComponentClassName               = GetComponentClassNameWithAnglr(AngularJsonFile, Model, appLoginComponentFolder, securityModuleFolder);
+    string appRegisterComponentClassName            = GetComponentClassNameWithAnglr(AngularJsonFile, Model, appRegisterComponentFolder, securityModuleFolder);
+    string securityDashboardComponentClassName      = GetComponentClassNameWithAnglr(AngularJsonFile, Model, securityDashboardComponentFolder, securityModuleFolder);
+    string securityRoutingModuleClassName           = GetModuleClassNameWithAnglr(AngularJsonFile, Model, securityRoutingModuleFolder, securityModuleFolder);
+    string materialModuleClassName                  = GetModuleClassNameWithAnglr(AngularJsonFile, Model, materialModuleFolder, securityModuleFolder);
+    string flexModuleClassName                      = GetModuleClassNameWithAnglr(AngularJsonFile, Model, flexModuleFolder, securityModuleFolder);
+
+
 
 #>
 

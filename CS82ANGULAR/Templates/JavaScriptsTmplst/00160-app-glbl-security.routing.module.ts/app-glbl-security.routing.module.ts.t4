@@ -24,13 +24,13 @@
 
     string securityRoutingModuleFolder              = "00160-app-glbl-security.routing.module.ts";
 
-
-    string appChangePasswordComponentClassName      = GetComponentClassName(Model, appChangePasswordComponentFolder);
-    string appLogoutComponentClassName              = GetComponentClassName(Model, appLogoutComponentFolder);
-    string appLoginComponentClassName               = GetComponentClassName(Model, appLoginComponentFolder);
-    string appRegisterComponentClassName            = GetComponentClassName(Model, appRegisterComponentFolder);
-    string securityDashboardComponentClassName      = GetComponentClassName(Model, securityDashboardComponentFolder);
     string securityRoutingModuleClassName           = GetModuleClassName(Model, securityRoutingModuleFolder);
+
+    string appChangePasswordComponentClassName      = GetComponentClassNameWithAnglr(AngularJsonFile, Model, appChangePasswordComponentFolder, securityRoutingModuleFolder);
+    string appLogoutComponentClassName              = GetComponentClassNameWithAnglr(AngularJsonFile, Model, appLogoutComponentFolder, securityRoutingModuleFolder);
+    string appLoginComponentClassName               = GetComponentClassNameWithAnglr(AngularJsonFile, Model, appLoginComponentFolder, securityRoutingModuleFolder);
+    string appRegisterComponentClassName            = GetComponentClassNameWithAnglr(AngularJsonFile, Model, appRegisterComponentFolder, securityRoutingModuleFolder);
+    string securityDashboardComponentClassName      = GetComponentClassNameWithAnglr(AngularJsonFile, Model, securityDashboardComponentFolder, securityRoutingModuleFolder);
 
 #>
 

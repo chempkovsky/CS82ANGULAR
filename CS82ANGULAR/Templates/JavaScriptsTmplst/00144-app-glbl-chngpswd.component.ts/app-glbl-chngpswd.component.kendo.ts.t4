@@ -28,15 +28,12 @@
     string appChangePasswordCssComponentFolder    = "00144-app-glbl-chngpswd.component.css";
     string appChangePasswordComponentFolder       = "00144-app-glbl-chngpswd.component.ts";
 
-    string appRegisterModelClassName        = GetModelClassName(Model, appRegisterInterfaceFolder);
-    string appLoginModelClassName           = GetModelClassName(Model, appLoginInterfaceFolder);
-    string appChangePasswordModelClassName  = GetModelClassName(Model, appChangePasswordInterfaceFolder);
-    string appSettingServiceClassName       = GetServiceClassName(Model, appSettingServiceFolder);
-    string appLoginServiceClassName         = GetServiceClassName(Model, appLoginServiceFolder);
-
     string appChangePasswordComponentClassName    = GetComponentClassName(Model, appChangePasswordComponentFolder);
-
     string appChangePasswordComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, appChangePasswordComponentFolder);
+
+    string appChangePasswordModelClassName  = GetModelClassNameWithAnglr(AngularJsonFile, Model, appChangePasswordInterfaceFolder, appChangePasswordComponentFolder);
+    string appSettingServiceClassName       = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, appChangePasswordComponentFolder);
+    string appLoginServiceClassName         = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appLoginServiceFolder, appChangePasswordComponentFolder);
 
     string AppearancePropName           = "appearance";
     string ShowErrorMethodName          = "showError";

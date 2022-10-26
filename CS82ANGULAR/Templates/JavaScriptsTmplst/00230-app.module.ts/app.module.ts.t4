@@ -9,50 +9,44 @@
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
-    string materialModuleFolder                     = "00010-app-material.module.ts";
-    string materialModuleClassName                  = GetModuleClassName(Model, materialModuleFolder);
-    string flexModuleFolder                         = "00011-app-flex-layout.module.ts";
-    string flexModuleClassName                      = GetModuleClassName(Model, flexModuleFolder);
 
-
-    string AppSettingServicePropName                = "appGlblSettings";
-    string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
-    string appSettingServiceClassName               = GetServiceClassName(Model, appSettingServiceFolder);
-
-
-    string appConfigServiceFolder                   = "00014-app-config.service.ts";
-    string appConfigServiceClassName                = GetServiceClassName(Model, appConfigServiceFolder);
-
-
-    string formatterModuleFolder                    = "00070-app-formatter.module.ts";
-    string formatterModuleClassName                 = GetModuleClassName(Model, formatterModuleFolder);
-
-    string appInterceptorFolder                     = "00200-app-glbl.interceptor.ts";
-    string appInterceptorClassName                  = GetInterceptorClassName(Model, appInterceptorFolder);
-
-
-    string appHtmlComponentFolder                   = "00210-app.component.html";
-    string appCssComponentFolder                    = "00210-app.component.css";
-    string appComponentFolder                       = "00210-app.component.ts";
-    string appComponentClassName                    = GetComponentClassName(Model, appComponentFolder);
-
-    string securityModuleFolder                     = "00170-app-glbl-security.module.ts";
-    string securityModuleClassName                  = GetModuleClassName(Model, securityModuleFolder);
-
-    string appRoutingModuleFolder                   = "00220-app-routing.module.ts";
-    string appRoutingModuleClassName                = GetModuleClassName(Model, appRoutingModuleFolder);    
     string appModuleFolder                          = "00230-app.module.ts";
     string appModuleClassName                       = GetModuleClassName(Model, appModuleFolder);    
 
+    string materialModuleFolder                     = "00010-app-material.module.ts";
+    string materialModuleClassName                  = GetModuleClassNameWithAnglr(AngularJsonFile, Model, materialModuleFolder, appModuleFolder);
+    string flexModuleFolder                         = "00011-app-flex-layout.module.ts";
+    string flexModuleClassName                      = GetModuleClassNameWithAnglr(AngularJsonFile, Model, flexModuleFolder, appModuleFolder);
+
+
+    string appConfigServiceFolder                   = "00014-app-config.service.ts";
+    string appConfigServiceClassName                = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appConfigServiceFolder, appModuleFolder);
+
+
+    string formatterModuleFolder                    = "00070-app-formatter.module.ts";
+    string formatterModuleClassName                 = GetModuleClassNameWithAnglr(AngularJsonFile, Model, formatterModuleFolder, appModuleFolder);
+
+    string appInterceptorFolder                     = "00200-app-glbl.interceptor.ts";
+    string appInterceptorClassName                  = GetInterceptorClassNameWithAnglr(AngularJsonFile, Model, appInterceptorFolder, appModuleFolder);
+
+    string appComponentFolder                       = "00210-app.component.ts";
+    string appComponentClassName                    = GetComponentClassNameWithAnglr(AngularJsonFile, Model, appComponentFolder, appModuleFolder);
+
+
+    string appRoutingModuleFolder                   = "00220-app-routing.module.ts";
+    string appRoutingModuleClassName                = GetModuleClassNameWithAnglr(AngularJsonFile, Model, appRoutingModuleFolder, appModuleFolder);    
+
     string pagenotfoundComponentFolder              = "00185-app-glbl-pagenotfound.component.ts";
-    string pagenotfoundComponentClassName           = GetComponentClassName(Model, pagenotfoundComponentFolder);
+    string pagenotfoundComponentClassName           = GetComponentClassNameWithAnglr(AngularJsonFile, Model, pagenotfoundComponentFolder, appModuleFolder);
 
     string homeComponentFolder                      = "00180-app-glbl-home.component.ts";
-    string homeComponentClassName                   = GetComponentClassName(Model, homeComponentFolder);
+    string homeComponentClassName                   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, homeComponentFolder, appModuleFolder);
 
 #>
 
@@ -62,23 +56,22 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 
-import { <#= appRoutingModuleClassName #> } from '<#= GetFolderName(Model, appRoutingModuleFolder, appModuleFolder)#>';
-import { <#= appComponentClassName #> } from '<#= GetFolderName(Model, appComponentFolder, appModuleFolder)#>';
-import { <#= materialModuleClassName #> } from '<#= GetFolderName(Model, materialModuleFolder, appModuleFolder)#>';
-import { <#= flexModuleClassName #> } from '<#= GetFolderName(Model, flexModuleFolder, appModuleFolder)#>';
-import { <#= appInterceptorClassName #> } from '<#= GetFolderName(Model, appInterceptorFolder, appModuleFolder)#>';
-import { <#= appConfigServiceClassName #> } from '<#= GetFolderName(Model, appConfigServiceFolder, appModuleFolder)#>';
-
-import { <#= formatterModuleClassName #> } from '<#= GetFolderName(Model, formatterModuleFolder, appModuleFolder)#>';
+import { <#= appRoutingModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appRoutingModuleFolder, appModuleFolder)#>';
+import { <#= appComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appComponentFolder, appModuleFolder)#>';
+import { <#= materialModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, materialModuleFolder, appModuleFolder)#>';
+import { <#= flexModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, flexModuleFolder, appModuleFolder)#>';
+import { <#= appInterceptorClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appInterceptorFolder, appModuleFolder)#>';
+import { <#= appConfigServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appConfigServiceFolder, appModuleFolder)#>';
+import { <#= formatterModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, formatterModuleFolder, appModuleFolder)#>';
 <#
     if(! string.IsNullOrEmpty(homeComponentClassName)) {
 #>
-import { <#= homeComponentClassName #> } from '<#= GetFolderName(Model, homeComponentFolder, appModuleFolder)#>';
+import { <#= homeComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, homeComponentFolder, appModuleFolder)#>';
 <#
     }
     if(! string.IsNullOrEmpty(pagenotfoundComponentClassName)) {
 #>
-import { <#= pagenotfoundComponentClassName #> } from '<#= GetFolderName(Model, pagenotfoundComponentFolder, appModuleFolder)#>';
+import { <#= pagenotfoundComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, pagenotfoundComponentFolder, appModuleFolder)#>';
 <#
     }
 #>

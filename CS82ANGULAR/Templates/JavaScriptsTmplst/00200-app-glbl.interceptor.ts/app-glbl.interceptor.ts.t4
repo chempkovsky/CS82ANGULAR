@@ -21,8 +21,9 @@
     string appSettingServiceFolder          = "00015-app-glbl-settings.service.ts";
     string appInterceptorFolder             = "00200-app-glbl.interceptor.ts";
 
-    string appSettingServiceClassName       = GetServiceClassName(Model, appSettingServiceFolder);
     string appInterceptorClassName          = GetInterceptorClassName(Model, appInterceptorFolder);
+
+    string appSettingServiceClassName       = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, appInterceptorFolder);
 
     string AppSettingServicePropName        = "appGlblSettings";
     string getAuthIntoMethodName            = "getAuthInto";
