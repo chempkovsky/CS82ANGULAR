@@ -1,0 +1,50 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with monorepo project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "ng add @angular/material",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "ng generate library common-modules",
+    "",
+    "Please make sure that you selected [src\\lib] folder",
+    "",
+    "Please make sure that you executed two commands",
+    "    ng add @angular/material",
+    "    npm i -s @angular/flex-layout@9.0.0-beta.31 @angular/cdk",
+    "",
+    "                                After you have finished the current batch generation",
+    "Please include ",
+    "",
+    "     AppMaterialModule ",
+    "     AppFlexLayoutModule ",
+    "     AppFormatterModule ",
+    "     WebServiceFilterModule ",
+    "     HttpClientModule ",
+    "",
+    "in the import:[]-section of AppModule",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "shared\\modules",
+      "GeneratorType": "00010-app-material.module.ts",
+      "GeneratorSript": "app-material.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\modules",
+      "GeneratorType": "00010-app-material.module.ts",
+      "GeneratorSript": "app-material.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\modules",
+      "GeneratorType": "00011-app-flex-layout.module.ts",
+      "GeneratorSript": "app-flex-layout.module.ts.t4"
+    }
+  ]
+
+}
