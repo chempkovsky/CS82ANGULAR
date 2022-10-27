@@ -30,7 +30,9 @@
     "ng generate library common-services",
     "ng generate library common-formatters",
     "ng generate library common-components",
+    "",
     "ng generate application ang-monorepo-app",
+    "ng add @angular/material --project=ang-monorepo-app",
     "",
     "Please make sure that you selected [src\\app] folder of the ang-monorepo-app application !!!",
     ""

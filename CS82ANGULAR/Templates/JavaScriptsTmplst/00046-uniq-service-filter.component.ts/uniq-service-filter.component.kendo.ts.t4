@@ -83,7 +83,7 @@
     string filterResultModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterResultModelFolder, uniqFilterComponentFolder);
     string menuItemDataModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, menuItemDataModelFolder, uniqFilterComponentFolder);
     string eventEmitterDataModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, eventEmitterDataModelFolder, uniqFilterComponentFolder);
-    string eventEmitterPubModelClassName    = GetModelClassNameWithAnglr(AngularJsonFile, (Model, eventEmitterPubModelFolder, uniqFilterComponentFolder);
+    string eventEmitterPubModelClassName    = GetModelClassNameWithAnglr(AngularJsonFile, Model, eventEmitterPubModelFolder, uniqFilterComponentFolder);
 
     
     string appSettingServiceClassName   = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, uniqFilterComponentFolder);
