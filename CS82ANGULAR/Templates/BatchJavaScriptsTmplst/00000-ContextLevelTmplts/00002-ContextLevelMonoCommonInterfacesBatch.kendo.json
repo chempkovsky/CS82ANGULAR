@@ -1,0 +1,187 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "",
+    "ng add @progress/kendo-angular-buttons",
+    "ng add @progress/kendo-angular-layout",
+    "ng add @progress/kendo-angular-icons",
+    "ng add @progress/kendo-angular-inputs",
+    "ng add @progress/kendo-angular-dropdowns",
+    "ng add @progress/kendo-angular-menu",
+    "ng add @progress/kendo-angular-progressbar",
+    "ng add @progress/kendo-angular-dialog",
+    "ng add @progress/kendo-angular-notification",
+    "ng add @progress/kendo-angular-toolbar",
+    "ng add @progress/kendo-angular-tooltip",
+    "ng add @progress/kendo-angular-listview",
+    "ng add @progress/kendo-angular-dateinputs",
+    "ng add @progress/kendo-angular-label",
+    "ng add @progress/kendo-angular-grid",
+    "",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "ng generate library common-modules",
+    "ng generate library common-interfaces",
+    "",
+    "Please make sure that you selected [src\\lib] folder of the common-interfaces library !!!",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00013-app-config.interface.ts",
+      "GeneratorSript": "app-config.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00013-app-config.interface.txt",
+      "GeneratorSript": "app-config.interface.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00016-item-height-data.interface.ts",
+      "GeneratorSript": "item-height-data.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00016-item-height-data.interface.txt",
+      "GeneratorSript": "item-height-data.interface.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00018-event-emitter-data.interface.ts",
+      "GeneratorSript": "event-emitter-data.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00018-event-emitter-data.interface.txt",
+      "GeneratorSript": "event-emitter-data.interface.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00017-menu-item-data.interface.ts",
+      "GeneratorSript": "menu-item-data.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00017-menu-item-data.interface.txt",
+      "GeneratorSript": "menu-item-data.interface.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00019-event-emitter-pub.interface.ts",
+      "GeneratorSript": "event-emitter-pub.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00019-event-emitter-pub.interface.txt",
+      "GeneratorSript": "event-emitter-pub.interface.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00020-detail-view-sel.interface.ts",
+      "GeneratorSript": "detail-view-sel.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00020-detail-view-sel.interface.txt",
+      "GeneratorSript": "detail-view-sel.interface.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00021-web-service-filter.interface.ts",
+      "GeneratorSript": "web-service-filter.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00021-web-service-filter.interface.txt",
+      "GeneratorSript": "web-service-filter.interface.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00022-web-service-filter-def.interface.ts",
+      "GeneratorSript": "web-service-filter-def.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00022-web-service-filter-def.interface.txt",
+      "GeneratorSript": "web-service-filter-def.interface.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00032-column-selector-item.interface.ts",
+      "GeneratorSript": "event-emitter-data.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00032-column-selector-item.interface.txt",
+      "GeneratorSript": "event-emitter-data.interface.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00037-message-dialog.interface.ts",
+      "GeneratorSript": "message-dialog.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00037-message-dialog.interface.txt",
+      "GeneratorSript": "message-dialog.interface.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00042-uniq-service-filter.interface.ts",
+      "GeneratorSript": "uniq-service-filter.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00042-uniq-service-filter.interface.txt",
+      "GeneratorSript": "uniq-service-filter.interface.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00044-uniq-service-filter-def.interface.ts",
+      "GeneratorSript": "uniq-service-filter-def.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00044-uniq-service-filter-def.interface.txt",
+      "GeneratorSript": "uniq-service-filter-def.interface.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00023-web-service-filter-operator.interface.ts",
+      "GeneratorSript": "web-service-filter-operator.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00023-web-service-filter-operator.interface.txt",
+      "GeneratorSript": "web-service-filter-operator.interface.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00024-web-service-filter-rslt.interface.ts",
+      "GeneratorSript": "web-service-filter-rslt.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00024-web-service-filter-rslt.interface.txt",
+      "GeneratorSript": "web-service-filter-rslt.interface.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00600-view-model-datasource.interface.ts",
+      "GeneratorSript": "view-model-datasource.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00600-view-model-datasource.interface.txt",
+      "GeneratorSript": "view-model-datasource.interface.txt.t4"
+    }
+  ]
+
+}

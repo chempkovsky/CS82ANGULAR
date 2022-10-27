@@ -1,0 +1,210 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "",
+    "ng add @progress/kendo-angular-buttons",
+    "ng add @progress/kendo-angular-layout",
+    "ng add @progress/kendo-angular-icons",
+    "ng add @progress/kendo-angular-inputs",
+    "ng add @progress/kendo-angular-dropdowns",
+    "ng add @progress/kendo-angular-menu",
+    "ng add @progress/kendo-angular-progressbar",
+    "ng add @progress/kendo-angular-dialog",
+    "ng add @progress/kendo-angular-notification",
+    "ng add @progress/kendo-angular-toolbar",
+    "ng add @progress/kendo-angular-tooltip",
+    "ng add @progress/kendo-angular-listview",
+    "ng add @progress/kendo-angular-dateinputs",
+    "ng add @progress/kendo-angular-label",
+    "ng add @progress/kendo-angular-grid",
+    "",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "ng generate library common-modules",
+    "ng generate library common-interfaces",
+    "ng generate library common-services",
+    "ng generate library common-formatters",
+    "ng generate library common-components",
+    "ng generate library common-auth",
+    "",
+    "Please make sure that you selected [src\\lib] folder of the common-auth library !!!",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "interfaces",
+      "GeneratorType": "00118-app-glbl-register.interface.ts",
+      "GeneratorSript": "app-glbl-register.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "interfaces",
+      "GeneratorType": "00118-app-glbl-register.interface.txt",
+      "GeneratorSript": "app-glbl-register.interface.txt.t4"
+    },
+    {
+      "DestinationFolder": "interfaces",
+      "GeneratorType": "00120-app-glbl-login.interface.ts",
+      "GeneratorSript": "app-glbl-login.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "interfaces",
+      "GeneratorType": "00120-app-glbl-login.interface.txt",
+      "GeneratorSript": "app-glbl-login.interface.txt.t4"
+    },
+    {
+      "DestinationFolder": "interfaces",
+      "GeneratorType": "00122-app-glbl-chngpswd.interface.ts",
+      "GeneratorSript": "app-glbl-chngpswd.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "interfaces",
+      "GeneratorType": "00122-app-glbl-chngpswd.interface.txt",
+      "GeneratorSript": "app-glbl-chngpswd.interface.txt.t4"
+    },
+    {
+      "DestinationFolder": "services",
+      "GeneratorType": "00130-app-glbl-login.service.ts",
+      "GeneratorSript": "app-glbl-login.service.ts.t4"
+    },
+    {
+      "DestinationFolder": "services",
+      "GeneratorType": "00130-app-glbl-login.service.txt",
+      "GeneratorSript": "app-glbl-login.service.txt.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-glbl-register",
+      "GeneratorType": "00135-app-glbl-register.component.css",
+      "GeneratorSript": "app-glbl-register.component.css.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-glbl-register",
+      "GeneratorType": "00135-app-glbl-register.component.html",
+      "GeneratorSript": "app-glbl-register.component.kendo.html.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-glbl-register",
+      "GeneratorType": "00135-app-glbl-register.component.ts",
+      "GeneratorSript": "app-glbl-register.component.kendo.ts.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-glbl-register",
+      "GeneratorType": "00135-app-glbl-register.component.txt",
+      "GeneratorSript": "app-glbl-register.component.txt.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-glbl-login",
+      "GeneratorType": "00140-app-glbl-login.component.css",
+      "GeneratorSript": "app-glbl-login.component.css.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-glbl-login",
+      "GeneratorType": "00140-app-glbl-login.component.html",
+      "GeneratorSript": "app-glbl-login.component.kendo.html.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-glbl-login",
+      "GeneratorType": "00140-app-glbl-login.component.ts",
+      "GeneratorSript": "app-glbl-login.component.kendo.ts.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-glbl-login",
+      "GeneratorType": "00140-app-glbl-login.component.txt",
+      "GeneratorSript": "app-glbl-login.component.txt.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-glbl-logout",
+      "GeneratorType": "00142-app-glbl-logout.component.css",
+      "GeneratorSript": "app-glbl-logout.component.css.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-glbl-logout",
+      "GeneratorType": "00142-app-glbl-logout.component.html",
+      "GeneratorSript": "app-glbl-logout.component.kendo.html.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-glbl-logout",
+      "GeneratorType": "00142-app-glbl-logout.component.ts",
+      "GeneratorSript": "app-glbl-logout.component.kendo.ts.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-glbl-logout",
+      "GeneratorType": "00142-app-glbl-logout.component.txt",
+      "GeneratorSript": "app-glbl-logout.component.txt.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-glbl-chngpswd",
+      "GeneratorType": "00144-app-glbl-chngpswd.component.css",
+      "GeneratorSript": "app-glbl-chngpswd.component.css.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-glbl-chngpswd",
+      "GeneratorType": "00144-app-glbl-chngpswd.component.html",
+      "GeneratorSript": "app-glbl-chngpswd.component.kendo.html.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-glbl-chngpswd",
+      "GeneratorType": "00144-app-glbl-chngpswd.component.ts",
+      "GeneratorSript": "app-glbl-chngpswd.component.kendo.ts.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-glbl-chngpswd",
+      "GeneratorType": "00144-app-glbl-chngpswd.component.txt",
+      "GeneratorSript": "app-glbl-chngpswd.component.txt.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-scrt-dashboard",
+      "GeneratorType": "00156-app-scrt-dashboard.component.css",
+      "GeneratorSript": "app-scrt-dashboard.component.css.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-scrt-dashboard",
+      "GeneratorType": "00156-app-scrt-dashboard.component.html",
+      "GeneratorSript": "app-scrt-dashboard.component.html.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-scrt-dashboard",
+      "GeneratorType": "00156-app-scrt-dashboard.component.ts",
+      "GeneratorSript": "app-scrt-dashboard.component.ts.t4"
+    },
+    {
+      "DestinationFolder": "components\\app-scrt-dashboard",
+      "GeneratorType": "00156-app-scrt-dashboard.component.txt",
+      "GeneratorSript": "app-scrt-dashboard.component.txt.t4"
+    },
+    {
+      "DestinationFolder": "modules",
+      "GeneratorType": "00160-app-glbl-security.routing.module.ts",
+      "GeneratorSript": "app-glbl-security.routing.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "modules",
+      "GeneratorType": "00160-app-glbl-security.routing.module.txt",
+      "GeneratorSript": "app-glbl-security.routing.module.txt.t4"
+    },
+    {
+      "DestinationFolder": "modules",
+      "GeneratorType": "00170-app-glbl-security.module.ts",
+      "GeneratorSript": "app-glbl-security.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "modules",
+      "GeneratorType": "00170-app-glbl-security.module.txt",
+      "GeneratorSript": "app-glbl-security.module.txt.t4"
+    },
+    {
+      "DestinationFolder": "interceptors",
+      "GeneratorType": "00200-app-glbl.interceptor.ts",
+      "GeneratorSript": "app-glbl.interceptor.ts.t4"
+    }
+    {
+      "DestinationFolder": "interceptors",
+      "GeneratorType": "00200-app-glbl.interceptor.txt",
+      "GeneratorSript": "app-glbl.interceptor.txt.t4"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "ng add @angular/material",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "",
+    "ng generate library common-modules",
+    "ng generate library common-interfaces",
+    "ng generate library common-services",
+    "",
+    "Please make sure that you selected [src\\lib] folder of the common-services library !!!",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00014-app-config.service.ts",
+      "GeneratorSript": "app-config.service.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00014-app-config.service.txt",
+      "GeneratorSript": "app-config.service.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00015-app-glbl-settings.service.ts",
+      "GeneratorSript": "app-glbl-settings.service.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00015-app-glbl-settings.service.txt",
+      "GeneratorSript": "app-glbl-settings.service.txt.t4"
+    }
+  ]
+}

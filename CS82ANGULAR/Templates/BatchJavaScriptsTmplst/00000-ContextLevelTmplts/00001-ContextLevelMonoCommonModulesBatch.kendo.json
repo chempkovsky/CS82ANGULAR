@@ -7,9 +7,24 @@
     "",
     "ng new ang-monorepo --no-create-application",
     "cd ang-monorepo",
-    "ng add @angular/material",
-    "npm i -s @angular/flex-layout @angular/cdk",
     "",
+    "ng add @progress/kendo-angular-buttons",
+    "ng add @progress/kendo-angular-layout",
+    "ng add @progress/kendo-angular-icons",
+    "ng add @progress/kendo-angular-inputs",
+    "ng add @progress/kendo-angular-dropdowns",
+    "ng add @progress/kendo-angular-menu",
+    "ng add @progress/kendo-angular-progressbar",
+    "ng add @progress/kendo-angular-dialog",
+    "ng add @progress/kendo-angular-notification",
+    "ng add @progress/kendo-angular-toolbar",
+    "ng add @progress/kendo-angular-tooltip",
+    "ng add @progress/kendo-angular-listview",
+    "ng add @progress/kendo-angular-dateinputs",
+    "ng add @progress/kendo-angular-label",
+    "ng add @progress/kendo-angular-grid",
+    "",
+    "npm i -s @angular/flex-layout @angular/cdk",
     "ng generate library common-modules",
     "",
     "Please make sure that you selected [src\\lib] folder of the common-modules library !!!",
@@ -28,24 +43,25 @@
   ],
   "BatchItems": [
     {
-      "DestinationFolder": "shared\\modules",
+      "DestinationFolder": "",
       "GeneratorType": "00010-app-material.module.ts",
-      "GeneratorSript": "app-material.module.ts.t4"
+      "GeneratorSript": "app-kendo.module.ts.t4"
     },
     {
-      "DestinationFolder": "shared\\modules",
+      "DestinationFolder": "",
       "GeneratorType": "00010-app-material.module.txt",
       "GeneratorSript": "app-material.module.txt.t4"
     },
     {
-      "DestinationFolder": "shared\\modules",
+      "DestinationFolder": "",
       "GeneratorType": "00011-app-flex-layout.module.ts",
       "GeneratorSript": "app-flex-layout.module.ts.t4"
     },
     {
-      "DestinationFolder": "shared\\modules",
+      "DestinationFolder": "",
       "GeneratorType": "00011-app-flex-layout.module.txt",
       "GeneratorSript": "app-flex-layout.module.txt.t4"
     }
   ]
+
 }

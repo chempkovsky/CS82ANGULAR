@@ -1,0 +1,68 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "",
+    "ng add @progress/kendo-angular-buttons",
+    "ng add @progress/kendo-angular-layout",
+    "ng add @progress/kendo-angular-icons",
+    "ng add @progress/kendo-angular-inputs",
+    "ng add @progress/kendo-angular-dropdowns",
+    "ng add @progress/kendo-angular-menu",
+    "ng add @progress/kendo-angular-progressbar",
+    "ng add @progress/kendo-angular-dialog",
+    "ng add @progress/kendo-angular-notification",
+    "ng add @progress/kendo-angular-toolbar",
+    "ng add @progress/kendo-angular-tooltip",
+    "ng add @progress/kendo-angular-listview",
+    "ng add @progress/kendo-angular-dateinputs",
+    "ng add @progress/kendo-angular-label",
+    "ng add @progress/kendo-angular-grid",
+    "",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "ng generate library common-modules",
+    "ng generate library common-interfaces",
+    "ng generate library common-services",
+    "ng generate library common-formatters",
+    "",
+    "Please make sure that you selected [src\\lib] folder of the common-formatters library !!!",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "pipes",
+      "GeneratorType": "00062-to-binary.pipe.ts",
+      "GeneratorSript": "to-binary.pipe.ts.t4"
+    },
+    {
+      "DestinationFolder": "pipes",
+      "GeneratorType": "00062-to-binary.pipe.txt",
+      "GeneratorSript": "to-binary.pipe.txt.t4"
+    },
+    {
+      "DestinationFolder": "directives",
+      "GeneratorType": "00064-to-binary-formatter.directive.ts",
+      "GeneratorSript": "to-binary-formatter.directive.kendo.ts.t4"
+    },
+    {
+      "DestinationFolder": "directives",
+      "GeneratorType": "00064-to-binary-formatter.directive.txt",
+      "GeneratorSript": "to-binary-formatter.directive.kendo.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00070-app-formatter.module.ts",
+      "GeneratorSript": "formatter.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00070-app-formatter.module.txt",
+      "GeneratorSript": "formatter.module.txt.t4"
+    }
+  ]
+}
