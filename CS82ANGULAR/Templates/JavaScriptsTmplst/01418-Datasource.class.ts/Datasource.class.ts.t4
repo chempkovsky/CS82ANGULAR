@@ -6,11 +6,14 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 
 <#
@@ -81,26 +84,31 @@
     string HiddenFilterByRowSuffix              = "HiddenFilterByRow";
     
 
+    string viewDatasourceClassFolder                = "01418-Datasource.class.ts";
+    string viewDatasourceClassName                  = GetJavaScriptClassName(Model, viewDatasourceClassFolder);
 
     string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
-    string appSettingServiceClassName               = GetCommonServiceClassName(Context, appSettingServiceFolder);
+    string appSettingServiceClassName               = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, viewDatasourceClassFolder);
 
     string filterResultModelFolder                  = "00024-web-service-filter-rslt.interface.ts";
-    string filterResultModelClassName               = GetModelClassName(Context, filterResultModelFolder);
+    string filterResultModelClassName               = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, filterResultModelFolder, viewDatasourceClassFolder);
 
 
 
     string viewModelDatasourceInterfaceFolder       = "00600-view-model-datasource.interface.ts";
-    string viewModelDatasourceInterfaceClassName    = GetModelClassName(Context, viewModelDatasourceInterfaceFolder);
+    string viewModelDatasourceInterfaceClassName    = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, viewModelDatasourceInterfaceFolder, viewDatasourceClassFolder);
 
-    string viewInterfaceFolder                  = "01100-.interface.ts";
-    string viewInterfacePageFolder              = "01200-Page.interface.ts";
-    string viewInterfaceFltFolder               = "01300-Filter.interface.ts";
-    string viewServiceFolder                    = "01400-.service.ts";
+    string viewInterfaceFolder                      = "01100-.interface.ts";
+    string viewInterfaceName                        = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, viewDatasourceClassFolder);
 
-    string viewDatasourceClassFolder            = "01418-Datasource.class.ts";
+    string viewInterfacePageFolder                  = "01200-Page.interface.ts";
+    string viewInterfacePageName                    = GetInterfacePageNameWithAnglr(AngularJsonFile, Model, viewInterfacePageFolder, viewDatasourceClassFolder);
 
-    string serviceClassName = GetServiceClassName(Model, viewServiceFolder);
+    string viewInterfaceFltFolder                   = "01300-Filter.interface.ts";
+    string viewInterfaceFilterName                  = GetInterfaceFilterNameWithAnglr(AngularJsonFile, Model, viewInterfaceFltFolder, viewDatasourceClassFolder);
+
+    string viewServiceFolder                        = "01400-.service.ts";
+    string serviceClassName                         = GetServiceClassNameWithAnglr(AngularJsonFile, Model, viewServiceFolder, viewDatasourceClassFolder);
     
     List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
     {
@@ -115,18 +123,16 @@ import { EventEmitter } from "@angular/core";
 import { catchError, Observable, switchMap } from "rxjs";
 import { of } from 'rxjs/internal/observable/of';
 
-import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, viewDatasourceClassFolder) #>';
-import { <#= viewModelDatasourceInterfaceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  viewModelDatasourceInterfaceFolder, viewDatasourceClassFolder) #>';
-import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, viewDatasourceClassFolder) #>';
-import { <#= GetInterfaceName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewDatasourceClassFolder, Context, Model.ViewName, viewInterfaceFolder) #>';
-import { <#= GetInterfacePageName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewDatasourceClassFolder, Context, Model.ViewName, viewInterfacePageFolder) #>';
-import { <#= GetInterfaceFilterName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, viewDatasourceClassFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, viewDatasourceClassFolder) #>';
+import { <#= viewModelDatasourceInterfaceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  viewModelDatasourceInterfaceFolder, viewDatasourceClassFolder) #>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterResultModelFolder, viewDatasourceClassFolder) #>';
 
+import { <#= viewInterfaceName #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, viewDatasourceClassFolder, Context, Model.ViewName, viewInterfaceFolder) #>';
+import { <#= viewInterfacePageName #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, viewDatasourceClassFolder, Context, Model.ViewName, viewInterfacePageFolder) #>';
+import { <#= viewInterfaceFilterName #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, viewDatasourceClassFolder, Context, Model.ViewName, viewInterfaceFltFolder) #>';
+import { <#= serviceClassName #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, viewDatasourceClassFolder, Context, Model.ViewName, viewServiceFolder) #>';
 
-
-import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, viewDatasourceClassFolder, Context, Model.ViewName, viewServiceFolder) #>';
-
-export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> implements <#= viewModelDatasourceInterfaceClassName #> {
+export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceInterfaceClassName #> {
     protected readonly _<#= CurrentViewNameFieldName #>: string  = '<#= Model.ViewName #>';
     protected readonly _<#= ClientViewNameFieldName #>: string | any;
     protected readonly _<#= DirectNavigationFieldName #>: string | any;
@@ -185,7 +191,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         if(aftrMstrChngd) this.<#= AfterMasterChangedPropName #>.emit(this);
         this.<#= AfterPropsChangedPropName #>.emit(this);
     }
-    public get<#= HiddenFilterByRowSuffix #>(rw: <#= GetInterfaceName(Model) #>|any, nvNm: string|any): {[key: string]: {[key: string]: {[key: string]: any}}} {
+    public get<#= HiddenFilterByRowSuffix #>(rw: <#= viewInterfaceName #>|any, nvNm: string|any): {[key: string]: {[key: string]: {[key: string]: any}}} {
         return this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(rw, nvNm);
     }
 
@@ -314,7 +320,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         }
         return src === dest;
     }
-    public <#= Interface2ValuesMethodName #>(data: <#= GetInterfaceName(Model) #> | null, doNotify: boolean = true): boolean {
+    public <#= Interface2ValuesMethodName #>(data: <#= viewInterfaceName #> | null, doNotify: boolean = true): boolean {
         if(typeof data === 'undefined') {
             return this.<#= ClearMethodName #>(doNotify);
         }
@@ -369,7 +375,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         if(doNotify) this.<#= DoEmitEventMethodName #>(aftrMstrChngd);
         return hasChanged;
     }
-    public <#= Values2InterfaceMethodName #>(): <#= GetInterfaceName(Model) #> | any {
+    public <#= Values2InterfaceMethodName #>(): <#= viewInterfaceName #> | any {
         return {
 <#
         if (Model.ScalarProperties != null) {
@@ -500,7 +506,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
                                     }
 #>
                     ).subscribe({
-                        next: (data: <#= GetInterfaceName(Model) #> ) => {
+                        next: (data: <#= viewInterfaceName #> ) => {
                             this.<#= Interface2ValuesMethodName #>(data, true);
                         },
                         error: (error) => { // error path
@@ -656,8 +662,8 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         }
         return rslt;
     }
-    protected <#= GetFilterByCurrDirMstrsMethodName #>(): <#=  GetInterfaceFilterName(Model) #> {
-        let flt: <#=  GetInterfaceFilterName(Model) #> | any = {}; // <#=  GetInterfaceFilterName(Model) #>
+    protected <#= GetFilterByCurrDirMstrsMethodName #>(): <#=  viewInterfaceFilterName #> {
+        let flt: <#=  viewInterfaceFilterName #> | any = {}; // <#=  viewInterfaceFilterName #>
         let <#= MasterToClientKeyFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}}} = this.<#= formRootService #>.get<#= MasterToClientKeyFieldsMapFieldName #>();
         for(let i in <#= MasterToClientKeyFieldsMapFieldName #>) {
             for(let j in <#= MasterToClientKeyFieldsMapFieldName #>[i]) {
@@ -666,12 +672,12 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
                         if (this.isSet<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm)) {
                             let nm: string = <#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm;
                             let op: string = nm + '<#= OperatorSufix #>';
-                            if (typeof flt[nm as keyof <#=  GetInterfaceFilterName(Model) #>] === 'undefined') { 
-                                flt[nm as keyof <#=  GetInterfaceFilterName(Model) #>] = [this.get<#= ValueSuffix #>(nm)]; 
-                                flt[op as keyof <#=  GetInterfaceFilterName(Model) #>] = ['<#= EqualOperator #>'];
+                            if (typeof flt[nm as keyof <#=  viewInterfaceFilterName #>] === 'undefined') { 
+                                flt[nm as keyof <#=  viewInterfaceFilterName #>] = [this.get<#= ValueSuffix #>(nm)]; 
+                                flt[op as keyof <#=  viewInterfaceFilterName #>] = ['<#= EqualOperator #>'];
                             } else { 
-                                flt[nm as keyof <#=  GetInterfaceFilterName(Model) #>].push(this.get<#= ValueSuffix #>(nm)); 
-                                flt[op as keyof <#=  GetInterfaceFilterName(Model) #>].push('<#= EqualOperator #>');
+                                flt[nm as keyof <#=  viewInterfaceFilterName #>].push(this.get<#= ValueSuffix #>(nm)); 
+                                flt[op as keyof <#=  viewInterfaceFilterName #>].push('<#= EqualOperator #>');
                             }
                         }
                     }
@@ -687,17 +693,17 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         };
     }
     // add input string to define flt.orderby prop
-    public <#= GetCllctByCurrDirMstrsMethodName #>(): Observable<Array<<#= GetInterfaceName(Model) #>>> {
+    public <#= GetCllctByCurrDirMstrsMethodName #>(): Observable<Array<<#= viewInterfaceName #>>> {
 <#
         if (Model.IsWebApiSelectManyWithPagination) {
 #>
         if (!this.<#= IsSetFilterByCurrDirMstrsMethodName #>()) {
             return of([]);
         }
-        let flt: <#=  GetInterfaceFilterName(Model) #> | any =  this.<#= GetFilterByCurrDirMstrsMethodName #>();
+        let flt: <#=  viewInterfaceFilterName #> | any =  this.<#= GetFilterByCurrDirMstrsMethodName #>();
         return this.<#= formRootService #>.<#= GetWithFilterMethodName #>(flt)
                 .pipe(
-                    switchMap((rslt: <#= GetInterfacePageName(Model) #>) => {
+                    switchMap((rslt: <#= viewInterfacePageName #>) => {
                         if (!(typeof rslt === 'undefined')) {
                            if (!(rslt === null)) {
                                 if (!(typeof rslt.items === 'undefined')) {
@@ -709,7 +715,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
                         }
                         return of([]);
                      }),
-                     catchError(this.handleError<Array<<#= GetInterfaceName(Model) #>>>([]))
+                     catchError(this.handleError<Array<<#= viewInterfaceName #>>>([]))
                 );
 <#
         } else {
@@ -719,7 +725,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         }
 #>
     }
-    public <#= GetCllctByFldFilterMethodName #>(fldName: string|any, fldVal: any): Observable<Array<<#= GetInterfaceName(Model) #>>> {
+    public <#= GetCllctByFldFilterMethodName #>(fldName: string|any, fldVal: any): Observable<Array<<#= viewInterfaceName #>>> {
 <#
         if (Model.IsWebApiSelectManyWithPagination) {
 #>
@@ -731,7 +737,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         if (!this.<#= IsSetFilterByCurrDirMstrsMethodName #>()) {
             return of([]);
         }
-        let flt: <#=  GetInterfaceFilterName(Model) #> | any =  this.<#= GetFilterByCurrDirMstrsMethodName #>();
+        let flt: <#=  viewInterfaceFilterName #> | any =  this.<#= GetFilterByCurrDirMstrsMethodName #>();
         if(typeof flt[fldName] === 'undefined') {
             flt[fldName] = [fldVal];
         } else {
@@ -745,7 +751,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
         flt.orderby = fldName;
         return this.<#= formRootService #>.<#= GetWithFilterMethodName #>(flt)
                 .pipe(
-                    switchMap((rslt: <#= GetInterfacePageName(Model) #>) => {
+                    switchMap((rslt: <#= viewInterfacePageName #>) => {
                         if (!(typeof rslt === 'undefined')) {
                            if (!(rslt === null)) {
                                 if (!(typeof rslt.items === 'undefined')) {
@@ -757,7 +763,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
                         }
                         return of([]);
                      }),
-                     catchError(this.handleError<Array<<#= GetInterfaceName(Model) #>>>([]))
+                     catchError(this.handleError<Array<<#= viewInterfaceName #>>>([]))
                 );
 <#
         } else {
@@ -829,7 +835,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
                 }
 #>
             ).subscribe({
-                next: (data: <#= GetInterfaceName(Model) #> ) => { 
+                next: (data: <#= viewInterfaceName #> ) => { 
                     if(!this.<#= Interface2ValuesMethodName #>(data, true)) {
                         this.<#= DoEmitEventMethodName #>(true);
                     };
@@ -938,7 +944,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 <# 
     if(localize) {
 #>
-        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Not all Unique or Primary key properties are defined to call Refresh-method@@<#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) + RefreshMethodName #>.Not-all-Unique-Primary:Not all Unique or Primary key properties are defined to call Refresh-method`});
+        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Not all Unique or Primary key properties are defined to call Refresh-method@@<#= viewDatasourceClassName + RefreshMethodName #>.Not-all-Unique-Primary:Not all Unique or Primary key properties are defined to call Refresh-method`});
 <# 
     } else {
 #>
@@ -955,7 +961,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 <# 
     if(localize) {
 #>
-            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Not all propertes are correctly defined@@<#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) + UpdateOneMethodName #>.Not-all-propertes:Not all propertes are correctly defined`});
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Not all propertes are correctly defined@@<#= viewDatasourceClassName + UpdateOneMethodName #>.Not-all-propertes:Not all propertes are correctly defined`});
 <# 
     } else {
 #>
@@ -965,9 +971,9 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 #>
             return;
         }
-        let itm: <#= GetInterfaceName(Model) #> | any = this.<#= Values2InterfaceMethodName #>();
+        let itm: <#= viewInterfaceName #> | any = this.<#= Values2InterfaceMethodName #>();
         this.<#= formRootService #>.<#= UpdateOneMethodName #>(itm).subscribe({
-                next: (data: <#= GetInterfaceName(Model) #> ) => { 
+                next: (data: <#= viewInterfaceName #> ) => { 
                     this.<#= Interface2ValuesMethodName #>(data, false);
                     this.<#= OnUpdatePropName #>.emit(this);
                 },
@@ -982,7 +988,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 <# 
     if(localize) {
 #>
-            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Update is not implemeted for the current ViewModel@@<#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) + UpdateOneMethodName #>.Update-not-implemeted:Update is not implemeted for the current ViewModel`});
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Update is not implemeted for the current ViewModel@@<#= viewDatasourceClassName + UpdateOneMethodName #>.Update-not-implemeted:Update is not implemeted for the current ViewModel`});
 <# 
     } else {
 #>
@@ -1004,7 +1010,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 <# 
     if(localize) {
 #>
-            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Not all propertes are correctly defined@@<#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) + AddOneMethodName #>.Not-all-propertes:Not all propertes are correctly defined`});
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Not all propertes are correctly defined@@<#= viewDatasourceClassName + AddOneMethodName #>.Not-all-propertes:Not all propertes are correctly defined`});
 <# 
     } else {
 #>
@@ -1014,9 +1020,9 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 #>
             return;
         }
-        let itm: <#= GetInterfaceName(Model) #> | any = this.<#= Values2InterfaceMethodName #>();
+        let itm: <#= viewInterfaceName #> | any = this.<#= Values2InterfaceMethodName #>();
         this.<#= formRootService #>.<#= AddOneMethodName #>(itm).subscribe({
-                next: (data: <#= GetInterfaceName(Model) #> ) => { 
+                next: (data: <#= viewInterfaceName #> ) => { 
                     this.<#= Interface2ValuesMethodName #>(data, false);
                     this.<#= OnAddPropName #>.emit(this);
                 },
@@ -1031,7 +1037,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 <# 
     if(localize) {
 #>
-        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Insert is not implemeted for the current ViewModel@@<#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) + AddOneMethodName #>.Insert-not-implemeted:Insert is not implemeted for the current ViewModel`});
+        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Insert is not implemeted for the current ViewModel@@<#= viewDatasourceClassName + AddOneMethodName #>.Insert-not-implemeted:Insert is not implemeted for the current ViewModel`});
 <# 
     } else {
 #>
@@ -1075,7 +1081,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 <# 
     if(localize) {
 #>
-            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Not all propertes are correctly defined@@<#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) + DeleteOneMethodName #>.Not-all-propertes:Not all propertes are correctly defined`});
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Not all propertes are correctly defined@@<#= viewDatasourceClassName + DeleteOneMethodName #>.Not-all-propertes:Not all propertes are correctly defined`});
 <# 
     } else {
 #>
@@ -1094,7 +1100,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
             }
         }
         #>).subscribe({
-                next: (data: <#= GetInterfaceName(Model) #> ) => { 
+                next: (data: <#= viewInterfaceName #> ) => { 
                     this.<#= Interface2ValuesMethodName #>(data, false);
                     this.<#= OnDeletePropName #>.emit(this);
                 },
@@ -1110,7 +1116,7 @@ export class <#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) #> imp
 <# 
     if(localize) {
 #>
-        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Delete is not implemeted for the current ViewModel@@<#= GetJavaScriptClassName(Model, viewDatasourceClassFolder) + DeleteOneMethodName #>.Delete-not-implemeted:Delete is not implemeted for the current ViewModel`});
+        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Delete is not implemeted for the current ViewModel@@<#= viewDatasourceClassName + DeleteOneMethodName #>.Delete-not-implemeted:Delete is not implemeted for the current ViewModel`});
 <# 
     } else {
 #>

@@ -6,11 +6,14 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 
 <#
@@ -49,16 +52,24 @@
 
     string src2destMethodName                   = "src2dest";
 
-    string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
+    string viewServiceFolder                    = "01400-.service.ts";
+    string serviceClassName                     = GetServiceClassName(Model, viewServiceFolder);
 
-    string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
-    string filterResultModelClassName   = GetModelClassName(Context, filterResultModelFolder);
 
-    string viewInterfaceFolder      = "01100-.interface.ts";
-    string viewInterfacePageFolder  = "01200-Page.interface.ts";
-    string viewInterfaceFltFolder   = "01300-Filter.interface.ts";
-    string viewServiceFolder        = "01400-.service.ts";
-    string appSettingServiceClassName = GetCommonServiceClassName(Context, appSettingServiceFolder);
+    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName           = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, viewServiceFolder);
+
+    string filterResultModelFolder              = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, filterResultModelFolder, viewServiceFolder);
+
+    string viewInterfaceFolder                  = "01100-.interface.ts";
+    string viewInterfaceName                    = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, viewServiceFolder);
+
+    string viewInterfacePageFolder              = "01200-Page.interface.ts";
+    string viewInterfacePageName                = GetInterfacePageNameWithAnglr(AngularJsonFile, Model, viewInterfacePageFolder, viewServiceFolder);
+
+    string viewInterfaceFltFolder               = "01300-Filter.interface.ts";
+    string viewInterfaceFilterName              = GetInterfaceFilterNameWithAnglr(AngularJsonFile, Model, viewInterfaceFltFolder, viewServiceFolder);
 
     List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
     {
@@ -72,17 +83,18 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/internal/Observable';
-import { <#= GetInterfaceName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceFolder, viewServiceFolder)#>';
-import { <#= GetInterfacePageName(Model) #> } from '<#= GetFolderName(Model, viewInterfacePageFolder, viewServiceFolder)#>';
-import { <#= GetInterfaceFilterName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceFltFolder, viewServiceFolder)#>';
-import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, viewServiceFolder)#>';
-import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, viewServiceFolder) #>';
+import { <#= viewInterfaceName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, viewServiceFolder) #>';
+import { <#= viewInterfacePageName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfacePageFolder, viewServiceFolder) #>';
+import { <#= viewInterfaceFilterName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFltFolder, viewServiceFolder) #>';
+
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, viewServiceFolder) #>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterResultModelFolder, viewServiceFolder) #>';
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class <#= GetJavaScriptServiceName(Model) #> {
+export class <#= serviceClassName #> {
     serviceUrl: string;  
     constructor(private http: HttpClient, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {
        this.serviceUrl = this.<#= AppSettingServicePropName #>.getWebApiPrefix('<#= Model.ViewName #>') + '<#= GetWebApiServicePrefix(Model) #>';  
@@ -118,7 +130,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
 #>
     };
     // master name, navigation name, master filed, master filed value
-    public get<#= HiddenFilterByRowSuffix #>(rw: <#= GetInterfaceName(Model) #>|any, nvNm: string|any): {[key: string]: {[key: string]: {[key: string]: any}}} {
+    public get<#= HiddenFilterByRowSuffix #>(rw: <#= viewInterfaceName #>|any, nvNm: string|any): {[key: string]: {[key: string]: {[key: string]: any}}} {
         let rslt: {[key: string]: {[key: string]: {[key: string]: any}}} = {}
         if((typeof rw === 'undefined') || (typeof nvNm === 'undefined')) return rslt;
         if((rw === null) || (nvNm === null)) return rslt;
@@ -438,15 +450,15 @@ export class <#= GetJavaScriptServiceName(Model) #> {
     // HowTo:
     //
     // this.serviceRefInYourCode.<#= GetAllMethodName #>().subscibe(value =>{
-    //    // handling value of type <#= GetInterfaceName(Model) #>[] 
+    //    // handling value of type <#= viewInterfaceName #>[] 
     // },
     // error => {
     //    // handling error 
     // });
     // 
-    <#= GetAllMethodName #>(): Observable<<#= GetInterfaceName(Model) #>[]> {
+    <#= GetAllMethodName #>(): Observable<<#= viewInterfaceName #>[]> {
 
-        return this.http.get<<#= GetInterfaceName(Model) #>[]>(this.serviceUrl+'/<#= GetAllMethodName #>');
+        return this.http.get<<#= viewInterfaceName #>[]>(this.serviceUrl+'/<#= GetAllMethodName #>');
         //    .pipe(
         //        catchError(this.handleError('<#= GetAllMethodName #>', []))
         //    );
@@ -461,16 +473,16 @@ export class <#= GetJavaScriptServiceName(Model) #> {
     if (Model.IsWebApiSelectManyWithPagination) { 
 #>
     // 
-    // HowTo: flt is of type <#=GetInterfaceFilterName(Model)#> 
+    // HowTo: flt is of type <#= viewInterfaceFilterName #> 
     //
     // this.serviceRefInYourCode.<#= GetWithFilterMethodName #>(flt).subscibe(value =>{
-    //    // handling value of type <#= GetInterfacePageName(Model) #>
+    //    // handling value of type <#= viewInterfacePageName #>
     // },
     // error => {
     //    // handling error 
     // });
     // 
-    <#= GetWithFilterMethodName #>(filter: <#=GetInterfaceFilterName(Model)#>): Observable<<#= GetInterfacePageName(Model) #>> {
+    <#= GetWithFilterMethodName #>(filter: <#= viewInterfaceFilterName #>): Observable<<#= viewInterfacePageName #>> {
         let params: HttpParams  = new HttpParams({encoder: this.<#= AppSettingServicePropName #>});
         let hasFilter: boolean = false;
         if (!(typeof filter === 'undefined')) {
@@ -562,7 +574,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
             } // if (!(filter === null ))
         } // if (!(typeof filter === 'undefined'))
         const options = hasFilter ? { params } : {};
-        return this.http.get<<#= GetInterfacePageName(Model) #>>(this.serviceUrl+'/<#= GetWithFilterMethodName #>', options);
+        return this.http.get<<#= viewInterfacePageName #>>(this.serviceUrl+'/<#= GetWithFilterMethodName #>', options);
           //    .pipe(
           //        catchError(this.handleError('<#= GetWithFilterMethodName #>', []))
           //    );
@@ -602,7 +614,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
     // HowTo: {prm1, prm2, ..., prmN} -- primary/unique key
     //
     // this.serviceRefInYourCode.<#= localRouteName #>(prm1, prm2, ..., prmN ).subscibe(value =>{
-    //    // handling value of type <#= GetInterfaceName(Model) #>
+    //    // handling value of type <#= viewInterfaceName #>
     // },
     // error => {
     //    // handling error 
@@ -626,7 +638,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
                     }
                 }
 #>
-        ): Observable<<#= GetInterfaceName(Model) #>> {
+        ): Observable<<#= viewInterfaceName #>> {
         let params: HttpParams  = new HttpParams({encoder: this.<#= AppSettingServicePropName #>});
         let hasFilter: boolean = false;
 <#
@@ -645,13 +657,13 @@ export class <#= GetJavaScriptServiceName(Model) #> {
                 }
 #>
         const options = hasFilter ? { params } : {};
-        return this.http.get<<#= GetInterfaceName(Model) #>>(this.serviceUrl+'/<#= localRouteName #>', options);
+        return this.http.get<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= localRouteName #>', options);
           // .pipe(
           //   catchError(this.handleError('<#= localRouteName #>', []))
           // );
     }
 
-    <#= localRouteManyName #>(filter: <#=GetInterfaceFilterName(Model)#>): Observable<<#= GetInterfacePageName(Model) #>> {
+    <#= localRouteManyName #>(filter: <#= viewInterfaceFilterName #>): Observable<<#= viewInterfacePageName #>> {
         let params: HttpParams  = new HttpParams({encoder: this.<#= AppSettingServicePropName #>});
         let hasFilter: boolean = false;
         if (!(typeof filter === 'undefined')) {
@@ -769,7 +781,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
             } // if (!(filter === null ))
         } // if (!(typeof filter === 'undefined'))
         const options = hasFilter ? { params } : {};
-        return this.http.get<<#= GetInterfacePageName(Model) #>>(this.serviceUrl+'/<#= localRouteManyName #>', options);
+        return this.http.get<<#= viewInterfacePageName #>>(this.serviceUrl+'/<#= localRouteManyName #>', options);
     }
 
 <#
@@ -782,18 +794,18 @@ export class <#= GetJavaScriptServiceName(Model) #> {
     if (Model.IsWebApiUpdate) { 
 #>
     // 
-    // HowTo: item is of type <#= GetInterfaceName(Model) #> 
+    // HowTo: item is of type <#= viewInterfaceName #> 
     //
     // this.serviceRefInYourCode.<#= UpdateOneMethodName #>(item).subscibe(value =>{
-    //    // handling value of type <#= GetInterfaceName(Model) #>
+    //    // handling value of type <#= viewInterfaceName #>
     // },
     // error => {
     //    // handling error 
     // });
     // 
-    <#= UpdateOneMethodName #>(item: <#= GetInterfaceName(Model) #>): Observable<<#= GetInterfaceName(Model) #>> {
+    <#= UpdateOneMethodName #>(item: <#= viewInterfaceName #>): Observable<<#= viewInterfaceName #>> {
 
-        return this.http.put<<#= GetInterfaceName(Model) #>>(this.serviceUrl+'/<#= UpdateOneMethodName #>', item); //, httpOptions);
+        return this.http.put<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= UpdateOneMethodName #>', item); //, httpOptions);
         //  .pipe(
         //    catchError(this.handleError('<#= UpdateOneMethodName #>', item))
         //  );
@@ -807,16 +819,16 @@ export class <#= GetJavaScriptServiceName(Model) #> {
         List<ModelViewPropertyOfVwSerializable> identProps = GetDatabaseGeneratedProp(Model);
 #>
     // 
-    // HowTo: item is of type <#= GetInterfaceName(Model) #> 
+    // HowTo: item is of type <#= viewInterfaceName #> 
     //
     // this.serviceRefInYourCode.<#= AddOneMethodName #>(item).subscibe(value =>{
-    //    // handling value of type <#= GetInterfaceName(Model) #>
+    //    // handling value of type <#= viewInterfaceName #>
     // },
     // error => {
     //    // handling error 
     // });
     // 
-    <#= AddOneMethodName #>(item: <#=GetInterfaceName(Model)#>): Observable<<#=GetInterfaceName(Model)#>> {
+    <#= AddOneMethodName #>(item: <#= viewInterfaceName #>): Observable<<#= viewInterfaceName #>> {
 <#
         foreach (ModelViewPropertyOfVwSerializable identProp in identProps) {
 #>
@@ -833,7 +845,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
 <#
         }
 #>
-        return this.http.post<<#=GetInterfaceName(Model)#>>(this.serviceUrl+'/<#= AddOneMethodName #>', item); //, httpOptions);
+        return this.http.post<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= AddOneMethodName #>', item); //, httpOptions);
         // .pipe(
         //      catchError(this.handleError('<#= AddOneMethodName #>', item))
         // );   
@@ -868,10 +880,10 @@ export class <#= GetJavaScriptServiceName(Model) #> {
 
 #>
     // 
-    // HowTo: item is of type <#= GetInterfaceName(Model) #> 
+    // HowTo: item is of type <#= viewInterfaceName #> 
     //
     // this.serviceRefInYourCode.<#= DeleteOneMethodName #>(item).subscibe(value =>{
-    //    // handling value of type <#= GetInterfaceName(Model) #>
+    //    // handling value of type <#= viewInterfaceName #>
     // },
     // error => {
     //    // handling error 
@@ -885,7 +897,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
                 counter++;
             }
         }
-        #>): Observable<<#= GetInterfaceName(Model) #>> {
+        #>): Observable<<#= viewInterfaceName #>> {
         let params: HttpParams  = new HttpParams({encoder: this.<#= AppSettingServicePropName #>});
         let hasFilter: boolean = false;
 <#
@@ -904,7 +916,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
     }
 #>
         const options = hasFilter ? { params } : {};
-        return this.http.delete<<#=GetInterfaceName(Model)#>>(this.serviceUrl+'/<#= DeleteOneMethodName #>', options); //, httpOptions);
+        return this.http.delete<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= DeleteOneMethodName #>', options); //, httpOptions);
         // .pipe(
         //      catchError(this.handleError('<#= DeleteOneMethodName #>', item))
         // );   
@@ -914,7 +926,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
     } 
 #>
 
-    <#= src2destMethodName #>(src: <#= GetInterfaceName(Model) #>, dest: <#= GetInterfaceName(Model) #>) {
+    <#= src2destMethodName #>(src: <#= viewInterfaceName #>, dest: <#= viewInterfaceName #>) {
         if ((typeof src === 'undefined') || (typeof dest === 'undefined')) return;
         if ((src === null) || (dest === null)) return;
 <#
@@ -930,7 +942,7 @@ export class <#= GetJavaScriptServiceName(Model) #> {
 #>        
     }
 
-    <#= row2FilterRsltMethodName #>(r: <#= GetInterfaceName(Model) #>| any): Array<<#= filterResultModelClassName #>> {
+    <#= row2FilterRsltMethodName #>(r: <#= viewInterfaceName #>| any): Array<<#= filterResultModelClassName #>> {
         let rslt: Array<<#= filterResultModelClassName #>> = [];
         if (typeof r === 'undefined') return rslt;
         if (r === null) return rslt;
@@ -951,12 +963,12 @@ export class <#= GetJavaScriptServiceName(Model) #> {
   if(false) {
 #>        
 
-    <#= filterRslt2rowMethodName #>(f: Array<<#= filterResultModelClassName #>>|any): <#= GetInterfaceName(Model) #>|null {
+    <#= filterRslt2rowMethodName #>(f: Array<<#= filterResultModelClassName #>>|any): <#= viewInterfaceName #>|null {
         if (typeof f === 'undefined') return null;
         if (f === null) return null;
         if (!Array.isArray(f)) return null;
         let isDef = false;
-        let rslt: <#= GetInterfaceName(Model) #>|any ={};
+        let rslt: <#= viewInterfaceName #>|any ={};
         f.forEach((i: <#= filterResultModelClassName #>) => {
             if(!(typeof i.fltrValue === 'undefined')) {
                 if(i.fltrName in this._Values) {
@@ -969,8 +981,8 @@ export class <#= GetJavaScriptServiceName(Model) #> {
         return null;
     }
 
-    <#= row2FilterMethodName #>(r: <#= GetInterfaceName(Model) #>|any): <#= GetInterfaceFilterName(Model) #> {
-        let rslt: <#= GetInterfaceFilterName(Model) #>|any = {};
+    <#= row2FilterMethodName #>(r: <#= viewInterfaceName #>|any): <#= viewInterfaceFilterName #> {
+        let rslt: <#= viewInterfaceFilterName #>|any = {};
         if (typeof r === 'undefined') return rslt;
         if (r === null) return rslt;
         for(let i in this._Values) {
@@ -980,11 +992,11 @@ export class <#= GetJavaScriptServiceName(Model) #> {
         }
         return rslt;
     }
-    <#= filter2rowMethodName #>(f: <#= GetInterfaceFilterName(Model) #>|any): <#= GetInterfaceName(Model) #>|null {
+    <#= filter2rowMethodName #>(f: <#= viewInterfaceFilterName #>|any): <#= viewInterfaceName #>|null {
         if (typeof f === 'undefined') return null;
         if (f === null) return null;
         let isDef = false;
-        let rslt: <#= GetInterfaceName(Model) #>|any ={};
+        let rslt: <#= viewInterfaceName #>|any ={};
         for(let i in this._Values) {
             if(typeof f[i] === 'undefined')
             if (Array.isArray( f[i] )) {

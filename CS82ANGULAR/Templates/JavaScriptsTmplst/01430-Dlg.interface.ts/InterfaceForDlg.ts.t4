@@ -2,16 +2,18 @@
 <#@ output extension="ts" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
-<#@ import namespace="System.IO" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
 
@@ -33,19 +35,21 @@
     string FilterMaxHeightPropSelector  = "filter-max-height";
     string FilterMaxHeightPropName      = "filterMaxHeight";
 
+    string viewInterfaceDlgFolder       = "01430-Dlg.interface.ts";
+    string viewInterfaceDlgClassName    = GetInterfaceDlgName(Model);
 
     string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName   = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, filterResultModelFolder, viewInterfaceDlgFolder);
+
     string viewInterfaceFolder          = "01100-.interface.ts";
-    string viewInterfaceDlgFolder       = "01430-Dlg.interface.ts";
-    string filterResultModelClassName   = GetModelClassName(Context, filterResultModelFolder);
+    string viewInterfaceName            = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, viewInterfaceDlgFolder);
 
 #>
 
-import { <#= GetInterfaceName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceFolder, viewInterfaceDlgFolder)#>';
-import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, viewInterfaceDlgFolder)#>';
+import { <#= viewInterfaceName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, viewInterfaceDlgFolder) #>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterResultModelFolder, viewInterfaceDlgFolder) #>';
 
-
-export interface <#= GetInterfaceDlgName(Model) #> {
+export interface <#= viewInterfaceDlgClassName #> {
         title : string | null; 
         <#= ShowFilterPropName #>: boolean;
         <#= CanAddPropName #> ? : boolean;
@@ -53,7 +57,7 @@ export interface <#= GetInterfaceDlgName(Model) #> {
         <#= CanDelPropName #> ? : boolean;
         <#= CanViewPropName #> ? : boolean;
         <#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>> | null;
-        <#= SelectedItemsPropName #>: Array<<#= GetInterfaceName(Model) #>> | null;
+        <#= SelectedItemsPropName #>: Array<<#= viewInterfaceName #>> | null;
         <#= MaxHeightPropName #>: number | null;
         <#= FilterMaxHeightPropName #>: number | null;
 }

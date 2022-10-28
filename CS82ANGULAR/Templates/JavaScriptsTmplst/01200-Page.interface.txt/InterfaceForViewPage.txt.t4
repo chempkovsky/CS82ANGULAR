@@ -1,5 +1,5 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
-<#@ output extension="ts" #>
+<#@ output extension="jsonefm2txt" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
@@ -16,24 +16,20 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
-    string OperatorSufix = "Oprtr";
+
+    string exportedFolder = "01200-Page.interface.ts";
+
 #>
 
-
-export interface <#= GetInterfaceFilterName(Model) #> {
-<#
-    foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
-        if (prop.IsUsedByfilter) {
-#>
-        <#= GetTypeScriptPropertyName(prop, Model)#> ?: Array< <#= GetPropertyTypeScriptTypeName(prop)#> >;
-        <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> ?: Array< string >;
-<#
+{
+    "FileModifierItems": [
+        {
+            "Description": [
+                'update public-api.ts or webpack.config.js',
+                'with export data'
+            ],
+            "MethodName": "UpdateExport",
+            "InvocationParams": ['<#= exportedFolder #>']
         }
-    }
-#>
-        orderby ?: string[];
-        page ?: number;
-        pagesize ?: number;
+    ]
 }
-
-

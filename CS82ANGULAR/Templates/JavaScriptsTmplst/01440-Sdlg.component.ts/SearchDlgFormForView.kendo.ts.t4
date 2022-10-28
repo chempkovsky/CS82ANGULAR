@@ -6,33 +6,39 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
 
-    string viewInterfaceFolder          = "01100-.interface.ts";
-    string sformComponentFolder         = "01420-Sform.component.ts";
-    string viewInterfaceDlgFolder       = "01430-Dlg.interface.ts";
     string sdlgCssFolder                = "01440-Sdlg.component.css";
     string sdlgHtmlFolder               = "01440-Sdlg.component.html";
     string sdlgComponentFolder          = "01440-Sdlg.component.ts";
+    string componentSelectorCommonPart  = GetComponentSelectorCommonPart(Model, sdlgComponentFolder);
+    string componentClassName           = GetComponentClassName(Model, sdlgComponentFolder);
 
     string showMultiSelectedRowSelector   = "show-multi-selected-row";
     string showMultiSelectedRowPropName   = "showMultiSelectedRow";
 
-    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, sdlgComponentFolder);
+    string viewInterfaceFolder          = "01100-.interface.ts";
+    string viewInterfaceName            = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, sdlgComponentFolder);
+
+    string viewInterfaceDlgFolder       = "01430-Dlg.interface.ts";
+    string viewInterfaceDlgClassName    = GetInterfaceDlgNameWithAnglr(AngularJsonFile, Model, viewInterfaceDlgFolder, sdlgComponentFolder);
 
 #>
 
 import { Component,  Input, Output, EventEmitter, ViewChild, Inject } from '@angular/core';
 import { DialogRef, DialogContentBase } from "@progress/kendo-angular-dialog";
 
-import { <#= GetInterfaceDlgName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceDlgFolder, sdlgComponentFolder)#>';
-import { <#= GetInterfaceName(Model) #> } from '<#=  GetFolderName(Model, viewInterfaceFolder, sdlgComponentFolder) #>';
+import { <#= viewInterfaceDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceDlgFolder, sdlgComponentFolder)#>';
+import { <#= viewInterfaceName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, sdlgComponentFolder) #>';
 
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
@@ -40,15 +46,15 @@ import { <#= GetInterfaceName(Model) #> } from '<#=  GetFolderName(Model, viewIn
   styleUrls: ['<#= GetFolderName(Model, sdlgCssFolder, sdlgComponentFolder)#>.css']
 })
 
-export class <#= GetComponentClassName(Model, sdlgComponentFolder) #> extends DialogContentBase { 
+export class <#= componentClassName #> extends DialogContentBase { 
     @Input('data')
-    data: <#= GetInterfaceDlgName(Model) #>|any;
+    data: <#= viewInterfaceDlgClassName #>|any;
     constructor(public dialogRef: DialogRef) { 
         super(dialogRef);
     }
-    currentRow: <#= GetInterfaceName(Model) #> |null = null;
+    currentRow: <#= viewInterfaceName #> |null = null;
     <#= showMultiSelectedRowPropName #>: boolean = false;
-    onSelectedRow(row:  <#= GetInterfaceName(Model) #> | null) {
+    onSelectedRow(row:  <#= viewInterfaceName #> | null) {
         this.currentRow = row;
     }
     onCancel() {

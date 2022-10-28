@@ -2673,6 +2673,42 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01100-.interface.txt\InterfaceForView.txt.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01200-Page.interface.txt\InterfaceForViewPage.txt.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01300-Filter.interface.txt\InterfaceForViewFilter.txt.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01400-.service.txt\WebServiceForView.txt.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01418-Datasource.class.txt\Datasource.class.txt.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01420-Sform.component.txt\SearchFormForView.txt.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01430-Dlg.interface.txt\InterfaceForDlg.txt.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01440-Sdlg.component.txt\SearchDlgFormForView.txt.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01450-S.module.txt\SearchModuleForView.txt.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />

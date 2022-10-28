@@ -6,58 +6,42 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
+    string searchModuleFolder           = "01450-S.module.ts";
+    string searchModuleClassName        = GetModuleClassName(Model, searchModuleFolder);
 
     string materialModuleFolder         = "00010-app-material.module.ts";
+    string materialModuleClassName      = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, materialModuleFolder, searchModuleFolder);
+    
     string flexModuleFolder             = "00011-app-flex-layout.module.ts";
-    string filterModuleFolder           = "00050-web-service-filter.module.ts";
+    string flexModuleClassName          = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, flexModuleFolder, searchModuleFolder);
 
+    string filterModuleFolder           = "00050-web-service-filter.module.ts";
+    string filterModuleClassName        = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, filterModuleFolder, searchModuleFolder);
 
     string sformComponentFolder         = "01420-Sform.component.ts";
+    string searchComponentClassName     = GetComponentClassNameWithAnglr(AngularJsonFile, Model, sformComponentFolder, searchModuleFolder);
+
     string sdlgComponentFolder          = "01440-Sdlg.component.ts";
-    string searchModuleFolder           = "01450-S.module.ts";
-
-
-    string flexModuleClassName          = GetContextModuleClassName(Context, flexModuleFolder);
-    string materialModuleClassName      = GetContextModuleClassName(Context, materialModuleFolder);
-    string filterModuleClassName        = GetContextModuleClassName(Context, filterModuleFolder);
-
-    string searchComponentClassName = GetComponentClassName(Model, sformComponentFolder);
-    string searchDlgComponentClassName = GetComponentClassName(Model, sdlgComponentFolder);
-    string searchModuleClassName = GetModuleClassName(Model, searchModuleFolder);
-
-    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
-    List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
-        GetSearchResources(Model, Context);
-
+    string searchDlgComponentClassName  = GetComponentClassNameWithAnglr(AngularJsonFile, Model, sdlgComponentFolder, searchModuleFolder);
 #>
 
 import { NgModule } from '@angular/core';
-//import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
-import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  flexModuleFolder, searchModuleFolder)#>';
-import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  materialModuleFolder, searchModuleFolder)#>';
-import { <#=  filterModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterModuleFolder, searchModuleFolder)#>';
-import { <#=  searchComponentClassName #> } from '<#= GetFolderName(Model, sformComponentFolder, searchModuleFolder) #>';
-import { <#=  searchDlgComponentClassName #> } from '<#= GetFolderName(Model, sdlgComponentFolder, searchModuleFolder) #>';
-<#
-        if(searchSchemas !=null) {
-            foreach(var sch in searchSchemas) {
-                continue; // this is correct
-                var m2mFk = sch.Item2;
-                ModelViewSerializable searchModel = GetViewByName(Context, m2mFk.ViewName);
-#>
-import { <#= GetModuleClassName(searchModel, searchModuleFolder) #> } from '<#=  GetCrossComponentFolderName(Model, searchModuleFolder, Context, searchModel.ViewName, searchModuleFolder) #>';
-<#
-            }
-        }
-#>
+import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  flexModuleFolder, searchModuleFolder)#>';
+import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  materialModuleFolder, searchModuleFolder)#>';
+import { <#=  filterModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterModuleFolder, searchModuleFolder)#>';
+import { <#=  searchComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, sformComponentFolder, searchModuleFolder) #>';
+import { <#=  searchDlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, sdlgComponentFolder, searchModuleFolder) #>';
 
 @NgModule({
     declarations: [
@@ -66,22 +50,9 @@ import { <#= GetModuleClassName(searchModel, searchModuleFolder) #> } from '<#= 
     ],
     imports: [
         CommonModule,
-//        BrowserModule,
         <#= materialModuleClassName #>,
         <#= flexModuleClassName #>,
         <#= filterModuleClassName #>,
-<#
-        if(searchSchemas !=null) {
-            foreach(var sch in searchSchemas) {
-                continue; // this is correct
-                var m2mFk = sch.Item2;
-                ModelViewSerializable searchModel = GetViewByName(Context, m2mFk.ViewName);
-#>
-        <#= GetModuleClassName(searchModel, searchModuleFolder) #>,
-<#
-            }
-        }
-#>
     ],
     exports: [
         <#=  searchComponentClassName #>,
