@@ -6,11 +6,14 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
     bool localize = Context.Localize;
@@ -18,25 +21,28 @@
     string FormControlNewModelPropName  = "eformNewControlModel";
     string OnAfterSubmitMethodName      = "onAfterSubmit";
 
-    string viewInterfaceFolder          = "01100-.interface.ts";
-
-    string addformComponentFolder       = "01502-Aform.component.ts";
     string adddlgCssFolder              = "01522-Adlg.component.css";
     string adddlgHtmlFolder             = "01522-Adlg.component.html";
     string adddlgComponentFolder        = "01522-Adlg.component.ts";
-
-    string viewInterfaceADlgFolder      = "01512-Adlg.interface.ts";
-
     string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, adddlgComponentFolder);
     string componentClassName = GetComponentClassName(Model, adddlgComponentFolder);
+
+    string viewInterfaceFolder          = "01100-.interface.ts";
+    string viewInterfaceName            = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, adddlgComponentFolder);
+
+    string addformComponentFolder       = "01502-Aform.component.ts";
+    string addformComponentClassName    = GetComponentClassNameWithAnglr(AngularJsonFile, Model,  addformComponentFolder, adddlgComponentFolder);
+
+    string viewInterfaceADlgFolder      = "01512-Adlg.interface.ts";
+    string viewInterfaceADlgClassName   = GetInterfaceADlgNameWithAnglr(AngularJsonFile, Model,  viewInterfaceADlgFolder, adddlgComponentFolder);
 
 #>
 
 import { Component,  Input, Output, EventEmitter, ViewChild, Inject } from '@angular/core';
 import { DialogRef, DialogContentBase } from "@progress/kendo-angular-dialog";
-import { <#= GetInterfaceADlgName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceADlgFolder, adddlgComponentFolder)#>';
-import { <#= GetComponentClassName(Model, addformComponentFolder) #> } from '<#=  GetFolderName(Model, addformComponentFolder, adddlgComponentFolder) #>';
-import { <#= GetInterfaceName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceFolder, adddlgComponentFolder)#>';
+import { <#= viewInterfaceADlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceADlgFolder, adddlgComponentFolder)#>';
+import { <#= addformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, addformComponentFolder, adddlgComponentFolder) #>';
+import { <#= viewInterfaceName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, adddlgComponentFolder) #>';
 
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
@@ -44,13 +50,13 @@ import { <#= GetInterfaceName(Model) #> } from '<#= GetFolderName(Model, viewInt
   styleUrls: ['<#= GetFolderName(Model, adddlgCssFolder, adddlgComponentFolder) #>.css']
 })
 export class <#= componentClassName #> extends DialogContentBase  {
-    @ViewChild(<#= GetComponentClassName(Model, addformComponentFolder) #>) childForm: <#= GetComponentClassName(Model, addformComponentFolder) #>|any;
+    @ViewChild(<#= addformComponentClassName #>) childForm: <#= addformComponentClassName #>|any;
     @Input('data')
-    data: <#= GetInterfaceADlgName(Model) #>|any;
+    data: <#= viewInterfaceADlgClassName #>|any;
     constructor(public dialogRef: DialogRef) {
         super(dialogRef);
     }
-    <#= OnAfterSubmitMethodName #>(newVal: <#= GetInterfaceName(Model) #>) {
+    <#= OnAfterSubmitMethodName #>(newVal: <#= viewInterfaceName #>) {
         this.data.<#= FormControlNewModelPropName #> = newVal; 
         this.dialogRef.close(this.data);
     }

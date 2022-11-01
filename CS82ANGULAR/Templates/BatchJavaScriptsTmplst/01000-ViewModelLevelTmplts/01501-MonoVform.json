@@ -1,0 +1,82 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "ng add @angular/material",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "",
+    "ng generate library XXXXX-vform",
+    "",
+    "where XXXXX is a name of the selected ViewModel",
+    "",
+    "Please make sure that you selected [src\\lib] folder of the common-interfaces library !!!"
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "vform",
+      "GeneratorType": "01500-Vform.component.css",
+      "GeneratorSript": "ViewFormForView.css.t4"
+    },
+    {
+      "DestinationFolder": "vform",
+      "GeneratorType": "01500-Vform.component.html",
+      "GeneratorSript": "ViewFormForView.html.t4"
+    },
+    {
+      "DestinationFolder": "vform",
+      "GeneratorType": "01500-Vform.component.ts",
+      "GeneratorSript": "ViewFormForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "vform",
+      "GeneratorType": "01500-Vform.component.txt",
+      "GeneratorSript": "ViewFormForView.txt.t4"
+    },
+    {
+      "DestinationFolder": "vdlg",
+      "GeneratorType": "01510-Vdlg.interface.ts",
+      "GeneratorSript": "InterfaceForVdlg.ts.t4"
+    },
+    {
+      "DestinationFolder": "vdlg",
+      "GeneratorType": "01510-Vdlg.interface.txt",
+      "GeneratorSript": "InterfaceForVdlg.txt.t4"
+    },
+    {
+      "DestinationFolder": "vdlg",
+      "GeneratorType": "01520-Vdlg.component.css",
+      "GeneratorSript": "ViewDlgFormForView.css.t4"
+    },
+    {
+      "DestinationFolder": "vdlg",
+      "GeneratorType": "01520-Vdlg.component.html",
+      "GeneratorSript": "ViewDlgFormForView.html.t4"
+    },
+    {
+      "DestinationFolder": "vdlg",
+      "GeneratorType": "01520-Vdlg.component.ts",
+      "GeneratorSript": "ViewDlgFormForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "vdlg",
+      "GeneratorType": "01520-Vdlg.component.txt",
+      "GeneratorSript": "ViewDlgFormForView.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01550-V.module.ts",
+      "GeneratorSript": "vformModuleForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01550-V.module.txt",
+      "GeneratorSript": "vformModuleForView.txt.t4"
+    }
+  ]
+
+}

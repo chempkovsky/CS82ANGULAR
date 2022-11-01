@@ -151,7 +151,7 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
         foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
             string defVal = IsBooleanTypeName(prop) ? "false" : "undefined";
 #>
-      { "<#= GetTypeScriptPropertyName(prop, Model) #>", <#= defVal #> },  //  <#= GetPropertyTypeName(prop) #>
+       "<#= GetTypeScriptPropertyName(prop, Model) #>": <#= defVal #> ,  //  <#= GetPropertyTypeName(prop) #>
 <#
 
         }

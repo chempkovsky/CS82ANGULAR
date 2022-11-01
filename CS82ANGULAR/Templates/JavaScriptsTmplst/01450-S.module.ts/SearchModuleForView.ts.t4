@@ -28,6 +28,9 @@
     string filterModuleFolder           = "00050-web-service-filter.module.ts";
     string filterModuleClassName        = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, filterModuleFolder, searchModuleFolder);
 
+    string formatterModuleFolder        = "00070-app-formatter.module.ts";
+    string formatterModuleClassName     = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model,Context, formatterModuleFolder, searchModuleFolder);
+
     string sformComponentFolder         = "01420-Sform.component.ts";
     string searchComponentClassName     = GetComponentClassNameWithAnglr(AngularJsonFile, Model, sformComponentFolder, searchModuleFolder);
 
@@ -37,11 +40,13 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  flexModuleFolder, searchModuleFolder)#>';
-import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  materialModuleFolder, searchModuleFolder)#>';
-import { <#=  filterModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterModuleFolder, searchModuleFolder)#>';
+import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  flexModuleFolder, searchModuleFolder) #>';
+import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  materialModuleFolder, searchModuleFolder) #>';
+import { <#=  filterModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterModuleFolder, searchModuleFolder) #>';
+import { <#=  formatterModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  formatterModuleFolder, searchModuleFolder) #>';
 import { <#=  searchComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, sformComponentFolder, searchModuleFolder) #>';
 import { <#=  searchDlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, sdlgComponentFolder, searchModuleFolder) #>';
+
 
 @NgModule({
     declarations: [
@@ -52,6 +57,7 @@ import { <#=  searchDlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(
         CommonModule,
         <#= materialModuleClassName #>,
         <#= flexModuleClassName #>,
+        <#= formatterModuleClassName #>,
         <#= filterModuleClassName #>,
     ],
     exports: [

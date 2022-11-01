@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Contexts;
 using System.Text;
+using System.Windows.Controls;
 
 namespace CS82ANGULAR.Model
 {
@@ -231,6 +232,7 @@ namespace CS82ANGULAR.Model
             result += refItem.FileName;
             return result;
         }
+
         string GetInterfaceName(ModelViewSerializable model)
         {
             if (model == null)
@@ -281,6 +283,33 @@ namespace CS82ANGULAR.Model
             }
             return GetNameByAngularJson(result, anglJson, refItem, curItem);
         }
+        string GetInterfaceNameEx(DbContextSerializable context, string viewName)
+        {
+            if ((context == null) || string.IsNullOrEmpty(viewName))
+            {
+                return "I";
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            if (model == null)
+            {
+                return "I";
+            }
+            return GetInterfaceName(model);
+        }
+        string GetInterfaceNameExWithAnglrEx(AngularJson anglJson, DbContextSerializable context, string viewName, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            if (context==null)
+            {
+                return GetInterfaceNameEx(context, viewName);
+            }
+            if (context.ModelViews == null)
+            {
+                return GetInterfaceNameEx(context, viewName);
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetInterfaceNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+        }
+
         string GetInterfacePageName(ModelViewSerializable model)
         {
             if (model == null)
@@ -331,6 +360,33 @@ namespace CS82ANGULAR.Model
             }
             return GetNameByAngularJson(result, anglJson, refItem, curItem);
         }
+        string GetInterfacePageNameEx(DbContextSerializable context, string viewName)
+        {
+            if ((context == null) || string.IsNullOrEmpty(viewName))
+            {
+                return "IPage";
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            if (model == null)
+            {
+                return "IPage";
+            }
+            return GetInterfacePageName(model);
+        }
+        string GetInterfacePageNameExWithAnglrEx(AngularJson anglJson, DbContextSerializable context, string viewName, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            if (context == null)
+            {
+                return GetInterfacePageNameEx(context, viewName);
+            }
+            if (context.ModelViews == null)
+            {
+                return GetInterfacePageNameEx(context, viewName);
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetInterfacePageNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+        }
+
         string GetInterfaceFilterName(ModelViewSerializable model)
         {
             if (model == null)
@@ -360,7 +416,7 @@ namespace CS82ANGULAR.Model
             }
             return GetNameByAngularJson(result, anglJson, refItem, curItem);
         }
-        string GetInterfaceFilterNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
+        string GetInterfaceFilterNameWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
         {
             string result = GetInterfaceFilterName(model);
             if (model == null)
@@ -381,6 +437,33 @@ namespace CS82ANGULAR.Model
             }
             return GetNameByAngularJson(result, anglJson, refItem, curItem);
         }
+        string GetInterfaceFilterNameEx(DbContextSerializable context, string viewName)
+        {
+            if ((context == null) || string.IsNullOrEmpty(viewName))
+            {
+                return "IFilter";
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            if (model == null)
+            {
+                return "IFilter";
+            }
+            return GetInterfaceFilterName(model);
+        }
+        string GetInterfaceFilterNameExWithAnglrEx(AngularJson anglJson, DbContextSerializable context, string viewName, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            if (context == null)
+            {
+                return GetInterfaceFilterNameEx(context, viewName);
+            }
+            if (context.ModelViews == null)
+            {
+                return GetInterfaceFilterNameEx(context, viewName);
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetInterfaceFilterNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+        }
+
         String GetJavaScriptServiceName(ModelViewSerializable model)
         {
             string result = model.ViewName + "Service";
@@ -623,6 +706,7 @@ namespace CS82ANGULAR.Model
             }
             return GetNameByAngularJson(result, anglJson, refItem, curItem);
         }
+
         string GetServiceClassName(ModelViewSerializable model, string fileType)
         {
             string result = "";
@@ -710,6 +794,33 @@ namespace CS82ANGULAR.Model
             }
             return GetNameByAngularJson(result, anglJson, refItem, curItem);
         }
+        string GetServiceClassNameEx(DbContextSerializable context, string viewName, string fileType)
+        {
+            if ((context == null) || string.IsNullOrEmpty(viewName) || string.IsNullOrEmpty(fileType))
+            {
+                return "";
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            if (model == null)
+            {
+                return "";
+            }
+            return GetServiceClassName(model, fileType);
+        }
+        string GetServiceClassNameExWithAnglrEx(AngularJson anglJson, DbContextSerializable context, string viewName, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            if (context == null)
+            {
+                return GetServiceClassNameEx(context, viewName, fileType);
+            }
+            if (context.ModelViews == null)
+            {
+                return GetServiceClassNameEx(context, viewName, fileType);
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetServiceClassNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+        }
+
         string GetCrossComponentFolderName(ModelViewSerializable model, string currFolder, DbContextSerializable context, string refViewName, string refFolder)
         {
             string result = "./";
@@ -876,6 +987,54 @@ namespace CS82ANGULAR.Model
             }
             return GetNameByAngularJson(result, anglJson, refItem, curItem);
         }
+        string GetJavaScriptClassNameWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            string result = GetJavaScriptClassName(model, fileType);
+            if ((model == null) || (currModel == null))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (currModel.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                currModel.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetJavaScriptClassNameEx(DbContextSerializable context, string viewName, string fileType)
+        {
+            if ((context == null) || string.IsNullOrEmpty(viewName) || string.IsNullOrEmpty(fileType))
+            {
+                return "";
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            if (model == null)
+            {
+                return "";
+            }
+            return GetJavaScriptClassName(model, fileType);
+        }
+        string GetJavaScriptClassNameExWithAnglrEx(AngularJson anglJson, DbContextSerializable context, string viewName, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            if (context == null)
+            {
+                return GetJavaScriptClassNameEx(context, viewName, fileType);
+            }
+            if (context.ModelViews == null)
+            {
+                return GetJavaScriptClassNameEx(context, viewName, fileType);
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetJavaScriptClassNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+        }
+
         string GetComponentClassName(ModelViewSerializable model, string fileType)
         {
             string result = "";
@@ -942,6 +1101,51 @@ namespace CS82ANGULAR.Model
             }
             return GetNameByAngularJson(result, anglJson, refItem, curItem);
         }
+        string GetComponentClassNameWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            string result = GetComponentClassName(model, fileType);
+            if ((model == null) || (currModel == null))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (currModel.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                currModel.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetComponentClassNameEx(DbContextSerializable context, string viewName, string fileType)
+        {
+            string result = "";
+            if ((context == null) || string.IsNullOrEmpty(fileType) || string.IsNullOrEmpty(viewName))
+            {
+                return result;
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetComponentClassName(model, fileType);
+        }
+        string GetComponentClassNameExWithAnglrEx(AngularJson anglJson, DbContextSerializable context, string viewName, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            if (context == null)
+            {
+                return GetComponentClassNameEx(context, viewName, fileType);
+            }
+            if (context.ModelViews == null)
+            {
+                return GetComponentClassNameEx(context, viewName, fileType);
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetComponentClassNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+        }
+
         string GetContextComponentClassName(DbContextSerializable context, string fileType)
         {
             string result = "";
@@ -1008,6 +1212,7 @@ namespace CS82ANGULAR.Model
             }
             return GetNameByAngularJson(result, anglJson, refItem, curItem);
         }
+
         string GetInterfaceDlgName(ModelViewSerializable model)
         {
             if (model == null)
@@ -1016,9 +1221,18 @@ namespace CS82ANGULAR.Model
             }
             return "I" + model.ViewName + "Dlg";
         }
+        string GetInterfaceDlgNameEx(DbContextSerializable context, string viewName)
+        {
+            if ((context == null) || string.IsNullOrEmpty(viewName))
+            {
+                return "IDlg";
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetInterfaceDlgName(model);
+        }
         string GetInterfaceDlgNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
         {
-            string result = GetInterfaceDlgName(model, fileType);
+            string result = GetInterfaceDlgName(model);
             if (model == null)
             {
                 return result;
@@ -1037,6 +1251,129 @@ namespace CS82ANGULAR.Model
             }
             return GetNameByAngularJson(result, anglJson, refItem, curItem);
         }
+        string GetInterfaceDlgNameWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            string result = GetInterfaceDlgName(model);
+            if ((model == null) || (currModel == null))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (currModel.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                currModel.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetInterfaceDlgNameExWithAnglrEx(AngularJson anglJson, DbContextSerializable context, string viewName, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            if (context == null)
+            {
+                return GetInterfaceDlgNameEx(context, viewName);
+            }
+            if (context.ModelViews == null)
+            {
+                return GetInterfaceDlgNameEx(context, viewName);
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetComponentClassNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+        }
+
+        string GetModuleClassName(ModelViewSerializable model, string fileType)
+        {
+            string result = "";
+            if ((model == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            if (refItem == null)
+            {
+                return result;
+            }
+            if (string.IsNullOrEmpty(refItem.FileName))
+            {
+                return result;
+            }
+            string fn = refItem.FileName.Replace(".module", "Module").Replace(".routing", "Routing");
+            StringBuilder sb = new StringBuilder();
+            bool toUpper = true;
+            foreach (char c in fn)
+            {
+                if (c == '-')
+                {
+                    toUpper = true;
+                }
+                else
+                {
+                    if (toUpper)
+                    {
+                        sb.Append(Char.ToUpper(c));
+                        toUpper = false;
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+            }
+            return sb.ToString();
+        }
+        string GetModuleClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetModuleClassName(model, fileType);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetModuleClassNameWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            string result = GetModuleClassName(model, fileType);
+            if ((model == null) || (currModel == null))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (currModel.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                currModel.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+
         string GetContextModuleClassName(DbContextSerializable context, string fileType)
         {
             string result = "";
@@ -1105,6 +1442,112 @@ namespace CS82ANGULAR.Model
         }
 
 
+        string GetInterfaceVDlgName(ModelViewSerializable model)
+        {
+            return "I" + model.ViewName + "Vdlg";
+        }
+        string GetInterfaceVDlgNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetInterfaceVDlgName(model);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+
+        string GetInterfaceADlgName(ModelViewSerializable model)
+        {
+            return "I" + model.ViewName + "Adlg";
+        }
+        string GetInterfaceADlgNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetInterfaceADlgName(model);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+
+        string GetInterfaceDDlgName(ModelViewSerializable model)
+        {
+            return "I" + model.ViewName + "Ddlg";
+        }
+        string GetInterfaceDDlgNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetInterfaceDDlgName(model);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+
+        string GetInterfaceUDlgName(ModelViewSerializable model)
+        {
+            return "I" + model.ViewName + "Udlg";
+        }
+        string GetInterfaceUDlgNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetInterfaceUDlgName(model);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+
+
+
 
 
 
@@ -1115,51 +1558,6 @@ namespace CS82ANGULAR.Model
                 return null;
             }
             return context.ModelViews.Where(v => v.ViewName == ViewName).FirstOrDefault();
-        }
-        string GetModuleClassName(ModelViewSerializable model, string fileType)
-        {
-            string result = "";
-            if ((model == null) || string.IsNullOrEmpty(fileType))
-            {
-                return result;
-            }
-            if (model.CommonStaffs == null)
-            {
-                return result;
-            }
-            CommonStaffSerializable refItem =
-                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-            if (refItem == null)
-            {
-                return result;
-            }
-            if (string.IsNullOrEmpty(refItem.FileName))
-            {
-                return result;
-            }
-            string fn = refItem.FileName.Replace(".module", "Module").Replace(".routing", "Routing");
-            StringBuilder sb = new StringBuilder();
-            bool toUpper = true;
-            foreach (char c in fn)
-            {
-                if (c == '-')
-                {
-                    toUpper = true;
-                }
-                else
-                {
-                    if (toUpper)
-                    {
-                        sb.Append(Char.ToUpper(c));
-                        toUpper = false;
-                    }
-                    else
-                    {
-                        sb.Append(c);
-                    }
-                }
-            }
-            return sb.ToString();
         }
         string GetViewByForeignNameChain(DbContextSerializable context, string ViewName, string foreignKeyNameChain)
         {
@@ -1470,19 +1868,6 @@ namespace CS82ANGULAR.Model
         string GetInterfaceEDlgName(ModelViewSerializable model)
         {
             return "I" + model.ViewName + "Edlg";
-        }
-        string GetInterfaceNameEx(DbContextSerializable context, string viewName)
-        {
-            if ((context == null) || string.IsNullOrEmpty(viewName))
-            {
-                return "I";
-            }
-            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
-            if (model == null)
-            {
-                return "I";
-            }
-            return GetInterfaceName(model);
         }
         public string FirstLetterToUpper(string str)
         {
@@ -2889,22 +3274,6 @@ namespace CS82ANGULAR.Model
                 return model.ScalarProperties.Where(p => (p.OriginalPropertyName == originalPropertyName) && (p.ForeignKeyNameChain == foreignKeyNameChain)).FirstOrDefault();
             }
         }
-        string GetInterfaceVDlgName(ModelViewSerializable model)
-        {
-            return "I" + model.ViewName + "Vdlg";
-        }
-        string GetInterfaceADlgName(ModelViewSerializable model)
-        {
-            return "I" + model.ViewName + "Adlg";
-        }
-        string GetInterfaceDDlgName(ModelViewSerializable model)
-        {
-            return "I" + model.ViewName + "Ddlg";
-        }
-        string GetInterfaceUDlgName(ModelViewSerializable model)
-        {
-            return "I" + model.ViewName + "Udlg";
-        }
         ModelViewSerializable GetModelViewByName(DbContextSerializable context, string viewName)
         {
             if ((context == null) || (string.IsNullOrEmpty(viewName)))
@@ -3083,41 +3452,6 @@ namespace CS82ANGULAR.Model
                 return "toBinaryFormatter";
             }
             return "";
-        }
-        string GetInterfacePageNameEx(DbContextSerializable context, string viewName)
-        {
-            if ((context == null) || string.IsNullOrEmpty(viewName))
-            {
-                return "IPage";
-            }
-            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
-            if (model == null)
-            {
-                return "IPage";
-            }
-            return GetInterfacePageName(model);
-        }
-        string GetInterfaceFilterNameEx(DbContextSerializable context, string viewName)
-        {
-            if ((context == null) || string.IsNullOrEmpty(viewName))
-            {
-                return "IFilter";
-            }
-            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
-            if (model == null)
-            {
-                return "IFilter";
-            }
-            return GetInterfaceFilterName(model);
-        }
-        string GetInterfaceDlgNameEx(DbContextSerializable context, string viewName)
-        {
-            if ((context == null) || string.IsNullOrEmpty(viewName))
-            {
-                return "IDlg";
-            }
-            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
-            return GetInterfaceDlgName(model);
         }
         string GetPropertyTypeScriptTypeName(ModelViewPropertyOfVwSerializable prop)
         {
@@ -4219,29 +4553,6 @@ namespace CS82ANGULAR.Model
             }
             return refItem.FileName.Replace(".component", "");
         }
-        string GetComponentClassNameEx(DbContextSerializable context, string viewName, string fileType)
-        {
-            string result = "";
-            if ((context == null) || string.IsNullOrEmpty(fileType) || string.IsNullOrEmpty(viewName))
-            {
-                return result;
-            }
-            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
-            return GetComponentClassName(model, fileType);
-        }
-        string GetServiceClassNameEx(DbContextSerializable context, string ViewName, string fileType)
-        {
-            if ((context == null) || string.IsNullOrEmpty(ViewName) || string.IsNullOrEmpty(fileType))
-            {
-                return "";
-            }
-            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == ViewName).FirstOrDefault();
-            if (model == null)
-            {
-                return "";
-            }
-            return GetServiceClassName(model, fileType);
-        }
         string GetViewNameByForeignNameChain(DbContextSerializable context, string ViewName, string foreignKeyNameChain)
         {
             if ((context == null) || (string.IsNullOrEmpty(ViewName)))
@@ -5083,19 +5394,6 @@ namespace CS82ANGULAR.Model
             if (string.IsNullOrEmpty(chain)) return "";
             string[] fks = chain.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
             return fks[fks.Length - 1];
-        }
-        string GetJavaScriptClassNameEx(DbContextSerializable context, string ViewName, string fileType)
-        {
-            if ((context == null) || string.IsNullOrEmpty(ViewName) || string.IsNullOrEmpty(fileType))
-            {
-                return "";
-            }
-            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == ViewName).FirstOrDefault();
-            if (model == null)
-            {
-                return "";
-            }
-            return GetJavaScriptClassName(model, fileType);
         }
         bool IsDatabaseGeneratedProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model)
         {

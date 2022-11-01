@@ -2,16 +2,18 @@
 <#@ output extension="ts" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
-<#@ import namespace="System.IO" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
 
@@ -20,20 +22,24 @@
     string FormControlModelPropName     = "eformControlModel";
     string FormControlNewModelPropName  = "eformNewControlModel";
 
-    string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
-    string viewInterfaceFolder          = "01100-.interface.ts";
     string viewInterfaceVDlgFolder      = "01510-Vdlg.interface.ts";
+    string viewInterfaceVDlgClassName   = GetInterfaceVDlgName(Model);
 
-    string filterResultModelClassName = GetModelClassName(Context, filterResultModelFolder);
+    string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName   = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, filterResultModelFolder, viewInterfaceVDlgFolder);
+
+    string viewInterfaceFolder          = "01100-.interface.ts";
+    string viewInterfaceName            = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, viewInterfaceVDlgFolder);
+
 #>
 
-import { <#= GetInterfaceName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceFolder, viewInterfaceVDlgFolder)#>';
-import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, viewInterfaceVDlgFolder)#>';
+import { <#= viewInterfaceName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, viewInterfaceVDlgFolder) #>';
+import { <#= filterResultModelClassName #> } from '<#= GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterResultModelFolder, viewInterfaceVDlgFolder) #>';
 
-export interface <#= GetInterfaceVDlgName(Model) #> {
+export interface <#= viewInterfaceVDlgClassName #> {
         title : string | null; 
         <#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>>;
-        <#= FormControlModelPropName #>: <#= GetInterfaceName(Model) #> | null;
-        <#= FormControlNewModelPropName #>: <#= GetInterfaceName(Model) #> | null;
+        <#= FormControlModelPropName #>: <#= viewInterfaceName #> | null;
+        <#= FormControlNewModelPropName #>: <#= viewInterfaceName #> | null;
 }
 

@@ -267,7 +267,7 @@ import { catchError, Observable, of, Subject, switchMap } from 'rxjs';
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, sformComponentFolder)#>';
 import { <#= uniqFilterDefModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  uniqFilterDefModelFolder, sformComponentFolder)#>';
 import { <#= uniqFilterModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  uniqFilterModelFolder, sformComponentFolder)#>';
-import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterResultModelFolder, sformComponentFolder)#>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterResultModelFolder, sformComponentFolder) #>';
 import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  eventEmitterDataModelFolder, sformComponentFolder)#>';
 import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  menuItemDataModelFolder, sformComponentFolder)#>';
 import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, sformComponentFolder)#>';

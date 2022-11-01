@@ -6,11 +6,14 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
     bool localize = Context.Localize;
@@ -231,53 +234,43 @@
         }
     }
 
-
+    string updformCssFolder                         = "01504-Uform.component.css";
+    string updformHtmlFolder                        = "01504-Uform.component.html";
+    string updformComponentFolder                   = "01504-Uform.component.ts";
+    string componentSelectorCommonPart              = GetComponentSelectorCommonPart(Model, updformComponentFolder);
+    string componentClassName                       = GetComponentClassName(Model, updformComponentFolder);
 
 
     string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
-    string eventEmitterDataModelFolder              = "00018-event-emitter-data.interface.ts";
-    string menuItemDataModelFolder                  = "00017-menu-item-data.interface.ts";
-    string eventEmitterPubModelFolder               = "00019-event-emitter-pub.interface.ts";
-    string filterModelFolder                        = "00021-web-service-filter.interface.ts";
-    string filterDefModelFolder                     = "00022-web-service-filter-def.interface.ts";
-    string filterOperatorModelFolder                = "00023-web-service-filter-operator.interface.ts";
-    string filterResultModelFolder                  = "00024-web-service-filter-rslt.interface.ts";
-    string filterComponentCssFolder                 = "00025-web-service-filter.component.css";
-    string filterComponentHtmlFolder                = "00025-web-service-filter.component.html";
-    string filterComponentFolder                    = "00025-web-service-filter.component.ts";
-    string viewModelDatasourceInterfaceFolder       = "00600-view-model-datasource.interface.ts";
-
-
-    string viewInterfaceFolder          = "01100-.interface.ts";
-    string viewInterfacePageFolder      = "01200-Page.interface.ts";
-    string viewInterfaceFltFolder       = "01300-Filter.interface.ts";
-    string viewServiceFolder            = "01400-.service.ts";
-    string viewDatasourceClassFolder    = "01418-Datasource.class.ts";
-
-
-    string updformCssFolder             = "01504-Uform.component.css";
-    string updformHtmlFolder            = "01504-Uform.component.html";
-    string updformComponentFolder       = "01504-Uform.component.ts";
-
-    string sformComponentFolder         = "01420-Sform.component.ts";
-    string viewInterfaceDlgFolder       = "01430-Dlg.interface.ts";
-    string sdlgComponentFolder          = "01440-Sdlg.component.ts";
+    string appSettingServiceClassName               = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, updformComponentFolder);
     
+    string eventEmitterDataModelFolder              = "00018-event-emitter-data.interface.ts";
+    string eventEmitterDataModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterDataModelFolder, updformComponentFolder);
+
+    string menuItemDataModelFolder                  = "00017-menu-item-data.interface.ts";
+    string menuItemDataModelClassName               = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, menuItemDataModelFolder, updformComponentFolder);
+
+    string eventEmitterPubModelFolder               = "00019-event-emitter-pub.interface.ts";
+    string eventEmitterPubModelClassName            = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, updformComponentFolder);
+
+    string filterResultModelFolder                  = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName               = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, filterResultModelFolder, updformComponentFolder);
+
+    string viewModelDatasourceInterfaceFolder       = "00600-view-model-datasource.interface.ts";
+    string viewModelDatasourceInterfaceClassName    = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, viewModelDatasourceInterfaceFolder, updformComponentFolder);
 
 
-    string viewModelDatasourceInterfaceClassName    = GetModelClassName(Context, viewModelDatasourceInterfaceFolder);
-    string eventEmitterDataModelClassName           = GetModelClassName(Context, eventEmitterDataModelFolder);
-    string menuItemDataModelClassName               = GetModelClassName(Context, menuItemDataModelFolder);
-    string eventEmitterPubModelClassName            = GetModelClassName(Context, eventEmitterPubModelFolder);
+    string viewInterfaceFolder                      = "01100-.interface.ts";
+    string viewInterfacePageFolder                  = "01200-Page.interface.ts";
+    string viewInterfaceFltFolder                   = "01300-Filter.interface.ts";
+
+    string viewServiceFolder                        = "01400-.service.ts";
+
+    string viewDatasourceClassFolder                = "01418-Datasource.class.ts";
 
 
-    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, updformComponentFolder);
-
-    string serviceClassName = GetServiceClassName(Model, viewServiceFolder);
-    string componentClassName = GetComponentClassName(Model, updformComponentFolder);
-    string filterResultModelClassName = GetModelClassName(Context, filterResultModelFolder);
-    string appSettingServiceClassName = GetCommonServiceClassName(Context, appSettingServiceFolder);
-
+    string viewInterfaceDlgFolder                   = "01430-Dlg.interface.ts";
+    string sdlgComponentFolder                      = "01440-Sdlg.component.ts";
 
 #>
 
@@ -292,28 +285,28 @@ import { InputFillMode } from '@progress/kendo-angular-inputs';
 import { DateInputFillMode } from '@progress/kendo-angular-dateinputs';
 import { Subscription } from 'rxjs';
 
-import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, updformComponentFolder)#>';
-import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, updformComponentFolder)#>';
-import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, updformComponentFolder)#>';
-import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  menuItemDataModelFolder, updformComponentFolder)#>';
-import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Model, Context,  eventEmitterPubModelFolder, updformComponentFolder)#>';
-import { <#= viewModelDatasourceInterfaceClassName #> } from '<#= GetCommonFolderName(Model, Context,  viewModelDatasourceInterfaceFolder, updformComponentFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, updformComponentFolder)#>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterResultModelFolder, updformComponentFolder)#>';
+import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  eventEmitterDataModelFolder, updformComponentFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  menuItemDataModelFolder, updformComponentFolder)#>';
+import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  eventEmitterPubModelFolder, updformComponentFolder)#>';
+import { <#= viewModelDatasourceInterfaceClassName #> } from '<#= GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  viewModelDatasourceInterfaceFolder, updformComponentFolder)#>';
 
 <#
     foreach(string viewNm in ViewsList) {
 #>
-import { <#=  GetInterfaceNameEx(Context, viewNm) #> } from '<#=  GetCrossComponentFolderName(Model, updformComponentFolder, Context, viewNm, viewInterfaceFolder) #>';
-import { <#=  GetInterfacePageNameEx(Context, viewNm) #> } from '<#=  GetCrossComponentFolderName(Model, updformComponentFolder, Context, viewNm, viewInterfacePageFolder) #>';
-import { <#=  GetInterfaceFilterNameEx(Context, viewNm) #> } from '<#= GetCrossComponentFolderName(Model, updformComponentFolder, Context, viewNm, viewInterfaceFltFolder) #>';
-import { <#=  GetServiceClassNameEx(Context, viewNm, viewServiceFolder) #> } from '<#= GetCrossComponentFolderName(Model, updformComponentFolder, Context, viewNm, viewServiceFolder) #>';
-import { <#=  GetJavaScriptClassNameEx(Context, viewNm, viewDatasourceClassFolder) #> } from '<#= GetCrossComponentFolderName(Model, updformComponentFolder, Context, viewNm, viewDatasourceClassFolder) #>';
+import { <#=  GetInterfaceNameExWithAnglrEx(AngularJsonFile, Context, viewNm, viewInterfaceFolder, Model, updformComponentFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, updformComponentFolder, Context, viewNm, viewInterfaceFolder) #>';
+// import { <#=  GetInterfacePageNameExWithAnglrEx(AngularJsonFile, Context, viewNm, viewInterfacePageFolder, Model, updformComponentFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, updformComponentFolder, Context, viewNm, viewInterfacePageFolder) #>';
+// import { <#=  GetInterfaceFilterNameExWithAnglrEx(AngularJsonFile, Context, viewNm, viewInterfaceFltFolder, Model, updformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, updformComponentFolder, Context, viewNm, viewInterfaceFltFolder) #>';
+import { <#=  GetServiceClassNameExWithAnglrEx(AngularJsonFile, Context, viewNm, viewServiceFolder, Model, updformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, updformComponentFolder, Context, viewNm, viewServiceFolder) #>';
+import { <#=  GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile,Context, viewNm, viewDatasourceClassFolder, Model, updformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, updformComponentFolder, Context, viewNm, viewDatasourceClassFolder) #>';
 
 <#
     }
     foreach(string viewNm in SearchDialogViewsList) {
 #>
-import { <#=  GetComponentClassNameEx(Context, viewNm, sdlgComponentFolder) #> } from '<#= GetCrossComponentFolderName(Model, updformComponentFolder, Context, viewNm, sdlgComponentFolder) #>';
-import { <#=  GetInterfaceDlgNameEx(Context, viewNm) #> } from '<#= GetCrossComponentFolderName(Model, updformComponentFolder, Context, viewNm, viewInterfaceDlgFolder) #>';
+import { <#=  GetComponentClassNameExWithAnglrEx(AngularJsonFile, Context, viewNm, sdlgComponentFolder, Model, updformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, updformComponentFolder, Context, viewNm, sdlgComponentFolder) #>';
+import { <#=  GetInterfaceDlgNameExWithAnglrEx(AngularJsonFile, Context, viewNm, viewInterfaceDlgFolder, Model, updformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, updformComponentFolder, Context, viewNm, viewInterfaceDlgFolder) #>';
 <#
     }
 #>
@@ -367,7 +360,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 #>
 
     @Output('<#= BeforeSubmitSelector #>') <#= BeforeSubmitPropName #> = new EventEmitter();
-    @Output('<#= AfterSubmitSelector #>') <#= AfterSubmitPropName #> = new EventEmitter<<#= GetInterfaceName(Model) #>>();
+    @Output('<#= AfterSubmitSelector #>') <#= AfterSubmitPropName #> = new EventEmitter<<#= GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, updformComponentFolder) #>>();
     public <#= DoSubmitMethodName #>(): void {
         if (this.<#= MainFormGroupName #>.invalid || (!this.<#= RootDataSource #>.<#= RefreshIsDefinedMethodName #>())) {
             this.<#= MainFormGroupName #>.markAllAsTouched();
@@ -431,7 +424,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     public <#= AppearancePropName #>: DropDownFillMode|InputFillMode|DateInputFillMode = 'outline';
     private ngOnInitCalled: boolean = false;
     public <#= MainFormGroupName #>: FormGroup|any = null;
-    public <#= RootDataSource #>: <#=  GetJavaScriptClassNameEx(Context, Model.ViewName, viewDatasourceClassFolder) #> | any = null;
+    public <#= RootDataSource #>: <#=  GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, Model.ViewName, viewDatasourceClassFolder, Model, updformComponentFolder) #> | any = null;
 <#    
     //////////////////////////// start helper variable and FormControl -generator 
     foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
@@ -440,13 +433,13 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 #>
     public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>: FormControl | any = null;
     public <#=  GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> : <#= string.Join(" | ", CollectComboListInterfacesEx(Context, modelViewUIFormPropertySerializable, Model, CurrentInputTypeId)) #> | any = null;
-    public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>: <#=  GetJavaScriptClassNameEx(Context, fk.Item2.ViewName, viewDatasourceClassFolder) #> | any = null;
+    public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>: <#=  GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, fk.Item2.ViewName, viewDatasourceClassFolder, Model, updformComponentFolder) #> | any = null;
 <#
         } // if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Combo) { ... }
         else if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.SearchDialog) {  
 #>
     public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonDisable) #>: boolean = true;
-    public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>: <#=  GetJavaScriptClassNameEx(Context, fk.Item2.ViewName, viewDatasourceClassFolder) #> | any = null;
+    public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>: <#=  GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, fk.Item2.ViewName, viewDatasourceClassFolder, Model, updformComponentFolder) #> | any = null;
 <#
         } // if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.SearchDialog) { ... }
         else if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead) {  
@@ -454,7 +447,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>: FormControl | any = null;
     public <#=  GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> : <#= 
                 string.Join(" | ", CollectTypeaheadListInterfacesEx(Context, modelViewUIFormPropertySerializable, Model, CurrentInputTypeId)) #> | any = null;
-    public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>: <#=  GetJavaScriptClassNameEx(Context, fk.Item2.ViewName, viewDatasourceClassFolder) #> | any = null;
+    public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>: <#=  GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, fk.Item2.ViewName, viewDatasourceClassFolder, Model, updformComponentFolder) #> | any = null;
 <#
         } // if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead) { ... } 
     } // end of foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
@@ -468,14 +461,14 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#    //////////////////////////// start Input Model -generator 
 #>
     @Input('<#= FormControlModelSelector #>') 
-        set <#= FormControlModelPropName #> (inFormControlModel : <#= GetInterfaceName(Model) #> | any) {
+        set <#= FormControlModelPropName #> (inFormControlModel : <#= GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, updformComponentFolder) #> | any) {
             let hasChanged: boolean = this.<#= RootDataSource #>.<#= Interface2ValuesMethodName #>(inFormControlModel, false);
             hasChanged = this.<#= RootDataSource #>.<#= UpdateByHiddenFilterFieldsMethodName #>(false) || hasChanged;
             if(this.ngOnInitCalled && hasChanged) {
                 this.<#= RootDataSource #>.<#= RefreshMethodName #>();
             }
         }
-        get <#=  FormControlModelPropName #>(): <#= GetInterfaceName(Model) #> | any {
+        get <#=  FormControlModelPropName #>(): <#= GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, updformComponentFolder) #> | any {
             return this.<#= RootDataSource #>.<#= Values2InterfaceMethodName #>();
         } // end of get <#= FormControlModelPropName #>
 <#    //////////////////////////// end Input Model -generator 
@@ -502,7 +495,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             if (constructorParams != "") {
                 constructorParams += ", ";
             }
-            constructorParams += "private " +  formServicePrefix + viewNm + ": " + GetServiceClassNameEx(Context, viewNm, viewServiceFolder);
+            constructorParams += "private " +  formServicePrefix + viewNm + ": " + GetServiceClassNameExWithAnglrEx(AngularJsonFile, Context, viewNm, viewServiceFolder, Model, updformComponentFolder);
         } 
 #>
     constructor(<#= constructorParams #>, public dialog: DialogService, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #> ) {
@@ -638,7 +631,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             }
         } // foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) { ... }
 #>
-        this.<#= RootDataSource #> = new <#= GetJavaScriptClassNameEx(Context, Model.ViewName, viewDatasourceClassFolder) #> (this.<#= formServicePrefix + Model.ViewName #>,
+        this.<#= RootDataSource #> = new <#= GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, Model.ViewName, viewDatasourceClassFolder, Model, updformComponentFolder) #> (this.<#= formServicePrefix + Model.ViewName #>,
             this.<#= AppSettingServicePropName #>, null, null, [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, "") #>],'');
         this.<#= RootDataSource #>.set<#= IsNewSuffix #>(false);
         this._<#= SubscriptionsPropName #>.push(
@@ -668,7 +661,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 throw new Exception("For [Foreign Key Name Chain]=" + fk.Item1 + " can not find direct detail");
             }
 #>
-        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #> = new <#= GetJavaScriptClassNameEx(Context, fk.Item2.ViewName, viewDatasourceClassFolder) #> (this.<#= formServicePrefix + fk.Item2.ViewName #>,
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #> = new <#= GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, fk.Item2.ViewName, viewDatasourceClassFolder, Model, updformComponentFolder) #> (this.<#= formServicePrefix + fk.Item2.ViewName #>,
             this.<#= AppSettingServicePropName #>, '<#= detailViewName #>', '<#= directNavigation #>', [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, fk.Item1) #>],'<#= fk.Item1 #>');
         this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.set<#= IsNewSuffix #>(false);
 <#
@@ -827,7 +820,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 #>
     public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
         this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= GetCllctByCurrDirMstrsMethodName #>().subscribe({
-            next: (data: Array<<#= GetInterfaceNameEx(Context, fk.Item2.ViewName) #>> ) => {
+            next: (data: Array<<#= GetInterfaceNameExWithAnglrEx(AngularJsonFile, Context, fk.Item2.ViewName, viewInterfaceFolder, Model, updformComponentFolder) #>> ) => {
                 this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #> = data;
                 let lfc: any = this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Values2InterfaceMethodName #>();
                 let ind: number = -1;
@@ -870,7 +863,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message:this.<#= frasesPropName #>['Not-all-masters'],});
             return;
         }
-        let flt: <#= GetInterfaceDlgName(fk.Item2) #> = {
+        let flt: <#= GetInterfaceDlgNameWithAnglrEx(AngularJsonFile, fk.Item2, viewInterfaceDlgFolder, Model, updformComponentFolder) #> = {
             <#= TitlePropName #>: this.<#= frasesPropName #>['<#= TitlePropName #>'],
             <#= ShowFilterPropName #>: true,
             <#= CanAddPropName #>: false,
@@ -885,11 +878,11 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
         let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
         let dialogRef = this.dialog.open({
-            content: <#= GetComponentClassName(fk.Item2, sdlgComponentFolder) #>,
+            content: <#= GetComponentClassNameWithAnglrEx(AngularJsonFile, fk.Item2, sdlgComponentFolder, Model, updformComponentFolder) #>,
             maxWidth: mw,
             width: w,
         });
-        const dlg = dialogRef.content.instance as <#= GetComponentClassName(fk.Item2, sdlgComponentFolder) #>;
+        const dlg = dialogRef.content.instance as <#= GetComponentClassNameWithAnglrEx(AngularJsonFile, fk.Item2, sdlgComponentFolder, Model, updformComponentFolder) #>;
         dlg.data = flt;
         dialogRef.result.subscribe((rslt: any) => {
             if (!(typeof rslt === 'undefined')) {

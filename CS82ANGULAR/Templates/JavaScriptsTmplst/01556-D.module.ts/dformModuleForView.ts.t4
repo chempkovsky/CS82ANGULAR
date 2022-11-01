@@ -6,32 +6,43 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
 
+    string dformModuleFolder            = "01556-D.module.ts";
+    string dformModuleClassName         = GetModuleClassName(Model, dformModuleFolder);
+
     string materialModuleFolder         = "00010-app-material.module.ts";
+    string materialModuleClassName      = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, materialModuleFolder, dformModuleFolder);
+    
     string flexModuleFolder             = "00011-app-flex-layout.module.ts";
+    string flexModuleClassName          = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, flexModuleFolder, dformModuleFolder);
+
     string filterModuleFolder           = "00050-web-service-filter.module.ts";
+    string filterModuleClassName        = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, filterModuleFolder, dformModuleFolder);
+
     string formatterModuleFolder        = "00070-app-formatter.module.ts";
+    string formatterModuleClassName     = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, formatterModuleFolder, dformModuleFolder);
+
 
     string searchModuleFolder           = "01450-S.module.ts";
-    string dformComponentFolder         = "01506-Dform.component.ts";
-    string ddlgComponentFolder          = "01526-Ddlg.component.ts";
-    string dformModuleFolder            = "01556-D.module.ts";
+    string searchModuleClassName        = GetModuleClassNameWithAnglr(AngularJsonFile, Model, searchModuleFolder, dformModuleFolder);
 
-    string flexModuleClassName          = GetContextModuleClassName(Context, flexModuleFolder);
-    string materialModuleClassName      = GetContextModuleClassName(Context, materialModuleFolder);
-    string filterModuleClassName        = GetContextModuleClassName(Context, filterModuleFolder);
-    string formatterModuleClassName     = GetContextModuleClassName(Context, formatterModuleFolder);
+    string dformComponentFolder         = "01506-Dform.component.ts";
+    string dformComponentClassName      = GetComponentClassNameWithAnglr(AngularJsonFile, Model, dformComponentFolder, dformModuleFolder);
+
+    string ddlgComponentFolder          = "01526-Ddlg.component.ts";
+    string dformDlgComponentClassName   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, ddlgComponentFolder, dformModuleFolder);
+
     
-    string dformComponentClassName = GetComponentClassName(Model, dformComponentFolder);
-    string dformDlgComponentClassName = GetComponentClassName(Model, ddlgComponentFolder);
-    string dformModuleClassName = GetModuleClassName(Model, dformModuleFolder);
 
     List<string> masterViewNames = new List<string>();
     masterViewNames = GetSearchDialogViewsList(Model, Context, masterViewNames);
@@ -41,12 +52,13 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  flexModuleFolder, dformModuleFolder)#>';
-import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  materialModuleFolder, dformModuleFolder)#>';
-import { <#=  formatterModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  formatterModuleFolder, dformModuleFolder)#>';
-import { <#=  dformComponentClassName #> } from '<#= GetFolderName(Model, dformComponentFolder, dformModuleFolder) #>';
-import { <#=  dformDlgComponentClassName #> } from '<#= GetFolderName(Model, ddlgComponentFolder, dformModuleFolder) #>';
 
+import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  flexModuleFolder, dformModuleFolder) #>';
+import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  materialModuleFolder, dformModuleFolder) #>';
+import { <#=  formatterModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  formatterModuleFolder, dformModuleFolder) #>';
+
+import { <#=  dformComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, dformComponentFolder, dformModuleFolder) #>';
+import { <#=  dformDlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, ddlgComponentFolder, dformModuleFolder) #>';
 
 <#
     foreach(string viewName in masterViewNames) {
@@ -60,7 +72,7 @@ import { <#=  dformDlgComponentClassName #> } from '<#= GetFolderName(Model, ddl
             continue;
         }
 #>
-import { <#=  GetModuleClassName(masterView, searchModuleFolder) #> } from '<#=  GetCrossComponentFolderName(Model, dformModuleFolder, Context, masterView.ViewName, searchModuleFolder) #>';
+import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, dformModuleFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, dformModuleFolder, Context, masterView.ViewName, searchModuleFolder) #>';
 <#
     }
 #>
@@ -81,9 +93,8 @@ import { <#=  GetModuleClassName(masterView, searchModuleFolder) #> } from '<#= 
         if (masterView == null) {
             continue;
         }
-        string searchModuleClassName = GetModuleClassName(masterView, searchModuleFolder);
 #>
-        <#= GetModuleClassName(masterView, searchModuleFolder) #>,
+        <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, dformModuleFolder) #>,
 <#
     }
 #>

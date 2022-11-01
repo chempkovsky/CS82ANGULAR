@@ -13,21 +13,1351 @@
             }
             foreach (AngularProject prj in anglJson.Projects)
             {
-                if (aPath.StartsWith(prj.AbsoluteSourceRoot, StringComparison.OrdinalIgnoreCase))
+                if (aPath.StartsWith(prj.AbsoluteSourceRoot + "\\" + prj.ProjectPrefix, StringComparison.OrdinalIgnoreCase))
                 {
                     return prj;
                 }
             }
             return null;
         }
-        ModelViewSerializable GetViewByName(DbContextSerializable context, string ViewName)
+        string GetNameByAngularJson(string srcName, AngularJson anglJson, CommonStaffSerializable refItem, CommonStaffSerializable curItem)
         {
-            if ((context == null) || (string.IsNullOrEmpty(ViewName)))
+            if ((anglJson != null) && (refItem != null) && (curItem != null) && (!string.IsNullOrEmpty(srcName)))
             {
-                return null;
+                AngularProject refAngularProject = GetAngularProjectByRefItem(anglJson, refItem);
+                AngularProject curAngularProject = GetAngularProjectByRefItem(anglJson, curItem);
+                if ((refAngularProject != null) && (curAngularProject != null))
+                {
+                    if (refAngularProject != curAngularProject)
+                    {
+                        if (refAngularProject.ProjectType == "library")
+                        {
+                            // string libFl = (".\\" + refItem.FileFolder + "\\" + refItem.FileName).Replace("\\", "/");
+                            string libFl = Path.Combine(refItem.FileProject, refItem.FileFolder, refItem.FileName).Replace(refAngularProject.AbsoluteSourceRoot, "");
+                            if (!libFl.StartsWith("\\")) libFl = "\\" + libFl;
+                            libFl = ("." + libFl).Replace("\\", "/");
+                            if (refAngularProject.PublicApiJson != null)
+                            {
+                                if (refAngularProject.PublicApiJson.exportItems != null)
+                                {
+                                    AngularPublicApiExportItem exportItem =
+                                        refAngularProject.PublicApiJson.exportItems
+                                        .Where(expItm => expItm.exportType == "ExportAllDeclaration" && libFl.Equals(expItm.exportSource, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                                    if (exportItem != null)
+                                    {
+                                        return srcName;
+                                    }
+                                    exportItem = refAngularProject.PublicApiJson.exportItems
+                                                    .Where(expItm => expItm.exportType == "ExportDefaultDeclaration" && libFl.Equals(expItm.exportSource, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                                    if (exportItem != null)
+                                    {
+                                        return srcName;
+                                    }
+                                    exportItem =
+                                        refAngularProject.PublicApiJson.exportItems
+                                        .Where(expItm => expItm.exportType == "ExportNamedDeclaration" && expItm.exportSubtype == "ExportSpecifier" && libFl.Equals(expItm.exportSource, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                                    if (exportItem != null)
+                                    {
+                                        if (exportItem.exportSpecifiers != null)
+                                        {
+                                            AngularPublicApiExportSpecifier exportSpecifier =
+                                                exportItem.exportSpecifiers.Where(expSpec => expSpec.localNm == srcName).FirstOrDefault();
+                                            if (exportSpecifier != null)
+                                            {
+                                                return exportSpecifier.exportedNm;
+                                            }
+                                        }
+                                    }
+                                    // 
+                                    // We ignore ExportNamespaceSpecifier:
+                                    // https://www.typescriptlang.org/docs/handbook/namespaces-and-modules.html#needless-namespacing
+                                    //
+                                    //exportItem =
+                                    //    refAngularProject.PublicApiJson.exportItems
+                                    //    .Where(expItm => expItm.exportType == "ExportNamedDeclaration" && expItm.exportSubtype == "ExportNamespaceSpecifier" && libFl.Equals(expItm.exportSource, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+
+                                }
+                            }
+
+                        }
+                        else if (refAngularProject.ProjectType == "application")
+                        {
+                            // string appFl = (".\\" + refAngularProject.SourceRoot + "\\" + refItem.FileFolder + "\\" + refItem.FileName).Replace("\\", "/");
+                            string appFl = Path.Combine(refItem.FileProject, refItem.FileFolder, refItem.FileName).Replace(anglJson.AngularJsonPath, "");
+                            if (!appFl.StartsWith("\\")) appFl = "\\" + appFl;
+                            appFl = ("." + appFl).Replace("\\", "/");
+
+                            if (refAngularProject.WebpackConfigJson != null)
+                            {
+                                if (refAngularProject.WebpackConfigJson.exposeItems != null)
+                                {
+                                    AngularWebpackConfigExposeItem exposeItm =
+                                        refAngularProject.WebpackConfigJson.exposeItems
+                                        .Where(itm => appFl.Equals(itm.exposeValue, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                                    if (exposeItm != null)
+                                    {
+                                        return exposeItm.exposeKey;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
-            return context.ModelViews.Where(v => v.ViewName == ViewName).FirstOrDefault();
+            return srcName;
         }
+        string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder)
+        {
+            string result = "./";
+            if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            string[] refFolders = new string[] { };
+            if (!string.IsNullOrEmpty(refItem.FileFolder))
+            {
+                refFolders = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+            }
+            string[] currFolders = new string[] { };
+            if (!string.IsNullOrEmpty(curItem.FileFolder))
+            {
+                currFolders = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+            }
+            int refLen = refFolders.Length;
+            int currLen = currFolders.Length;
+            int minLen = refLen < currLen ? refLen : currLen;
+            int cnt = 0;
+            for (int i = 0; i < minLen; i++)
+            {
+                if (!refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase)) break;
+                cnt++;
+            }
+            if (currLen > cnt)
+            {
+                result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
+            }
+            if (refLen > cnt)
+            {
+                result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+            }
+            result += refItem.FileName;
+            return result;
+        }
+        string GetFolderNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string refFolder, string currFolder)
+        {
+            string result = "./";
+            if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            if (anglJson != null)
+            {
+                AngularProject refAngularProject = GetAngularProjectByRefItem(anglJson, refItem);
+                AngularProject curAngularProject = GetAngularProjectByRefItem(anglJson, curItem);
+                if ((refAngularProject != null) && (curAngularProject != null))
+                {
+                    if (refAngularProject != curAngularProject)
+                    {
+                        return refAngularProject.ProjectName;
+                    }
+                }
+            }
+            string[] refFolders = new string[] { };
+            if (!string.IsNullOrEmpty(refItem.FileFolder))
+            {
+                refFolders = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+            }
+            string[] currFolders = new string[] { };
+            if (!string.IsNullOrEmpty(curItem.FileFolder))
+            {
+                currFolders = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+            }
+            int refLen = refFolders.Length;
+            int currLen = currFolders.Length;
+            int minLen = refLen < currLen ? refLen : currLen;
+            int cnt = 0;
+            for (int i = 0; i < minLen; i++)
+            {
+                if (!refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase)) break;
+                cnt++;
+            }
+            if (currLen > cnt)
+            {
+                result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
+            }
+            if (refLen > cnt)
+            {
+                result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+            }
+            result += refItem.FileName;
+            return result;
+        }
+
+        string GetInterfaceName(ModelViewSerializable model)
+        {
+            if (model == null)
+            {
+                return "I";
+            }
+            return "I" + model.ViewName;
+        }
+        string GetInterfaceNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetInterfaceName(model);
+            if (model == null) 
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetInterfaceNameWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            string result = GetInterfaceName(model);
+            if ((model == null) || (currModel == null))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (currModel.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                currModel.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetInterfaceNameEx(DbContextSerializable context, string viewName)
+        {
+            if ((context == null) || string.IsNullOrEmpty(viewName))
+            {
+                return "I";
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            if (model == null)
+            {
+                return "I";
+            }
+            return GetInterfaceName(model);
+        }
+        string GetInterfaceNameExWithAnglrEx(AngularJson anglJson, DbContextSerializable context, string viewName, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            if (context==null)
+            {
+                return GetInterfaceNameEx(context, viewName);
+            }
+            if (context.ModelViews == null)
+            {
+                return GetInterfaceNameEx(context, viewName);
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetInterfaceNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+        }
+
+        string GetInterfacePageName(ModelViewSerializable model)
+        {
+            if (model == null)
+            {
+                return "IPage";
+            }
+            return "I" + model.PageViewName;
+        }
+        string GetInterfacePageNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetInterfacePageName(model);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetInterfacePageNameWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            string result = GetInterfacePageName(model);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                currModel.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetInterfacePageNameEx(DbContextSerializable context, string viewName)
+        {
+            if ((context == null) || string.IsNullOrEmpty(viewName))
+            {
+                return "IPage";
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            if (model == null)
+            {
+                return "IPage";
+            }
+            return GetInterfacePageName(model);
+        }
+        string GetInterfacePageNameExWithAnglrEx(AngularJson anglJson, DbContextSerializable context, string viewName, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            if (context == null)
+            {
+                return GetInterfacePageNameEx(context, viewName);
+            }
+            if (context.ModelViews == null)
+            {
+                return GetInterfacePageNameEx(context, viewName);
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetInterfacePageNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+        }
+
+        string GetInterfaceFilterName(ModelViewSerializable model)
+        {
+            if (model == null)
+            {
+                return "IFilter";
+            }
+            return "I" + model.ViewName + "Filter";
+        }
+        string GetInterfaceFilterNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetInterfaceFilterName(model);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetInterfaceFilterNameWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            string result = GetInterfaceFilterName(model);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                currModel.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetInterfaceFilterNameEx(DbContextSerializable context, string viewName)
+        {
+            if ((context == null) || string.IsNullOrEmpty(viewName))
+            {
+                return "IFilter";
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            if (model == null)
+            {
+                return "IFilter";
+            }
+            return GetInterfaceFilterName(model);
+        }
+        string GetInterfaceFilterNameExWithAnglrEx(AngularJson anglJson, DbContextSerializable context, string viewName, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            if (context == null)
+            {
+                return GetInterfaceFilterNameEx(context, viewName);
+            }
+            if (context.ModelViews == null)
+            {
+                return GetInterfaceFilterNameEx(context, viewName);
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetInterfaceFilterNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+        }
+
+        String GetJavaScriptServiceName(ModelViewSerializable model)
+        {
+            string result = model.ViewName + "Service";
+            return result.First().ToString().ToUpper() + result.Substring(1);
+        }
+        String GetJavaScriptServiceNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetJavaScriptServiceName(model);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetCommonFolderName(ModelViewSerializable model, DbContextSerializable context, string refFolder, string currFolder)
+        {
+            string result = "./";
+            if ((model == null) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (context.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                context.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            string[] refFolders = new string[] { };
+            if (!string.IsNullOrEmpty(refItem.FileFolder))
+            {
+                refFolders = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+            }
+            string[] currFolders = new string[] { };
+            if (!string.IsNullOrEmpty(curItem.FileFolder))
+            {
+                currFolders = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+            }
+            int refLen = refFolders.Length;
+            int currLen = currFolders.Length;
+            int minLen = refLen < currLen ? refLen : currLen;
+            int cnt = 0;
+            for (int i = 0; i < minLen; i++)
+            {
+                if (!refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase)) break;
+                cnt++;
+            }
+            if (currLen > cnt)
+            {
+                result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
+            }
+            if (refLen > cnt)
+            {
+                result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+            }
+            result += refItem.FileName;
+            return result;
+        }
+        string GetCommonFolderNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, DbContextSerializable context, string refFolder, string currFolder)
+        {
+            string result = "./";
+            if ((model == null) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (context.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                context.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            if (anglJson != null)
+            {
+                AngularProject refAngularProject = GetAngularProjectByRefItem(anglJson, refItem);
+                AngularProject curAngularProject = GetAngularProjectByRefItem(anglJson, curItem);
+                if ((refAngularProject != null) && (curAngularProject != null))
+                {
+                    if (refAngularProject != curAngularProject)
+                    {
+                        return refAngularProject.ProjectName;
+                    }
+                }
+            }
+            return GetCommonFolderName(model, context, refFolder, currFolder);
+        }
+        string GetCommonServiceClassName(DbContextSerializable context, string fileType)
+        {
+            string result = "";
+            if ((context == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (context.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            if (refItem == null)
+            {
+                return result;
+            }
+            if (string.IsNullOrEmpty(refItem.FileName))
+            {
+                return result;
+            }
+            string fn = refItem.FileName.Replace(".service", "Service");
+            StringBuilder sb = new StringBuilder();
+            bool toUpper = true;
+            foreach (char c in fn)
+            {
+                if (c == '-')
+                {
+                    toUpper = true;
+                }
+                else
+                {
+                    if (toUpper)
+                    {
+                        sb.Append(Char.ToUpper(c));
+                        toUpper = false;
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+
+            }
+            return sb.ToString();
+        }
+        string GetCommonServiceClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, DbContextSerializable context, string fileType, string currFolder)
+        {
+            string result = GetCommonServiceClassName(context, fileType);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetModelClassName(DbContextSerializable context, string fileType)
+        {
+            string result = "";
+            if ((context == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (context.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            if (refItem == null)
+            {
+                return result;
+            }
+            if (string.IsNullOrEmpty(refItem.FileName))
+            {
+                return result;
+            }
+            string fn = refItem.FileName.Replace(".interface", "");
+            StringBuilder sb = new StringBuilder();
+            bool toUpper = true;
+            foreach (char c in fn)
+            {
+                if (c == '-')
+                {
+                    toUpper = true;
+                }
+                else
+                {
+                    if (toUpper)
+                    {
+                        sb.Append(Char.ToUpper(c));
+                        toUpper = false;
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+
+            }
+            return "I" + sb.ToString();
+        }
+        string GetModelClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, DbContextSerializable context, string fileType, string currFolder)
+        {
+            string result = GetModelClassName(context, fileType);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+
+        string GetServiceClassName(ModelViewSerializable model, string fileType)
+        {
+            string result = "";
+            if ((model == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            if (refItem == null)
+            {
+                return result;
+            }
+            if (string.IsNullOrEmpty(refItem.FileName))
+            {
+                return result;
+            }
+            string fn = refItem.FileName.Replace(".service", "Service");
+            StringBuilder sb = new StringBuilder();
+            bool toUpper = true;
+            foreach (char c in fn)
+            {
+                if (c == '-')
+                {
+                    toUpper = true;
+                }
+                else
+                {
+                    if (toUpper)
+                    {
+                        sb.Append(Char.ToUpper(c));
+                        toUpper = false;
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+            }
+            return sb.ToString();
+        }
+        string GetServiceClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetServiceClassName(model, fileType);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetServiceClassNameWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            string result = GetServiceClassName(model, fileType);
+            if ((model == null) || (currModel == null))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (currModel.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                currModel.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetServiceClassNameEx(DbContextSerializable context, string viewName, string fileType)
+        {
+            if ((context == null) || string.IsNullOrEmpty(viewName) || string.IsNullOrEmpty(fileType))
+            {
+                return "";
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            if (model == null)
+            {
+                return "";
+            }
+            return GetServiceClassName(model, fileType);
+        }
+        string GetServiceClassNameExWithAnglrEx(AngularJson anglJson, DbContextSerializable context, string viewName, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            if (context == null)
+            {
+                return GetServiceClassNameEx(context, viewName, fileType);
+            }
+            if (context.ModelViews == null)
+            {
+                return GetServiceClassNameEx(context, viewName, fileType);
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetServiceClassNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+        }
+
+        string GetCrossComponentFolderName(ModelViewSerializable model, string currFolder, DbContextSerializable context, string refViewName, string refFolder)
+        {
+            string result = "./";
+            if ((model == null) || string.IsNullOrEmpty(currFolder) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(refViewName))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (context.ModelViews == null))
+            {
+                return result;
+            }
+            ModelViewSerializable refModel = context.ModelViews.Where(v => v.ViewName == refViewName).FirstOrDefault();
+            if (refModel == null)
+            {
+                return result;
+            }
+            if (refModel.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                refModel.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            string[] refFolders = new string[] { };
+            if (!string.IsNullOrEmpty(refItem.FileFolder))
+            {
+                refFolders = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+            }
+            string[] currFolders = new string[] { };
+            if (!string.IsNullOrEmpty(curItem.FileFolder))
+            {
+                currFolders = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+            }
+            int refLen = refFolders.Length;
+            int currLen = currFolders.Length;
+            int minLen = refLen < currLen ? refLen : currLen;
+            int cnt = 0;
+            for (int i = 0; i < minLen; i++)
+            {
+                if (!refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase)) break;
+                cnt++;
+            }
+            if (currLen > cnt)
+            {
+                result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
+            }
+            if (refLen > cnt)
+            {
+                result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+            }
+            result += refItem.FileName;
+            return result;
+        }
+        string GetCrossComponentFolderNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string currFolder, DbContextSerializable context, string refViewName, string refFolder)
+        {
+            string result = "./";
+            if ((model == null) || string.IsNullOrEmpty(currFolder) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(refViewName))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (context.ModelViews == null))
+            {
+                return result;
+            }
+            ModelViewSerializable refModel = context.ModelViews.Where(v => v.ViewName == refViewName).FirstOrDefault();
+            if (refModel == null)
+            {
+                return result;
+            }
+            if (refModel.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                refModel.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            if (anglJson != null)
+            {
+                AngularProject refAngularProject = GetAngularProjectByRefItem(anglJson, refItem);
+                AngularProject curAngularProject = GetAngularProjectByRefItem(anglJson, curItem);
+                if ((refAngularProject != null) && (curAngularProject != null))
+                {
+                    if (refAngularProject != curAngularProject)
+                    {
+                        return refAngularProject.ProjectName;
+                    }
+                }
+            }
+            return GetCrossComponentFolderName(model, currFolder, context, refViewName, refFolder);
+        }
+        string GetJavaScriptClassName(ModelViewSerializable model, string fileType)
+        {
+            string result = "";
+            if ((model == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            if (refItem == null)
+            {
+                return result;
+            }
+            if (string.IsNullOrEmpty(refItem.FileName))
+            {
+                return result;
+            }
+            string fn = refItem.FileName.Replace(".class", "");
+            StringBuilder sb = new StringBuilder();
+            bool toUpper = true;
+            foreach (char c in fn)
+            {
+                if (c == '-')
+                {
+                    toUpper = true;
+                }
+                else
+                {
+                    if (toUpper)
+                    {
+                        sb.Append(Char.ToUpper(c));
+                        toUpper = false;
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+            }
+            return sb.ToString();
+        }
+        string GetJavaScriptClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetJavaScriptClassName(model, fileType);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetJavaScriptClassNameWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            string result = GetJavaScriptClassName(model, fileType);
+            if ((model == null) || (currModel == null))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (currModel.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                currModel.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetJavaScriptClassNameEx(DbContextSerializable context, string viewName, string fileType)
+        {
+            if ((context == null) || string.IsNullOrEmpty(viewName) || string.IsNullOrEmpty(fileType))
+            {
+                return "";
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            if (model == null)
+            {
+                return "";
+            }
+            return GetJavaScriptClassName(model, fileType);
+        }
+        string GetJavaScriptClassNameExWithAnglrEx(AngularJson anglJson, DbContextSerializable context, string viewName, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            if (context == null)
+            {
+                return GetJavaScriptClassNameEx(context, viewName, fileType);
+            }
+            if (context.ModelViews == null)
+            {
+                return GetJavaScriptClassNameEx(context, viewName, fileType);
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetJavaScriptClassNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+        }
+
+        string GetComponentClassName(ModelViewSerializable model, string fileType)
+        {
+            string result = "";
+            if ((model == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            if (refItem == null)
+            {
+                return result;
+            }
+            if (string.IsNullOrEmpty(refItem.FileName))
+            {
+                return result;
+            }
+            string fn = refItem.FileName.Replace(".component", "Component");
+            StringBuilder sb = new StringBuilder();
+            bool toUpper = true;
+            foreach (char c in fn)
+            {
+                if (c == '-')
+                {
+                    toUpper = true;
+                }
+                else
+                {
+                    if (toUpper)
+                    {
+                        sb.Append(Char.ToUpper(c));
+                        toUpper = false;
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+            }
+            return sb.ToString();
+        }
+        string GetComponentClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetComponentClassName(model, fileType);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetComponentClassNameWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            string result = GetComponentClassName(model, fileType);
+            if ((model == null) || (currModel == null))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (currModel.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                currModel.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetComponentClassNameEx(DbContextSerializable context, string viewName, string fileType)
+        {
+            string result = "";
+            if ((context == null) || string.IsNullOrEmpty(fileType) || string.IsNullOrEmpty(viewName))
+            {
+                return result;
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetComponentClassName(model, fileType);
+        }
+        string GetComponentClassNameExWithAnglrEx(AngularJson anglJson, DbContextSerializable context, string viewName, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            if (context == null)
+            {
+                return GetComponentClassNameEx(context, viewName, fileType);
+            }
+            if (context.ModelViews == null)
+            {
+                return GetComponentClassNameEx(context, viewName, fileType);
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetComponentClassNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+        }
+
+        string GetContextComponentClassName(DbContextSerializable context, string fileType)
+        {
+            string result = "";
+            if ((context == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (context.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            if (refItem == null)
+            {
+                return result;
+            }
+            if (string.IsNullOrEmpty(refItem.FileName))
+            {
+                return result;
+            }
+            string fn = refItem.FileName.Replace(".component", "Component");
+            StringBuilder sb = new StringBuilder();
+            bool toUpper = true;
+            foreach (char c in fn)
+            {
+                if (c == '-')
+                {
+                    toUpper = true;
+                }
+                else
+                {
+                    if (toUpper)
+                    {
+                        sb.Append(Char.ToUpper(c));
+                        toUpper = false;
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+            }
+            return sb.ToString();
+        }
+        string GetContextComponentClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, DbContextSerializable context, string fileType, string currFolder)
+        {
+            string result = GetContextComponentClassName(context, fileType);
+            if ((model == null) || (context == null))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (context.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+
+        string GetInterfaceDlgName(ModelViewSerializable model)
+        {
+            if (model == null)
+            {
+                return "IDlg";
+            }
+            return "I" + model.ViewName + "Dlg";
+        }
+        string GetInterfaceDlgNameEx(DbContextSerializable context, string viewName)
+        {
+            if ((context == null) || string.IsNullOrEmpty(viewName))
+            {
+                return "IDlg";
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetInterfaceDlgName(model);
+        }
+        string GetInterfaceDlgNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetInterfaceDlgName(model);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetInterfaceDlgNameWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            string result = GetInterfaceDlgName(model);
+            if ((model == null) || (currModel == null))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (currModel.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                currModel.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetInterfaceDlgNameExWithAnglrEx(AngularJson anglJson, DbContextSerializable context, string viewName, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            if (context == null)
+            {
+                return GetInterfaceDlgNameEx(context, viewName);
+            }
+            if (context.ModelViews == null)
+            {
+                return GetInterfaceDlgNameEx(context, viewName);
+            }
+            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetComponentClassNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+        }
+
+        string GetModuleClassName(ModelViewSerializable model, string fileType)
+        {
+            string result = "";
+            if ((model == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            if (refItem == null)
+            {
+                return result;
+            }
+            if (string.IsNullOrEmpty(refItem.FileName))
+            {
+                return result;
+            }
+            string fn = refItem.FileName.Replace(".module", "Module").Replace(".routing", "Routing");
+            StringBuilder sb = new StringBuilder();
+            bool toUpper = true;
+            foreach (char c in fn)
+            {
+                if (c == '-')
+                {
+                    toUpper = true;
+                }
+                else
+                {
+                    if (toUpper)
+                    {
+                        sb.Append(Char.ToUpper(c));
+                        toUpper = false;
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+            }
+            return sb.ToString();
+        }
+        string GetModuleClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetModuleClassName(model, fileType);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetModuleClassNameWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            string result = GetModuleClassName(model, fileType);
+            if ((model == null) || (currModel == null))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (currModel.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                currModel.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+
         string GetContextModuleClassName(DbContextSerializable context, string fileType)
         {
             string result = "";
@@ -73,10 +1403,37 @@
             }
             return sb.ToString();
         }
-        string GetModuleClassName(ModelViewSerializable model, string fileType)
+        string GetContextModuleClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, DbContextSerializable context, string fileType, string currFolder)
         {
-            string result = "";
-            if ((model == null) || string.IsNullOrEmpty(fileType))
+            string result = GetContextModuleClassName(context, fileType);
+            if ((model == null) || (context == null))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (context.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+
+
+        string GetInterfaceVDlgName(ModelViewSerializable model)
+        {
+            return "I" + model.ViewName + "Vdlg";
+        }
+        string GetInterfaceVDlgNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetInterfaceVDlgName(model);
+            if (model == null)
             {
                 return result;
             }
@@ -86,37 +1443,105 @@
             }
             CommonStaffSerializable refItem =
                 model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-            if (refItem == null)
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
             {
                 return result;
             }
-            if (string.IsNullOrEmpty(refItem.FileName))
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+
+        string GetInterfaceADlgName(ModelViewSerializable model)
+        {
+            return "I" + model.ViewName + "Adlg";
+        }
+        string GetInterfaceADlgNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetInterfaceADlgName(model);
+            if (model == null)
             {
                 return result;
             }
-            string fn = refItem.FileName.Replace(".module", "Module").Replace(".routing", "Routing");
-            StringBuilder sb = new StringBuilder();
-            bool toUpper = true;
-            foreach (char c in fn)
+            if (model.CommonStaffs == null)
             {
-                if (c == '-')
-                {
-                    toUpper = true;
-                }
-                else
-                {
-                    if (toUpper)
-                    {
-                        sb.Append(Char.ToUpper(c));
-                        toUpper = false;
-                    }
-                    else
-                    {
-                        sb.Append(c);
-                    }
-                }
+                return result;
             }
-            return sb.ToString();
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+
+        string GetInterfaceDDlgName(ModelViewSerializable model)
+        {
+            return "I" + model.ViewName + "Ddlg";
+        }
+        string GetInterfaceDDlgNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetInterfaceDDlgName(model);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+
+        string GetInterfaceUDlgName(ModelViewSerializable model)
+        {
+            return "I" + model.ViewName + "Udlg";
+        }
+        string GetInterfaceUDlgNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetInterfaceUDlgName(model);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+
+
+
+
+
+
+        ModelViewSerializable GetViewByName(DbContextSerializable context, string ViewName)
+        {
+            if ((context == null) || (string.IsNullOrEmpty(ViewName)))
+            {
+                return null;
+            }
+            return context.ModelViews.Where(v => v.ViewName == ViewName).FirstOrDefault();
         }
         string GetViewByForeignNameChain(DbContextSerializable context, string ViewName, string foreignKeyNameChain)
         {
@@ -400,51 +1825,6 @@
             }
             return "";
         }
-        string GetContextComponentClassName(DbContextSerializable context, string fileType)
-        {
-            string result = "";
-            if ((context == null) || string.IsNullOrEmpty(fileType))
-            {
-                return result;
-            }
-            if (context.CommonStaffs == null)
-            {
-                return result;
-            }
-            CommonStaffSerializable refItem =
-                context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-            if (refItem == null)
-            {
-                return result;
-            }
-            if (string.IsNullOrEmpty(refItem.FileName))
-            {
-                return result;
-            }
-            string fn = refItem.FileName.Replace(".component", "Component");
-            StringBuilder sb = new StringBuilder();
-            bool toUpper = true;
-            foreach (char c in fn)
-            {
-                if (c == '-')
-                {
-                    toUpper = true;
-                }
-                else
-                {
-                    if (toUpper)
-                    {
-                        sb.Append(Char.ToUpper(c));
-                        toUpper = false;
-                    }
-                    else
-                    {
-                        sb.Append(c);
-                    }
-                }
-            }
-            return sb.ToString();
-        }
         string GetInputTypeToEnumName(int inputType)
         {
             switch (inputType)
@@ -472,19 +1852,6 @@
         string GetInterfaceEDlgName(ModelViewSerializable model)
         {
             return "I" + model.ViewName + "Edlg";
-        }
-        string GetInterfaceNameEx(DbContextSerializable context, string viewName)
-        {
-            if ((context == null) || string.IsNullOrEmpty(viewName))
-            {
-                return "I";
-            }
-            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
-            if (model == null)
-            {
-                return "I";
-            }
-            return GetInterfaceName(model);
         }
         public string FirstLetterToUpper(string str)
         {
@@ -1891,22 +3258,6 @@
                 return model.ScalarProperties.Where(p => (p.OriginalPropertyName == originalPropertyName) && (p.ForeignKeyNameChain == foreignKeyNameChain)).FirstOrDefault();
             }
         }
-        string GetInterfaceVDlgName(ModelViewSerializable model)
-        {
-            return "I" + model.ViewName + "Vdlg";
-        }
-        string GetInterfaceADlgName(ModelViewSerializable model)
-        {
-            return "I" + model.ViewName + "Adlg";
-        }
-        string GetInterfaceDDlgName(ModelViewSerializable model)
-        {
-            return "I" + model.ViewName + "Ddlg";
-        }
-        string GetInterfaceUDlgName(ModelViewSerializable model)
-        {
-            return "I" + model.ViewName + "Udlg";
-        }
         ModelViewSerializable GetModelViewByName(DbContextSerializable context, string viewName)
         {
             if ((context == null) || (string.IsNullOrEmpty(viewName)))
@@ -1919,14 +3270,6 @@
             }
             return context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
         }
-        string GetInterfaceDlgName(ModelViewSerializable model)
-        {
-            if (model == null)
-            {
-                return "IDlg";
-            }
-            return "I" + model.ViewName + "Dlg";
-        }
         string GetExpressionForControlListFilter(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string sufix)
         {
             return GetTypeScriptPropertyNameWithSufix(prop, model, sufix) + "OnFilter";
@@ -1934,11 +3277,6 @@
         string GetExpressionForControlListIsOpen(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string sufix)
         {
             return GetTypeScriptPropertyNameWithSufix(prop, model, sufix) + "IsOpen";
-        }
-        String GetJavaScriptServiceName(ModelViewSerializable model)
-        {
-            string result = model.ViewName + "Service";
-            return result.First().ToString().ToUpper() + result.Substring(1);
         }
         string GetExpressionForFormControl(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string mainFormGroupName)
         {
@@ -2099,111 +3437,6 @@
             }
             return "";
         }
-        string GetInterfaceName(ModelViewSerializable model)
-        {
-            if (model == null)
-            {
-                return "I";
-            }
-            return "I" + model.ViewName;
-        }
-        string GetInterfacePageName(ModelViewSerializable model)
-        {
-            if (model == null)
-            {
-                return "IPage";
-            }
-            return "I" + model.PageViewName;
-        }
-        string GetInterfacePageNameEx(DbContextSerializable context, string viewName)
-        {
-            if ((context == null) || string.IsNullOrEmpty(viewName))
-            {
-                return "IPage";
-            }
-            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
-            if (model == null)
-            {
-                return "IPage";
-            }
-            return GetInterfacePageName(model);
-        }
-        string GetInterfaceFilterName(ModelViewSerializable model)
-        {
-            if (model == null)
-            {
-                return "IFilter";
-            }
-            return "I" + model.ViewName + "Filter";
-        }
-        string GetInterfaceFilterNameEx(DbContextSerializable context, string viewName)
-        {
-            if ((context == null) || string.IsNullOrEmpty(viewName))
-            {
-                return "IFilter";
-            }
-            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
-            if (model == null)
-            {
-                return "IFilter";
-            }
-            return GetInterfaceFilterName(model);
-        }
-        string GetInterfaceDlgNameEx(DbContextSerializable context, string viewName)
-        {
-            if ((context == null) || string.IsNullOrEmpty(viewName))
-            {
-                return "IDlg";
-            }
-            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
-            return GetInterfaceDlgName(model);
-        }
-        string GetModelClassName(DbContextSerializable context, string fileType)
-        {
-            string result = "";
-            if ((context == null) || string.IsNullOrEmpty(fileType))
-            {
-                return result;
-            }
-            if (context.CommonStaffs == null)
-            {
-                return result;
-            }
-            CommonStaffSerializable refItem =
-                context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-            if (refItem == null)
-            {
-                return result;
-            }
-            if (string.IsNullOrEmpty(refItem.FileName))
-            {
-                return result;
-            }
-            string fn = refItem.FileName.Replace(".interface", "");
-            StringBuilder sb = new StringBuilder();
-            bool toUpper = true;
-            foreach (char c in fn)
-            {
-                if (c == '-')
-                {
-                    toUpper = true;
-                }
-                else
-                {
-                    if (toUpper)
-                    {
-                        sb.Append(Char.ToUpper(c));
-                        toUpper = false;
-                    }
-                    else
-                    {
-                        sb.Append(c);
-                    }
-                }
-
-            }
-            return "I" + sb.ToString();
-        }
         string GetPropertyTypeScriptTypeName(ModelViewPropertyOfVwSerializable prop)
         {
             string result = "";
@@ -2273,116 +3506,6 @@
                 return prop.UnderlyingTypeName + " ?";
             }
             return prop.UnderlyingTypeName;
-        }
-        string GetFolderName(ModelViewSerializable model, string refFolder, string currFolder)
-        {
-            string result = "./";
-            if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder))
-            {
-                return result;
-            }
-            if (model.CommonStaffs == null)
-            {
-                return result;
-            }
-            CommonStaffSerializable refItem =
-                model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
-            CommonStaffSerializable curItem =
-                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
-            if ((refItem == null) || (curItem == null))
-            {
-                return result;
-            }
-            string[] refFolders = new string[] { };
-            if (!string.IsNullOrEmpty(refItem.FileFolder))
-            {
-                refFolders = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-            }
-            string[] currFolders = new string[] { };
-            if (!string.IsNullOrEmpty(curItem.FileFolder))
-            {
-                currFolders = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-            }
-            int refLen = refFolders.Length;
-            int currLen = currFolders.Length;
-            int minLen = refLen < currLen ? refLen : currLen;
-            int cnt = 0;
-            for (int i = 0; i < minLen; i++)
-            {
-                if (!refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase)) break;
-                cnt++;
-            }
-            if (currLen > cnt)
-            {
-                result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
-            }
-            if (refLen > cnt)
-            {
-                result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
-            }
-            result += refItem.FileName;
-            return result;
-        }
-        string GetFolderNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string refFolder, string currFolder)
-        {
-            string result = "./";
-            if ((model == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder))
-            {
-                return result;
-            }
-            if (model.CommonStaffs == null)
-            {
-                return result;
-            }
-            CommonStaffSerializable refItem =
-                model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
-            CommonStaffSerializable curItem =
-                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
-            if ((refItem == null) || (curItem == null))
-            {
-                return result;
-            }
-            if (anglJson != null)
-            {
-                AngularProject refAngularProject = GetAngularProjectByRefItem(anglJson, refItem);
-                AngularProject curAngularProject = GetAngularProjectByRefItem(anglJson, curItem);
-                if ((refAngularProject != null) && (curAngularProject != null))
-                {
-                    if (refAngularProject != curAngularProject)
-                    {
-                        return refAngularProject.ProjectName;
-                    }
-                }
-            }
-            string[] refFolders = new string[] { };
-            if (!string.IsNullOrEmpty(refItem.FileFolder))
-            {
-                refFolders = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-            }
-            string[] currFolders = new string[] { };
-            if (!string.IsNullOrEmpty(curItem.FileFolder))
-            {
-                currFolders = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-            }
-            int refLen = refFolders.Length;
-            int currLen = currFolders.Length;
-            int minLen = refLen < currLen ? refLen : currLen;
-            int cnt = 0;
-            for (int i = 0; i < minLen; i++)
-            {
-                if (!refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase)) break;
-                cnt++;
-            }
-            if (currLen > cnt)
-            {
-                result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
-            }
-            if (refLen > cnt)
-            {
-                result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
-            }
-            result += refItem.FileName;
-            return result;
         }
         String GetWebApiServicePrefix(ModelViewSerializable model)
         {
@@ -3391,290 +4514,6 @@
             }
             return sb.ToString();
         }
-        string GetCommonServiceClassName(DbContextSerializable context, string fileType)
-        {
-            string result = "";
-            if ((context == null) || string.IsNullOrEmpty(fileType))
-            {
-                return result;
-            }
-            if (context.CommonStaffs == null)
-            {
-                return result;
-            }
-            CommonStaffSerializable refItem =
-                context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-            if (refItem == null)
-            {
-                return result;
-            }
-            if (string.IsNullOrEmpty(refItem.FileName))
-            {
-                return result;
-            }
-            string fn = refItem.FileName.Replace(".service", "Service");
-            StringBuilder sb = new StringBuilder();
-            bool toUpper = true;
-            foreach (char c in fn)
-            {
-                if (c == '-')
-                {
-                    toUpper = true;
-                }
-                else
-                {
-                    if (toUpper)
-                    {
-                        sb.Append(Char.ToUpper(c));
-                        toUpper = false;
-                    }
-                    else
-                    {
-                        sb.Append(c);
-                    }
-                }
-
-            }
-            return sb.ToString();
-        }
-        string GetCommonFolderName(ModelViewSerializable model, DbContextSerializable context, string refFolder, string currFolder)
-        {
-            string result = "./";
-            if ((model == null) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder))
-            {
-                return result;
-            }
-            if ((model.CommonStaffs == null) || (context.CommonStaffs == null))
-            {
-                return result;
-            }
-            CommonStaffSerializable refItem =
-                context.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
-            CommonStaffSerializable curItem =
-                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
-            if ((refItem == null) || (curItem == null))
-            {
-                return result;
-            }
-            string[] refFolders = new string[] { };
-            if (!string.IsNullOrEmpty(refItem.FileFolder))
-            {
-                refFolders = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-            }
-            string[] currFolders = new string[] { };
-            if (!string.IsNullOrEmpty(curItem.FileFolder))
-            {
-                currFolders = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-            }
-            int refLen = refFolders.Length;
-            int currLen = currFolders.Length;
-            int minLen = refLen < currLen ? refLen : currLen;
-            int cnt = 0;
-            for (int i = 0; i < minLen; i++)
-            {
-                if (!refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase)) break;
-                cnt++;
-            }
-            if (currLen > cnt)
-            {
-                result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
-            }
-            if (refLen > cnt)
-            {
-                result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
-            }
-            result += refItem.FileName;
-            return result;
-        }
-        string GetCommonFolderNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, DbContextSerializable context, string refFolder, string currFolder)
-        {
-            string result = "./";
-            if ((model == null) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder))
-            {
-                return result;
-            }
-            if ((model.CommonStaffs == null) || (context.CommonStaffs == null))
-            {
-                return result;
-            }
-            CommonStaffSerializable refItem =
-                context.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
-            CommonStaffSerializable curItem =
-                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
-            if ((refItem == null) || (curItem == null))
-            {
-                return result;
-            }
-            if (anglJson != null)
-            {
-                AngularProject refAngularProject = GetAngularProjectByRefItem(anglJson, refItem);
-                AngularProject curAngularProject = GetAngularProjectByRefItem(anglJson, curItem);
-                if ((refAngularProject != null) && (curAngularProject != null))
-                {
-                    if (refAngularProject != curAngularProject)
-                    {
-                        return refAngularProject.ProjectName;
-                    }
-                }
-            }
-            string[] refFolders = new string[] { };
-            if (!string.IsNullOrEmpty(refItem.FileFolder))
-            {
-                refFolders = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-            }
-            string[] currFolders = new string[] { };
-            if (!string.IsNullOrEmpty(curItem.FileFolder))
-            {
-                currFolders = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-            }
-            int refLen = refFolders.Length;
-            int currLen = currFolders.Length;
-            int minLen = refLen < currLen ? refLen : currLen;
-            int cnt = 0;
-            for (int i = 0; i < minLen; i++)
-            {
-                if (!refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase)) break;
-                cnt++;
-            }
-            if (currLen > cnt)
-            {
-                result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
-            }
-            if (refLen > cnt)
-            {
-                result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
-            }
-            result += refItem.FileName;
-            return result;
-        }
-        string GetCrossComponentFolderName(ModelViewSerializable model, string currFolder, DbContextSerializable context, string refViewName, string refFolder)
-        {
-            string result = "./";
-            if ((model == null) || string.IsNullOrEmpty(currFolder) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(refViewName))
-            {
-                return result;
-            }
-            if ((model.CommonStaffs == null) || (context.ModelViews == null))
-            {
-                return result;
-            }
-            ModelViewSerializable refModel = context.ModelViews.Where(v => v.ViewName == refViewName).FirstOrDefault();
-            if (refModel == null)
-            {
-                return result;
-            }
-            if (refModel.CommonStaffs == null)
-            {
-                return result;
-            }
-            CommonStaffSerializable refItem =
-                refModel.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
-            CommonStaffSerializable curItem =
-                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
-            if ((refItem == null) || (curItem == null))
-            {
-                return result;
-            }
-            string[] refFolders = new string[] { };
-            if (!string.IsNullOrEmpty(refItem.FileFolder))
-            {
-                refFolders = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-            }
-            string[] currFolders = new string[] { };
-            if (!string.IsNullOrEmpty(curItem.FileFolder))
-            {
-                currFolders = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-            }
-            int refLen = refFolders.Length;
-            int currLen = currFolders.Length;
-            int minLen = refLen < currLen ? refLen : currLen;
-            int cnt = 0;
-            for (int i = 0; i < minLen; i++)
-            {
-                if (!refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase)) break;
-                cnt++;
-            }
-            if (currLen > cnt)
-            {
-                result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
-            }
-            if (refLen > cnt)
-            {
-                result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
-            }
-            result += refItem.FileName;
-            return result;
-        }
-        string GetCrossComponentFolderNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string currFolder, DbContextSerializable context, string refViewName, string refFolder)
-        {
-            string result = "./";
-            if ((model == null) || string.IsNullOrEmpty(currFolder) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(refViewName))
-            {
-                return result;
-            }
-            if ((model.CommonStaffs == null) || (context.ModelViews == null))
-            {
-                return result;
-            }
-            ModelViewSerializable refModel = context.ModelViews.Where(v => v.ViewName == refViewName).FirstOrDefault();
-            if (refModel == null)
-            {
-                return result;
-            }
-            if (refModel.CommonStaffs == null)
-            {
-                return result;
-            }
-            CommonStaffSerializable refItem =
-                refModel.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
-            CommonStaffSerializable curItem =
-                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
-            if ((refItem == null) || (curItem == null))
-            {
-                return result;
-            }
-            if(anglJson != null)
-            {
-                AngularProject refAngularProject = GetAngularProjectByRefItem(anglJson, refItem);
-                AngularProject curAngularProject = GetAngularProjectByRefItem(anglJson, curItem);
-                if ((refAngularProject != null) && (curAngularProject != null))
-                {
-                    if(refAngularProject != curAngularProject)
-                    {
-                        return refAngularProject.ProjectName;
-                    }
-                }
-            }
-            string[] refFolders = new string[] { };
-            if (!string.IsNullOrEmpty(refItem.FileFolder))
-            {
-                refFolders = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-            }
-            string[] currFolders = new string[] { };
-            if (!string.IsNullOrEmpty(curItem.FileFolder))
-            {
-                currFolders = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-            }
-            int refLen = refFolders.Length;
-            int currLen = currFolders.Length;
-            int minLen = refLen < currLen ? refLen : currLen;
-            int cnt = 0;
-            for (int i = 0; i < minLen; i++)
-            {
-                if (!refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase)) break;
-                cnt++;
-            }
-            if (currLen > cnt)
-            {
-                result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
-            }
-            if (refLen > cnt)
-            {
-                result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
-            }
-            result += refItem.FileName;
-            return result;
-        }
         string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType)
         {
             string result = "";
@@ -3697,119 +4536,6 @@
                 return result;
             }
             return refItem.FileName.Replace(".component", "");
-        }
-        string GetComponentClassName(ModelViewSerializable model, string fileType)
-        {
-            string result = "";
-            if ((model == null) || string.IsNullOrEmpty(fileType))
-            {
-                return result;
-            }
-            if (model.CommonStaffs == null)
-            {
-                return result;
-            }
-            CommonStaffSerializable refItem =
-                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-            if (refItem == null)
-            {
-                return result;
-            }
-            if (string.IsNullOrEmpty(refItem.FileName))
-            {
-                return result;
-            }
-            string fn = refItem.FileName.Replace(".component", "Component");
-            StringBuilder sb = new StringBuilder();
-            bool toUpper = true;
-            foreach (char c in fn)
-            {
-                if (c == '-')
-                {
-                    toUpper = true;
-                }
-                else
-                {
-                    if (toUpper)
-                    {
-                        sb.Append(Char.ToUpper(c));
-                        toUpper = false;
-                    }
-                    else
-                    {
-                        sb.Append(c);
-                    }
-                }
-            }
-            return sb.ToString();
-        }
-        string GetComponentClassNameEx(DbContextSerializable context, string viewName, string fileType)
-        {
-            string result = "";
-            if ((context == null) || string.IsNullOrEmpty(fileType) || string.IsNullOrEmpty(viewName))
-            {
-                return result;
-            }
-            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
-            return GetComponentClassName(model, fileType);
-        }
-        string GetServiceClassName(ModelViewSerializable model, string fileType)
-        {
-            string result = "";
-            if ((model == null) || string.IsNullOrEmpty(fileType))
-            {
-                return result;
-            }
-            if (model.CommonStaffs == null)
-            {
-                return result;
-            }
-            CommonStaffSerializable refItem =
-                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-            if (refItem == null)
-            {
-                return result;
-            }
-            if (string.IsNullOrEmpty(refItem.FileName))
-            {
-                return result;
-            }
-            string fn = refItem.FileName.Replace(".service", "Service");
-            StringBuilder sb = new StringBuilder();
-            bool toUpper = true;
-            foreach (char c in fn)
-            {
-                if (c == '-')
-                {
-                    toUpper = true;
-                }
-                else
-                {
-                    if (toUpper)
-                    {
-                        sb.Append(Char.ToUpper(c));
-                        toUpper = false;
-                    }
-                    else
-                    {
-                        sb.Append(c);
-                    }
-                }
-            }
-            return sb.ToString();
-        }
-        string GetServiceClassNameEx(DbContextSerializable context, string ViewName, string fileType)
-        {
-            if ((context == null) || string.IsNullOrEmpty(ViewName) || string.IsNullOrEmpty(fileType))
-            {
-                return "";
-            }
-            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == ViewName).FirstOrDefault();
-            if (model == null)
-            {
-                return "";
-            }
-            return GetServiceClassName(model, fileType);
         }
         string GetViewNameByForeignNameChain(DbContextSerializable context, string ViewName, string foreignKeyNameChain)
         {
@@ -4652,64 +5378,6 @@
             if (string.IsNullOrEmpty(chain)) return "";
             string[] fks = chain.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
             return fks[fks.Length - 1];
-        }
-        string GetJavaScriptClassName(ModelViewSerializable model, string fileType)
-        {
-            string result = "";
-            if ((model == null) || string.IsNullOrEmpty(fileType))
-            {
-                return result;
-            }
-            if (model.CommonStaffs == null)
-            {
-                return result;
-            }
-            CommonStaffSerializable refItem =
-                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-            if (refItem == null)
-            {
-                return result;
-            }
-            if (string.IsNullOrEmpty(refItem.FileName))
-            {
-                return result;
-            }
-            string fn = refItem.FileName.Replace(".class", "");
-            StringBuilder sb = new StringBuilder();
-            bool toUpper = true;
-            foreach (char c in fn)
-            {
-                if (c == '-')
-                {
-                    toUpper = true;
-                }
-                else
-                {
-                    if (toUpper)
-                    {
-                        sb.Append(Char.ToUpper(c));
-                        toUpper = false;
-                    }
-                    else
-                    {
-                        sb.Append(c);
-                    }
-                }
-            }
-            return sb.ToString();
-        }
-        string GetJavaScriptClassNameEx(DbContextSerializable context, string ViewName, string fileType)
-        {
-            if ((context == null) || string.IsNullOrEmpty(ViewName) || string.IsNullOrEmpty(fileType))
-            {
-                return "";
-            }
-            ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == ViewName).FirstOrDefault();
-            if (model == null)
-            {
-                return "";
-            }
-            return GetJavaScriptClassName(model, fileType);
         }
         bool IsDatabaseGeneratedProperty(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model)
         {
@@ -5710,6 +6378,5 @@
             }
             return "[sortable]=\"false\"";
         }
-
 
 #>

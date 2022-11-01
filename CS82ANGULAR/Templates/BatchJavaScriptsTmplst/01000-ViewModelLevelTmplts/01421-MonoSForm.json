@@ -1,0 +1,82 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "ng add @angular/material",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "",
+    "ng generate library XXXXX-sform",
+    "",
+    "where XXXXX is a name of the selected ViewModel",
+    "",
+    "Please make sure that you selected [src\\lib] folder of the common-interfaces library !!!"
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "sform",
+      "GeneratorType": "01420-Sform.component.css",
+      "GeneratorSript": "SearchFormForView.css.t4"
+    },
+    {
+      "DestinationFolder": "sform",
+      "GeneratorType": "01420-Sform.component.html",
+      "GeneratorSript": "SearchFormForView.html.t4"
+    },
+    {
+      "DestinationFolder": "sform",
+      "GeneratorType": "01420-Sform.component.ts",
+      "GeneratorSript": "SearchFormForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "sform",
+      "GeneratorType": "01420-Sform.component.txt",
+      "GeneratorSript": "SearchFormForView.txt.t4"
+    },
+    {
+      "DestinationFolder": "interfaces",
+      "GeneratorType": "01430-Dlg.interface.ts",
+      "GeneratorSript": "InterfaceForDlg.ts.t4"
+    },
+    {
+      "DestinationFolder": "interfaces",
+      "GeneratorType": "01430-Dlg.interface.txt",
+      "GeneratorSript": "InterfaceForDlg.txt.t4"
+    },
+    {
+      "DestinationFolder": "sdlg",
+      "GeneratorType": "01440-Sdlg.component.css",
+      "GeneratorSript": "SearchDlgFormForView.css.t4"
+    },
+    {
+      "DestinationFolder": "sdlg",
+      "GeneratorType": "01440-Sdlg.component.html",
+      "GeneratorSript": "SearchDlgFormForView.html.t4"
+    },
+    {
+      "DestinationFolder": "sdlg",
+      "GeneratorType": "01440-Sdlg.component.ts",
+      "GeneratorSript": "SearchDlgFormForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "sdlg",
+      "GeneratorType": "01440-Sdlg.component.txt",
+      "GeneratorSript": "SearchDlgFormForView.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01450-S.module.ts",
+      "GeneratorSript": "SearchModuleForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01450-S.module.txt",
+      "GeneratorSript": "SearchModuleForView.txt.t4"
+    }
+  ]
+
+}

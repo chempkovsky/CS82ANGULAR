@@ -1,0 +1,82 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "ng add @angular/material",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "",
+    "ng generate library XXXXX-aform",
+    "",
+    "where XXXXX is a name of the selected ViewModel",
+    "",
+    "Please make sure that you selected [src\\lib] folder of the common-interfaces library !!!"
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "uform",
+      "GeneratorType": "01504-Uform.component.css",
+      "GeneratorSript": "UpdFormForView.css.t4"
+    },
+    {
+      "DestinationFolder": "uform",
+      "GeneratorType": "01504-Uform.component.html",
+      "GeneratorSript": "UpdFormForView.html.t4"
+    },
+    {
+      "DestinationFolder": "uform",
+      "GeneratorType": "01504-Uform.component.ts",
+      "GeneratorSript": "UpdFormForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "uform",
+      "GeneratorType": "01504-Uform.component.txt",
+      "GeneratorSript": "UpdFormForView.txt.t4"
+    },
+    {
+      "DestinationFolder": "udlg",
+      "GeneratorType": "01514-Udlg.interface.ts",
+      "GeneratorSript": "InterfaceForUdlg.ts.t4"
+    },
+    {
+      "DestinationFolder": "udlg",
+      "GeneratorType": "01514-Udlg.interface.txt",
+      "GeneratorSript": "InterfaceForUdlg.txt.t4"
+    },
+    {
+      "DestinationFolder": "udlg",
+      "GeneratorType": "01524-Udlg.component.css",
+      "GeneratorSript": "UpdDlgFormForView.css.t4"
+    },
+    {
+      "DestinationFolder": "udlg",
+      "GeneratorType": "01524-Udlg.component.html",
+      "GeneratorSript": "UpdDlgFormForView.html.t4"
+    },
+    {
+      "DestinationFolder": "udlg",
+      "GeneratorType": "01524-Udlg.component.ts",
+      "GeneratorSript": "UpdDlgFormForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "udlg",
+      "GeneratorType": "01524-Udlg.component.txt",
+      "GeneratorSript": "UpdDlgFormForView.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01554-U.module.ts",
+      "GeneratorSript": "uformModuleForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01554-U.module.txt",
+      "GeneratorSript": "uformModuleForView.txt.t4"
+    }
+  ]
+
+}
