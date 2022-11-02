@@ -6,11 +6,14 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
     bool localize = Context.Localize;
@@ -119,52 +122,76 @@
         FKViewsDict.Add(Model.ViewName);
     }
 
-    string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
-
-    string eventEmitterDataModelFolder  = "00018-event-emitter-data.interface.ts";
-    string menuItemDataModelFolder      = "00017-menu-item-data.interface.ts";
-    string eventEmitterPubModelFolder   = "00019-event-emitter-pub.interface.ts";
-    string itemHeightDataModelFolder    = "00016-item-height-data.interface.ts";
-
-    string filterModelFolder            = "00021-web-service-filter.interface.ts";
-    string filterDefModelFolder         = "00022-web-service-filter-def.interface.ts";
-    string filterOperatorModelFolder    = "00023-web-service-filter-operator.interface.ts";
-    string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
-    string filterComponentCssFolder     = "00025-web-service-filter.component.css";
-    string filterComponentHtmlFolder    = "00025-web-service-filter.component.html";
-    string filterComponentFolder        = "00025-web-service-filter.component.ts";
+    string lformCssFolder                           = "01600-Lform.component.css";
+    string lformHtmlFolder                          = "01600-Lform.component.html";
+    string lformComponentFolder                     = "01600-Lform.component.ts";
+    string componentClassName                       = GetComponentClassName(Model, lformComponentFolder);
+    string componentSelectorCommonPart              = GetComponentSelectorCommonPart(Model, lformComponentFolder);
 
 
-    string messageDialogInterfaceFolder = "00037-message-dialog.interface.ts";
-    string messageDialogComponentFolder = "00038-message-dialog.component.ts";
+    string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName               = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, lformComponentFolder);
 
+    string eventEmitterDataModelFolder              = "00018-event-emitter-data.interface.ts";
+    string eventEmitterDataModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterDataModelFolder, lformComponentFolder);
 
-    string viewInterfaceFolder          = "01100-.interface.ts";
-    string viewInterfacePageFolder      = "01200-Page.interface.ts";
-    string viewInterfaceFltFolder       = "01300-Filter.interface.ts";
-    string viewServiceFolder            = "01400-.service.ts";
+    string menuItemDataModelFolder                  = "00017-menu-item-data.interface.ts";
+    string menuItemDataModelClassName               = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, menuItemDataModelFolder, lformComponentFolder);
 
+    string eventEmitterPubModelFolder               = "00019-event-emitter-pub.interface.ts";
+    string eventEmitterPubModelClassName            = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, lformComponentFolder);
 
+    string itemHeightDataModelFolder                = "00016-item-height-data.interface.ts";
+    string itemHeightDataModelClassName             = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, itemHeightDataModelFolder, lformComponentFolder);
+    
+    string filterResultModelFolder                  = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName               = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, filterResultModelFolder, lformComponentFolder);
 
-    string sformComponentFolder         = "01420-Sform.component.ts";
+    string messageDialogInterfaceFolder             = "00037-message-dialog.interface.ts";
+    string messageDialogInterfaceName               = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, messageDialogInterfaceFolder, lformComponentFolder);
 
+    string messageDialogComponentFolder             = "00038-message-dialog.component.ts";
+    string messageDialogComponentClassName          = GetContextComponentClassNameWithAnglr(AngularJsonFile, Model, Context, messageDialogComponentFolder, lformComponentFolder);
 
-    string viewInterfaceVDlgFolder      = "01510-Vdlg.interface.ts";
-    string vdlgComponentFolder          = "01520-Vdlg.component.ts";
+    string viewInterfaceFolder                      = "01100-.interface.ts";
+    string viewInterfaceName                        = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, lformComponentFolder);
 
-    string viewInterfaceADlgFolder      = "01512-Adlg.interface.ts";
-    string adlgComponentFolder          = "01522-Adlg.component.ts";
+    string viewInterfacePageFolder                  = "01200-Page.interface.ts";
+    string viewInterfacePageName                    = GetInterfacePageNameWithAnglr(AngularJsonFile, Model, viewInterfacePageFolder, lformComponentFolder);
 
-    string viewInterfaceUDlgFolder      = "01514-Udlg.interface.ts";
-    string udlgComponentFolder          = "01524-Udlg.component.ts";
+    string viewInterfaceFltFolder                   = "01300-Filter.interface.ts";
+    string viewInterfaceFilterName                  = GetInterfaceFilterNameWithAnglr(AngularJsonFile, Model, viewInterfaceFltFolder, lformComponentFolder);
 
-    string viewInterfaceDDlgFolder      = "01516-Ddlg.interface.ts";
-    string ddlgComponentFolder          = "01526-Ddlg.component.ts";
+    string viewServiceFolder                        = "01400-.service.ts";
+    string serviceClassName                         = GetServiceClassNameWithAnglr(AngularJsonFile, Model, viewServiceFolder, lformComponentFolder);
 
+    string sformComponentFolder                     = "01420-Sform.component.ts";
+    string searchComponentClassName                 = GetComponentClassNameWithAnglr(AngularJsonFile, Model, sformComponentFolder, lformComponentFolder);
 
-    string lformCssFolder               = "01600-Lform.component.css";
-    string lformHtmlFolder              = "01600-Lform.component.html";
-    string lformComponentFolder         = "01600-Lform.component.ts";
+    string viewInterfaceVDlgFolder                  = "01510-Vdlg.interface.ts";
+    string viewInterfaceVDlgClassName               = GetInterfaceVDlgNameWithAnglr(AngularJsonFile, Model,  viewInterfaceVDlgFolder, lformComponentFolder);
+
+    string vdlgComponentFolder                      = "01520-Vdlg.component.ts";
+    string vdlgComponentClassName                   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, vdlgComponentFolder, lformComponentFolder);
+
+    string viewInterfaceADlgFolder                  = "01512-Adlg.interface.ts";
+    string viewInterfaceADlgClassName               = GetInterfaceADlgNameWithAnglr(AngularJsonFile, Model,  viewInterfaceADlgFolder, lformComponentFolder);
+
+    string adlgComponentFolder                      = "01522-Adlg.component.ts";
+    string adlgComponentClassName                   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, adlgComponentFolder, lformComponentFolder); 
+
+    string viewInterfaceUDlgFolder                  = "01514-Udlg.interface.ts";
+    string viewInterfaceUDlgClassName               = GetInterfaceUDlgNameWithAnglr(AngularJsonFile, Model,  viewInterfaceUDlgFolder, lformComponentFolder);
+
+    string udlgComponentFolder                      = "01524-Udlg.component.ts";
+    string udlgComponentClassName                   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, udlgComponentFolder, lformComponentFolder); 
+
+    string viewInterfaceDDlgFolder                  = "01516-Ddlg.interface.ts";
+    string viewInterfaceDDlgClassName               = GetInterfaceDDlgNameWithAnglr(AngularJsonFile, Model,  viewInterfaceDDlgFolder, lformComponentFolder);
+
+    string ddlgComponentFolder                      = "01526-Ddlg.component.ts";
+    string ddlgComponentClassName                   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, ddlgComponentFolder, lformComponentFolder); 
+
 
     string captionPropName              = "caption";
     string captionSelector              = "caption";
@@ -184,35 +211,7 @@
     string MatPaginatorPageSize         = "10";
     string MatPaginatorPageSizeOptions  = "[10, 25, 50, 100]";
 
-    string AppSettingServicePropName            = "appGlblSettings";
-    string appSettingServiceClassName           = GetCommonServiceClassName(Context, appSettingServiceFolder);
-
-
-    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, lformComponentFolder);
-
-    string serviceClassName = GetServiceClassName(Model, viewServiceFolder);
-    string componentClassName = GetComponentClassName(Model, lformComponentFolder);
-    string searchComponentClassName = GetComponentClassName(Model, sformComponentFolder);
-
-    string messageDialogComponentClassName = GetContextComponentClassName(Context, messageDialogComponentFolder);
-    string messageDialogInterfaceName = GetModelClassName(Context, messageDialogInterfaceFolder);
-
-    string filterModelClassName = GetModelClassName(Context, filterModelFolder);
-    string filterDefModelClassName = GetModelClassName(Context, filterDefModelFolder);
-    string filterOperatorModelClassName = GetModelClassName(Context, filterOperatorModelFolder);
-    string filterResultModelClassName = GetModelClassName(Context, filterResultModelFolder);
-    string filterComponentClassName = GetContextComponentClassName(Context, filterComponentFolder);
-
-    string eventEmitterDataModelClassName   = GetModelClassName(Context, eventEmitterDataModelFolder);
-    string menuItemDataModelClassName   = GetModelClassName(Context, menuItemDataModelFolder);
-    string eventEmitterPubModelClassName    = GetModelClassName(Context, eventEmitterPubModelFolder);
-    string itemHeightDataModelClassName   = GetModelClassName(Context, itemHeightDataModelFolder);
-
-
-    string vdlgComponentClassName = GetComponentClassName(Model, vdlgComponentFolder);
-    string adlgComponentClassName = GetComponentClassName(Model, adlgComponentFolder);
-    string udlgComponentClassName = GetComponentClassName(Model, udlgComponentFolder);
-    string ddlgComponentClassName = GetComponentClassName(Model, ddlgComponentFolder);
+    string AppSettingServicePropName    = "appGlblSettings";
 
 #>
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
@@ -226,30 +225,26 @@ import { MatSort, Sort } from '@angular/material/sort';
 import { MatRow } from '@angular/material/table';
 import { ProgressBarMode } from '@angular/material/progress-bar';
 
-
-import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, lformComponentFolder)#>';
-import { <#= filterModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterModelFolder, lformComponentFolder)#>';
-import { <#= filterDefModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterDefModelFolder, lformComponentFolder)#>';
-import { <#= filterOperatorModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterOperatorModelFolder, lformComponentFolder)#>';
-import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, lformComponentFolder)#>';
-// import { <#= filterComponentClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterComponentFolder, lformComponentFolder)#>';
-import { <#= searchComponentClassName #> } from '<#=  GetFolderName(Model, sformComponentFolder, lformComponentFolder) #>';
-import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, lformComponentFolder)#>';
-import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  menuItemDataModelFolder, lformComponentFolder)#>';
-import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Model, Context, eventEmitterPubModelFolder, lformComponentFolder)#>';
-import { <#= itemHeightDataModelClassName #> } from '<#= GetCommonFolderName(Model, Context, itemHeightDataModelFolder, lformComponentFolder)#>';
-import { <#= messageDialogInterfaceName #> } from '<#=  GetCommonFolderName(Model, Context,  messageDialogInterfaceFolder, lformComponentFolder)#>';
-import { <#= messageDialogComponentClassName #> } from '<#=  GetCommonFolderName(Model, Context,  messageDialogComponentFolder, lformComponentFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, lformComponentFolder)#>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterResultModelFolder, lformComponentFolder) #>';
+import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  eventEmitterDataModelFolder, lformComponentFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  menuItemDataModelFolder, lformComponentFolder)#>';
+import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, lformComponentFolder)#>';
+import { <#= itemHeightDataModelClassName #> } from '<#= GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context, itemHeightDataModelFolder, lformComponentFolder)#>';
+import { <#= messageDialogInterfaceName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  messageDialogInterfaceFolder, lformComponentFolder)#>';
+import { <#= messageDialogComponentClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  messageDialogComponentFolder, lformComponentFolder)#>';
+import { <#= searchComponentClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, sformComponentFolder, lformComponentFolder) #>';
 
 
 <# 
     {
         string viewNm = Model.ViewName;
 #>
-import { <#= GetInterfaceName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, lformComponentFolder, Context, viewNm, viewInterfaceFolder) #>';
-import { <#= GetInterfacePageName(Model) #> } from '<#= GetCrossComponentFolderName(Model, lformComponentFolder, Context, viewNm, viewInterfacePageFolder) #>';
-import { <#= GetInterfaceFilterName(Model) #> } from '<#=  GetCrossComponentFolderName(Model, lformComponentFolder, Context, viewNm, viewInterfaceFltFolder) #>';
-import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCrossComponentFolderName(Model, lformComponentFolder, Context, viewNm, viewServiceFolder) #>';
+import { <#= viewInterfaceName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, lformComponentFolder) #>';
+// import { <#= viewInterfacePageName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfacePageFolder, lformComponentFolder) #>';
+// import { <#= viewInterfaceFilterName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFltFolder, lformComponentFolder) #>';
+import { <#= serviceClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewServiceFolder, lformComponentFolder) #>';
+
 <# 
     }
 #>
@@ -257,26 +252,26 @@ import { <#= GetServiceClassName(Model, viewServiceFolder) #> } from '<#=  GetCr
 <#
     if(Model.IsWebApiSelectOneByPrimarykey) {
 #>
-import { <#=  GetInterfaceVDlgName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceVDlgFolder, lformComponentFolder)#>';
-import { <#=  vdlgComponentClassName #> } from '<#= GetFolderName(Model, vdlgComponentFolder, lformComponentFolder) #>';
+import { <#=  viewInterfaceVDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceVDlgFolder, lformComponentFolder)#>';
+import { <#=  vdlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, vdlgComponentFolder, lformComponentFolder) #>';
 <#
     }
     if(Model.IsWebApiAdd) {
 #>
-import { <#=  GetInterfaceADlgName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceADlgFolder, lformComponentFolder)#>';
-import { <#=  adlgComponentClassName #> } from '<#= GetFolderName(Model, adlgComponentFolder, lformComponentFolder) #>';
+import { <#=  viewInterfaceADlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceADlgFolder, lformComponentFolder)#>';
+import { <#=  adlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, adlgComponentFolder, lformComponentFolder) #>';
 <#
     }
     if(Model.IsWebApiUpdate) {
 #>
-import { <#=  GetInterfaceUDlgName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceUDlgFolder, lformComponentFolder)#>';
-import { <#=  udlgComponentClassName #> } from '<#= GetFolderName(Model, udlgComponentFolder, lformComponentFolder) #>';
+import { <#=  viewInterfaceUDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceUDlgFolder, lformComponentFolder)#>';
+import { <#=  udlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, udlgComponentFolder, lformComponentFolder) #>';
 <#
     }
     if(Model.IsWebApiDelete) {
 #>
-import { <#=  GetInterfaceDDlgName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceDDlgFolder, lformComponentFolder)#>';
-import { <#=  ddlgComponentClassName #> } from '<#= GetFolderName(Model, ddlgComponentFolder, lformComponentFolder) #>';
+import { <#=  viewInterfaceDDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceDDlgFolder, lformComponentFolder)#>';
+import { <#=  ddlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, ddlgComponentFolder, lformComponentFolder) #>';
 <#
     }
 #>
@@ -319,8 +314,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 
     @Input('<#= showMultiSelectedRowSelector #>') <#= showMultiSelectedRowPropName #>: boolean = true;
 
-    @Output('<#= multiSelectedRowSelector #>') <#= multiSelectedRowPropName #>: EventEmitter<Array<<#= GetInterfaceName(Model) #>>> = new EventEmitter<Array<<#= GetInterfaceName(Model) #>>>();
-    <#= onMultiSelectedRowPropName #>(e: Array<<#= GetInterfaceName(Model) #>>): void {
+    @Output('<#= multiSelectedRowSelector #>') <#= multiSelectedRowPropName #>: EventEmitter<Array<<#= viewInterfaceName #>>> = new EventEmitter<Array<<#= viewInterfaceName #>>>();
+    <#= onMultiSelectedRowPropName #>(e: Array<<#= viewInterfaceName #>>): void {
         this.<#= multiSelectedRowPropName #>.emit(e);
     }
 
@@ -382,8 +377,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     @Input('<#= HiddenFilterSelector #>') <#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>>|any = [];
 
 
-    public <#= currentRowPropName #>: <#= GetInterfaceName(Model) #> | null = null;
-    @Output('<#= selectedRowSelector #>') <#= selectedRowPropName #>: EventEmitter<<#= GetInterfaceName(Model) #>> = new EventEmitter<<#= GetInterfaceName(Model) #>>();
+    public <#= currentRowPropName #>: <#= viewInterfaceName #> | null = null;
+    @Output('<#= selectedRowSelector #>') <#= selectedRowPropName #>: EventEmitter<<#= viewInterfaceName #>> = new EventEmitter<<#= viewInterfaceName #>>();
 
     protected _<#= CanViewPropName #>: boolean = true;
     @Input('<#= CanViewSelector #>') 
@@ -527,16 +522,16 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     }    
 
 
-    <#= OnSelectRowMethodName #>(e: <#= GetInterfaceName(Model) #>|any) {
+    <#= OnSelectRowMethodName #>(e: <#= viewInterfaceName #>|any) {
         this.<#= selectedRowPropName #>.emit(e);
     }
 
 
-    onView(e: <#= GetInterfaceName(Model) #>) {
+    onView(e: <#= viewInterfaceName #>) {
 <#
     if(Model.IsWebApiSelectOneByPrimarykey) {
 #>
-        let locdata: <#=  GetInterfaceVDlgName(Model) #> = {
+        let locdata: <#=  viewInterfaceVDlgClassName #> = {
             title: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'],
             <#= HiddenFilterPropName #>: this.<#= HiddenFilterPropName #>,
             <#= FormControlModelPropName #>: e,
@@ -561,7 +556,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 <#
     if(Model.IsWebApiAdd) {
 #>
-        let locdata: <#=  GetInterfaceADlgName(Model) #> = {
+        let locdata: <#=  viewInterfaceADlgClassName #> = {
             title: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'],
             <#= HiddenFilterPropName #>: this.<#= HiddenFilterPropName #>,
             <#= FormControlModelPropName #>: null,
@@ -603,11 +598,11 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 #>
     }
 
-    onEdit(e: <#= GetInterfaceName(Model) #>) {
+    onEdit(e: <#= viewInterfaceName #>) {
 <#
     if(Model.IsWebApiUpdate) {
 #>
-        let locdata: <#=  GetInterfaceUDlgName(Model) #> = {
+        let locdata: <#=  viewInterfaceUDlgClassName #> = {
             title: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'],
             <#= HiddenFilterPropName #>: this.<#= HiddenFilterPropName #>,
             <#= FormControlModelPropName #>: e,
@@ -636,11 +631,11 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 #>
     }
 
-    onDelete(e: <#= GetInterfaceName(Model) #> , sender: <#= searchComponentClassName #> ) {
+    onDelete(e: <#= viewInterfaceName #> , sender: <#= searchComponentClassName #> ) {
 <#
     if(Model.IsWebApiDelete) {
 #>
-        let locdata: <#=  GetInterfaceDDlgName(Model) #> = {
+        let locdata: <#=  viewInterfaceDDlgClassName #> = {
             title: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'],
             <#= HiddenFilterPropName #>: this.<#= HiddenFilterPropName #>,
             <#= FormControlModelPropName #>: e,
@@ -706,12 +701,12 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         dialogRef.afterClosed().subscribe(async rslt => {
             if (typeof rslt === 'undefined') return;
             if (rslt === null) return;
-            let currRowsCp: Array<<#= GetInterfaceName(Model) #>> = sender.<#= currentMultiRowPropName #>.slice();
-            let deletedRows: Array<<#= GetInterfaceName(Model) #>> = [];
+            let currRowsCp: Array<<#= viewInterfaceName #>> = sender.<#= currentMultiRowPropName #>.slice();
+            let deletedRows: Array<<#= viewInterfaceName #>> = [];
             for(let row of currRowsCp) {
                 try {
-                    // let data: <#= GetInterfaceName(Model) #>  =  
-                    await firstValueFrom<<#= GetInterfaceName(Model) #>>(this.<#= formRootService #>.<#= DeleteOneMethodName #>(<# 
+                    // let data: <#= viewInterfaceName #>  =  
+                    await firstValueFrom<<#= viewInterfaceName #>>(this.<#= formRootService #>.<#= DeleteOneMethodName #>(<# 
                     {
                         int counter = 0;
                         List<ModelViewPropertyOfVwSerializable> primKeys = GetPrimaryKeyProps(Context, Model.ViewName);
@@ -726,12 +721,12 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 }
             }
             sender.deselectRows(deletedRows);
-            deletedRows.forEach((r: <#= GetInterfaceName(Model) #>) => {
+            deletedRows.forEach((r: <#= viewInterfaceName #>) => {
                 let i: number = sender.dataSource.indexOf(r); 
                 if(i > -1) sender.dataSource.splice(i, 1);
             });
             sender.dataSource = sender.dataSource.slice(0);
-            if ((deletedRows.indexOf( sender.<#= currentRowPropName #>  as <#= GetInterfaceName(Model) #>) > -1) && (sender.dataSource.length > 0)) sender.<#= OnSelectRowMethodName #>(sender.dataSource[0]);
+            if ((deletedRows.indexOf( sender.<#= currentRowPropName #>  as <#= viewInterfaceName #>) > -1) && (sender.dataSource.length > 0)) sender.<#= OnSelectRowMethodName #>(sender.dataSource[0]);
         });
 <#
     }

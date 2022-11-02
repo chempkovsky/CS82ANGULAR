@@ -6,31 +6,34 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
-    string viewInterfaceFolder      = "01100-.interface.ts";
-    string viewInterfaceDlgFolder   = "01430-Dlg.interface.ts";
-    string lformComponentFolder     = "01600-Lform.component.ts";
-    string ldlgCssFolder            = "01620-Ldlg.component.css";
-    string ldlgHtmlFolder           = "01620-Ldlg.component.html";
-    string ldlgComponentFolder      = "01620-Ldlg.component.ts";
+    string ldlgCssFolder                = "01620-Ldlg.component.css";
+    string ldlgHtmlFolder               = "01620-Ldlg.component.html";
+    string ldlgComponentFolder          = "01620-Ldlg.component.ts";
+    string componentSelectorCommonPart  = GetComponentSelectorCommonPart(Model, ldlgComponentFolder);
+    string componentClassName           = GetComponentClassName(Model, ldlgComponentFolder);
 
-    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, ldlgComponentFolder);
-    string componentClassName = GetComponentClassName(Model, ldlgComponentFolder);
+    string viewInterfaceFolder          = "01100-.interface.ts";
+    string viewInterfaceName            = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, ldlgComponentFolder);
 
+    string viewInterfaceDlgFolder       = "01430-Dlg.interface.ts";
+    string viewInterfaceDlgClassName    = GetInterfaceDlgNameWithAnglr(AngularJsonFile, Model, viewInterfaceDlgFolder, ldlgComponentFolder);
 #>
 
 import { Component,  Input, Output, EventEmitter, ViewChild, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
-import { <#= GetInterfaceDlgName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceDlgFolder, ldlgComponentFolder)#>';
-import { <#= GetComponentClassName(Model, lformComponentFolder) #> } from '<#=  GetFolderName(Model, lformComponentFolder, ldlgComponentFolder) #>';
-import { <#= GetInterfaceName(Model) #> } from '<#=  GetFolderName(Model, viewInterfaceFolder, lformComponentFolder) #>';
+import { <#= viewInterfaceName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, ldlgComponentFolder) #>';
+import { <#= viewInterfaceDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceDlgFolder, ldlgComponentFolder) #>';
 
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
@@ -38,9 +41,9 @@ import { <#= GetInterfaceName(Model) #> } from '<#=  GetFolderName(Model, viewIn
   styleUrls: ['<#= GetFolderName(Model, ldlgCssFolder, ldlgComponentFolder)#>.css']
 })
 export class <#= componentClassName #> { 
-    constructor(public dialogRef: MatDialogRef<<#= componentClassName #>>, @Inject(MAT_DIALOG_DATA) public data: <#= GetInterfaceDlgName(Model) #> ) { }
-    currentRow: <#= GetInterfaceName(Model) #> |null = null;
-    onSelectedRow(row:  <#= GetInterfaceName(Model) #> | null) {
+    constructor(public dialogRef: MatDialogRef<<#= componentClassName #>>, @Inject(MAT_DIALOG_DATA) public data: <#= viewInterfaceDlgClassName #> ) { }
+    currentRow: <#= viewInterfaceName #> |null = null;
+    onSelectedRow(row:  <#= viewInterfaceName #> | null) {
         this.currentRow = row;
     }
     onCancel() {

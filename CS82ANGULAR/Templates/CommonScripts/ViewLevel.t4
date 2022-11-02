@@ -1,5 +1,4 @@
 ﻿<#+
-
         AngularProject GetAngularProjectByRefItem(AngularJson anglJson, CommonStaffSerializable refItem)
         {
             if ((refItem is null) || (anglJson is null)) return null;
@@ -6378,5 +6377,4 @@
             }
             return "[sortable]=\"false\"";
         }
-
 #>
