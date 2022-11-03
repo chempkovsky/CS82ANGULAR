@@ -6,31 +6,31 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
-    string raFormModuleFolder                       = "01952-Ra.module.ts";
-    string raComponentRoutingModuleFolder           = "01962-Ra.routing.module.ts";
     string raComponentLazyRoutingModuleFolder       = "01972-Ra-lazy.routing.module.ts";
-
-    string raFormModuleClassName                    = GetModuleClassName(Model, raFormModuleFolder);
-    string raComponentRoutingModuleClassName        = GetModuleClassName(Model, raComponentRoutingModuleFolder);
     string raComponentLazyRoutingModuleClassName    = GetModuleClassName(Model, raComponentLazyRoutingModuleFolder);
 
+    string raFormModuleFolder                       = "01952-Ra.module.ts";
+    string raFormModuleClassName                    = GetModuleClassNameWithAnglr(AngularJsonFile, Model, raFormModuleFolder, raComponentLazyRoutingModuleFolder);
+
+    string raComponentRoutingModuleFolder           = "01962-Ra.routing.module.ts";
+    string raComponentRoutingModuleClassName        = GetModuleClassNameWithAnglr(AngularJsonFile, Model, raComponentRoutingModuleFolder, raComponentLazyRoutingModuleFolder);
 #>
-
-
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
-import { <#= raFormModuleClassName #> } from '<#= GetFolderName(Model, raFormModuleFolder, raComponentLazyRoutingModuleFolder) #>';
-import { <#= raComponentRoutingModuleClassName #> } from '<#= GetFolderName(Model, raComponentRoutingModuleFolder, raComponentLazyRoutingModuleFolder) #>';
-
+import { <#= raFormModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, raFormModuleFolder, raComponentLazyRoutingModuleFolder) #>';
+import { <#= raComponentRoutingModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, raComponentRoutingModuleFolder, raComponentLazyRoutingModuleFolder) #>';
 
 @NgModule({
     declarations: [

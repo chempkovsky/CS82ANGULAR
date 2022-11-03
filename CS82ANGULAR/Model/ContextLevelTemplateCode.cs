@@ -986,35 +986,7 @@ namespace CS82ANGULAR.Model
                     }
                 }
             }
-            string[] refFolders = new string[] { };
-            if (!string.IsNullOrEmpty(refItem.FileFolder))
-            {
-                refFolders = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-            }
-            string[] currFolders = new string[] { };
-            if (!string.IsNullOrEmpty(curItem.FileFolder))
-            {
-                currFolders = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-            }
-            int refLen = refFolders.Length;
-            int currLen = currFolders.Length;
-            int minLen = refLen < currLen ? refLen : currLen;
-            int cnt = 0;
-            for (int i = 0; i < minLen; i++)
-            {
-                if (!refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase)) break;
-                cnt++;
-            }
-            if (currLen > cnt)
-            {
-                result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
-            }
-            if (refLen > cnt)
-            {
-                result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
-            }
-            result += refItem.FileName;
-            return result;
+            return GetModuleComponentFolderName(model, currFolder, refFolder);
         }
         string GetEntityClassName(ModelViewSerializable model, string fileType)
         {
@@ -1063,6 +1035,55 @@ namespace CS82ANGULAR.Model
             }
             return DefaultProjectNameSpace + "." + result;
         }
+        string GetCrossComponentFolderNameEx(ModelViewSerializable model, string currFolder, ModelViewSerializable refModel, string refFolder)
+        {
+            string result = "./";
+            if ((model == null) || string.IsNullOrEmpty(currFolder) || (refModel == null) || string.IsNullOrEmpty(refFolder))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (refModel.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                refModel.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            string[] refFolders = new string[] { };
+            if (!string.IsNullOrEmpty(refItem.FileFolder))
+            {
+                refFolders = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+            }
+            string[] currFolders = new string[] { };
+            if (!string.IsNullOrEmpty(curItem.FileFolder))
+            {
+                currFolders = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+            }
+            int refLen = refFolders.Length;
+            int currLen = currFolders.Length;
+            int minLen = refLen < currLen ? refLen : currLen;
+            int cnt = 0;
+            for (int i = 0; i < minLen; i++)
+            {
+                if (!refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase)) break;
+                cnt++;
+            }
+            if (currLen > cnt)
+            {
+                result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
+            }
+            if (refLen > cnt)
+            {
+                result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+            }
+            result += refItem.FileName;
+            return result;
+        }
         string GenerateLoadChildrenImportWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
         {
             string result = "import('').then(m => m.)";
@@ -1094,7 +1115,10 @@ namespace CS82ANGULAR.Model
                     } else if (refAngularProject.ProjectType == "application")
                     {
                         string aliasNm = null;
-                        string appFl = (".\\" + refAngularProject.SourceRoot + "\\" + refItem.FileFolder + "\\" + refItem.FileName).Replace("\\", "/");
+                        string appFl = Path.Combine(refItem.FileProject, refItem.FileFolder, refItem.FileName).Replace(anglJson.AngularJsonPath, "");
+                        if (!appFl.StartsWith("\\")) appFl = "\\" + appFl;
+                        appFl = ("." + appFl).Replace("\\", "/");
+
                         if (refAngularProject.WebpackConfigJson != null)
                         {
                             if (refAngularProject.WebpackConfigJson.exposeItems != null)
@@ -1108,12 +1132,12 @@ namespace CS82ANGULAR.Model
                                 }
                             }
                         }
-                        if(string.IsNullOrEmpty(aliasNm)) aliasNm = GetModuleFileName(model, fileType);
+                        if(string.IsNullOrEmpty(aliasNm)) aliasNm = appFl;
                         return "loadRemoteModule({type: 'manifest', remoteName: '" + refAngularProject.ProjectName + "', exposedModule: '"+ aliasNm + "'}).then(m => m." + GetModuleClassName(model, fileType) + ")";
                     }
                 }
             }
-            return "import('" + GetModuleFileName(model, fileType) + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
+            return "import('" + GetCrossComponentFolderNameEx(model, currFolder, model, fileType) + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
         }
     }
 }

@@ -6,15 +6,29 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
     
-
+    string rLazyRoutesFolder            = "01980-R-lazy.routes.ts";
+    CommonStaffSerializable refItem     = null;
+    if(!(Model.CommonStaffs == null)) {
+        refItem = Model.CommonStaffs.Where(c => c.FileType == rLazyRoutesFolder).FirstOrDefault();
+    }
+    AngularProject currAngularPrj = GetAngularProjectByRefItem(AngularJsonFile, refItem);
+    if(currAngularPrj is null) {
+        throw new Exception("Critical error: Couldn't find Angular Project to generate code!");
+    }
+    if(currAngularPrj.ProjectType != "application") {
+        throw new Exception("Critical error: The folder you choose to generate the code must belong to an application-type project.");
+    }
 
     string HiddenFilterPrefix           = "hf";
     string IdPrefix                     = "id";
@@ -156,11 +170,31 @@
         ModelViewSerializable aModel = node.Item1;
         int CurrDepth = node.Item3 + 1;
         List<ModelViewPropertyOfVwSerializable> aModelPrincipals = GetModelPrimaryKeyProps(aModel);
-        string fileNm_rl = GeFileNameWithoutExt(aModel, rlLazyModuleFolder);
-        string fileNm_rv = GeFileNameWithoutExt(aModel, rvLazyModuleFolder);
-        string fileNm_ra = GeFileNameWithoutExt(aModel, raLazyModuleFolder);
-        string fileNm_ru = GeFileNameWithoutExt(aModel, ruLazyModuleFolder);
-        string fileNm_rd = GeFileNameWithoutExt(aModel, rdLazyModuleFolder);
+
+        string rlLazyModuleImport = null;
+        if(aModel.CommonStaffs.Any(c => c.FileType == rlLazyModuleFolder)) {
+            rlLazyModuleImport = GenerateLoadChildrenImportWithAnglrEx(AngularJsonFile, aModel, rlLazyModuleFolder, currAngularPrj);
+        }
+
+        string rvLazyModuleImport = null;
+        if(aModel.CommonStaffs.Any(c => c.FileType == rvLazyModuleFolder)) {
+            rvLazyModuleImport = GenerateLoadChildrenImportWithAnglrEx(AngularJsonFile, aModel, rvLazyModuleFolder, currAngularPrj);
+        }
+
+        string raLazyModuleImport = null;
+        if(aModel.CommonStaffs.Any(c => c.FileType == raLazyModuleFolder)) {
+            rvLazyModuleImport = GenerateLoadChildrenImportWithAnglrEx(AngularJsonFile, aModel, raLazyModuleFolder, currAngularPrj);
+        }
+
+        string ruLazyModuleImport = null;
+        if(aModel.CommonStaffs.Any(c => c.FileType == ruLazyModuleFolder)) {
+            ruLazyModuleImport = GenerateLoadChildrenImportWithAnglrEx(AngularJsonFile, aModel, ruLazyModuleFolder, currAngularPrj);
+        }
+
+        string rdLazyModuleImport = null;
+        if(aModel.CommonStaffs.Any(c => c.FileType == rdLazyModuleFolder)) {
+            rdLazyModuleImport = GenerateLoadChildrenImportWithAnglrEx(AngularJsonFile, aModel, rdLazyModuleFolder, currAngularPrj);
+        }
         
 #>
 
@@ -171,15 +205,15 @@
 <#
 
         if(aModel.IsWebApiSelectManyWithPagination) {
-            if(!string.IsNullOrEmpty(fileNm_rl)  && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rlLazyModuleFolder)))) {
+            if(!string.IsNullOrEmpty(rlLazyModuleImport)  && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rlLazyModuleFolder)))) {
 
 
 
                 if(aModel.IsWebApiSelectOneByPrimarykey) {
-                    if(!string.IsNullOrEmpty(fileNm_rv) && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rvLazyModuleFolder)))) {
+                    if(!string.IsNullOrEmpty(rvLazyModuleImport) && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rvLazyModuleFolder)))) {
 #>
     { path: '<#= node.Item2 + "/" + VPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
-        loadChildren: () => import('<#= fileNm_rv #>').then(m => m.<#= GetModuleClassName(aModel, rvLazyModuleFolder) #>),
+        <#= rvLazyModuleImport #>,
         data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'v', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'View <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>', <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
@@ -202,10 +236,10 @@
 
 
                 if(aModel.IsWebApiAdd) {
-                    if(!string.IsNullOrEmpty(fileNm_ra)  && (!string.IsNullOrEmpty( GetModuleClassName(aModel, raLazyModuleFolder)))) {
+                    if(!string.IsNullOrEmpty(raLazyModuleImport)  && (!string.IsNullOrEmpty( GetModuleClassName(aModel, raLazyModuleFolder)))) {
 #>
     { path: '<#= node.Item2 + "/" + APrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() #>', 
-        loadChildren: () => import('<#= fileNm_ra #>').then(m => m.<#= GetModuleClassName(aModel, raLazyModuleFolder) #>),
+        <#= raLazyModuleImport #>,
         data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'a', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'Add <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
@@ -228,10 +262,10 @@
 
 
                 if(aModel.IsWebApiUpdate) {
-                    if(!string.IsNullOrEmpty(fileNm_ru)  && (!string.IsNullOrEmpty( GetModuleClassName(aModel, ruLazyModuleFolder)))) {
+                    if(!string.IsNullOrEmpty(ruLazyModuleImport)  && (!string.IsNullOrEmpty( GetModuleClassName(aModel, ruLazyModuleFolder)))) {
 #>
     { path: '<#= node.Item2 + "/" + UPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
-        loadChildren: () => import('<#= fileNm_ru #>').then(m => m.<#= GetModuleClassName(aModel, ruLazyModuleFolder) #>),
+        <#= ruLazyModuleImport #>,
         data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'u', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'Update <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
@@ -254,10 +288,10 @@
 
 
                 if(aModel.IsWebApiDelete) {
-                    if(!string.IsNullOrEmpty(fileNm_rd)  && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rdLazyModuleFolder)))) {
+                    if(!string.IsNullOrEmpty(rdLazyModuleImport)  && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rdLazyModuleFolder)))) {
 #>
     { path: '<#= node.Item2 + "/" + DPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
-        loadChildren: () => import('<#= fileNm_rd #>').then(m => m.<#= GetModuleClassName(aModel, rdLazyModuleFolder) #>),
+        <#= rdLazyModuleImport #>
         data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'd', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'Delete <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
@@ -280,7 +314,7 @@
                 if(node.Item3 > 1) {
 #>
     { path: '<#= node.Item2 #>', 
-        loadChildren: () => import('<#= fileNm_rl #>').then(m => m.<#= GetModuleClassName(aModel, rlLazyModuleFolder) #>),
+        <#= rlLazyModuleImport #>,
         data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true,  <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, /*  <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + node.Item3.ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
@@ -288,7 +322,7 @@
                 } else {
 #>
     { path: '<#= node.Item2 #>', 
-        loadChildren: () => import('<#= fileNm_rl #>').then(m => m.<#= GetModuleClassName(aModel, rlLazyModuleFolder) #>),
+        <#= rlLazyModuleImport #>,
         data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true,  <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, /* <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#

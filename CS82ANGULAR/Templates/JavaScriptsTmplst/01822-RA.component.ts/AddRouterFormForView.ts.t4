@@ -6,11 +6,14 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
     bool localize = Context.Localize;
@@ -58,44 +61,53 @@
     string frasesPropName                       = "frases";
 
 
-    string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
-    string eventEmitterDataModelFolder  = "00018-event-emitter-data.interface.ts";
-    string menuItemDataModelFolder      = "00017-menu-item-data.interface.ts";
-    string eventEmitterPubModelFolder   = "00019-event-emitter-pub.interface.ts";
-    string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
-    string viewInterfaceFolder          = "01100-.interface.ts";
-    string viewServiceFolder            = "01400-.service.ts";
+    string raCssFolder                          = "01822-RA.component.css";
+    string raHtmlFolder                         = "01822-RA.component.html";
+    string raComponentFolder                    = "01822-RA.component.ts";
+    string componentClassName                   = GetComponentClassName(Model, raComponentFolder);
+    string componentSelectorCommonPart          = GetComponentSelectorCommonPart(Model, raComponentFolder);
 
-    string aformComponentFolder         = "01502-Aform.component.ts";
+    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName           = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, raComponentFolder);
 
-    string raCssFolder               = "01822-RA.component.css";
-    string raHtmlFolder              = "01822-RA.component.html";
-    string raComponentFolder         = "01822-RA.component.ts";
+    string eventEmitterDataModelFolder          = "00018-event-emitter-data.interface.ts";
+    string eventEmitterDataModelClassName       = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterDataModelFolder, raComponentFolder);
+
+    string menuItemDataModelFolder              = "00017-menu-item-data.interface.ts";
+    string menuItemDataModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, menuItemDataModelFolder, raComponentFolder);
+
+    string eventEmitterPubModelFolder           = "00019-event-emitter-pub.interface.ts";
+    string eventEmitterPubModelClassName        = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, raComponentFolder);
+
+    string filterResultModelFolder              = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, filterResultModelFolder, raComponentFolder);
+
+    string viewInterfaceFolder                  = "01100-.interface.ts";
+    string viewInterfaceName                    = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, raComponentFolder);
+
+    string viewServiceFolder                    = "01400-.service.ts";
+    string serviceClassName                     = GetServiceClassNameWithAnglr(AngularJsonFile, Model, viewServiceFolder, raComponentFolder);
+
+    string aformComponentFolder                 = "01502-Aform.component.ts";
+    string aformComponentClassName              = GetComponentClassNameWithAnglr(AngularJsonFile, Model, aformComponentFolder, raComponentFolder);
 
 
-    string eventEmitterDataModelClassName   = GetModelClassName(Context, eventEmitterDataModelFolder);
-    string menuItemDataModelClassName   = GetModelClassName(Context, menuItemDataModelFolder);
-    string eventEmitterPubModelClassName    = GetModelClassName(Context, eventEmitterPubModelFolder);
-
-    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, raComponentFolder);
-    string componentClassName = GetComponentClassName(Model, raComponentFolder);
-    string appSettingServiceClassName = GetCommonServiceClassName(Context, appSettingServiceFolder);
-    string serviceClassName = GetServiceClassName(Model, viewServiceFolder);
-    string filterResultModelClassName = GetModelClassName(Context, filterResultModelFolder);
     List<ModelViewPropertyOfVwSerializable> primKeys= GetModelPrimaryKeyProps(Model);
 #>
 
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, Inject } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap, UrlSegment, ActivatedRouteSnapshot } from '@angular/router';
 
-import { <#= GetComponentClassName(Model, aformComponentFolder) #> } from '<#=  GetFolderName(Model, aformComponentFolder, raComponentFolder) #>';
-import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, raComponentFolder)#>';
-import { <#= serviceClassName #> } from '<#= GetFolderName(Model, viewServiceFolder, raComponentFolder) #>';
-import { <#= GetInterfaceName(Model) #> } from '<#= GetFolderName(Model, viewInterfaceFolder, raComponentFolder)#>';
-import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  filterResultModelFolder, raComponentFolder)#>';
-import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, raComponentFolder)#>';
-import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  menuItemDataModelFolder, raComponentFolder)#>';
-import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Model, Context, eventEmitterPubModelFolder, raComponentFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, raComponentFolder)#>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterResultModelFolder, raComponentFolder) #>';
+import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  eventEmitterDataModelFolder, raComponentFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  menuItemDataModelFolder, raComponentFolder)#>';
+import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, raComponentFolder)#>';
+
+import { <#= viewInterfaceName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, raComponentFolder) #>';
+import { <#= serviceClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewServiceFolder, raComponentFolder) #>';
+import { <#= aformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, aformComponentFolder, raComponentFolder) #>';
+
 
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
@@ -131,9 +143,9 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     }
     <#= HiddenFilterPrefix #>: string = '<#= HiddenFilterPrefix + "1" #>';
     <#= DepthParamName #>: number = 1;
-    @ViewChild(<#= GetComponentClassName(Model, aformComponentFolder) #>) childForm: <#= GetComponentClassName(Model, aformComponentFolder) #> | any;
+    @ViewChild(<#= aformComponentClassName #>) childForm: <#= aformComponentClassName #> | any;
     <#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
-    <#= FormControlModelPropName #>: <#= GetInterfaceName(Model) #> | null = null;
+    <#= FormControlModelPropName #>: <#= viewInterfaceName #> | null = null;
     constructor(protected route: ActivatedRoute, protected router: Router, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, protected <#= formRootService #>: <#= serviceClassName #>) { }
     <#= IsDetailPropName #>: boolean = false;
     ngOnInit() {
@@ -172,7 +184,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
         }
         this.<#= HiddenFilterPropName #> = lhf;
     }
-    <#= OnAfterSubmitMethodName #>(newVal: <#= GetInterfaceName(Model) #>) {
+    <#= OnAfterSubmitMethodName #>(newVal: <#= viewInterfaceName #>) {
 <#
         if(primKeys != null) {
 #>      

@@ -6,20 +6,38 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
+//    string rlFormModuleFolder           = "01958-Rl.module.ts";
+//    string rvFormModuleFolder           = "01950-Rv.module.ts";
+    string raFormModuleFolder           = "01952-Ra.module.ts";
+//    string ruFormModuleFolder           = "01954-Ru.module.ts";
+//    string rdFormModuleFolder           = "01956-Rd.module.ts";
+
+    string rvFormModuleClassName        = null;//GetModuleClassName(Model, rvFormModuleFolder);
+    string raFormModuleClassName        = GetModuleClassName(Model, raFormModuleFolder);
+    string ruFormModuleClassName        = null;//GetModuleClassName(Model, ruFormModuleFolder);
+    string rdFormModuleClassName        = null;//GetModuleClassName(Model, rdFormModuleFolder);
+    string rlFormModuleClassName        = null;//GetModuleClassName(Model, rlFormModuleFolder);
 
     string materialModuleFolder         = "00010-app-material.module.ts";
+    string materialModuleClassName      = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, materialModuleFolder, raFormModuleFolder);
+
     string flexModuleFolder             = "00011-app-flex-layout.module.ts";
-    string filterModuleFolder           = "00050-web-service-filter.module.ts";
+    string flexModuleClassName          = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, flexModuleFolder, raFormModuleFolder);
 
 
     string searchModuleFolder           = "01450-S.module.ts";
+    string searchModuleClassName        = GetModuleClassNameWithAnglr(AngularJsonFile, Model, searchModuleFolder, raFormModuleFolder);
+
     string viewformModuleFolder         = "01550-V.module.ts";
     string addformModuleFolder          = "01552-A.module.ts";
     string updformModuleFolder          = "01554-U.module.ts";
@@ -33,34 +51,18 @@
     string rlistComponentFolder         = "01920-Rlist.component.ts";
 
 
-//    string rlFormModuleFolder           = "01958-Rl.module.ts";
-//    string rvFormModuleFolder           = "01950-Rv.module.ts";
-    string raFormModuleFolder           = "01952-Ra.module.ts";
-//    string ruFormModuleFolder           = "01954-Ru.module.ts";
-//    string rdFormModuleFolder           = "01956-Rd.module.ts";
 
-    string flexModuleClassName          = GetContextModuleClassName(Context, flexModuleFolder);
-    string materialModuleClassName      = GetContextModuleClassName(Context, materialModuleFolder);
-    string filterModuleClassName        = GetContextModuleClassName(Context, filterModuleFolder);
-
-    string searchModuleClassName        = GetModuleClassName(Model, searchModuleFolder);
 
     string viewformModuleClassName      = null;//GetModuleClassName(Model, viewformModuleFolder);
-    string addformModuleClassName       = GetModuleClassName(Model, addformModuleFolder);
+    string addformModuleClassName       = GetModuleClassNameWithAnglr(AngularJsonFile, Model, addformModuleFolder, raFormModuleFolder);
     string updformModuleClassName       = null;//GetModuleClassName(Model, updformModuleFolder);
     string delformModuleClassName       = null;//GetModuleClassName(Model, delformModuleFolder);
 
-    string rvFormModuleClassName        = null;//GetModuleClassName(Model, rvFormModuleFolder);
-    string raFormModuleClassName        = GetModuleClassName(Model, raFormModuleFolder);
-    string ruFormModuleClassName        = null;//GetModuleClassName(Model, ruFormModuleFolder);
-    string rdFormModuleClassName        = null;//GetModuleClassName(Model, rdFormModuleFolder);
-    string rlFormModuleClassName        = null;//GetModuleClassName(Model, rlFormModuleFolder);
-
-    string rvComponentClassName = null;//GetComponentClassName(Model, rvComponentFolder);
-    string raComponentClassName = GetComponentClassName(Model, raComponentFolder);
-    string ruComponentClassName = null;//GetComponentClassName(Model, ruComponentFolder);
-    string rdComponentClassName = null;//GetComponentClassName(Model, rdComponentFolder);
-    string rlComponentClassName = null;//GetComponentClassName(Model, rlistComponentFolder);
+    string rvComponentClassName         = null;//GetComponentClassName(Model, rvComponentFolder);
+    string raComponentClassName         = GetComponentClassNameWithAnglr(AngularJsonFile, Model, raComponentFolder, raFormModuleFolder);
+    string ruComponentClassName         = null;//GetComponentClassName(Model, ruComponentFolder);
+    string rdComponentClassName         = null;//GetComponentClassName(Model, rdComponentFolder);
+    string rlComponentClassName         = null;//GetComponentClassName(Model, rlistComponentFolder);
 
 
     List<string> masterViewNames = new List<string>();
@@ -71,36 +73,35 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  flexModuleFolder, raFormModuleFolder)#>';
-import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  materialModuleFolder, raFormModuleFolder)#>';
-
-
+import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  flexModuleFolder, raFormModuleFolder) #>';
+import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  materialModuleFolder, raFormModuleFolder) #>';
 
 <#
     if(!string.IsNullOrEmpty(rlComponentClassName)) {
 #>
-import { <#=  searchModuleClassName #> } from '<#= GetFolderName(Model, searchModuleFolder, raFormModuleFolder) #>';
-import { <#=  rlComponentClassName #> } from '<#= GetFolderName(Model, rlistComponentFolder, raFormModuleFolder) #>';
+import { <#=  searchModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, searchModuleFolder, raFormModuleFolder) #>';
+import { <#=  rlComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, rlistComponentFolder, raFormModuleFolder) #>';
+
 <#
     }
     if(!string.IsNullOrEmpty(rvComponentClassName)) {
 #>
-import { <#=  rvComponentClassName #> } from '<#=  GetFolderName(Model, rvComponentFolder, raFormModuleFolder) #>';
+import { <#=  rvComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, rvComponentFolder, raFormModuleFolder) #>';
 <#
     }
     if(!string.IsNullOrEmpty(raComponentClassName)) {
 #>
-import { <#=  raComponentClassName #> } from '<#=  GetFolderName(Model, raComponentFolder, raFormModuleFolder) #>';
+import { <#=  raComponentClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, raComponentFolder, raFormModuleFolder) #>';
 <#
     }
     if(!string.IsNullOrEmpty(ruComponentClassName)) {
 #>
-import { <#=  ruComponentClassName #> } from '<#=  GetFolderName(Model, ruComponentFolder, raFormModuleFolder) #>';
+import { <#=  ruComponentClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, ruComponentFolder, raFormModuleFolder) #>';
 <#
     }
     if(!string.IsNullOrEmpty(rdComponentClassName)) {
 #>
-import { <#=  rdComponentClassName #> } from '<#=  GetFolderName(Model, rdComponentFolder, raFormModuleFolder) #>';
+import { <#=  rdComponentClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, rdComponentFolder, raFormModuleFolder) #>';
 <#
     }
 #>
@@ -109,22 +110,22 @@ import { <#=  rdComponentClassName #> } from '<#=  GetFolderName(Model, rdCompon
 <#
     if(!string.IsNullOrEmpty(viewformModuleClassName)) {
 #>
-import { <#=  viewformModuleClassName #> } from '<#=  GetFolderName(Model, viewformModuleFolder, raFormModuleFolder) #>';
+import { <#=  viewformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewformModuleFolder, raFormModuleFolder) #>';
 <#
     }
     if(!string.IsNullOrEmpty(addformModuleClassName)) {
 #>
-import { <#=  addformModuleClassName #> } from '<#=  GetFolderName(Model, addformModuleFolder, raFormModuleFolder) #>';
+import { <#=  addformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, addformModuleFolder, raFormModuleFolder) #>';
 <#
     }
     if(!string.IsNullOrEmpty(updformModuleClassName)) {
 #>
-import { <#=  updformModuleClassName #> } from '<#=  GetFolderName(Model, updformModuleFolder, raFormModuleFolder) #>';
+import { <#=  updformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, updformModuleFolder, raFormModuleFolder) #>';
 <#
     }
     if(!string.IsNullOrEmpty(delformModuleClassName)) {
 #>
-import { <#=  delformModuleClassName #> } from '<#=  GetFolderName(Model, delformModuleFolder, raFormModuleFolder) #>';
+import { <#=  delformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, delformModuleFolder, raFormModuleFolder) #>';
 <#
     }
 #>
@@ -142,7 +143,7 @@ import { <#=  delformModuleClassName #> } from '<#=  GetFolderName(Model, delfor
             continue;
         }
 #>
-import { <#=  GetModuleClassName(masterView, searchModuleFolder) #> } from '<#=  GetCrossComponentFolderName(Model, raFormModuleFolder, Context, viewName, searchModuleFolder) #>';
+import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, raFormModuleFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, raFormModuleFolder, Context, masterView.ViewName, searchModuleFolder) #>';
 <#
     }
 #>
@@ -184,7 +185,6 @@ import { <#=  GetModuleClassName(masterView, searchModuleFolder) #> } from '<#= 
         // BrowserModule,
         <#= materialModuleClassName #>,
         <#= flexModuleClassName #>,
-        // <#= filterModuleClassName #>,
 <#
     if(!string.IsNullOrEmpty(rlComponentClassName)) {
 #>
@@ -200,7 +200,7 @@ import { <#=  GetModuleClassName(masterView, searchModuleFolder) #> } from '<#= 
             continue;
         }
 #>
-        <#= GetModuleClassName(masterView, searchModuleFolder) #>,
+        <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, raFormModuleFolder) #>,
 <#
     }
 #>

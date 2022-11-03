@@ -6,20 +6,24 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
-    string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
-    string rdComponentFolder                        = "01826-RD.component.ts";
     string rdComponentLazyRoutingModuleFolder       = "01966-Rd.routing.module.ts";
-
-    string rdComponentClassName                     = GetComponentClassName(Model, rdComponentFolder);
     string rdComponentLazyRoutingModuleClassName    = GetModuleClassName(Model, rdComponentLazyRoutingModuleFolder);
-    string appSettingServiceClassName               = GetCommonServiceClassName(Context, appSettingServiceFolder);
+
+    string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName               = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, rdComponentLazyRoutingModuleFolder);
+
+    string rdComponentFolder                        = "01826-RD.component.ts";
+    string rdComponentClassName                     = GetComponentClassNameWithAnglr(AngularJsonFile, Model, rdComponentFolder, rdComponentLazyRoutingModuleFolder);
 #>
 
 
@@ -27,9 +31,8 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { <#= rdComponentClassName #> } from '<#= GetFolderName(Model, rdComponentFolder, rdComponentLazyRoutingModuleFolder) #>';
-import { <#= appSettingServiceClassName + "Activator" #> } from '<#= GetCommonFolderName(Model, Context,  appSettingServiceFolder, rdComponentLazyRoutingModuleFolder)#>';
-
+import { <#= appSettingServiceClassName + "Activator" #> } from '<#= GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, rdComponentLazyRoutingModuleFolder) #>';
+import { <#= rdComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, rdComponentFolder, rdComponentLazyRoutingModuleFolder) #>';
 
 const routes: Routes = [
  {
