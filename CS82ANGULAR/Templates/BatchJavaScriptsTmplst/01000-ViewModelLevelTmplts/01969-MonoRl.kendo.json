@@ -24,7 +24,7 @@
     "ng add @progress/kendo-angular-grid",
     "npm i -s @angular/flex-layout @angular/cdk",
     "",
-    "ng generate library XXXXX-lform",
+    "ng generate library XXXXX-rl",
     "",
     "where XXXXX is a name of the selected ViewModel",
     "",
@@ -32,54 +32,55 @@
   ],
   "BatchItems": [
     {
-      "DestinationFolder": "lform",
-      "GeneratorType": "01600-Lform.component.css",
-      "GeneratorSript": "ListFormForView.css.t4"
+      "DestinationFolder": "rlist",
+      "GeneratorType": "01920-Rlist.component.css",
+      "GeneratorSript": "ListRouterFormForView.css.t4"
     },
     {
-      "DestinationFolder": "lform",
-      "GeneratorType": "01600-Lform.component.html",
-      "GeneratorSript": "ListFormForView.kendo.html.t4"
+      "DestinationFolder": "rlist",
+      "GeneratorType": "01920-Rlist.component.html",
+      "GeneratorSript": "ListRouterFormForView.kendo.html.t4"
     },
     {
-      "DestinationFolder": "lform",
-      "GeneratorType": "01600-Lform.component.ts",
-      "GeneratorSript": "ListFormForView.kendo.ts.t4"
+      "DestinationFolder": "rlist",
+      "GeneratorType": "01920-Rlist.component.ts",
+      "GeneratorSript": "ListRouterFormForView.kendo.ts.t4"
     },
     {
-      "DestinationFolder": "lform",
-      "GeneratorType": "01600-Lform.component.txt",
-      "GeneratorSript": "ListFormForView.txt.t4"
-    },
-    {
-      "DestinationFolder": "ldlg",
-      "GeneratorType": "01620-Ldlg.component.css",
-      "GeneratorSript": "ListDlgFormForView.css.t4"
-    },
-    {
-      "DestinationFolder": "ldlg",
-      "GeneratorType": "01620-Ldlg.component.html",
-      "GeneratorSript": "ListDlgFormForView.kendo.html.t4"
-    },
-    {
-      "DestinationFolder": "ldlg",
-      "GeneratorType": "01620-Ldlg.component.ts",
-      "GeneratorSript": "ListDlgFormForView.kendo.ts.t4"
-    },
-    {
-      "DestinationFolder": "ldlg",
-      "GeneratorType": "01620-Ldlg.component.txt",
-      "GeneratorSript": "ListDlgFormForView.txt.t4"
+      "DestinationFolder": "rlist",
+      "GeneratorType": "01920-Rlist.component.txt",
+      "GeneratorSript": "ListRouterFormForView.txt.t4"
     },
     {
       "DestinationFolder": "",
-      "GeneratorType": "01650-L.module.ts",
-      "GeneratorSript": "lformModuleForView.ts.t4"
+      "GeneratorType": "01958-Rl.module.ts",
+      "GeneratorSript": "rlformModuleForView.ts.t4"
     },
     {
       "DestinationFolder": "",
-      "GeneratorType": "01650-L.module.txt",
-      "GeneratorSript": "lformModuleForView.txt.t4"
+      "GeneratorType": "01958-Rl.module.txt",
+      "GeneratorSript": "rlformModuleForView.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01968-Rl.routing.module.ts",
+      "GeneratorSript": "rl.routing.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01968-Rl.routing.module.txt",
+      "GeneratorSript": "rl.routing.module.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01978-Rl-lazy.routing.module.ts",
+      "GeneratorSript": "rl-lazy.routing.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01978-Rl-lazy.routing.module.txt",
+      "GeneratorSript": "rl-lazy.routing.module.txt.t4"
     }
+
   ]
 }

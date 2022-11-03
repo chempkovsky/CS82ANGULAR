@@ -1,0 +1,71 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "ng add @angular/material",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "",
+    "ng generate library XXXXX-rdl",
+    "",
+    "where XXXXX is a name of the selected ViewModel",
+    "",
+    "Please make sure that you selected [src\\lib] folder of the created library !!!"
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "rdlist",
+      "GeneratorType": "02020-Rdlist.component.css",
+      "GeneratorSript": "DListRouterFormForView.css.t4"
+    },
+    {
+      "DestinationFolder": "rdlist",
+      "GeneratorType": "02020-Rdlist.component.html",
+      "GeneratorSript": "DListRouterFormForView.html.t4"
+    },
+    {
+      "DestinationFolder": "rdlist",
+      "GeneratorType": "02020-Rdlist.component.ts",
+      "GeneratorSript": "DListRouterFormForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "rdlist",
+      "GeneratorType": "02020-Rdlist.component.txt",
+      "GeneratorSript": "DListRouterFormForView.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "02030-Rdl.module.ts",
+      "GeneratorSript": "rdlformModuleForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "02030-Rdl.module.txt",
+      "GeneratorSript": "rdlformModuleForView.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "02040-Rdl.routing.module.ts",
+      "GeneratorSript": "rdl.routing.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "02040-Rdl.routing.module.txt",
+      "GeneratorSript": "rdl.routing.module.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "02050-Rdl-lazy.routing.module.ts",
+      "GeneratorSript": "rdl-lazy.routing.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "02050-Rdl-lazy.routing.module.txt",
+      "GeneratorSript": "rdl-lazy.routing.module.txt.t4"
+    }
+  ]
+}

@@ -6,11 +6,14 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
     bool localize = Context.Localize;
@@ -40,31 +43,40 @@
     string captionPropName                      = "caption";
     string captionSelector                      = "caption";
 
-    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
-    string itemHeightDataModelFolder            = "00016-item-height-data.interface.ts";
-    string menuItemDataModelFolder              = "00017-menu-item-data.interface.ts";
-    string eventEmitterDataModelFolder          = "00018-event-emitter-data.interface.ts";
-    string eventEmitterPubModelFolder           = "00019-event-emitter-pub.interface.ts";
-
     string staticContentCssFolder               = "02100-Sc.component.css";
     string staticContentHtmlFolder              = "02100-Sc.component.html";
     string staticContentComponentFolder         = "02100-Sc.component.ts";
-
     string staticContentSelectorCommonPart      = GetComponentSelectorCommonPart(Model, staticContentComponentFolder);
     string staticContentClassName               = GetComponentClassName(Model, staticContentComponentFolder);
 
+    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName           = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, staticContentComponentFolder);
+
+    string itemHeightDataModelFolder            = "00016-item-height-data.interface.ts";
+    string itemHeightDataModelClassName         = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, itemHeightDataModelFolder, staticContentComponentFolder);
+
+    string menuItemDataModelFolder              = "00017-menu-item-data.interface.ts";
+    string menuItemDataModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, menuItemDataModelFolder, staticContentComponentFolder);
+
+    string eventEmitterDataModelFolder          = "00018-event-emitter-data.interface.ts";
+    string eventEmitterDataModelClassName       = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterDataModelFolder, staticContentComponentFolder);
+
+    string eventEmitterPubModelFolder           = "00019-event-emitter-pub.interface.ts";
+    string eventEmitterPubModelClassName        = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, staticContentComponentFolder);
+
+
+
     string eventEmitterPubModelClassName        = GetModelClassName(Context, eventEmitterPubModelFolder);
     string eventEmitterDataModelClassName       = GetModelClassName(Context, eventEmitterDataModelFolder);
-    string appSettingServiceClassName           = GetCommonServiceClassName(Context, appSettingServiceFolder);
     string menuItemDataModelClassName           = GetModelClassName(Context, menuItemDataModelFolder);
 
 #>
 
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
-import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  eventEmitterDataModelFolder, staticContentComponentFolder)#>';
-import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderName(Model, Context, eventEmitterPubModelFolder, staticContentComponentFolder)#>';
-import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderName(Model, Context,  menuItemDataModelFolder, staticContentComponentFolder)#>';
-import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderName(Model, Context,  appSettingServiceFolder, staticContentComponentFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, staticContentComponentFolder)#>';
+import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  eventEmitterDataModelFolder, staticContentComponentFolder)#>';
+import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, staticContentComponentFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  menuItemDataModelFolder, staticContentComponentFolder)#>';
 
 
 

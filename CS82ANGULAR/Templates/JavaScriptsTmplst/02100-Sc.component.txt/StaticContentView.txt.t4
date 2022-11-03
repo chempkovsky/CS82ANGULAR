@@ -1,5 +1,5 @@
 ﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
-<#@ output extension="css" #>
+<#@ output extension="jsonefm2txt" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
@@ -14,3 +14,22 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+
+    string exportedFolder = "02100-Sc.component.ts";
+
+#>
+
+{
+    "FileModifierItems": [
+        {
+            "Description": [
+                'update public-api.ts or webpack.config.js',
+                'with export data'
+            ],
+            "MethodName": "UpdateExport",
+            "InvocationParams": ['<#= exportedFolder #>']
+        }
+    ]
+}

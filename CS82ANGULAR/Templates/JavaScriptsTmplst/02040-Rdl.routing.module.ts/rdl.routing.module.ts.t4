@@ -6,26 +6,30 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
     bool localize = Context.Localize;
 
-    string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
-    string rdlComponentFolder                       = "02020-Rdlist.component.ts";
-
-    
     string rdlComponentLazyRoutingModuleFolder      = "02040-Rdl.routing.module.ts";
+    string rdlComponentLazyRoutingModuleClassName   = GetModuleClassName(Model, rdlComponentLazyRoutingModuleFolder);
+
+
+    string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName               = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, rdlComponentLazyRoutingModuleFolder);
+
+    string rdlComponentFolder                       = "02020-Rdlist.component.ts";
+    string rdlComponentClassName                    = GetComponentClassNameWithAnglr(AngularJsonFile, Model, rdlComponentFolder, rdlComponentLazyRoutingModuleFolder);
 
     string rdlLazyModuleFolder                      = "02050-Rdl-lazy.routing.module.ts";
 
-    string rdlComponentClassName                    = GetComponentClassName(Model, rdlComponentFolder);
-    string rdlComponentLazyRoutingModuleClassName   = GetModuleClassName(Model, rdlComponentLazyRoutingModuleFolder);
-    string appSettingServiceClassName               = GetCommonServiceClassName(Context, appSettingServiceFolder);
 
     string OutletNmPropName             = "outletNm";
     string HiddenFilterPrefix           = "hf";
@@ -114,8 +118,9 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { <#= rdlComponentClassName #> } from '<#= GetFolderName(Model, rdlComponentFolder, rdlComponentLazyRoutingModuleFolder) #>';
-import { <#= appSettingServiceClassName + "Activator" #> } from '<#= GetCommonFolderName(Model, Context,  appSettingServiceFolder, rdlComponentLazyRoutingModuleFolder)#>';
+import { <#= appSettingServiceClassName + "Activator" #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, rdlComponentLazyRoutingModuleFolder)#>';
+import { <#= rdlComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, rdlComponentFolder, rdlComponentLazyRoutingModuleFolder) #>';
+
 
 const <#= rdllzFrases #>: {[key:string]: string} = {
 <#
@@ -158,7 +163,10 @@ const routes: Routes = [
         Tuple<ModelViewSerializable, string, int> node = nodes[k];
         ModelViewSerializable aModel = node.Item1;
         int CurrDepth = node.Item3 + 1;
-        string fileNm_rdl = GetCrossComponentFolderName(Model, rdlComponentLazyRoutingModuleFolder, Context, aModel.ViewName, rdlLazyModuleFolder);
+        string rdlLazyModuleImport = null;
+        if (aModel.CommonStaffs.Any(c => c.FileType == rdlLazyModuleFolder)) {
+            rdlLazyModuleImport = GenerateLoadChildrenImportWithAnglr(AngularJsonFile, aModel, rdlLazyModuleFolder, Model, rdlComponentLazyRoutingModuleFolder);
+        }
 #>
 
 //
@@ -168,12 +176,12 @@ const routes: Routes = [
 <#
 
         if(aModel.IsWebApiSelectManyWithPagination) {
-            if(!string.IsNullOrEmpty(fileNm_rdl) && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rdlLazyModuleFolder)))) {
+            if(!string.IsNullOrEmpty(rdlLazyModuleImport) && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rdlLazyModuleFolder)))) {
 #>
     { 
 //        outlet: '<#=  OutletNameValue #>',
         path: '<#= node.Item2 #>', 
-        loadChildren: () => import('<#= fileNm_rdl #>').then(m => m.<#= GetModuleClassName(aModel, rdlLazyModuleFolder) #>),
+        <#= rdlLazyModuleImport #>,
         data: { <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, /* <#= routeOutletNmPropName #>: '<#=  OutletNameValue #>', */ <#= NavPrefix #>: '', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, <#= TitlePropName #>: <#= rdllzFrases #>['<#= "List" + aModel.ViewName #>'], <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
         canActivate: [<#= appSettingServiceClassName + "Activator" #>],
     },

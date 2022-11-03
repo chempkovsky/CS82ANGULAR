@@ -1,0 +1,71 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "ng add @angular/material",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "",
+    "ng generate library XXXXX-rv",
+    "",
+    "where XXXXX is a name of the selected ViewModel",
+    "",
+    "Please make sure that you selected [src\\lib] folder of the created library !!!"
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "rvform",
+      "GeneratorType": "01820-RV.component.css",
+      "GeneratorSript": "ViewRouterFormForView.css.t4"
+    },
+    {
+      "DestinationFolder": "rvform",
+      "GeneratorType": "01820-RV.component.html",
+      "GeneratorSript": "ViewRouterFormForView.html.t4"
+    },
+    {
+      "DestinationFolder": "rvform",
+      "GeneratorType": "01820-RV.component.ts",
+      "GeneratorSript": "ViewRouterFormForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "rvform",
+      "GeneratorType": "01820-RV.component.txt",
+      "GeneratorSript": "ViewRouterFormForView.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01950-Rv.module.ts",
+      "GeneratorSript": "rvformModuleForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01950-Rv.module.txt",
+      "GeneratorSript": "rvformModuleForView.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01960-Rv.routing.module.ts",
+      "GeneratorSript": "rv.routing.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01960-Rv.routing.module.txt",
+      "GeneratorSript": "rv.routing.module.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01970-Rv-lazy.routing.module.ts",
+      "GeneratorSript": "rv-lazy.routing.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01970-Rv-lazy.routing.module.txt",
+      "GeneratorSript": "rv-lazy.routing.module.txt.t4"
+    }
+  ]
+}

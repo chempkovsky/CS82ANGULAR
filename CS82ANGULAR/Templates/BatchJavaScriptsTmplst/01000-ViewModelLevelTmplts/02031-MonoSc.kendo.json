@@ -1,0 +1,67 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "ng add @progress/kendo-angular-buttons",
+    "ng add @progress/kendo-angular-layout",
+    "ng add @progress/kendo-angular-icons",
+    "ng add @progress/kendo-angular-inputs",
+    "ng add @progress/kendo-angular-dropdowns",
+    "ng add @progress/kendo-angular-menu",
+    "ng add @progress/kendo-angular-progressbar",
+    "ng add @progress/kendo-angular-dialog",
+    "ng add @progress/kendo-angular-notification",
+    "ng add @progress/kendo-angular-toolbar",
+    "ng add @progress/kendo-angular-tooltip",
+    "ng add @progress/kendo-angular-listview",
+    "ng add @progress/kendo-angular-dateinputs",
+    "ng add @progress/kendo-angular-label",
+    "ng add @progress/kendo-angular-grid",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "",
+    "ng generate library XXXXX-sc",
+    "",
+    "where XXXXX is a name of the selected ViewModel",
+    "",
+    "Please make sure that you selected [src\\lib] folder of the created library !!!"
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "sc",
+      "GeneratorType": "02100-Sc.component.css",
+      "GeneratorSript": "StaticContentView.css.t4"
+    },
+    {
+      "DestinationFolder": "sc",
+      "GeneratorType": "02100-Sc.component.html",
+      "GeneratorSript": "StaticContentView.kendo.html.t4"
+    },
+    {
+      "DestinationFolder": "sc",
+      "GeneratorType": "02100-Sc.component.ts",
+      "GeneratorSript": "StaticContentView.ts.t4"
+    },
+    {
+      "DestinationFolder": "sc",
+      "GeneratorType": "02100-Sc.component.txt",
+      "GeneratorSript": "StaticContentView.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "02150-Sc.module.ts",
+      "GeneratorSript": "StaticContentModuleForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "02150-Sc.module.txt",
+      "GeneratorSript": "StaticContentModuleForView.txt.t4"
+    }
+
+
+  ]
+}

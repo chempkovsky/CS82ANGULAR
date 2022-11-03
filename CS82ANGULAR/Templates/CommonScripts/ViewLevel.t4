@@ -19,6 +19,7 @@
             }
             return null;
         }
+
         string GetNameByAngularJson(string srcName, AngularJson anglJson, CommonStaffSerializable refItem, CommonStaffSerializable curItem)
         {
             if ((anglJson != null) && (refItem != null) && (curItem != null) && (!string.IsNullOrEmpty(srcName)))
@@ -185,36 +186,120 @@
                     }
                 }
             }
-            string[] refFolders = new string[] { };
-            if (!string.IsNullOrEmpty(refItem.FileFolder))
-            {
-                refFolders = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-            }
-            string[] currFolders = new string[] { };
-            if (!string.IsNullOrEmpty(curItem.FileFolder))
-            {
-                currFolders = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-            }
-            int refLen = refFolders.Length;
-            int currLen = currFolders.Length;
-            int minLen = refLen < currLen ? refLen : currLen;
-            int cnt = 0;
-            for (int i = 0; i < minLen; i++)
-            {
-                if (!refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase)) break;
-                cnt++;
-            }
-            if (currLen > cnt)
-            {
-                result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
-            }
-            if (refLen > cnt)
-            {
-                result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
-            }
-            result += refItem.FileName;
-            return result;
+            return GetFolderName(model, refFolder, currFolder);
         }
+        string GenerateLoadChildrenImportWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            string result = "import('').then(m => m.)";
+            if ((anglJson == null) || (model == null) || (currModel == null) || string.IsNullOrEmpty(currFolder) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (currModel.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                currModel.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            AngularProject refAngularProject = GetAngularProjectByRefItem(anglJson, refItem);
+            AngularProject curAngularProject = GetAngularProjectByRefItem(anglJson, curItem);
+            if ((refAngularProject != null) && (curAngularProject != null))
+            {
+                if (refAngularProject != curAngularProject)
+                {
+                    if (refAngularProject.ProjectType == "library")
+                    {
+                        return "import('" + refAngularProject.ProjectName + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
+                    }
+                    else if (refAngularProject.ProjectType == "application")
+                    {
+                        string aliasNm = null;
+                        string appFl = Path.Combine(refItem.FileProject, refItem.FileFolder, refItem.FileName).Replace(anglJson.AngularJsonPath, "");
+                        if (!appFl.StartsWith("\\")) appFl = "\\" + appFl;
+                        appFl = ("." + appFl).Replace("\\", "/");
+
+
+                        if (refAngularProject.WebpackConfigJson != null)
+                        {
+                            if (refAngularProject.WebpackConfigJson.exposeItems != null)
+                            {
+                                AngularWebpackConfigExposeItem exposeItm =
+                                    refAngularProject.WebpackConfigJson.exposeItems
+                                    .Where(itm => appFl.Equals(itm.exposeValue, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                                if (exposeItm != null)
+                                {
+                                    aliasNm = exposeItm.exposeKey;
+                                }
+                            }
+                        }
+                        if (string.IsNullOrEmpty(aliasNm)) aliasNm = appFl;
+                        return "loadRemoteModule({type: 'manifest', remoteName: '" + refAngularProject.ProjectName + "', exposedModule: '" + aliasNm + "'}).then(m => m." + GetModuleClassName(model, fileType) + ")";
+                    }
+                }
+            }
+            return "import('" + GetCrossComponentFolderNameEx(currModel, currFolder, model, fileType) + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
+        }
+        string GenerateLoadChildrenImportWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, AngularProject curAngularProject)
+        {
+            string result = "import('').then(m => m.)";
+            if ((anglJson == null) || (model == null) || (curAngularProject == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            if (refItem == null)
+            {
+                return result;
+            }
+            AngularProject refAngularProject = GetAngularProjectByRefItem(anglJson, refItem);
+            if ((refAngularProject != null) && (curAngularProject != null))
+            {
+                if (refAngularProject != curAngularProject)
+                {
+                    if (refAngularProject.ProjectType == "library")
+                    {
+                        return "import('" + refAngularProject.ProjectName + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
+                    }
+                    else if (refAngularProject.ProjectType == "application")
+                    {
+                        string aliasNm = null;
+                        string appFl = Path.Combine(refItem.FileProject, refItem.FileFolder, refItem.FileName).Replace(anglJson.AngularJsonPath, "");
+                        if (!appFl.StartsWith("\\")) appFl = "\\" + appFl;
+                        appFl = ("." + appFl).Replace("\\", "/");
+
+
+                        if (refAngularProject.WebpackConfigJson != null)
+                        {
+                            if (refAngularProject.WebpackConfigJson.exposeItems != null)
+                            {
+                                AngularWebpackConfigExposeItem exposeItm =
+                                    refAngularProject.WebpackConfigJson.exposeItems
+                                    .Where(itm => appFl.Equals(itm.exposeValue, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                                if (exposeItm != null)
+                                {
+                                    aliasNm = exposeItm.exposeKey;
+                                }
+                            }
+                        }
+                        if (string.IsNullOrEmpty(aliasNm)) aliasNm = appFl;
+                        return "loadRemoteModule({type: 'manifest', remoteName: '" + refAngularProject.ProjectName + "', exposedModule: '" + aliasNm + "'}).then(m => m." + GetModuleClassName(model, fileType) + ")";
+                    }
+                }
+            }
+            return "import('" + GetCrossComponentFolderNameExEx(Path.Combine(curAngularProject.AbsoluteSourceRoot, curAngularProject.ProjectPrefix), model, fileType) + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
+        }
+
 
         string GetInterfaceName(ModelViewSerializable model)
         {
@@ -862,6 +947,100 @@
             result += refItem.FileName;
             return result;
         }
+        string GetCrossComponentFolderNameEx(ModelViewSerializable model, string currFolder, ModelViewSerializable refModel, string refFolder)
+        {
+            string result = "./";
+            if ((model == null) || string.IsNullOrEmpty(currFolder) || (refModel == null) || string.IsNullOrEmpty(refFolder))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (refModel.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                refModel.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            string[] refFolders = new string[] { };
+            if (!string.IsNullOrEmpty(refItem.FileFolder))
+            {
+                refFolders = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+            }
+            string[] currFolders = new string[] { };
+            if (!string.IsNullOrEmpty(curItem.FileFolder))
+            {
+                currFolders = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
+            }
+            int refLen = refFolders.Length;
+            int currLen = currFolders.Length;
+            int minLen = refLen < currLen ? refLen : currLen;
+            int cnt = 0;
+            for (int i = 0; i < minLen; i++)
+            {
+                if (!refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase)) break;
+                cnt++;
+            }
+            if (currLen > cnt)
+            {
+                result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
+            }
+            if (refLen > cnt)
+            {
+                result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+            }
+            result += refItem.FileName;
+            return result;
+        }
+        string GetCrossComponentFolderNameExEx(string currAbsolutePath, ModelViewSerializable refModel, string refFolder)
+        {
+            string result = "./";
+            if (string.IsNullOrEmpty(currAbsolutePath) || (refModel == null) || string.IsNullOrEmpty(refFolder))
+            {
+                return result;
+            }
+            if (refModel.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                refModel.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+            if (refItem == null)
+            {
+                return result;
+            }
+            string[] refFolders = new string[] { };
+            if (!string.IsNullOrEmpty(refItem.FileFolder))
+            {
+                refFolders = Path.Combine(refItem.FileProject, refItem.FileFolder).Split(new string[] { "\\" }, StringSplitOptions.None);
+            }
+            string[] currFolders = currAbsolutePath.Split(new string[] { "\\" }, StringSplitOptions.None); ;
+
+            int refLen = refFolders.Length;
+            int currLen = currFolders.Length;
+            int minLen = refLen < currLen ? refLen : currLen;
+            int cnt = 0;
+            for (int i = 0; i < minLen; i++)
+            {
+                if (!refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase)) break;
+                cnt++;
+            }
+            if (currLen > cnt)
+            {
+                result += string.Join("", Enumerable.Repeat("../", currLen - cnt));
+            }
+            if (refLen > cnt)
+            {
+                result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
+            }
+            result += refItem.FileName;
+            return result;
+        }
+
         string GetCrossComponentFolderNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string currFolder, DbContextSerializable context, string refViewName, string refFolder)
         {
             string result = "./";
@@ -6377,4 +6556,5 @@
             }
             return "[sortable]=\"false\"";
         }
+
 #>

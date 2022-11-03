@@ -6,41 +6,38 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
 
-    string materialModuleFolder         = "00010-app-material.module.ts";
-    string flexModuleFolder             = "00011-app-flex-layout.module.ts";
-    string filterModuleFolder           = "00050-web-service-filter.module.ts";
+    string staticContentModuleFolder            = "02150-Sc.module.ts";
+    string staticContentModuleClassName         = GetModuleClassName(Model, staticContentModuleFolder);
 
+    string materialModuleFolder                 = "00010-app-material.module.ts";
+    string materialModuleClassName              = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, materialModuleFolder, staticContentModuleFolder);
 
+    string flexModuleFolder                     = "00011-app-flex-layout.module.ts";
+    string flexModuleClassName                  = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, flexModuleFolder, staticContentModuleFolder);
 
     string staticContentComponentFolder         = "02100-Sc.component.ts";
-    string staticContentModuleFolder            = "02150-Sc.module.ts";
-
-    string flexModuleClassName          = GetContextModuleClassName(Context, flexModuleFolder);
-    string materialModuleClassName      = GetContextModuleClassName(Context, materialModuleFolder);
-    string filterModuleClassName        = GetContextModuleClassName(Context, filterModuleFolder);
-
-
-
-    string staticContentComponentClassName  = GetComponentClassName(Model, staticContentComponentFolder);
-    string staticContentModuleClassName     = GetModuleClassName(Model, staticContentModuleFolder);
+    string staticContentComponentClassName      = GetComponentClassNameWithAnglr(AngularJsonFile, Model, staticContentComponentFolder, staticContentModuleFolder);
 
 #>
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  flexModuleFolder, staticContentModuleFolder)#>';
-import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderName(Model, Context,  materialModuleFolder, staticContentModuleFolder)#>';
 
+import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  flexModuleFolder, staticContentModuleFolder)#>';
+import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  materialModuleFolder, staticContentModuleFolder)#>';
 
-import { <#=  staticContentComponentClassName #> } from '<#= GetFolderName(Model, staticContentComponentFolder, staticContentModuleFolder) #>';
+import { <#=  staticContentComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, staticContentComponentFolder, staticContentModuleFolder) #>';
 
 @NgModule({
     declarations: [

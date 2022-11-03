@@ -6,20 +6,25 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 <#
-    string rdlFormModuleFolder                      = "02030-Rdl.module.ts";
-    string rdlComponentRoutingModuleFolder          = "02040-Rdl.routing.module.ts";
     string rdlComponentLazyRoutingModuleFolder      = "02050-Rdl-lazy.routing.module.ts";
-
-    string rdlFormModuleClassName                   = GetModuleClassName(Model, rdlFormModuleFolder);
-    string rdlComponentRoutingModuleClassName       = GetModuleClassName(Model, rdlComponentRoutingModuleFolder);
     string rdlComponentLazyRoutingModuleClassName   = GetModuleClassName(Model, rdlComponentLazyRoutingModuleFolder);
+
+
+    string rdlFormModuleFolder                      = "02030-Rdl.module.ts";
+    string rdlFormModuleClassName                   = GetModuleClassNameWithAnglr(AngularJsonFile, Model, rdlFormModuleFolder, rdlComponentLazyRoutingModuleFolder);
+
+    string rdlComponentRoutingModuleFolder          = "02040-Rdl.routing.module.ts";
+    string rdlComponentRoutingModuleClassName        = GetModuleClassNameWithAnglr(AngularJsonFile, Model, rdlComponentRoutingModuleFolder, rdlComponentLazyRoutingModuleFolder);
 
 #>
 
@@ -28,9 +33,8 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
-import { <#= rdlFormModuleClassName #> } from '<#= GetFolderName(Model, rdlFormModuleFolder, rdlComponentLazyRoutingModuleFolder) #>';
-import { <#= rdlComponentRoutingModuleClassName #> } from '<#= GetFolderName(Model, rdlComponentRoutingModuleFolder, rdlComponentLazyRoutingModuleFolder) #>';
-
+import { <#= rdlFormModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, rdlFormModuleFolder, rdlComponentLazyRoutingModuleFolder) #>';
+import { <#= rdlComponentRoutingModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, rdlComponentRoutingModuleFolder, rdlComponentLazyRoutingModuleFolder) #>';
 
 @NgModule({
     declarations: [
