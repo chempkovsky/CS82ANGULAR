@@ -1086,7 +1086,7 @@ namespace CS82ANGULAR.Model
         }
         string GenerateLoadChildrenImportWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
         {
-            string result = "import('').then(m => m.)";
+            string result = "loadChildren: () => import('').then(m => m.)";
             if ((anglJson == null) || (model == null) || string.IsNullOrEmpty(currFolder) || string.IsNullOrEmpty(fileType))
             {
                 return result;
@@ -1111,7 +1111,7 @@ namespace CS82ANGULAR.Model
                 {
                     if (refAngularProject.ProjectType == "library")
                     {
-                        return "import('" + refAngularProject.ProjectName + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
+                        return "loadChildren: () => import('" + refAngularProject.ProjectName + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
                     } else if (refAngularProject.ProjectType == "application")
                     {
                         string aliasNm = null;
@@ -1133,11 +1133,11 @@ namespace CS82ANGULAR.Model
                             }
                         }
                         if(string.IsNullOrEmpty(aliasNm)) aliasNm = appFl;
-                        return "loadRemoteModule({type: 'manifest', remoteName: '" + refAngularProject.ProjectName + "', exposedModule: '"+ aliasNm + "'}).then(m => m." + GetModuleClassName(model, fileType) + ")";
+                        return "loadChildren: () => loadRemoteModule({type: 'manifest', remoteName: '" + refAngularProject.ProjectName + "', exposedModule: '"+ aliasNm + "'}).then(m => m." + GetModuleClassName(model, fileType) + ")";
                     }
                 }
             }
-            return "import('" + GetCrossComponentFolderNameEx(model, currFolder, model, fileType) + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
+            return "loadChildren: () => import('" + GetCrossComponentFolderNameEx(model, currFolder, model, fileType) + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
         }
     }
 }

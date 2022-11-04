@@ -208,7 +208,7 @@ namespace CS82ANGULAR.Model
         }
         string GenerateLoadChildrenImportWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
         {
-            string result = "import('').then(m => m.)";
+            string result = "loadChildren: () => import('').then(m => m.)";
             if ((anglJson == null) || (model == null) || (currModel == null) || string.IsNullOrEmpty(currFolder) || string.IsNullOrEmpty(fileType))
             {
                 return result;
@@ -233,7 +233,7 @@ namespace CS82ANGULAR.Model
                 {
                     if (refAngularProject.ProjectType == "library")
                     {
-                        return "import('" + refAngularProject.ProjectName + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
+                        return "loadChildren: () => import('" + refAngularProject.ProjectName + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
                     }
                     else if (refAngularProject.ProjectType == "application")
                     {
@@ -257,15 +257,15 @@ namespace CS82ANGULAR.Model
                             }
                         }
                         if (string.IsNullOrEmpty(aliasNm)) aliasNm = appFl;
-                        return "loadRemoteModule({type: 'manifest', remoteName: '" + refAngularProject.ProjectName + "', exposedModule: '" + aliasNm + "'}).then(m => m." + GetModuleClassName(model, fileType) + ")";
+                        return "loadChildren: () => loadRemoteModule({type: 'manifest', remoteName: '" + refAngularProject.ProjectName + "', exposedModule: '" + aliasNm + "'}).then(m => m." + GetModuleClassName(model, fileType) + ")";
                     }
                 }
             }
-            return "import('" + GetCrossComponentFolderNameEx(currModel, currFolder, model, fileType) + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
+            return "loadChildren: () => import('" + GetCrossComponentFolderNameEx(currModel, currFolder, model, fileType) + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
         }
         string GenerateLoadChildrenImportWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, AngularProject curAngularProject)
         {
-            string result = "import('').then(m => m.)";
+            string result = "loadChildren: () => import('').then(m => m.)";
             if ((anglJson == null) || (model == null) || (curAngularProject == null) || string.IsNullOrEmpty(fileType))
             {
                 return result;
@@ -287,7 +287,7 @@ namespace CS82ANGULAR.Model
                 {
                     if (refAngularProject.ProjectType == "library")
                     {
-                        return "import('" + refAngularProject.ProjectName + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
+                        return "loadChildren: () => import('" + refAngularProject.ProjectName + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
                     }
                     else if (refAngularProject.ProjectType == "application")
                     {
@@ -311,11 +311,11 @@ namespace CS82ANGULAR.Model
                             }
                         }
                         if (string.IsNullOrEmpty(aliasNm)) aliasNm = appFl;
-                        return "loadRemoteModule({type: 'manifest', remoteName: '" + refAngularProject.ProjectName + "', exposedModule: '" + aliasNm + "'}).then(m => m." + GetModuleClassName(model, fileType) + ")";
+                        return "loadChildren: () => loadRemoteModule({type: 'manifest', remoteName: '" + refAngularProject.ProjectName + "', exposedModule: '" + aliasNm + "'}).then(m => m." + GetModuleClassName(model, fileType) + ")";
                     }
                 }
             }
-            return "import('" + GetCrossComponentFolderNameExEx(Path.Combine(curAngularProject.AbsoluteSourceRoot, curAngularProject.ProjectPrefix), model, fileType) + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
+            return "loadChildren: () => import('" + GetCrossComponentFolderNameExEx(Path.Combine(curAngularProject.AbsoluteSourceRoot, curAngularProject.ProjectPrefix), model, fileType) + "').then(m => m." + GetModuleClassName(model, fileType) + ")";
         }
 
 
@@ -1463,7 +1463,7 @@ namespace CS82ANGULAR.Model
                 return GetInterfaceDlgNameEx(context, viewName);
             }
             ModelViewSerializable model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
-            return GetComponentClassNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+            return GetInterfaceDlgNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
         }
 
         string GetModuleClassName(ModelViewSerializable model, string fileType)
