@@ -1,0 +1,406 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "ng add @angular/material",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "",
+    "ng generate library XXXXX-aform",
+    "",
+    "where XXXXX can be like ansnet",
+    "",
+    "Please make sure that you selected [src\\lib] folder of the created library !!!",
+    "",
+    "2.",
+    " Please make sure that AspNet ModelViews has the following names",
+    " (Names are case sensitive)",
+    "     aspnetmodelView",
+    "     aspnetuserView",
+    "     aspnetroleView",
+    "     aspnetuserrolesView",
+    "     aspnetrolemaskView",
+    "     aspnetusermaskView",
+    "     aspnetuserpermsView",
+    ""
+  ],
+  "BatchItems": [
+
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\aform",
+      "GeneratorType": "01502-Aform.component.css",
+      "GeneratorSript": "AddFormForView.css.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\aform",
+      "GeneratorType": "01502-Aform.component.html",
+      "GeneratorSript": "AddFormForView.html.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\aform",
+      "GeneratorType": "01502-Aform.component.ts",
+      "GeneratorSript": "AddFormForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\aform",
+      "GeneratorType": "01502-Aform.component.txt",
+      "GeneratorSript": "AddFormForView.txt.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\adlg",
+      "GeneratorType": "01512-Adlg.interface.ts",
+      "GeneratorSript": "InterfaceForAdlg.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\adlg",
+      "GeneratorType": "01512-Adlg.interface.txt",
+      "GeneratorSript": "InterfaceForAdlg.txt.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.css",
+      "GeneratorSript": "AddDlgFormForView.css.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.html",
+      "GeneratorSript": "AddDlgFormForView.html.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.ts",
+      "GeneratorSript": "AddDlgFormForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.txt",
+      "GeneratorSript": "AddDlgFormForView.txt.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01552-A.module.ts",
+      "GeneratorSript": "aformModuleForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01552-A.module.txt",
+      "GeneratorSript": "aformModuleForView.txt.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+
+
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\aform",
+      "GeneratorType": "01502-Aform.component.css",
+      "GeneratorSript": "AddFormForView.css.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\aform",
+      "GeneratorType": "01502-Aform.component.html",
+      "GeneratorSript": "AddFormForView.html.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\aform",
+      "GeneratorType": "01502-Aform.component.ts",
+      "GeneratorSript": "AddFormForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\aform",
+      "GeneratorType": "01502-Aform.component.txt",
+      "GeneratorSript": "AddFormForView.txt.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\adlg",
+      "GeneratorType": "01512-Adlg.interface.ts",
+      "GeneratorSript": "InterfaceForAdlg.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\adlg",
+      "GeneratorType": "01512-Adlg.interface.txt",
+      "GeneratorSript": "InterfaceForAdlg.txt.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.css",
+      "GeneratorSript": "AddDlgFormForView.css.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.html",
+      "GeneratorSript": "AddDlgFormForView.html.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.ts",
+      "GeneratorSript": "AddDlgFormForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.txt",
+      "GeneratorSript": "AddDlgFormForView.txt.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01552-A.module.ts",
+      "GeneratorSript": "aformModuleForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01552-A.module.txt",
+      "GeneratorSript": "aformModuleForView.txt.t4",
+      "ViewModel": "aspnetuserView"
+    },
+
+
+
+
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\aform",
+      "GeneratorType": "01502-Aform.component.css",
+      "GeneratorSript": "AddFormForView.css.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\aform",
+      "GeneratorType": "01502-Aform.component.html",
+      "GeneratorSript": "AddFormForView.html.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\aform",
+      "GeneratorType": "01502-Aform.component.ts",
+      "GeneratorSript": "AddFormForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\aform",
+      "GeneratorType": "01502-Aform.component.txt",
+      "GeneratorSript": "AddFormForView.txt.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\adlg",
+      "GeneratorType": "01512-Adlg.interface.ts",
+      "GeneratorSript": "InterfaceForAdlg.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\adlg",
+      "GeneratorType": "01512-Adlg.interface.txt",
+      "GeneratorSript": "InterfaceForAdlg.txt.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.css",
+      "GeneratorSript": "AddDlgFormForView.css.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.html",
+      "GeneratorSript": "AddDlgFormForView.html.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.ts",
+      "GeneratorSript": "AddDlgFormForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.txt",
+      "GeneratorSript": "AddDlgFormForView.txt.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01552-A.module.ts",
+      "GeneratorSript": "aformModuleForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01552-A.module.txt",
+      "GeneratorSript": "aformModuleForView.txt.t4",
+      "ViewModel": "aspnetroleView"
+    },
+
+
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\aform",
+      "GeneratorType": "01502-Aform.component.css",
+      "GeneratorSript": "AddFormForView.css.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\aform",
+      "GeneratorType": "01502-Aform.component.html",
+      "GeneratorSript": "AddFormForView.html.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\aform",
+      "GeneratorType": "01502-Aform.component.ts",
+      "GeneratorSript": "AddFormForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\aform",
+      "GeneratorType": "01502-Aform.component.txt",
+      "GeneratorSript": "AddFormForView.txt.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\adlg",
+      "GeneratorType": "01512-Adlg.interface.ts",
+      "GeneratorSript": "InterfaceForAdlg.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\adlg",
+      "GeneratorType": "01512-Adlg.interface.txt",
+      "GeneratorSript": "InterfaceForAdlg.txt.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.css",
+      "GeneratorSript": "AddDlgFormForView.css.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.html",
+      "GeneratorSript": "AddDlgFormForView.html.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.ts",
+      "GeneratorSript": "AddDlgFormForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.txt",
+      "GeneratorSript": "AddDlgFormForView.txt.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01552-A.module.ts",
+      "GeneratorSript": "aformModuleForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01552-A.module.txt",
+      "GeneratorSript": "aformModuleForView.txt.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+
+
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\aform",
+      "GeneratorType": "01502-Aform.component.css",
+      "GeneratorSript": "AddFormForView.css.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\aform",
+      "GeneratorType": "01502-Aform.component.html",
+      "GeneratorSript": "AddFormForView.html.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\aform",
+      "GeneratorType": "01502-Aform.component.ts",
+      "GeneratorSript": "AddFormForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\aform",
+      "GeneratorType": "01502-Aform.component.txt",
+      "GeneratorSript": "AddFormForView.txt.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\adlg",
+      "GeneratorType": "01512-Adlg.interface.ts",
+      "GeneratorSript": "InterfaceForAdlg.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\adlg",
+      "GeneratorType": "01512-Adlg.interface.txt",
+      "GeneratorSript": "InterfaceForAdlg.txt.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.css",
+      "GeneratorSript": "AddDlgFormForView.css.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.html",
+      "GeneratorSript": "AddDlgFormForView.html.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.ts",
+      "GeneratorSript": "AddDlgFormForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\adlg",
+      "GeneratorType": "01522-Adlg.component.txt",
+      "GeneratorSript": "AddDlgFormForView.txt.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01552-A.module.ts",
+      "GeneratorSript": "aformModuleForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01552-A.module.txt",
+      "GeneratorSript": "aformModuleForView.txt.t4",
+      "ViewModel": "aspnetrolemaskView"
+    }
+
+
+  ]
+}

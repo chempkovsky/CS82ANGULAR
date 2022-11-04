@@ -1,0 +1,348 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "ng add @angular/material",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "",
+    "ng generate library XXXXX-ru",
+    "",
+    "where XXXXX can be like ansnet",
+    "",
+    "Please make sure that you selected [src\\lib] folder of the created library !!!",
+    "",
+    "2.",
+    " Please make sure that AspNet ModelViews has the following names",
+    " (Names are case sensitive)",
+    "     aspnetmodelView",
+    "     aspnetuserView",
+    "     aspnetroleView",
+    "     aspnetuserrolesView",
+    "     aspnetrolemaskView",
+    "     aspnetusermaskView",
+    "     aspnetuserpermsView",
+    ""
+  ],
+  "BatchItems": [
+
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\ruform",
+      "GeneratorType": "01824-RU.component.css",
+      "GeneratorSript": "UpdRouterFormForView.css.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\ruform",
+      "GeneratorType": "01824-RU.component.html",
+      "GeneratorSript": "UpdRouterFormForView.html.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\ruform",
+      "GeneratorType": "01824-RU.component.ts",
+      "GeneratorSript": "UpdRouterFormForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\ruform",
+      "GeneratorType": "01824-RU.component.txt",
+      "GeneratorSript": "UpdRouterFormForView.txt.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01954-Ru.module.ts",
+      "GeneratorSript": "ruformModuleForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01954-Ru.module.txt",
+      "GeneratorSript": "ruformModuleForView.txt.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01964-Ru.routing.module.ts",
+      "GeneratorSript": "ru.routing.module.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01964-Ru.routing.module.txt",
+      "GeneratorSript": "ru.routing.module.txt.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01974-Ru-lazy.routing.module.ts",
+      "GeneratorSript": "ru-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01974-Ru-lazy.routing.module.txt",
+      "GeneratorSript": "ru-lazy.routing.module.txt.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+
+
+
+
+
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\ruform",
+      "GeneratorType": "01824-RU.component.css",
+      "GeneratorSript": "UpdRouterFormForView.css.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\ruform",
+      "GeneratorType": "01824-RU.component.html",
+      "GeneratorSript": "UpdRouterFormForView.html.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\ruform",
+      "GeneratorType": "01824-RU.component.ts",
+      "GeneratorSript": "UpdRouterFormForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\ruform",
+      "GeneratorType": "01824-RU.component.txt",
+      "GeneratorSript": "UpdRouterFormForView.txt.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01954-Ru.module.ts",
+      "GeneratorSript": "ruformModuleForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01954-Ru.module.txt",
+      "GeneratorSript": "ruformModuleForView.txt.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01964-Ru.routing.module.ts",
+      "GeneratorSript": "ru.routing.module.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01964-Ru.routing.module.txt",
+      "GeneratorSript": "ru.routing.module.txt.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01974-Ru-lazy.routing.module.ts",
+      "GeneratorSript": "ru-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01974-Ru-lazy.routing.module.txt",
+      "GeneratorSript": "ru-lazy.routing.module.txt.t4",
+      "ViewModel": "aspnetuserView"
+    },
+
+
+
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\ruform",
+      "GeneratorType": "01824-RU.component.css",
+      "GeneratorSript": "UpdRouterFormForView.css.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\ruform",
+      "GeneratorType": "01824-RU.component.html",
+      "GeneratorSript": "UpdRouterFormForView.html.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\ruform",
+      "GeneratorType": "01824-RU.component.ts",
+      "GeneratorSript": "UpdRouterFormForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\ruform",
+      "GeneratorType": "01824-RU.component.txt",
+      "GeneratorSript": "UpdRouterFormForView.txt.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01954-Ru.module.ts",
+      "GeneratorSript": "ruformModuleForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01954-Ru.module.txt",
+      "GeneratorSript": "ruformModuleForView.txt.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01964-Ru.routing.module.ts",
+      "GeneratorSript": "ru.routing.module.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01964-Ru.routing.module.txt",
+      "GeneratorSript": "ru.routing.module.txt.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01974-Ru-lazy.routing.module.ts",
+      "GeneratorSript": "ru-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01974-Ru-lazy.routing.module.txt",
+      "GeneratorSript": "ru-lazy.routing.module.txt.t4",
+      "ViewModel": "aspnetroleView"
+    },
+
+
+
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\ruform",
+      "GeneratorType": "01824-RU.component.css",
+      "GeneratorSript": "UpdRouterFormForView.css.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\ruform",
+      "GeneratorType": "01824-RU.component.html",
+      "GeneratorSript": "UpdRouterFormForView.html.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\ruform",
+      "GeneratorType": "01824-RU.component.ts",
+      "GeneratorSript": "UpdRouterFormForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\ruform",
+      "GeneratorType": "01824-RU.component.txt",
+      "GeneratorSript": "UpdRouterFormForView.txt.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01954-Ru.module.ts",
+      "GeneratorSript": "ruformModuleForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01954-Ru.module.txt",
+      "GeneratorSript": "ruformModuleForView.txt.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01964-Ru.routing.module.ts",
+      "GeneratorSript": "ru.routing.module.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01964-Ru.routing.module.txt",
+      "GeneratorSript": "ru.routing.module.txt.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01974-Ru-lazy.routing.module.ts",
+      "GeneratorSript": "ru-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01974-Ru-lazy.routing.module.txt",
+      "GeneratorSript": "ru-lazy.routing.module.txt.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\ruform",
+      "GeneratorType": "01824-RU.component.css",
+      "GeneratorSript": "UpdRouterFormForView.css.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\ruform",
+      "GeneratorType": "01824-RU.component.html",
+      "GeneratorSript": "UpdRouterFormForView.html.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\ruform",
+      "GeneratorType": "01824-RU.component.ts",
+      "GeneratorSript": "UpdRouterFormForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\ruform",
+      "GeneratorType": "01824-RU.component.txt",
+      "GeneratorSript": "UpdRouterFormForView.txt.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01954-Ru.module.ts",
+      "GeneratorSript": "ruformModuleForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01954-Ru.module.txt",
+      "GeneratorSript": "ruformModuleForView.txt.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01964-Ru.routing.module.ts",
+      "GeneratorSript": "ru.routing.module.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01964-Ru.routing.module.txt",
+      "GeneratorSript": "ru.routing.module.txt.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01974-Ru-lazy.routing.module.ts",
+      "GeneratorSript": "ru-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01974-Ru-lazy.routing.module.txt",
+      "GeneratorSript": "ru-lazy.routing.module.txt.t4",
+      "ViewModel": "aspnetrolemaskView"
+    }
+
+
+  ]
+}

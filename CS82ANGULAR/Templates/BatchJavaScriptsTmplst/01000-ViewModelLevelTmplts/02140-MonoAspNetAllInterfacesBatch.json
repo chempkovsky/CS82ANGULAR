@@ -1,0 +1,313 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "1.",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "ng add @angular/material",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "",
+    "ng generate library XXXXX-interfaces",
+    "",
+    "where XXXXX can be like ansnet",
+    "",
+    "Please make sure that you selected [src\\lib] folder of the created library !!!",
+    "",
+    "for kendo-UI instead of the command",
+    "ng add @angular/material",
+    "please use the following commands",
+    "",
+    "ng add @progress/kendo-angular-buttons",
+    "ng add @progress/kendo-angular-layout",
+    "ng add @progress/kendo-angular-icons",
+    "ng add @progress/kendo-angular-inputs",
+    "ng add @progress/kendo-angular-dropdowns",
+    "ng add @progress/kendo-angular-menu",
+    "ng add @progress/kendo-angular-progressbar",
+    "ng add @progress/kendo-angular-dialog",
+    "ng add @progress/kendo-angular-notification",
+    "ng add @progress/kendo-angular-toolbar",
+    "ng add @progress/kendo-angular-tooltip",
+    "ng add @progress/kendo-angular-listview",
+    "ng add @progress/kendo-angular-dateinputs",
+    "ng add @progress/kendo-angular-label",
+    "ng add @progress/kendo-angular-grid",
+    "",
+    "2.",
+    " Please make sure that AspNet ModelViews has the following names",
+    " (Names are case sensitive)",
+    "     aspnetmodelView",
+    "     aspnetuserView",
+    "     aspnetroleView",
+    "     aspnetuserrolesView",
+    "     aspnetrolemaskView",
+    "     aspnetusermaskView",
+    "     aspnetuserpermsView",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\interfaces",
+      "GeneratorType": "01100-.interface.ts",
+      "GeneratorSript": "InterfaceForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\interfaces",
+      "GeneratorType": "01100-.interface.txt",
+      "GeneratorSript": "InterfaceForView.txt.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\interfaces",
+      "GeneratorType": "01200-Page.interface.ts",
+      "GeneratorSript": "InterfaceForViewPage.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\interfaces",
+      "GeneratorType": "01200-Page.interface.txt",
+      "GeneratorSript": "InterfaceForViewPage.txt.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\interfaces",
+      "GeneratorType": "01300-Filter.interface.ts",
+      "GeneratorSript": "InterfaceForViewFilter.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\interfaces",
+      "GeneratorType": "01300-Filter.interface.txt",
+      "GeneratorSript": "InterfaceForViewFilter.txt.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\interfaces",
+      "GeneratorType": "01100-.interface.ts",
+      "GeneratorSript": "InterfaceForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\interfaces",
+      "GeneratorType": "01100-.interface.txt",
+      "GeneratorSript": "InterfaceForView.txt.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\interfaces",
+      "GeneratorType": "01200-Page.interface.ts",
+      "GeneratorSript": "InterfaceForViewPage.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\interfaces",
+      "GeneratorType": "01200-Page.interface.txt",
+      "GeneratorSript": "InterfaceForViewPage.txt.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\interfaces",
+      "GeneratorType": "01300-Filter.interface.ts",
+      "GeneratorSript": "InterfaceForViewFilter.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\interfaces",
+      "GeneratorType": "01300-Filter.interface.txt",
+      "GeneratorSript": "InterfaceForViewFilter.txt.t4",
+      "ViewModel": "aspnetuserView"
+    },
+
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\interfaces",
+      "GeneratorType": "01100-.interface.ts",
+      "GeneratorSript": "InterfaceForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\interfaces",
+      "GeneratorType": "01100-.interface.txt",
+      "GeneratorSript": "InterfaceForView.txt.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\interfaces",
+      "GeneratorType": "01200-Page.interface.ts",
+      "GeneratorSript": "InterfaceForViewPage.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\interfaces",
+      "GeneratorType": "01200-Page.interface.txt",
+      "GeneratorSript": "InterfaceForViewPage.txt.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\interfaces",
+      "GeneratorType": "01300-Filter.interface.ts",
+      "GeneratorSript": "InterfaceForViewFilter.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\interfaces",
+      "GeneratorType": "01300-Filter.interface.txt",
+      "GeneratorSript": "InterfaceForViewFilter.txt.t4",
+      "ViewModel": "aspnetroleView"
+    },
+
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\interfaces",
+      "GeneratorType": "01100-.interface.ts",
+      "GeneratorSript": "InterfaceForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\interfaces",
+      "GeneratorType": "01100-.interface.txt",
+      "GeneratorSript": "InterfaceForView.txt.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\interfaces",
+      "GeneratorType": "01200-Page.interface.ts",
+      "GeneratorSript": "InterfaceForViewPage.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\interfaces",
+      "GeneratorType": "01200-Page.interface.txt",
+      "GeneratorSript": "InterfaceForViewPage.txt.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\interfaces",
+      "GeneratorType": "01300-Filter.interface.ts",
+      "GeneratorSript": "InterfaceForViewFilter.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\interfaces",
+      "GeneratorType": "01300-Filter.interface.txt",
+      "GeneratorSript": "InterfaceForViewFilter.txt.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\interfaces",
+      "GeneratorType": "01100-.interface.ts",
+      "GeneratorSript": "InterfaceForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\interfaces",
+      "GeneratorType": "01100-.interface.txt",
+      "GeneratorSript": "InterfaceForView.txt.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\interfaces",
+      "GeneratorType": "01200-Page.interface.ts",
+      "GeneratorSript": "InterfaceForViewPage.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\interfaces",
+      "GeneratorType": "01200-Page.interface.txt",
+      "GeneratorSript": "InterfaceForViewPage.txt.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\interfaces",
+      "GeneratorType": "01300-Filter.interface.ts",
+      "GeneratorSript": "InterfaceForViewFilter.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\interfaces",
+      "GeneratorType": "01300-Filter.interface.txt",
+      "GeneratorSript": "InterfaceForViewFilter.txt.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+
+    {
+      "DestinationFolder": "components\\aspnetusermask-view\\interfaces",
+      "GeneratorType": "01100-.interface.ts",
+      "GeneratorSript": "InterfaceForView.ts.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetusermask-view\\interfaces",
+      "GeneratorType": "01100-.interface.txt",
+      "GeneratorSript": "InterfaceForView.txt.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetusermask-view\\interfaces",
+      "GeneratorType": "01200-Page.interface.ts",
+      "GeneratorSript": "InterfaceForViewPage.ts.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetusermask-view\\interfaces",
+      "GeneratorType": "01200-Page.interface.txt",
+      "GeneratorSript": "InterfaceForViewPage.txt.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetusermask-view\\interfaces",
+      "GeneratorType": "01300-Filter.interface.ts",
+      "GeneratorSript": "InterfaceForViewFilter.ts.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetusermask-view\\interfaces",
+      "GeneratorType": "01300-Filter.interface.txt",
+      "GeneratorSript": "InterfaceForViewFilter.txt.t4",
+      "ViewModel": "aspnetusermaskView"
+    },
+
+    {
+      "DestinationFolder": "components\\aspnetuserperms-view\\interfaces",
+      "GeneratorType": "01100-.interface.ts",
+      "GeneratorSript": "InterfaceForView.ts.t4",
+      "ViewModel": "aspnetuserpermsView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserperms-view\\interfaces",
+      "GeneratorType": "01100-.interface.txt",
+      "GeneratorSript": "InterfaceForView.txt.t4",
+      "ViewModel": "aspnetuserpermsView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserperms-view\\interfaces",
+      "GeneratorType": "01200-Page.interface.ts",
+      "GeneratorSript": "InterfaceForViewPage.ts.t4",
+      "ViewModel": "aspnetuserpermsView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserperms-view\\interfaces",
+      "GeneratorType": "01200-Page.interface.txt",
+      "GeneratorSript": "InterfaceForViewPage.txt.t4",
+      "ViewModel": "aspnetuserpermsView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserperms-view\\interfaces",
+      "GeneratorType": "01300-Filter.interface.ts",
+      "GeneratorSript": "InterfaceForViewFilter.ts.t4",
+      "ViewModel": "aspnetuserpermsView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserperms-view\\interfaces",
+      "GeneratorType": "01300-Filter.interface.txt",
+      "GeneratorSript": "InterfaceForViewFilter.txt.t4",
+      "ViewModel": "aspnetuserpermsView"
+    }
+  ]
+
+}
