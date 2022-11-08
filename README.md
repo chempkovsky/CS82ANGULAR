@@ -8,3 +8,5 @@
       - [Material Design components for Angular](https://material.angular.io)
       - [Kendo UI for Angular](https://www.telerik.com/kendo-angular-ui)
 - Please refer to the [CS82ANGULAR wiki](https://github.com/chempkovsky/CS82ANGULAR/wiki) for details.
+- Note:
+  - it requires @babel/core to be installed in the separate folder
