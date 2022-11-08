@@ -9,4 +9,12 @@
       - [Kendo UI for Angular](https://www.telerik.com/kendo-angular-ui)
 - Please refer to the [CS82ANGULAR wiki](https://github.com/chempkovsky/CS82ANGULAR/wiki) for details.
 - Note:
-  - it requires @babel/core to be installed in the separate folder
+  - it requires @babel/core to be installed in the **separate** folder
+  - please use the following commands to meet this requirement:
+````
+cd c:\
+mkdir babelcore
+cd babelcore
+npm install --save-dev @babel/core
+````
+
