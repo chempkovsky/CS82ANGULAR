@@ -183,7 +183,7 @@
 
         string raLazyModuleImport = null;
         if(aModel.CommonStaffs.Any(c => c.FileType == raLazyModuleFolder)) {
-            rvLazyModuleImport = GenerateLoadChildrenImportWithAnglrEx(AngularJsonFile, aModel, raLazyModuleFolder, currAngularPrj);
+            raLazyModuleImport = GenerateLoadChildrenImportWithAnglrEx(AngularJsonFile, aModel, raLazyModuleFolder, currAngularPrj);
         }
 
         string ruLazyModuleImport = null;
@@ -220,7 +220,7 @@
                     } else {
 #>
 //
-//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= rvLazyModuleFolder #>] has not been generated yet
+//warning: for the View   [<#= aModel.ViewName #>] the component [<#= rvLazyModuleFolder #>] has not been generated yet
 //
 <#
                     } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
