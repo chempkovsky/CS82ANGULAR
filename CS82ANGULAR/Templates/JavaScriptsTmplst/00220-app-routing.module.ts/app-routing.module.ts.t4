@@ -47,7 +47,7 @@ import { <#= pagenotfoundComponentClassName #> } from '<#= GetFolderNameWithAngl
 
 const routes: Routes = [
   // { path: 'authentication', loadChildren: () => import('<#= GetModuleFileName(Model, securityModuleFolder) #>').then(m => m.<#= securityModuleClassName #>) },  
-  { path: 'authentication', loadChildren: () => <#= GenerateLoadChildrenImportWithAnglr(AngularJsonFile, Model, securityModuleFolder, appRoutingModuleFolder) #> },  
+  { path: 'authentication', <#= GenerateLoadChildrenImportWithAnglr(AngularJsonFile, Model, securityModuleFolder, appRoutingModuleFolder) #> },  
 
   
 
