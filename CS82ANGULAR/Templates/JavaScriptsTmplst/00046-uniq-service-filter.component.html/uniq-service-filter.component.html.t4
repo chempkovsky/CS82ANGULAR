@@ -117,6 +117,7 @@
 
             <ng-template [ngIf]="flt.fltrDataType === 'boolean' || flt.fltrDataType === 'bool'">
                 <mat-form-field [appearance]="<#= AppearancePropName #>" fxFlex="100">
+                    <input matInput style="display: none">
                     <mat-checkbox [formControl]="flt.fltrValue"> {{flt.fltrCaption}} </mat-checkbox>
                 </mat-form-field>
             </ng-template>
