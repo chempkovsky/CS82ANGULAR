@@ -103,74 +103,12 @@
     string rdLazyModuleFolder           = "01976-Rd-lazy.routing.module.ts";
     string rlLazyModuleFolder           = "01978-Rl-lazy.routing.module.ts";
 
-    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
     List<Tuple<ModelViewSerializable, string, int>> nodes = new List<Tuple<ModelViewSerializable, string, int>>();
-    List<string> detailViewNames = new List<string>();
-    List<string> allViewNames= new List<string>();
-
-    if(isRist || isRDlist)
+    if(isRist)
     {
-        // Model, url, depth
-        nodes.Add(new Tuple<ModelViewSerializable, string, int>( Model, Model.ViewName, 1));
-        allViewNames.Add(Model.ViewName);
-
-        int currId= 0;
-        while(currId < nodes.Count) {
-            Tuple<ModelViewSerializable, string, int> masterNode = nodes[currId];
-            ModelViewSerializable masterView = masterNode.Item1;
-            List<ModelViewPropertyOfVwSerializable> masterPrincipals = GetModelPrimaryKeyProps(masterView);
-            string CurrPath = masterNode.Item2;
-            int CurrDepth = masterNode.Item3 + 1;
-            List<string> viewNames = GetDetailViews(masterView, Context, null);
-            foreach(string viewName in viewNames) {
-                ModelViewSerializable detailView = GetViewByName(Context, viewName);
-                if(nodes.Count(p => p.Item1 == detailView) > 2) {
-                    continue;
-                }
-                string newPath = CurrPath + "/" + viewName;
-                if (CurrDepth > 1) {
-                    newPath = newPath +"/:" + HiddenFilterPrefix + CurrDepth.ToString();
-                }
-                List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(masterView, detailView, null);
-                detailViewNames.Clear();
-                bool isM2m = false;
-                if(IsTableMatchesIndex(detailView)) {
-                    if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
-                        if(ForeignKeysOrderedInsidePrimKey(detailView)) {
-                            isM2m = true;
-                        }
-                    }
-                }
-                foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
-                    if(isM2m) {
-                        // m2mMdl, m2mFk, searchFks, otherFks, externalFks
-                        tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
-                        if (tmpSearchSchema != null) {
-                            int  cnt = 0;
-                            if(tmpSearchSchema.Item5 == null) continue;
-                            if(tmpSearchSchema.Item5.Count != 1) continue;
-                            if(tmpSearchSchema.Item4 != null) continue;
-                            if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
-                            ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
-                            string newPathEx = CurrPath + "/" + viewToNavigate.ViewName;
-                            if (CurrDepth > 1) {
-                                newPathEx = newPathEx +"/:" + HiddenFilterPrefix + CurrDepth.ToString();
-                            }
-                            if (!detailViewNames.Any(v => v == viewToNavigate.ViewName)) {
-                                nodes.Add(new Tuple<ModelViewSerializable, string, int>(viewToNavigate, newPathEx, CurrDepth));
-                                detailViewNames.Add(viewToNavigate.ViewName);
-                            }
-                            continue;
-                        }
-                    }
-                    if (!detailViewNames.Any(v => v == detailView.ViewName)) {
-                        nodes.Add(new Tuple<ModelViewSerializable, string, int>(detailView, newPath, CurrDepth));
-                        detailViewNames.Add(detailView.ViewName);
-                    }
-                }
-            }
-            currId++;
-        }
+        nodes = GetRouteNodes(Model, nodes, null, HiddenFilterPrefix);
+    } else if(isRDlist) {
+        nodes = GetRouteNodes(Model, nodes, RDLPrefix, HiddenFilterPrefix);
     }
 
 #>
@@ -256,10 +194,10 @@ if(isRist) {
 
 
                 if(aModel.IsWebApiSelectOneByPrimarykey) {
-                    if(!string.IsNullOrEmpty(fileNm_rv) && (!string.IsNullOrEmpty(raLazyModuleImport))) {
+                    if(!string.IsNullOrEmpty(fileNm_rv) && (!string.IsNullOrEmpty(rvLazyModuleImport))) {
 #>
     { path: '<#= node.Item2 + "/" + VPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', 
-        <#= raLazyModuleImport #>,
+        <#= rvLazyModuleImport #>,
         data: { <#= routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'v', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'View <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>', <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
@@ -427,7 +365,7 @@ if(isRDlist) {
 #>
     { path: '<#= node.Item2 #>', 
         <#= rdlLazyModuleImport #>,
-        data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, <#= NavPrefix #>: '<#= RDLPrefix #>', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, /* <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + node.Item3.ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+        data: { <#= routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, <#= NavPrefix #>: '<#= RDLPrefix #>', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, /* <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + node.Item3.ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
 
@@ -435,7 +373,7 @@ if(isRDlist) {
 #>
     { path: '<#= node.Item2 #>', 
         <#= rdlLazyModuleImport #>,
-        data: { <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, <#= NavPrefix #>: '<#= RDLPrefix #>', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, /* <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+        data: { <#= routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, <#= NavPrefix #>: '<#= RDLPrefix #>', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, /* <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
                 } // if(node.Item3 > 1) { ... } else { ... }
@@ -474,3 +412,78 @@ if(isRDlist) {
 export class <#= featureRoutingModuleClassName #> { }
 
 
+<#+
+
+    List<Tuple<ModelViewSerializable, string, int>> GetRouteNodes(ModelViewSerializable model, List<Tuple<ModelViewSerializable, string, int>> aNodes, string aRDLPrefix, string aHiddenFilterPrefix) 
+    {
+        if(aNodes == null) aNodes = new List<Tuple<ModelViewSerializable, string, int>>();
+        if(String.IsNullOrEmpty(aRDLPrefix)) aRDLPrefix = "";
+        if(String.IsNullOrEmpty(aHiddenFilterPrefix)) aHiddenFilterPrefix = "";
+        aNodes.Clear();
+        if(model == null) return aNodes;
+        Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
+        List<string> detailViewNames = new List<string>();
+        // Model, url, depth
+        aNodes.Add(new Tuple<ModelViewSerializable, string, int>( model, aRDLPrefix + model.ViewName, 1));
+
+        int currId= 0;
+        while(currId < aNodes.Count) {
+            Tuple<ModelViewSerializable, string, int> masterNode = aNodes[currId];
+            ModelViewSerializable masterView = masterNode.Item1;
+            List<ModelViewPropertyOfVwSerializable> masterPrincipals = GetModelPrimaryKeyProps(masterView);
+            string CurrPath = masterNode.Item2;
+            int CurrDepth = masterNode.Item3 + 1;
+            List<string> viewNames = GetDetailViews(masterView, Context, null);
+            foreach(string viewName in viewNames) {
+                ModelViewSerializable detailView = GetViewByName(Context, viewName);
+                if(aNodes.Count(p => p.Item1 == detailView) > 2) {
+                    continue;
+                }
+                string newPath = CurrPath + "/" + aRDLPrefix + viewName;
+                if (CurrDepth > 1) {
+                    newPath = newPath +"/:" + aHiddenFilterPrefix + CurrDepth.ToString();
+                }
+                List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(masterView, detailView, null);
+                detailViewNames.Clear();
+                bool isM2m = false;
+                if(IsTableMatchesIndex(detailView)) {
+                    if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                        if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                            isM2m = true;
+                        }
+                    }
+                }
+                foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                    if(isM2m) {
+                        // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                        tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                        if (tmpSearchSchema != null) {
+                            int  cnt = 0;
+                            if(tmpSearchSchema.Item5 == null) continue;
+                            if(tmpSearchSchema.Item5.Count != 1) continue;
+                            if(tmpSearchSchema.Item4 != null) continue;
+                            if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                            ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                            string newPathEx = CurrPath + "/" + aRDLPrefix + viewToNavigate.ViewName;
+                            if (CurrDepth > 1) {
+                                newPathEx = newPathEx +"/:" + aHiddenFilterPrefix + CurrDepth.ToString();
+                            }
+                            if (!detailViewNames.Any(v => v == viewToNavigate.ViewName)) {
+                                aNodes.Add(new Tuple<ModelViewSerializable, string, int>(viewToNavigate, newPathEx, CurrDepth));
+                                detailViewNames.Add(viewToNavigate.ViewName);
+                            }
+                            continue;
+                        }
+                    }
+                    if (!detailViewNames.Any(v => v == detailView.ViewName)) {
+                        aNodes.Add(new Tuple<ModelViewSerializable, string, int>(detailView, newPath, CurrDepth));
+                        detailViewNames.Add(detailView.ViewName);
+                    }
+                }
+            }
+            currId++;
+        }
+        return aNodes;
+    }
+
+#>

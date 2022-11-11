@@ -136,7 +136,7 @@ namespace CS82ANGULAR.ViewModel
                 {
                     this.FileExtension = ".txt";
                     this.GenerateText = await ExportFileModifier.ExecuteJsonScriptFeatureEFMAsync(AngularJsonHelper.GetAngularJson(), GeneratedFeature, this.GenerateText);
-                    throw new Exception("Not implemented yet");
+                    // throw new Exception("Not implemented yet");
                 }
             }
             IsReady.DoNotify(this, string.IsNullOrEmpty(this.GenerateError));
