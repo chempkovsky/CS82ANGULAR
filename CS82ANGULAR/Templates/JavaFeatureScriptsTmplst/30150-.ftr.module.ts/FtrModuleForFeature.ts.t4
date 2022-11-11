@@ -6,27 +6,31 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureSerializable" name="Feature" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+
 <#
 
-    string materialModuleFolder         = "00010-app-material.module.ts";
-    string flexModuleFolder             = "00011-app-flex-layout.module.ts";
-
-    string ftrFeatureComponentFolder    = "30100-.ftr.component.ts";
     string ftrFeatureModuleFolder       = "30150-.ftr.module.ts";
-
-    string featureClassName             = GetFeatureComponentClassName(Feature, ftrFeatureComponentFolder);
     string featureModuleClassName       = GetFeatureModuleClassName(Feature, ftrFeatureModuleFolder);
 
-    string flexModuleClassName          = GetContextModuleClassName(Context, flexModuleFolder);
-    string materialModuleClassName      = GetContextModuleClassName(Context, materialModuleFolder);
+    string materialModuleFolder         = "00010-app-material.module.ts";
+    string materialModuleClassName      = GetFeatureContextModuleClassNameWithAnglr(AngularJsonFile, Feature, Context, materialModuleFolder, ftrFeatureModuleFolder);
 
+    string flexModuleFolder             = "00011-app-flex-layout.module.ts";
+    string flexModuleClassName          = GetFeatureContextModuleClassNameWithAnglr(AngularJsonFile, Feature, Context, flexModuleFolder, ftrFeatureModuleFolder);
+
+    string ftrFeatureComponentFolder    = "30100-.ftr.component.ts";
+    string featureClassName             = GetFeatureComponentClassNameWithAnglr(AngularJsonFile, Feature, ftrFeatureComponentFolder, ftrFeatureModuleFolder);
 
 #>
 
@@ -34,10 +38,10 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
-import { <#=  flexModuleClassName #> } from '<#=  GetFeatureCommonFolderName(Feature, Context,  flexModuleFolder, ftrFeatureModuleFolder)#>';
-import { <#=  materialModuleClassName #> } from '<#=  GetFeatureCommonFolderName(Feature, Context,  materialModuleFolder, ftrFeatureModuleFolder)#>';
+import { <#=  materialModuleClassName #> } from '<#= GetFeatureCommonFolderNameWithAnglr(AngularJsonFile, Feature, Context, materialModuleFolder, ftrFeatureModuleFolder) #>';
+import { <#=  flexModuleClassName #> } from '<#= GetFeatureCommonFolderNameWithAnglr(AngularJsonFile, Feature, Context, flexModuleFolder, ftrFeatureModuleFolder) #>';
+import { <#=  featureClassName #> } from '<#= GetFeatureComponentFolderNameWithAnglr(AngularJsonFile, Feature, ftrFeatureComponentFolder, ftrFeatureModuleFolder) #>';
 
-import { <#=  featureClassName #> } from '<#=  GetFeatureComponentFolderName(Feature, ftrFeatureModuleFolder, ftrFeatureComponentFolder )#>';
 
 <#
     if(Feature.FeatureItems!=null) {
@@ -56,7 +60,7 @@ import { <#=  featureClassName #> } from '<#=  GetFeatureComponentFolderName(Fea
 <#
                     } else {
 #>
-import { <#= GetModuleClassName(aModel, allowedFileType.ModuleFileType) #> } from '<#=  GetFeatureCrossComponentFolderName(Feature, ftrFeatureModuleFolder, Context, featureItemSerializable.ViewName, allowedFileType.ModuleFileType) #>';
+import { <#= GetModuleClassNameForFeatureWithAnglrEx(AngularJsonFile, aModel, allowedFileType.ModuleFileType, Feature, ftrFeatureModuleFolder) #> } from '<#=  GetFeatureCrossComponentFolderNameWithAnglr(AngularJsonFile, Feature, ftrFeatureModuleFolder, Context, featureItemSerializable.ViewName, allowedFileType.ModuleFileType) #>';
 <#
                     }
                 }
@@ -92,7 +96,7 @@ import { <#= GetModuleClassName(aModel, allowedFileType.ModuleFileType) #> } fro
 <#
                     } else {
 #>
-        <#= GetModuleClassName(aModel, allowedFileType.ModuleFileType) #>,
+        <#= GetModuleClassNameForFeatureWithAnglrEx(AngularJsonFile, aModel, allowedFileType.ModuleFileType, Feature, ftrFeatureModuleFolder) #>,
 <#
                     }
                 }

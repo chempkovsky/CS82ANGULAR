@@ -224,6 +224,158 @@ namespace CS82ANGULAR.Helpers
             }
             return sb.ToString();
         }
+        public static async Task<string> UpdateExportFileFeatureEFMAsync(AngularJson angularJson, FeatureSerializable feature, FileModifierItemSerializable stepItm)
+        {
+            if (feature is null) return "Error: FeatureSerializable is not set";
+            if (feature.CommonStaffs is null) return "Error: FeatureSerializable.CommonStaffs is not set";
+            if (stepItm is null) return "Error: FileModifierItem is not set";
+            if (stepItm.InvocationParams is null) return "Error: FileModifierItem.InvocationParams is not set";
+            if (stepItm.InvocationParams.Count() < 1) return "Error: FileModifierItem.InvocationParams is not set";
+            if (angularJson is null) return "Error: AngularJson is not set";
+            if (angularJson.Projects is null) return "Error: AngularJson is not set";
+            if (angularJson.Projects.Count < 1) return "Error: AngularJson is not set";
+            string result = "";
+            foreach (string fileType in stepItm.InvocationParams)
+            {
+                if (string.IsNullOrEmpty(fileType))
+                {
+                    result += "FileType is not defined.\n";
+                    continue;
+                }
+                CommonStaffSerializable refItem =
+                    feature.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+                if (refItem is null)
+                {
+                    result += "CommonStaffs does not contain Item with fileType = '" + fileType + "'.\n";
+                    continue;
+                }
+                AngularProject angPrj = GetAngularProjectByRefItemEFM(angularJson, refItem);
+                if (angPrj is null)
+                {
+                    result += "AngularProject does not contain Project Item with fileType = '" + fileType + "'.\n";
+                    continue;
+                }
+                if (angPrj.ProjectType == "library")
+                {
+                    string patsNm = angPrj.AbsoluteSourceRoot + "\\" + "public-api.ts";
+                    if (File.Exists(patsNm))
+                    {
+                        string patsText = File.ReadAllText(patsNm);
+
+                        string patsPath = Path.Combine(refItem.FileProject, refItem.FileFolder, refItem.FileName).Replace(angPrj.AbsoluteSourceRoot, "");
+                        if (!patsPath.StartsWith("\\")) patsPath = "\\" + patsPath;
+                        patsPath = ("." + patsPath).Replace("\\", "/");
+
+                        patsText = await StaticNodeJSService.InvokeFromStringAsync<string>(PublicApiTsUpdaterCode, args: new object[] { patsText, patsPath });
+                        File.WriteAllText(patsNm, patsText);
+                        result += "The file '" + patsNm + "' has been updated.\n";
+                    }
+                    else
+                    {
+                        result += "The file '" + patsNm + "' does not exist.\n";
+                    }
+                }
+                else if (angPrj.ProjectType == "application")
+                {
+                    string wpcjsNm = angPrj.AbsoluteProjectRoot + "\\" + "webpack.config.js";
+                    if (File.Exists(wpcjsNm))
+                    {
+                        string wpcjsText = File.ReadAllText(wpcjsNm);
+                        string wpcjsPath = Path.Combine(refItem.FileProject, refItem.FileFolder, refItem.FileName).Replace(angularJson.AngularJsonPath, "");
+                        if (!wpcjsPath.StartsWith("\\")) wpcjsPath = "\\" + wpcjsPath;
+                        wpcjsPath = ("." + wpcjsPath).Replace("\\", "/");
+
+                        wpcjsText = await StaticNodeJSService.InvokeFromStringAsync<string>(WebpackConfigJsUpdaterCode, args: new object[] { wpcjsText, wpcjsPath });
+                        File.WriteAllText(wpcjsNm, wpcjsText);
+                        result += "The file '" + wpcjsNm + "' has been updated.\n";
+                    }
+                    else
+                    {
+                        result += "The file '" + wpcjsNm + "' does not exist.\n";
+                    }
+                }
+            }
+            return result;
+        }
+        public static async Task<string> ExecuteJsonScriptFeatureEFMAsync(AngularJson angularJson, FeatureSerializable feature, string jsonScript)
+        {
+            StringBuilder sb;
+            if (string.IsNullOrEmpty(jsonScript)) sb = new StringBuilder(); else sb = new StringBuilder(jsonScript);
+            sb.AppendLine("==============================================================================");
+            sb.AppendLine("Deserialize json Script");
+            FileModifierSerializable steps = null;
+            try
+            {
+                steps = JsonConvert.DeserializeObject<FileModifierSerializable>(jsonScript);
+                sb.AppendLine("Deserialize json Script: Done");
+                if (steps == null)
+                {
+                    sb.AppendLine("Result:");
+                    sb.AppendLine(" The list of FileModifierSerializable steps is epmty.");
+                    return sb.ToString();
+                }
+                if (steps.FileModifierItems == null)
+                {
+                    sb.AppendLine("Result:");
+                    sb.AppendLine(" The list of FileModifierSerializable steps is epmty.");
+                    return sb.ToString();
+                }
+                if (steps.FileModifierItems.Count < 1)
+                {
+                    sb.AppendLine("Result:");
+                    sb.AppendLine(" The list of FileModifierSerializable steps is epmty.");
+                    return sb.ToString();
+                }
+            }
+            catch (Exception e)
+            {
+                sb.AppendLine("Error:");
+                sb.AppendLine(e.Message);
+                return sb.ToString();
+            }
+
+            try
+            {
+                sb.AppendLine("Reading updaters code");
+                WebpackConfigJsUpdaterCode = File.ReadAllText(Path.Combine(T4RootFolder, NodejsSriptsFolder, WebpackConfigJsUpdater));
+                PublicApiTsUpdaterCode = File.ReadAllText(Path.Combine(T4RootFolder, NodejsSriptsFolder, PublicApiTsUpdater));
+                sb.AppendLine("Reading updaters code: Done");
+                sb.AppendLine("Setting Babel Folder Path");
+                StaticNodeJSService.Configure<NodeJSProcessOptions>(options => options.ProjectPath = BabelFolderPath);
+                sb.AppendLine("Setting Babel Folder Path: Done");
+            }
+            catch (Exception e)
+            {
+                sb.AppendLine("Error:");
+                sb.AppendLine(e.Message);
+                return sb.ToString();
+            }
+
+            foreach (FileModifierItemSerializable stepItm in steps.FileModifierItems)
+            {
+                switch (stepItm.MethodName)
+                {
+                    case "UpdateExport":
+                        try
+                        {
+                            stepItm.Result = await UpdateExportFileFeatureEFMAsync(angularJson, feature, stepItm);
+                        }
+                        catch (Exception e)
+                        {
+                            stepItm.Result = "Exception thrown: " + e.Message;
+                        }
+                        break;
+
+
+                    default:
+                        stepItm.Result = "Error: Unknown MethodName";
+                        break;
+                }
+                sb = FormatOutputEFM(sb, stepItm);
+            }
+            return sb.ToString();
+        }
+
     }
 
 }

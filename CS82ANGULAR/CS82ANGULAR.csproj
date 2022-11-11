@@ -300,6 +300,10 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30170-.ftr.lazy.routes.ts\Readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Templates\JavaScriptsTmplst\00001-app-config.json\Readme.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -3090,6 +3094,26 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30170-.ftr.lazy.routes.ts\ftr.lazy.routes.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30100-.ftr.component.txt\ftr.component.txt.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30130-.ftr.routing.module.txt\FtrRoutingModuleForFeature.txt.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30150-.ftr.module.txt\FtrModuleForFeature.txt.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaFeatureScriptsTmplst\30160-.ftr.lazy.routing.module.txt\FtrLazyRoutingModuleForFeature.txt.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -3208,7 +3232,7 @@
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties templates_4batchjavascriptstmplst_401000-viewmodelleveltmplts_401963-monora_1json__JsonSchema="https://citation-file-format.github.io/1.2.0/schema.json" templates_4batchjavascriptstmplst_401000-viewmodelleveltmplts_401600-lform_1json__JsonSchema="https://download.stackhawk.com/hawk/jsonschema/hawkconfig.json" templates_4batchjavascriptstmplst_400000-contextleveltmplts_400200-app-glbl-auth_1json__JsonSchema="https://beaujs.com/schema.json" />
+      <UserProperties templates_4batchjavascriptstmplst_400000-contextleveltmplts_400200-app-glbl-auth_1json__JsonSchema="https://beaujs.com/schema.json" templates_4batchjavascriptstmplst_401000-viewmodelleveltmplts_401600-lform_1json__JsonSchema="https://download.stackhawk.com/hawk/jsonschema/hawkconfig.json" templates_4batchjavascriptstmplst_401000-viewmodelleveltmplts_401963-monora_1json__JsonSchema="https://citation-file-format.github.io/1.2.0/schema.json" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

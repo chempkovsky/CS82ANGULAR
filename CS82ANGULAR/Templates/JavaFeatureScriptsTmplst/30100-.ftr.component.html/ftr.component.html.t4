@@ -6,13 +6,17 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureSerializable" name="Feature" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 
 <#
     string containerMenuItemsPropName           = "contMenuItems";
@@ -89,53 +93,3 @@
   </div>
 </div>
 
-<#+
-
-        ModelViewSerializable GetModelViewByName(DbContextSerializable context, string viewName) {
-            if ((context == null) || (string.IsNullOrEmpty(viewName))) {
-                return null;
-            }
-            if (context.ModelViews == null) {
-                return null;
-            }
-            return context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
-        }
-
-        string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType)
-        {
-            string result = "";
-            if ((model == null) || string.IsNullOrEmpty(fileType))
-            {
-                return result;
-            }
-            if (model.CommonStaffs == null)
-            {
-                return result;
-            }
-            CommonStaffSerializable refItem =
-                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-            if (refItem == null)
-            {
-                return result;
-            }
-            if (string.IsNullOrEmpty(refItem.FileName))
-            {
-                return result;
-            }
-            return refItem.FileName.Replace(".component", "");
-        }
-
-        bool isRoutedItem(AllowedFileTypesSerializable allowedFileTypes, string fileType) {
-            if( (allowedFileTypes == null) || string.IsNullOrEmpty(fileType)) {
-                return false;
-            }
-            if(allowedFileTypes.Items == null) {
-                return false;
-            }
-            AllowedFileTypeSerializable rslt= allowedFileTypes.Items.Where(i => i.FileType == fileType).FirstOrDefault();
-            if(rslt == null) {
-                return false;
-            }
-            return rslt.IsRouted;
-        }
-#>

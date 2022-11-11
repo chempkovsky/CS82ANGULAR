@@ -6,13 +6,16 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureSerializable" name="Feature" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 
 .dashboard-grid-container {
     box-sizing: border-box;

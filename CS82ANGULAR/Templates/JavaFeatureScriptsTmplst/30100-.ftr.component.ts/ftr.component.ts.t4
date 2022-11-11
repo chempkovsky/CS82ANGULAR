@@ -6,13 +6,17 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureSerializable" name="Feature" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 
 <#
     string containerMenuItemsPropName           = "contMenuItems";
@@ -29,26 +33,27 @@
     string onActivateMethodName                 = "onActivate";
     string onDeActivateMethodName               = "onDeActivate";
 
-    string AppSettingServicePropName            = "appGlblSettings";
-    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
-    string appSettingServiceClassName           = GetCommonServiceClassName(Context, appSettingServiceFolder);
-    
-    string itemHeightDataModelFolder            = "00016-item-height-data.interface.ts";
-    string itemHeightDataModelClassName         = GetModelClassName(Context, itemHeightDataModelFolder);
-
-    string menuItemDataModelFolder              = "00017-menu-item-data.interface.ts";
-    string menuItemDataModelClassName           = GetModelClassName(Context, menuItemDataModelFolder);
-
-    string eventEmitterPubModelFolder           = "00019-event-emitter-pub.interface.ts";
-    string eventEmitterPubModelClassName        = GetModelClassName(Context, eventEmitterPubModelFolder);
-
     string ftrFeatureHtmlFolder                 = "30100-.ftr.component.css";
     string ftrFeatureCssFolder                  = "30100-.ftr.component.html";
     string ftrFeatureComponentFolder            = "30100-.ftr.component.ts";
-
-
     string featureSelectorCommonPart            = GetFeatureComponentSelectorCommonPart(Feature, ftrFeatureComponentFolder);
     string featureClassName                     = GetFeatureComponentClassName(Feature, ftrFeatureComponentFolder);
+
+
+    string AppSettingServicePropName            = "appGlblSettings";
+    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName           = GetCommonServiceClassNameForFeatureWithAnglr(AngularJsonFile, Feature, Context, appSettingServiceFolder, ftrFeatureComponentFolder);
+
+    string itemHeightDataModelFolder            = "00016-item-height-data.interface.ts";
+    string itemHeightDataModelClassName         = GetModelClassNameForFeatureWithAnglr(AngularJsonFile, Feature, Context, itemHeightDataModelFolder, ftrFeatureComponentFolder);
+
+    string menuItemDataModelFolder              = "00017-menu-item-data.interface.ts";
+    string menuItemDataModelClassName           = GetModelClassNameForFeatureWithAnglr(AngularJsonFile, Feature, Context, menuItemDataModelFolder, ftrFeatureComponentFolder);
+
+    string eventEmitterPubModelFolder           = "00019-event-emitter-pub.interface.ts";
+    string eventEmitterPubModelClassName        = GetModelClassNameForFeatureWithAnglr(AngularJsonFile, Feature, Context, eventEmitterPubModelFolder, ftrFeatureComponentFolder);
+    
+
 
     int FeatureItemsCount = 0;
     int rotedId= -1;
@@ -67,10 +72,10 @@
 #>
 import { Component, OnInit } from '@angular/core';
 import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
-import { <#= appSettingServiceClassName #> } from '<#=  GetFeatureCommonFolderName(Feature, Context,  appSettingServiceFolder, ftrFeatureComponentFolder)#>';
-import { <#= menuItemDataModelClassName #> } from '<#=  GetFeatureCommonFolderName(Feature, Context,  menuItemDataModelFolder, ftrFeatureComponentFolder)#>';
-import { <#= itemHeightDataModelClassName #> } from '<#=  GetFeatureCommonFolderName(Feature, Context,  itemHeightDataModelFolder, ftrFeatureComponentFolder)#>';
-import { <#= eventEmitterPubModelClassName #> } from '<#=  GetFeatureCommonFolderName(Feature, Context,  eventEmitterPubModelFolder, ftrFeatureComponentFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#=  GetFeatureCommonFolderNameWithAnglr(AngularJsonFile, Feature, Context, appSettingServiceFolder, ftrFeatureComponentFolder) #>';
+import { <#= menuItemDataModelClassName #> } from '<#=  GetFeatureCommonFolderNameWithAnglr(AngularJsonFile, Feature, Context, menuItemDataModelFolder, ftrFeatureComponentFolder) #>';
+import { <#= itemHeightDataModelClassName #> } from '<#=  GetFeatureCommonFolderNameWithAnglr(AngularJsonFile, Feature, Context, itemHeightDataModelFolder, ftrFeatureComponentFolder) #>';
+import { <#= eventEmitterPubModelClassName #> } from '<#=  GetFeatureCommonFolderNameWithAnglr(AngularJsonFile, Feature, Context, eventEmitterPubModelFolder, ftrFeatureComponentFolder) #>';
 
 import { Subscription } from 'rxjs';
 
@@ -309,297 +314,3 @@ export class <#= featureClassName #>  {
 
 }
 
-<#+
-
-    string GetFeatureCommonFolderName(FeatureSerializable  feature, DbContextSerializable context,  string refFolder, string currFolder) {
-        string result="./";
-        if ((feature == null) || (context == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
-            return result;
-        }
-        if ((feature.CommonStaffs == null) || (context.CommonStaffs == null)) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            context.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
-        CommonStaffSerializable curItem= 
-            feature.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
-        if ((refItem == null) || (curItem == null)) {
-            return result;
-        }
-        string[] refFolders  = new string[] {};
-        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
-            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-        }
-        string[] currFolders = new string[]{};
-        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
-            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-        }
-        int refLen = refFolders.Length;
-        int currLen = currFolders.Length;
-        int minLen = refLen < currLen ? refLen : currLen;
-        int cnt= 0;
-        for(int i = 0; i < minLen; i++) {
-            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
-            cnt++;
-        }
-        if(currLen > cnt) {
-            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
-        }
-        if(refLen > cnt) {
-            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
-        }
-        result += refItem.FileName;
-        return result;
-    }
-
-    string GetModelClassName(DbContextSerializable context, string fileType) {
-        string result="";
-        if ((context == null) || string.IsNullOrEmpty(fileType)) {
-            return result;
-        }
-        if (context.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-        if (refItem == null) {
-            return result;
-        }
-        if(string.IsNullOrEmpty(refItem.FileName)) {
-            return result;
-        }
-        string fn = refItem.FileName.Replace(".interface","");
-        StringBuilder sb = new StringBuilder();
-        bool toUpper = true;
-        foreach (char c in fn)
-        {
-            if( c == '-' )
-            {
-                toUpper = true;
-            } else
-            {
-                if (toUpper)
-                {
-                    sb.Append(Char.ToUpper(c));
-                    toUpper = false;
-                }
-                else
-                {
-                    sb.Append(c);
-                }
-            }
-                
-        }
-        return "I" + sb.ToString();
-    }
-
-    string GetAllFeatureDefaultIsExp(FeatureSerializable  Feature) {
-        if (Feature == null) return "";
-        if (Feature.FeatureItems == null) return "";
-        string rslt = "false";
-        if(Feature.FeatureItems.Count < 2) return rslt;
-        for(int i = 1; i< Feature.FeatureItems.Count;i++) {
-            rslt += ", false";
-        }
-        return rslt;
-    }
-        
-    string GetFeatureComponentClassName(FeatureSerializable feature, string fileType) {
-        string result="";
-        if ((feature == null) || string.IsNullOrEmpty(fileType) ) {
-            return result;
-        }
-        if (feature.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            feature.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-        if (refItem == null) {
-            return result;
-        }
-        if(string.IsNullOrEmpty(refItem.FileName)) {
-            return result;
-        }
-        string fn = refItem.FileName.Replace(".component","Component").Replace(".","-");
-        StringBuilder sb = new StringBuilder();
-        bool toUpper = true;
-        foreach (char c in fn)
-        {
-            if( c == '-' )
-            {
-                toUpper = true;
-            } else
-            {
-                if (toUpper)
-                {
-                    sb.Append(Char.ToUpper(c));
-                    toUpper = false;
-                }
-                else
-                {
-                    sb.Append(c);
-                }
-            }
-        }
-        return sb.ToString();
-    }
-
-    string GetFeatureComponentSelectorCommonPart(FeatureSerializable feature, string fileType) {
-        string result="";
-        if ((feature == null) || string.IsNullOrEmpty(fileType)) {
-            return result;
-        }
-        if (feature.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            feature.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-        if (refItem == null) {
-            return result;
-        }
-        if(string.IsNullOrEmpty(refItem.FileName)) {
-            return result;
-        }
-        return refItem.FileName.Replace(".component","").Replace(".","-");
-    }
-
-    string GetFeatureFolderName(FeatureSerializable feature, string refFolder, string currFolder) {
-        string result="./";
-        if ((feature == null) || string.IsNullOrEmpty(refFolder) || string.IsNullOrEmpty(currFolder)) {
-            return result;
-        }
-        if (feature.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            feature.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
-        CommonStaffSerializable curItem= 
-            feature.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
-        if ((refItem == null) || (curItem == null)) {
-            return result;
-        }
-        string[] refFolders  = new string[] {};
-        if(!string.IsNullOrEmpty(refItem.FileFolder)) {
-            refFolders  = refItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-        }
-        string[] currFolders = new string[]{};
-        if(!string.IsNullOrEmpty(curItem.FileFolder)) {
-            currFolders  = curItem.FileFolder.Split(new string[] { "\\" }, StringSplitOptions.None);
-        }
-        int refLen = refFolders.Length;
-        int currLen = currFolders.Length;
-        int minLen = refLen < currLen ? refLen : currLen;
-        int cnt= 0;
-        for(int i = 0; i < minLen; i++) {
-            if ( !refFolders[i].Equals(currFolders[i], StringComparison.OrdinalIgnoreCase) ) break;
-            cnt++;
-        }
-        if(currLen > cnt) {
-            result += string.Join("",Enumerable.Repeat("../", currLen - cnt));
-        }
-        if(refLen > cnt) {
-            result += string.Join("/", refFolders, cnt, refLen - cnt) + "/";
-        }
-        result += refItem.FileName;
-        return result;
-    }
-
-
-    ModelViewSerializable GetModelViewByName(DbContextSerializable context, string viewName) {
-        if ((context == null) || (string.IsNullOrEmpty(viewName))) {
-            return null;
-        }
-        if (context.ModelViews == null) {
-            return null;
-        }
-        return context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
-    }
-
-    string GetComponentSelectorCommonPart(ModelViewSerializable model, string fileType)
-    {
-        string result = "";
-        if ((model == null) || string.IsNullOrEmpty(fileType))
-        {
-            return result;
-        }
-        if (model.CommonStaffs == null)
-        {
-            return result;
-        }
-        CommonStaffSerializable refItem =
-            model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-        if (refItem == null)
-        {
-            return result;
-        }
-        if (string.IsNullOrEmpty(refItem.FileName))
-        {
-            return result;
-        }
-        return refItem.FileName.Replace(".component", "");
-    }
-
-    bool isRoutedItem(AllowedFileTypesSerializable allowedFileTypes, string fileType) {
-        if( (allowedFileTypes == null) || string.IsNullOrEmpty(fileType)) {
-            return false;
-        }
-        if(allowedFileTypes.Items == null) {
-            return false;
-        }
-        AllowedFileTypeSerializable rslt= allowedFileTypes.Items.Where(i => i.FileType == fileType).FirstOrDefault();
-        if(rslt == null) {
-            return false;
-        }
-        return rslt.IsRouted;
-    }
-    AllowedFileTypeSerializable GetAllowedFileType(AllowedFileTypesSerializable allowedFileTypes, string fileType) {
-        if( (allowedFileTypes == null) || string.IsNullOrEmpty(fileType)) {
-            return null;
-        }
-        if(allowedFileTypes.Items == null) {
-            return null;
-        }
-        return allowedFileTypes.Items.Where(i => i.FileType == fileType).FirstOrDefault();
-    }
-    string GetCommonServiceClassName(DbContextSerializable context, string fileType) {
-        string result="";
-        if ((context == null) || string.IsNullOrEmpty(fileType)) {
-            return result;
-        }
-        if (context.CommonStaffs == null) {
-            return result;
-        }
-        CommonStaffSerializable refItem= 
-            context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
-        if (refItem == null) {
-            return result;
-        }
-        if(string.IsNullOrEmpty(refItem.FileName)) {
-            return result;
-        }
-        string fn = refItem.FileName.Replace(".service","Service");
-        StringBuilder sb = new StringBuilder();
-        bool toUpper = true;
-        foreach (char c in fn)
-        {
-            if( c == '-' )
-            {
-                toUpper = true;
-            } else
-            {
-                if (toUpper)
-                {
-                    sb.Append(Char.ToUpper(c));
-                    toUpper = false;
-                }
-                else
-                {
-                    sb.Append(c);
-                }
-            }
-                
-        }
-        return sb.ToString();
-    }
-
-#>
