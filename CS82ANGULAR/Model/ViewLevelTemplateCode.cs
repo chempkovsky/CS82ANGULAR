@@ -7337,7 +7337,7 @@ namespace CS82ANGULAR.Model
                             }
                         }
                         if (string.IsNullOrEmpty(aliasNm)) aliasNm = appFl;
-                        return "loadChildren: () => loadRemoteModule({type: 'manifest', remoteName: '" + refAngularProject.ProjectName + "', exposedModule: '" + aliasNm + "'}).then(m => m." + GetFeatureModuleClassNameWithAnglr(anglJson, feature, fileType, currFolder) + ")";
+                        return "loadChildren: () => loadRemoteModule({type: 'manifest', remoteName: '" + refAngularProject.ProjectName + "', exposedModule: '" + aliasNm + "'}).then(m => m." + GetFeatureModuleClassNameWithAnglr(anglJson, feature, fileType, fileType) + ")"; // this is correct: fileType, fileType
                     }
                 }
             }
