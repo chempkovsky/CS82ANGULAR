@@ -1,0 +1,662 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
+<#
+
+    bool localize = Context.Localize;
+
+    string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName   = GetServiceClassName(Model, appSettingServiceFolder);
+    string appConfigServiceFolder       = "00014-app-config.service.ts";
+    string appConfigServiceClassName    = GetServiceClassNameWithAnglr(AngularJsonFile,Model, appConfigServiceFolder, appSettingServiceFolder);
+
+
+    string AppearancePropName           = "appearance";
+    string ShowErrorMethodName          = "showError";
+    string ShowMessageMethodName        = "showMsg";
+    string AppSettingServicePropName    = "appGlblSettings";
+
+    string configPropName               = "config";
+    string settingsPropName             = "settings";
+    string webApiUrlPropName            = "webApiUrl";
+    string securityUrlPropName          = "securityUrl";
+    string permissionWebApiPropName     = "permissionWebApi";
+
+
+    string getStorageItemMethodName     = "getStorageItem";
+    string setStorageItemMethodName     = "setStorageItem";
+    string getStorageLengthMethodName   = "getStorageLength";
+    string removeStorageItemMethodName  = "removeStorageItem";
+    string getStorageKeyMethodName      = "getStorageKey";
+    string clearStorageMethodName       = "clearStorage";
+    string vwModelsPropName             = "vwModels";
+
+    string toastComponentName           = "ToastsContainer";
+
+
+
+#>
+
+import { Injectable, Component, TemplateRef } from '@angular/core';
+import { AbstractControl, ValidationErrors } from '@angular/forms';
+import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot, CanActivateChild, Route } from '@angular/router';
+import { <#= appConfigServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appConfigServiceFolder, appSettingServiceFolder) #>';
+import { HttpParameterCodec } from '@angular/common/http';
+
+
+@Component({
+	selector: 'app-toasts',
+	template: `
+		<ngb-toast
+			*ngFor="let toast of toastService.toasts"
+			[class]="toast.classname"
+            [header]="toast.headertext"
+			[autohide]="true"
+			[delay]="toast.delay || 5000"
+			(hidden)="toastService.remove(toast)">
+			<ng-template [ngIf]="isTemplate(toast)" [ngIfElse]="text">
+				<ng-template [ngTemplateOutlet]="toast.textOrTpl"></ng-template>
+			</ng-template>
+
+			<ng-template #text>{{ toast.textOrTpl }}</ng-template>
+		</ngb-toast>
+	`,
+	host: { class: 'toast-container position-fixed top-0 end-0 p-3', style: 'z-index: 1200' },
+})
+export class <#= toastComponentName #> {
+	constructor(public toastService: <#= appSettingServiceClassName #>) {}
+
+	isTemplate(toast) {
+		return toast.textOrTpl instanceof TemplateRef;
+	}
+}
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class <#= appSettingServiceClassName #> implements CanActivate, CanActivateChild, HttpParameterCodec {
+//
+// begin HttpParameterCodec: https://github.com/angular/angular/issues/20376
+//
+    encodeKey(key: string): string {
+      return encodeURIComponent(key);
+    }
+    encodeValue(value: string): string {
+      return encodeURIComponent(value);
+    }
+    decodeKey(key: string): string {
+      return decodeURIComponent(key);
+    }
+    decodeValue(value: string): string {
+      return decodeURIComponent(value);
+    }
+//
+// end HttpParameterCodec: https://github.com/angular/angular/issues/20376
+//
+    public filterHeightAddition: number = 0.5;
+    public filterHeightFactor: number = 5;
+    public tableHeightAddition: number = 0;
+    public tableHeightFactor: number = 31;
+
+    public toasts: any[] = [];
+    // Push new Toasts to array with content and options
+    public showToast(textOrTpl: string | TemplateRef<any>, options: any = {}) {
+        this.toasts.push({ textOrTpl, ...options });
+    }
+    // Callback method to remove Toast DOM element from view
+    public removeToast(toast: any) {
+        this.toasts = this.toasts.filter(t => t !== toast);
+    }
+
+
+    constructor(private _<#= settingsPropName #>: <#= appConfigServiceClassName #>) {}
+    public <#= ShowMessageMethodName #>(msg: string) {
+      this.showToast(msg, {
+        classname: 'bg-info text-light',
+        delay: 4000 ,
+        autohide: true,
+        headertext: 'Info'
+      });      
+    }
+    public <#= ShowErrorMethodName #>(errTp: string, errorStruct: any) {
+<# 
+    if(localize) {
+#>
+        let text: string = $localize`:Error prefix@@<#= appSettingServiceClassName #>.Error:Error`+': ';
+<# 
+    } else {
+#>
+        let text: string = 'Error :';
+<# 
+    }
+#>
+        if(!(typeof errTp === 'undefined')) {
+            if(!(errTp === null)) {
+<# 
+    if(localize) {
+#>
+                text = $localize`:Error of type prefix@@<#= appSettingServiceClassName #>.Error-of-type:Error of type` + ' ' + errTp + ' : ';
+<# 
+    } else {
+#>
+                text = 'Error of type ' + errTp + ': ';
+<# 
+    }
+#>
+            }
+        }
+        if(!(typeof errorStruct === 'undefined')) {
+            if(!(errorStruct === null)) {
+                if(!(typeof errorStruct.message === 'undefined')) {
+                    if(!(errorStruct.message === null)) {
+                        text = text + ' ' +  errorStruct.message;
+                    }
+                }
+                if(!(typeof errorStruct.status === 'undefined')) {
+                  if(!(errorStruct.status === null)) {
+<# 
+    if(localize) {
+#>
+                      text = text + ' ' + $localize`:Status prefix@@<#= appSettingServiceClassName #>.status:status` + ' ' + errorStruct.status;
+<# 
+    } else {
+#>
+                      text = text + ' status: ' +  errorStruct.status;
+<# 
+    }
+#>
+                  }
+              }
+              if(!(typeof errorStruct.statusText === 'undefined')) {
+                    if(!(errorStruct.statusText === null)) {
+<# 
+    if(localize) {
+#>
+                        text = text + ' ' + $localize`:Status Text prefix@@<#= appSettingServiceClassName #>.Status-Text:Status Text` + ' ' + errorStruct.statusText;
+<# 
+    } else {
+#>
+                        text = text + ' Status Text:' +  errorStruct.statusText;
+<# 
+    }
+#>
+                    }
+                }
+                if(!(typeof errorStruct.error === 'undefined')) {
+                  if(!(errorStruct.error === null)) {
+                    if(!(typeof errorStruct.error.errors === 'undefined')) {
+                      if(Array.isArray( errorStruct.error.errors )) {
+                        errorStruct.error.errors.forEach((e: any) => {
+<# 
+    if(localize) {
+#>
+                          if(e.code) text = text + ' ' + $localize`:error code prefix@@<#= appSettingServiceClassName #>.error-code:error code` + ' ' + e.code;
+                          if(e.description) text = text + ' ' + $localize`:error descr prefix@@<#= appSettingServiceClassName #>.error-descr:error descr` + ' ' + e.description;
+<# 
+    } else {
+#>
+                          if(e.code) text = text + ' error code:' + e.code;
+                          if(e.description) text = text + ' error descr: ' + e.description;
+<# 
+    }
+#>
+                        });
+                      }
+                    }
+                  }
+                }
+            }
+        }
+        this.showToast(text, {
+          classname: 'bg-danger text-light',
+          delay: 4000 ,
+          autohide: true,
+          headertext: 'Error'
+        });
+    }
+    public getWebApiPrefix(vwNm: string): string {
+        let reslt: string = '';
+        if(!(vwNm === null)) {
+            if(!(vwNm === null)) {
+                //
+                // here: defining url by ViewName
+                //
+                reslt =  this._<#= settingsPropName #>.<#= configPropName #>.<#= webApiUrlPropName #>; // 'https://localhost:7148/';
+            }
+        }
+        return reslt;
+    } 
+    public getSecurityWebApiPrefix(): string {
+        return this._<#= settingsPropName #>.<#= configPropName #>.<#= securityUrlPropName #>; //'https://localhost:7148/';
+    } 
+    public getPermissionWebApiPrefix(): string {
+        return this._<#= settingsPropName #>.<#= configPropName #>.<#= permissionWebApiPropName #>; // 'https://localhost:7148/';
+    }
+
+    getValidationErrorMessage(fc: AbstractControl): string {
+<# 
+    if(localize) {
+#>
+        let rslt: string = $localize`:Validation Error prefix@@<#= appSettingServiceClassName #>.Validation-Error:Validation Error` + '. ';
+<# 
+    } else {
+#>
+        let rslt: string = 'Validation Error. ';
+<# 
+    }
+#>
+
+        if (typeof fc === 'undefined') {
+          return rslt;
+        }
+        if (fc === null) {
+          return rslt;
+        }
+        if (fc.errors === null) return rslt;
+        const errs: ValidationErrors = fc.errors as ValidationErrors;
+        Object.keys(errs).forEach(k => {
+          switch(k) {
+            case 'maxlength':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Required max length@@<#= appSettingServiceClassName #>.Required-max-length:Required max length` + ': ' + errs[k].requiredLength;
+<# 
+    } else {
+#>
+              rslt +=' Required max length: ' + errs[k].requiredLength;
+<# 
+    }
+#>
+              break;
+            case 'minlength':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Required min length@@<#= appSettingServiceClassName #>.Required-min-length:Required min length` + ': ' + errs[k].requiredLength;
+<# 
+    } else {
+#>
+              rslt +=' Required min length: ' + errs[k].requiredLength;
+<# 
+    }
+#>
+              break;
+            case 'required':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Required field@@<#= appSettingServiceClassName #>.Required-field:Required field` + ': ' + errs[k].requiredLength;
+<# 
+    } else {
+#>
+              rslt +=' Required field: ' ;
+<# 
+    }
+#>
+              break;
+            case 'max':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:The value must be less than@@<#= appSettingServiceClassName #>.The-value-must-be-less-than:The value must be less than` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
+              rslt +=' The value must be less than ' + errs[k].max;
+<# 
+    }
+#>
+              break;
+            case 'min':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:The value must be greater than@@<#= appSettingServiceClassName #>.The-value-must-be-greater-than:The value must be greater than` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
+              rslt +=' Value must be greater than ' + errs[k].min;
+<# 
+    }
+#>
+              break;
+            case 'pattern':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Icorrect format@@<#= appSettingServiceClassName #>.Icorrect-format:Icorrect format` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
+              rslt +=' Icorrect format.' ;
+<# 
+    }
+#>
+              break;
+            case 'matDatepickerMin':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Value must be greater than@@<#= appSettingServiceClassName #>.Value-must-be-greater-than:Value must be greater than` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
+              rslt +=' Value must be greater than ' + errs[k].min;
+<# 
+    }
+#>
+              break;
+            case 'matDatepickerMax':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Value must be less than@@<#= appSettingServiceClassName #>.Value-must-be-less-than:Value must be less than` + ': ' + errs[k].max;
+<# 
+    } else {
+#>
+              rslt +=' The value must be less than ' + errs[k].max;
+<# 
+    }
+#>
+              break;
+            case 'matDatepickerParse':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Icorrect date format@@<#= appSettingServiceClassName #>.Icorrect-date-format:Icorrect date format` + '.';
+<# 
+    } else {
+#>
+              rslt +=' Icorrect date format.' ;
+<# 
+    }
+#>
+              break;
+            default:
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + $localize`:Icorrect format@@<#= appSettingServiceClassName #>.Icorrect-format2:Icorrect format` + '.';
+<# 
+    } else {
+#>
+              rslt +=' Icorrect format.' ;
+<# 
+    }
+#>
+              break;
+          }
+        });
+        return rslt;
+    } // end of getErrorMessage
+    public getDialogWidth(vwNm: string): string {
+        let rslt: string = '99vw';
+        if(!(vwNm === null)) {
+            if(!(vwNm === null)) {
+                //
+                // here: set dialog width for the given ViewName
+                //
+                return '99vw';        
+            }
+        }
+        return rslt;
+    }
+    public getDialogMaxWidth(vwNm: string): string {
+        let rslt: string = '100vw';
+        if(!(vwNm === null)) {
+            if(!(vwNm === null)) {
+                //
+                // here: set dialog max width for the given ViewName
+                //
+                return '100vw';        
+            }
+        }
+        return rslt;
+    }
+    
+    protected authInto: any = null;
+    public getAuthInto(): any {
+        return this.authInto;
+    }
+    public setAuthInto(info: any): any {
+        if(typeof info === 'undefined') {
+            this.authInto = null;
+        } else {
+            this.authInto = info;
+        }
+    }
+
+    public perms: number[] = [0,0,0,0,  0,0,0,0,  0,0,0,0,  0,0,  1,0,0];
+    public <#= vwModelsPropName #>:  { [key: string]: number } = {
+/*        
+        'LitAuthorView': 0,
+        'LitBookView': 1,
+        'LitCountryView':2,
+        'LitDialectView':3,
+        'LitEditionView':4,
+        'LitGenreView':5,
+        'LitLanguageView':6,
+        'LitManuscriptView':7,
+        'LitPublisherView':8,
+*/
+    };
+    public dshBrds:  { [key: string]: number } = {
+/*
+      'FirstFtrComponent': 0
+*/
+    };
+    getViewModelMask(vwModel: string): number {
+      return 31; // delete this line when <#= vwModelsPropName #> is ready
+      let pk = this.<#= vwModelsPropName #>[vwModel];
+      if(typeof pk === 'undefined') { return 0; } else { return pk; }
+/*
+
+deprecated
+
+      let pk = this.vwModels[vwModel];
+      if(typeof pk === 'undefined') return 0;
+      let rid: number = Math.floor(pk/7);
+      if(rid >= (this.perms.length-3))  return 0; 
+      let sft: number = (pk - rid * 7) * 4;
+      let rslt = this.perms[rid];
+      if(sft > 0) {
+        rslt = this.perms[rid] >> sft;
+      }
+      return rslt; 
+*/
+    }
+    getDashBrdMask(dshBrd: string): number {
+      return 1; // delete this line when dshBrds is ready
+      let pk = this.<#= vwModelsPropName #>[dshBrd];
+      if(typeof pk === 'undefined') { return 0; } else { return pk; }
+/* 
+
+deprecated
+
+      let pk = this.dshBrds[dshBrd];
+      if(typeof pk === 'undefined') return 0;
+      let rid: number = Math.floor(pk/31);
+      if(rid >= (this.perms.length-14))  return 0; 
+      let sft: number = (pk - rid * 31);
+      let rslt = (this.perms[rid+14])
+      if(sft > 0) {
+        rslt = (this.perms[rid+14]) >> sft;
+      }
+      return rslt; 
+*/
+    }
+    canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean  {
+      if((typeof childRoute.data['vn'] === 'undefined') || (typeof childRoute.data['va'] === 'undefined')) return false;
+      if((childRoute.data['vn'] === null) || (childRoute.data['va'] === null)) return false;
+      let msk = this.getViewModelMask(childRoute.data['vn']);
+      let rslt: boolean = false;
+
+      switch( childRoute.data['va'] ) {
+        case 'a':
+          rslt = ((msk & 8) === 8);
+          break;
+        case 'u':
+          rslt = ((msk & 4) === 4);
+          break;
+        case 'd':
+          rslt = ((msk & 2) === 2);
+          break;
+        case 'l':
+          rslt = ((msk & 1) === 1);
+          break;
+        case 'v':
+          rslt = ((msk & 1) === 1);
+          break;
+      };
+
+<# 
+    if(localize) {
+#>
+      if(!rslt) this.<#= ShowErrorMethodName #>('navigation', {message: $localize`:Access denied@@<#= appSettingServiceClassName #>.Access-denied:Access denied`});
+<# 
+    } else {
+#>
+      if(!rslt) this.<#= ShowErrorMethodName #>('navigation', {message: 'Access denied'});
+<# 
+    }
+#>
+
+
+      return rslt;
+/*
+
+deprecated
+
+      if (childRoute.routeConfig === null) return false;
+      if ( typeof ((childRoute.routeConfig as Route).path) === 'undefined') return false;
+      let pth: string[] = ((childRoute.routeConfig as Route).path as string).split('/');
+      let vnm: string = '';
+      let act: number = 1;
+      let vid: number = -1;
+      let cnt = 0;
+      for(let i = pth.length-1; i > -1; i-- ) {
+        if(!pth[i].startsWith(':')) {
+          if(cnt > 0) {
+            vnm = pth[i];
+            vid = i;
+            break;
+          } else cnt++;
+        }
+      }
+      if (vid < 0) {
+        if(pth.length>0) {
+          vnm = pth[0];
+          vid = 0;
+        } else return false;
+      }
+      if ( pth[pth.length-1].startsWith(':') ) {
+        switch( childRoute.url[childRoute.url.length-1].path ) {
+          case 'add':
+            act = 8;
+            break;
+          case 'update':
+            act = 4;
+            break;
+          case 'delete':
+            act = 2;
+            break;
+        };
+      } 
+      return (this.getViewModelMask(vnm) & act) === act;
+*/
+    }
+    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean  {
+      if(route.routeConfig === null) return false;
+      if( typeof ((route.routeConfig as Route).component) === 'undefined') return false;
+      return ( this.getDashBrdMask(((route.routeConfig as Route).component as any)['name']) & 1) === 1;
+
+    }
+    
+    public userName: string|null=null;
+
+    public useLocalStorage: boolean = false;
+    public useSessionStorage: boolean = false;
+    protected serviceStorage: {[key: string]: any} = {};
+
+    public <#= getStorageItemMethodName #>(key: string): any {
+        if(typeof key === 'undefined') return null;
+        if (this.useLocalStorage) {
+            return null;
+        } else if (this.useSessionStorage) {
+            return null;
+        } else {
+            return this.serviceStorage[key];
+        }
+    }
+    public <#= setStorageItemMethodName #>(key: string, val: any): void {
+        if(!(typeof key === 'undefined')) {
+            if (this.useLocalStorage) {
+                
+            } else if (this.useSessionStorage) {
+            
+            } else {
+                this.serviceStorage[key] = val;
+            }
+        }
+    }
+    public <#= getStorageLengthMethodName #>(): number {
+        if (this.useLocalStorage) {
+            return 0;
+        } else if (this.useSessionStorage) {
+            return 0;
+        } else {
+            return Object.keys(this.serviceStorage).length;
+        }
+    }
+    public <#= removeStorageItemMethodName #>(key: string): void {
+        delete this.serviceStorage[key];
+    }
+    public <#= getStorageKeyMethodName #>(index: number): string | null {
+        if (this.useLocalStorage) {
+            return null;
+        } else if (this.useSessionStorage) {
+            return null;
+        } else {
+            const ks = Object.keys(this.serviceStorage);
+            return index >= 0 && ks.length < index ? ks[index] : null;
+        }
+
+    }
+    public <#= clearStorageMethodName #>(): void {
+        if (this.useLocalStorage) {
+            
+        } else if (this.useSessionStorage) {
+            
+        } else {
+            this.serviceStorage = {};
+        }
+    }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class <#= appSettingServiceClassName + "Activator" #> implements CanActivate {
+    constructor(protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {}
+    
+    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+        return this.<#= AppSettingServicePropName #>.canActivateChild(route, state);
+    }
+}
+

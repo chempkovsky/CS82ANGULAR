@@ -1,0 +1,221 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please make sure that you selected [src\\app] folder",
+    "",
+    "Please make sure that you executed two commands",
+    "    ng add @angular/material",
+    "    npm i -s @angular/flex-layout@9.0.0-beta.31 @angular/cdk",
+    "",
+    "                                After you have finished the current batch generation",
+    "Please include ",
+    "",
+    "     AppMaterialModule ",
+    "     AppFlexLayoutModule ",
+    "     AppFormatterModule ",
+    "     WebServiceFilterModule ",
+    "     HttpClientModule ",
+    "",
+    "in the import:[]-section of AppModule",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "shared\\modules",
+      "GeneratorType": "00010-app-material.module.ts",
+      "GeneratorSript": "app-bootstrap.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\modules",
+      "GeneratorType": "00011-app-flex-layout.module.ts",
+      "GeneratorSript": "app-flex-layout.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00013-app-config.interface.ts",
+      "GeneratorSript": "app-config.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\services",
+      "GeneratorType": "00014-app-config.service.ts",
+      "GeneratorSript": "app-config.service.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\services",
+      "GeneratorType": "00015-app-glbl-settings.service.ts",
+      "GeneratorSript": "app-glbl-settings.service.bootstrap.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\pipes",
+      "GeneratorType": "00062-to-binary.pipe.ts",
+      "GeneratorSript": "to-binary.pipe.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\directives",
+      "GeneratorType": "00064-to-binary-formatter.directive.ts",
+      "GeneratorSript": "to-binary-formatter.directive.kendo.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\modules",
+      "GeneratorType": "00070-app-formatter.module.ts",
+      "GeneratorSript": "formatter.module.ts.t4"
+    },
+
+
+
+
+
+    {
+      "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00016-item-height-data.interface.ts",
+      "GeneratorSript": "item-height-data.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00018-event-emitter-data.interface.ts",
+      "GeneratorSript": "event-emitter-data.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00017-menu-item-data.interface.ts",
+      "GeneratorSript": "menu-item-data.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00019-event-emitter-pub.interface.ts",
+      "GeneratorSript": "event-emitter-pub.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00020-detail-view-sel.interface.ts",
+      "GeneratorSript": "detail-view-sel.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00021-web-service-filter.interface.ts",
+      "GeneratorSript": "web-service-filter.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00022-web-service-filter-def.interface.ts",
+      "GeneratorSript": "web-service-filter-def.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00042-uniq-service-filter.interface.ts",
+      "GeneratorSript": "uniq-service-filter.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00044-uniq-service-filter-def.interface.ts",
+      "GeneratorSript": "uniq-service-filter-def.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00023-web-service-filter-operator.interface.ts",
+      "GeneratorSript": "web-service-filter-operator.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00024-web-service-filter-rslt.interface.ts",
+      "GeneratorSript": "web-service-filter-rslt.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00600-view-model-datasource.interface.ts",
+      "GeneratorSript": "view-model-datasource.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\web-service-filter",
+      "GeneratorType": "00025-web-service-filter.component.css",
+      "GeneratorSript": "web-service-filter.component.css.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\web-service-filter",
+      "GeneratorType": "00025-web-service-filter.component.html",
+      "GeneratorSript": "web-service-filter.component.kendo.html.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\web-service-filter",
+      "GeneratorType": "00025-web-service-filter.component.ts",
+      "GeneratorSript": "web-service-filter.component.kendo.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\uniq-service-filter",
+      "GeneratorType": "00046-uniq-service-filter.component.css",
+      "GeneratorSript": "uniq-service-filter.component.css.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\uniq-service-filter",
+      "GeneratorType": "00046-uniq-service-filter.component.html",
+      "GeneratorSript": "uniq-service-filter.component.kendo.html.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\uniq-service-filter",
+      "GeneratorType": "00046-uniq-service-filter.component.ts",
+      "GeneratorSript": "uniq-service-filter.component.kendo.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\column-selector",
+      "GeneratorType": "00032-column-selector-item.interface.ts",
+      "GeneratorSript": "event-emitter-data.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\column-selector",
+      "GeneratorType": "00033-column-selector.component.css",
+      "GeneratorSript": "column-selector.component.css.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\column-selector",
+      "GeneratorType": "00033-column-selector.component.html",
+      "GeneratorSript": "column-selector.component.kendo.html.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\column-selector",
+      "GeneratorType": "00033-column-selector.component.ts",
+      "GeneratorSript": "column-selector.component.kendo.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\column-selector-dlg",
+      "GeneratorType": "00035-column-selector-dlg.component.css",
+      "GeneratorSript": "column-selector-dlg.component.css.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\column-selector-dlg",
+      "GeneratorType": "00035-column-selector-dlg.component.html",
+      "GeneratorSript": "column-selector-dlg.component.kendo.html.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\column-selector-dlg",
+      "GeneratorType": "00035-column-selector-dlg.component.ts",
+      "GeneratorSript": "column-selector-dlg.component.kendo.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\message-dialog",
+      "GeneratorType": "00037-message-dialog.interface.ts",
+      "GeneratorSript": "message-dialog.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\message-dialog",
+      "GeneratorType": "00038-message-dialog.component.css",
+      "GeneratorSript": "message-dialog.component.css.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\message-dialog",
+      "GeneratorType": "00038-message-dialog.component.html",
+      "GeneratorSript": "message-dialog.component.kendo.html.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\message-dialog",
+      "GeneratorType": "00038-message-dialog.component.ts",
+      "GeneratorSript": "message-dialog.component.kendo.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\modules",
+      "GeneratorType": "00050-web-service-filter.module.ts",
+      "GeneratorSript": "WebServiceFilterModule.ts.t4"
+    }
+  ]
+
+}
