@@ -1,0 +1,128 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "",
+    "1.",
+    "Please make sure that you selected src\\app folder",
+    "  where [your-view-model-name] is a name of currently selected ViewModel",
+    "",
+    "                                After you have finished the current batch generation",
+    "Please include WebServiceFilterModule in the import:[]-section of AppGlblSecurityModule"
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00118-app-glbl-register.interface.ts",
+      "GeneratorSript": "app-glbl-register.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00120-app-glbl-login.interface.ts",
+      "GeneratorSript": "app-glbl-login.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\interfaces",
+      "GeneratorType": "00122-app-glbl-chngpswd.interface.ts",
+      "GeneratorSript": "app-glbl-chngpswd.interface.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\services",
+      "GeneratorType": "00130-app-glbl-login.service.ts",
+      "GeneratorSript": "app-glbl-login.service.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-register",
+      "GeneratorType": "00135-app-glbl-register.component.css",
+      "GeneratorSript": "app-glbl-register.component.bootstrap.css.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-register",
+      "GeneratorType": "00135-app-glbl-register.component.html",
+      "GeneratorSript": "app-glbl-register.component.bootstrap.html.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-register",
+      "GeneratorType": "00135-app-glbl-register.component.ts",
+      "GeneratorSript": "app-glbl-register.component.bootstrap.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-login",
+      "GeneratorType": "00140-app-glbl-login.component.css",
+      "GeneratorSript": "app-glbl-login.component.bootstrap.css.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-login",
+      "GeneratorType": "00140-app-glbl-login.component.html",
+      "GeneratorSript": "app-glbl-login.component.bootstrap.html.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-login",
+      "GeneratorType": "00140-app-glbl-login.component.ts",
+      "GeneratorSript": "app-glbl-login.component.bootstrap.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-logout",
+      "GeneratorType": "00142-app-glbl-logout.component.css",
+      "GeneratorSript": "app-glbl-logout.component.css.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-logout",
+      "GeneratorType": "00142-app-glbl-logout.component.html",
+      "GeneratorSript": "app-glbl-logout.component.bootstrap.html.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-logout",
+      "GeneratorType": "00142-app-glbl-logout.component.ts",
+      "GeneratorSript": "app-glbl-logout.component.bootstrap.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-chngpswd",
+      "GeneratorType": "00144-app-glbl-chngpswd.component.css",
+      "GeneratorSript": "app-glbl-chngpswd.component.bootstrap.css.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-chngpswd",
+      "GeneratorType": "00144-app-glbl-chngpswd.component.html",
+      "GeneratorSript": "app-glbl-chngpswd.component.bootstrap.html.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-chngpswd",
+      "GeneratorType": "00144-app-glbl-chngpswd.component.ts",
+      "GeneratorSript": "app-glbl-chngpswd.component.bootstrap.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-scrt-dashboard",
+      "GeneratorType": "00156-app-scrt-dashboard.component.css",
+      "GeneratorSript": "app-scrt-dashboard.component.css.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-scrt-dashboard",
+      "GeneratorType": "00156-app-scrt-dashboard.component.html",
+      "GeneratorSript": "app-scrt-dashboard.component.html.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-scrt-dashboard",
+      "GeneratorType": "00156-app-scrt-dashboard.component.ts",
+      "GeneratorSript": "app-scrt-dashboard.component.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\modules",
+      "GeneratorType": "00160-app-glbl-security.routing.module.ts",
+      "GeneratorSript": "app-glbl-security.routing.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\modules",
+      "GeneratorType": "00170-app-glbl-security.module.ts",
+      "GeneratorSript": "app-glbl-security.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\interceptors",
+      "GeneratorType": "00200-app-glbl.interceptor.ts",
+      "GeneratorSript": "app-glbl.interceptor.ts.t4"
+    }
+
+
+  ]
+
+}

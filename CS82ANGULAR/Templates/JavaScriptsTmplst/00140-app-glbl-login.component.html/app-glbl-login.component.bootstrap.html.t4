@@ -1,0 +1,129 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string AppearancePropName           = "appearance";
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string OverflowSelector             = "ovrflw";
+    string OverflowPropName             = "ovrflw";
+    string containerMenuItemsPropName           = "contMenuItems";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string showAddFltItemSelector       = "show-add-flt-item";
+    string showAddFltItemPropName       = "showAddFltItem";
+
+    string OnBackBtnMethodName          = "onBackBtnMd";
+    string OnBackBtnPropName            = "onBackBtn";
+    string showBackBtnPropName          = "showBackBtn";
+    string showBackBtnSelector          = "show-back-btn";
+
+    string appLoginComponentFolder      = "00140-app-glbl-login.component.ts";
+    string appLoginComponentClassName   = GetComponentClassName(Model, appLoginComponentFolder);
+
+#>
+
+<div class="card">
+    <div class="card-header">
+        {{title}}
+    </div>
+    <div class="card-body">
+
+        <div [formGroup]="loginFormGroup" (ngSubmit)="doSubmit()" fxLayout="column wrap">
+            <div class="form-group">
+<# 
+    if(localize) {
+#>
+                <label i18n="User name@@<#= appLoginComponentClassName #>.User-name-label">User name</label>
+                <input  class="form-control" i18n-placeholder="Email@@<#= appLoginComponentClassName #>.User-name-placeholder" placeholder="User name" formControlName="username">
+<# 
+    } else {
+#>
+                <label>User name</label>
+                <input  class="form-control" placeholder="User name..." formControlName="username">
+<# 
+    }
+#>
+                <small class="text-danger" *ngIf="loginFormGroup.controls['username'].invalid">{{getErrorMessage(loginFormGroup.controls['username'])}}</small>
+<# 
+    if(localize) {
+#>
+                <small class="text-muted" align="end" i18n="Enter User name@@<#= appLoginComponentClassName #>.Enter-User-name-hint">Enter User name</small>
+<# 
+    } else {
+#>
+                <small class="text-muted" align="end">Enter User name</small>
+<# 
+    }
+#>
+            </div>
+            <div class="form-group">
+<# 
+    if(localize) {
+#>
+                <label i18n="Password@@<#= appLoginComponentClassName #>.Password-label">Password</label>
+                <div class="input-group" >
+                    <input  class="form-control" i18n-placeholder="Password@@<#= appLoginComponentClassName #>.Password-placeholder" placeholder="Password" formControlName="password" [type]="pwdhide ? 'password' : 'text'">
+<# 
+    } else {
+#>
+                <label>Password</label>
+                <div class="input-group" >
+                    <input  class="form-control" placeholder="Password" formControlName="password" [type]="pwdhide ? 'password' : 'text'">
+<# 
+    }
+#>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" (click)="pwdhide = !pwdhide">
+                            <i class="material-icons md-18">{{pwdhide ? 'visibility_off' : 'visibility'}}</i>
+                        </button>
+                    </div>
+                </div>
+                <small class="text-danger" *ngIf="loginFormGroup.controls['password'].invalid">{{getErrorMessage(loginFormGroup.controls['password'])}}</small>
+<# 
+    if(localize) {
+#>
+                <small class="text-muted" align="end" i18n="Enter Password@@<#= appLoginComponentClassName #>.Enter-Password-hint">Enter Password</small>
+<# 
+    } else {
+#>
+                <small class="text-muted" align="end">Enter Password</small>
+<# 
+    }
+#>
+            </div>
+        </div>
+
+    </div>
+    <div class="card-footer">
+<# 
+    if(localize) {
+#>
+        <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" cdkFocusInitial i18n="Canceld@@Cancel.Cancel">Cancel</button>
+        <button type="button" class="btn btn-outline-secondary" (click)="doSubmit()" i18n="Ok@@Ok.Ok">Ok</button>
+<# 
+    } else {
+#>
+        <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" cdkFocusInitial>Cancel</button>
+        <button type="button" class="btn btn-outline-secondary" (click)="doSubmit()">Ok</button>
+<# 
+    }
+#>
+    </div>
+</div>
+

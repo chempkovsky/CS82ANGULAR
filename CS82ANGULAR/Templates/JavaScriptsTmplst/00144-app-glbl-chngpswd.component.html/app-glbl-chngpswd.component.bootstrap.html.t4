@@ -1,0 +1,174 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string AppearancePropName           = "appearance";
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string OverflowSelector             = "ovrflw";
+    string OverflowPropName             = "ovrflw";
+    string containerMenuItemsPropName           = "contMenuItems";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string showAddFltItemSelector       = "show-add-flt-item";
+    string showAddFltItemPropName       = "showAddFltItem";
+
+    string OnBackBtnMethodName          = "onBackBtnMd";
+    string OnBackBtnPropName            = "onBackBtn";
+    string showBackBtnPropName          = "showBackBtn";
+    string showBackBtnSelector          = "show-back-btn";
+
+    string appChangePasswordComponentFolder       = "00144-app-glbl-chngpswd.component.ts";
+    string appChangePasswordComponentClassName    = GetComponentClassName(Model, appChangePasswordComponentFolder);
+
+#>
+
+<div class="card">
+    <div class="card-header">
+        {{title}}
+    </div>
+    <div class="card-body">
+
+    <div [formGroup]="chngpswdFormGroup" (ngSubmit)="doSubmit()" fxLayout="column wrap">
+        <div class="form-group">
+<# 
+    if(localize) {
+#>
+            <label i18n="Old Password@@<#= appChangePasswordComponentClassName #>.Old-Password-label">Old Password</label>
+            <div class="input-group" >
+                <input  class="form-control" i18n-placeholder="Old Password@@<#= appChangePasswordComponentClassName #>.Old-Password-placeholder" placeholder="Old Password..." formControlName="oldpassword" [type]="oldpwdhide ? 'password' : 'text'">
+<# 
+    } else {
+#>
+            <label>Old Password</label>
+            <div class="input-group" >
+                <input  class="form-control" placeholder="Old Password..." formControlName="oldpassword" [type]="oldpwdhide ? 'password' : 'text'">
+<# 
+    }
+#>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button"  (click)="oldpwdhide = !oldpwdhide">
+                            <i class="material-icons md-18">{{oldpwdhide ? 'visibility_off' : 'visibility'}}</i>
+                        </button>
+                    </div>
+                </div>
+            <mat-error *ngIf="chngpswdFormGroup.controls['oldpassword'].invalid">{{getErrorMessage(chngpswdFormGroup.controls['oldpassword'])}}</mat-error>
+<# 
+    if(localize) {
+#>
+                <mat-hint align="end" i18n="Enter Old Password@@<#= appChangePasswordComponentClassName #>.Enter-Old-Password-hint">Enter Old Password</mat-hint>
+<# 
+    } else {
+#>
+            <mat-hint align="end">Enter Old Password</mat-hint>
+<# 
+    }
+#>
+
+        </div>
+        <div class="form-group">
+<# 
+    if(localize) {
+#>
+            <label i18n="New Password@@<#= appChangePasswordComponentClassName #>.New-Password-label">New Password</label>
+            <div class="input-group" >
+                <input  class="form-control" i18n-placeholder="New Password@@<#= appChangePasswordComponentClassName #>.New-Password-placeholder" placeholder="New Password"  formControlName="newPassword" [type]="pwdhide ? 'password' : 'text'">
+<# 
+    } else {
+#>
+            <label>New Password</label>
+            <div class="input-group" >
+                <input  class="form-control" placeholder="New Password..." formControlName="newPassword" [type]="pwdhide ? 'password' : 'text'">
+<# 
+    }
+#>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" (click)="pwdhide = !pwdhide">
+                            <i class="material-icons md-18">{{pwdhide ? 'visibility_off' : 'visibility'}}</i>
+                        </button>
+                    </div>
+                </div>
+            <mat-error *ngIf="chngpswdFormGroup.controls['newPassword'].invalid">{{getErrorMessage(chngpswdFormGroup.controls['newPassword'])}}</mat-error>
+<# 
+    if(localize) {
+#>
+                <mat-hint align="end" i18n="Enter New Password@@<#= appChangePasswordComponentClassName #>.Enter-New-Password-hint">Enter New Password</mat-hint>
+<# 
+    } else {
+#>
+            <mat-hint align="end">Enter New Password</mat-hint>
+<# 
+    }
+#>
+        </div>
+        <div class="form-group">
+<# 
+    if(localize) {
+#>
+            <label i18n="Confirm Password@@<#= appChangePasswordComponentClassName #>.Confirm-Password-label">Confirm Password</label>
+            <div class="input-group" >
+                <input  class="form-control" i18n-placeholder="New Password@@<#= appChangePasswordComponentClassName #>.Confirm-Password-placeholder" placeholder="Confirm Password"  formControlName="confirmPassword" [type]="cnfPwdhide ? 'password' : 'text'">
+<# 
+    } else {
+#>
+            <label>Confirm Password</label>
+            <div class="input-group" >
+                <input  class="form-control" placeholder="Confirm Password..." formControlName="confirmPassword" [type]="cnfPwdhide ? 'password' : 'text'">
+<# 
+    }
+#>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" (click)="cnfPwdhide = !cnfPwdhide">
+                            <i class="material-icons md-18">{{cnfPwdhide ? 'visibility_off' : 'visibility'}}</i>
+                        </button>
+                    </div>
+                </div>
+            <mat-error *ngIf="chngpswdFormGroup.controls['confirmPassword'].invalid">{{getErrorMessage(chngpswdFormGroup.controls['confirmPassword'])}}</mat-error>
+<# 
+    if(localize) {
+#>
+                <mat-hint align="end" i18n="Confirm Password@@<#= appChangePasswordComponentClassName #>.Confirm Password-hint">Confirm Password</mat-hint>
+<# 
+    } else {
+#>
+            <mat-hint align="end">Confirm Password</mat-hint>
+<# 
+    }
+#>
+
+        </div>
+    </div>
+
+    </div>
+    <div class="card-footer">
+<# 
+    if(localize) {
+#>
+        <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" cdkFocusInitial i18n="Canceld@@Cancel.Cancel">Cancel</button>
+        <button type="button" class="btn btn-outline-secondary" (click)="doSubmit()" i18n="Ok@@Ok.Ok">Ok</button>
+<# 
+    } else {
+#>
+        <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" cdkFocusInitial>Cancel</button>
+        <button type="button" class="btn btn-outline-secondary" (click)="doSubmit()">Ok</button>
+<# 
+    }
+#>
+    </div>
+</div>
+

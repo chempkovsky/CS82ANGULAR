@@ -1,0 +1,133 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string appSettingServiceFolder          = "00015-app-glbl-settings.service.ts";
+    string appRegisterInterfaceFolder       = "00118-app-glbl-register.interface.ts";
+    string appLoginInterfaceFolder          = "00120-app-glbl-login.interface.ts";
+    string appLoginServiceFolder            = "00130-app-glbl-login.service.ts";
+
+
+    string appLoginHtmlComponentFolder      = "00140-app-glbl-login.component.html";
+    string appLoginCssComponentFolder       = "00140-app-glbl-login.component.css";
+    string appLoginComponentFolder          = "00140-app-glbl-login.component.ts";
+
+    string appLoginComponentClassName       = GetComponentClassName(Model, appLoginComponentFolder);
+    string appLoginComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, appLoginComponentFolder);
+
+    string appSettingServiceClassName       = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, appLoginComponentFolder);
+    string appLoginServiceClassName         = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appLoginServiceFolder, appLoginComponentFolder);
+
+
+    string AppearancePropName           = "appearance";
+    string ShowErrorMethodName          = "showError";
+    string securityServiceName          = "scrtSvr";
+    string registerMethodName           = "register";
+    string loginMethodName              = "login";
+    string AppSettingServicePropName    = "appGlblSettings";
+    string getAuthIntoMethodName        = "getAuthInto";
+    string setAuthIntoMethodName        = "setAuthInto";
+    string vwModelsPropName             = "vwModels";
+
+#>
+import { Component } from '@angular/core';
+import { FormControl, Validators, ValidatorFn, FormGroup, AbstractControl } from '@angular/forms';
+import { Router } from '@angular/router';
+//import { MatFormFieldAppearance } from '@angular/material/form-field';
+
+import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, appLoginComponentFolder)#>';
+import { <#= appLoginServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginServiceFolder, appLoginComponentFolder)#>';
+
+@Component({
+  selector: 'app-<#= appLoginComponentSelectorCommonPart #>',
+  templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginHtmlComponentFolder, appLoginComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginCssComponentFolder, appLoginComponentFolder) #>.css']
+})
+export class <#= appLoginComponentClassName #> {
+<# 
+    if(localize) {
+#>
+    title: string = $localize`:Sign in@@<#= appLoginComponentClassName #>.Sign-in:Sign in`;
+<# 
+    } else {
+#>
+    title: string = 'Sign in';
+<# 
+    }
+#>
+
+    cnfPwdhide: boolean = true;
+    pwdhide: boolean = true;
+//    public <#= AppearancePropName #>: MatFormFieldAppearance = 'outline';
+    loginFormGroup: FormGroup;
+
+    constructor(private <#= securityServiceName #>: <#= appLoginServiceClassName #>, protected router: Router, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #> ) {
+//        this.<#= AppearancePropName #> = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
+
+        this.loginFormGroup =  new FormGroup({});
+        let locValidators: ValidatorFn[]; 
+
+        locValidators = [ Validators.required,Validators.minLength(3) ];
+        this.loginFormGroup.addControl('username', new FormControl({ value: null, disabled: false}, locValidators));
+
+        locValidators = [ Validators.required,Validators.minLength(6) ];
+        this.loginFormGroup.addControl('password', new FormControl({ value: null, disabled: false}, locValidators));
+
+    } 
+    getErrorMessage(fc: AbstractControl): string {
+        return this.<#= AppSettingServicePropName #>.getValidationErrorMessage(fc);
+    } 
+
+    doSubmit() {
+        if(typeof this.loginFormGroup === 'undefined') return;
+        if(this.loginFormGroup === null) return;
+        if (this.loginFormGroup.invalid) {
+            this.loginFormGroup.markAllAsTouched();
+            return;
+        }
+        this.<#= securityServiceName #>.<#= loginMethodName #>(this.loginFormGroup.controls['username'].value, this.loginFormGroup.controls['password'].value)
+        .subscribe({
+            next: (respdata: any ) => { // success path
+                this.<#= AppSettingServicePropName #>.<#= setAuthIntoMethodName #>(respdata);
+                this.<#= AppSettingServicePropName #>.userName = this.loginFormGroup.controls['username'].value;
+                this.router.navigate(['/']);
+
+                this.<#= securityServiceName #>.getPermissions().subscribe({
+                    next: (rspdt: {modelName: string, userPerms: number}[]) => {
+                        this.<#= AppSettingServicePropName #>.<#= vwModelsPropName #> = {};
+                        rspdt.forEach((r: {modelName: string, userPerms: number}) => {
+                            this.<#= AppSettingServicePropName #>.<#= vwModelsPropName #>[r.modelName] = r.userPerms;
+                        });
+                    },
+                    error: (error) => { 
+                        this.appGlblSettings.showError('http', error)
+                    }
+                });
+            },
+            error: (error) => { // error path
+                this.appGlblSettings.showError('http', error)
+            }
+        });
+    }
+    onCancel(){
+        this.router.navigate(['/']);
+    }
+}
+
+

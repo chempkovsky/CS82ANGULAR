@@ -1,0 +1,113 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string appSettingServiceFolder          = "00015-app-glbl-settings.service.ts";
+    string appRegisterInterfaceFolder       = "00118-app-glbl-register.interface.ts";
+    string appLoginInterfaceFolder          = "00120-app-glbl-login.interface.ts";
+    string appLoginServiceFolder            = "00130-app-glbl-login.service.ts";
+
+
+    string appLoginHtmlComponentFolder      = "00140-app-glbl-login.component.html";
+    string appLoginCssComponentFolder       = "00140-app-glbl-login.component.css";
+    string appLoginComponentFolder          = "00140-app-glbl-login.component.ts";
+
+
+    string appLogoutCssComponentFolder      = "00142-app-glbl-logout.component.css";
+    string appLogoutHtmlComponentFolder     = "00142-app-glbl-logout.component.html";
+    string appLogoutComponentFolder         = "00142-app-glbl-logout.component.ts";
+
+    string appLogoutComponentClassName      = GetComponentClassName(Model, appLogoutComponentFolder);
+    string appLogoutComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, appLogoutComponentFolder);
+
+    string appSettingServiceClassName       = GetServiceClassNameWithAnglr(AngularJsonFile,Model, appSettingServiceFolder, appLogoutComponentFolder);
+    string appLoginServiceClassName         = GetServiceClassNameWithAnglr(AngularJsonFile,Model, appLoginServiceFolder, appLogoutComponentFolder);
+
+
+    string AppearancePropName           = "appearance";
+    string ShowErrorMethodName          = "showError";
+    string securityServiceName          = "scrtSvr";
+    string registerMethodName           = "register";
+    string loginMethodName              = "login";
+    string logoutMethodName             = "logout";
+    string AppSettingServicePropName    = "appGlblSettings";
+    string getAuthIntoMethodName        = "getAuthInto";
+    string setAuthIntoMethodName        = "setAuthInto";
+    string vwModelsPropName             = "vwModels";
+                                
+#>
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+// import { MatFormFieldAppearance } from '@angular/material/form-field';
+
+import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, appLogoutComponentFolder)#>';
+import { <#= appLoginServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginServiceFolder, appLogoutComponentFolder)#>';
+
+
+@Component({
+  selector: 'app-<#= appLogoutComponentSelectorCommonPart #>',
+  templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLogoutHtmlComponentFolder, appLogoutComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLogoutCssComponentFolder, appLogoutComponentFolder) #>.css']
+})
+export class <#= appLogoutComponentClassName #> {
+<# 
+    if(localize) {
+#>
+    title: string = $localize`:Do you want to Sign Out@@<#= appLogoutComponentClassName #>.Sign Out:Do you want to Sign Out?`;
+<# 
+    } else {
+#>
+    title: string = 'Do you want to Sign Out?';
+<# 
+    }
+#>
+
+    // public <#= AppearancePropName #>: MatFormFieldAppearance = 'outline';
+
+    constructor(private <#= securityServiceName #>: <#= appLoginServiceClassName #>, protected router: Router, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #> ) {
+        // this.appearance = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
+    } 
+    doSubmit() {
+        this.<#= AppSettingServicePropName #>.perms = [0,0,0,0,  0,0,0,0,  0,0,0,0,  0,0,  1,0,0];
+        this.<#= AppSettingServicePropName #>.<#= setAuthIntoMethodName #>(null);
+        this.<#= AppSettingServicePropName #>.userName = null;
+        this.<#= AppSettingServicePropName #>.<#= vwModelsPropName #> = {};
+        this.router.navigate(['/']);
+/*
+        this.<#= securityServiceName #>.<#= logoutMethodName #>()
+        .subscribe({
+            next: (respdata: any ) => { // success path
+                this.<#= AppSettingServicePropName #>.perms = [0,0,0,0,  0,0,0,0,  0,0,0,0,  0,0,  1,0,0];
+                this.<#= AppSettingServicePropName #>.<#= setAuthIntoMethodName #>(null);
+                this.<#= AppSettingServicePropName #>.userName = null;
+                this.<#= AppSettingServicePropName #>.<#= vwModelsPropName #> = {};
+                this.router.navigate(['/']);
+            },
+            error: (error) => { // error path
+                this.appGlblSettings.showError('http', error)
+            }
+        });
+*/
+    }
+    onCancel(){
+        this.router.navigate(['/']);
+    }
+}
+
+
