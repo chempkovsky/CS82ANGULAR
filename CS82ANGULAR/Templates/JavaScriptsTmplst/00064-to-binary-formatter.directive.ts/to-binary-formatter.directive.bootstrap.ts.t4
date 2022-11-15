@@ -1,0 +1,107 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
+<#
+
+    string toBinaryPipeFolder                       = "00062-to-binary.pipe.ts";
+    string toBinaryFormatterDirectiveFolder         = "00064-to-binary-formatter.directive.ts";
+
+    string toBinaryFormatterDirectiveClassName      = GetDirectiveClassName(Model, toBinaryFormatterDirectiveFolder);
+    string toBinaryFormatterDirectiveSelectorName   = GetDirectiveSelectorName(Model, toBinaryFormatterDirectiveFolder);
+
+    string toBinaryPipeClassName                    = GetPipeClassNameWithAnglr(AngularJsonFile, Model, toBinaryPipeFolder, toBinaryFormatterDirectiveFolder);
+
+#>
+
+import { Directive, HostListener, ElementRef, OnInit, Input, forwardRef } from "@angular/core";
+// import { MAT_INPUT_VALUE_ACCESSOR } from '@angular/material/input';
+import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
+import { <#= toBinaryPipeClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, toBinaryPipeFolder, toBinaryFormatterDirectiveFolder) #>';
+
+ @Directive({ 
+   selector: '[<#= toBinaryFormatterDirectiveSelectorName #>]',
+   providers: [
+//     {
+//       provide: MAT_INPUT_VALUE_ACCESSOR, 
+//       useExisting: forwardRef(() => <#= toBinaryFormatterDirectiveClassName #>)
+//     },
+     {
+       provide: NG_VALUE_ACCESSOR,
+       useExisting: forwardRef(() => <#= toBinaryFormatterDirectiveClassName #>),
+       multi: true,
+     }
+   ],   
+ })
+export class <#= toBinaryFormatterDirectiveClassName #> implements ControlValueAccessor, OnInit {
+  protected _value: string | null = null;
+    
+    constructor(protected elementRef: ElementRef<HTMLInputElement>, protected tobinaryPipe: <#= toBinaryPipeClassName #>) {
+    }
+  
+    ngOnInit() {
+      
+    }
+    @Input('value')
+    get value(): string | null {
+      return this._value;
+    }    
+    set value(value: string | null) {
+      this._value = value;
+      this.formatValue();
+    }
+    private formatValue() {
+      if (this._value !== null) { 
+        this.elementRef.nativeElement.value = this.tobinaryPipe.transform(this._value);
+      } else {
+        this.elementRef.nativeElement.value = '';
+      }
+    }
+    private unFormatValue() {
+      if (this._value) {
+        this.elementRef.nativeElement.value = this._value; 
+      } else {
+        this.elementRef.nativeElement.value = '';
+      }
+    }
+    @HostListener('input', ['$event.target.value'])
+    onInput(value: any) {
+      this._value = this.tobinaryPipe.parse(value);
+      this._onChange(this._value);
+    }    
+    _onChange(value: any): void {
+    }    
+    @HostListener('blur')
+    _onBlur() {
+      this._value = this.tobinaryPipe.parse(this.elementRef.nativeElement.value);
+      this.formatValue(); 
+    }   
+    @HostListener('focus')
+    onFocus() {
+      this.unFormatValue(); 
+    }     
+    writeValue(value: any): void {
+      this._value = this.tobinaryPipe.parse(value);
+      this.formatValue(); 
+    }
+    registerOnChange(fn: (value: any) => void) {
+      this._onChange = fn;
+    }
+    registerOnTouched(fn: any): void {
+      
+    }
+}
+

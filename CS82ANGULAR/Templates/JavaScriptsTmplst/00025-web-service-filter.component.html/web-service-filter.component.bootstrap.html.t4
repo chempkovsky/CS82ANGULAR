@@ -125,7 +125,7 @@
 <# 
     }
 #>
-                    <select class="form-control form-control" [formControl]="flt.fltrName" (change)="onSelectionChanged($event.target, flt)">
+                    <select class="form-control" [formControl]="flt.fltrName" (change)="onSelectionChanged($event.target, flt)">
                         <option *ngFor="let fltDef of webServiceFilterDefs;" [value]="fltDef.fltrName">{{fltDef.fltrCaption}}</option>
                     </select>
                 </div>
@@ -145,7 +145,7 @@
 <# 
     }
 #>
-                    <select class="form-control form-control" [formControl]="flt.fltrOperator">
+                    <select class="form-control" [formControl]="flt.fltrOperator">
                         <option *ngFor="let oprtr of webServiceOperators;" [value]="oprtr.oName">{{oprtr.oCaption}}</option>
                     </select>
                 </div>
@@ -165,7 +165,7 @@
     }
 #>
                     <div class="input-group">
-                        <input  class="form-control form-control" placeholder="Placeholder" [formControl]="flt.fltrValue" [maxlength]="flt.fltrMaxLen">
+                        <input  class="form-control" placeholder="Placeholder" [formControl]="flt.fltrValue" [maxlength]="flt.fltrMaxLen">
                         <div class="input-group-append">
                             <button class="btn btn-outline-secondary " type="button"   (click)="removeFltr(flt)" data-toggle="tooltip" 
 <# 
@@ -200,7 +200,7 @@
     }
 #>
                     <div class="input-group">
-                        <input class="form-control form-control" ngbDatepicker #d="ngbDatepicker" container="body"
+                        <input class="form-control" ngbDatepicker #d="ngbDatepicker" container="body"
                         (click)="d.toggle()" [formControl]="flt.fltrValue" [min]="flt.fltrMin" [max]="flt.fltrMax">
 
                         <div class="input-group-append" >

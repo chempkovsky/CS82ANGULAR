@@ -5,8 +5,14 @@
     "Please make sure that you selected [src\\app] folder",
     "",
     "Please make sure that you executed two commands",
-    "    ng add @angular/material",
-    "    npm i -s @angular/flex-layout@9.0.0-beta.31 @angular/cdk",
+    "",
+    "    ng add @ng-bootstrap/ng-bootstrap",
+    "",
+    "    npm install material-design-icons",
+    "        in the file styles.css add the following line",
+    "    @import '~material-design-icons/iconfont/material-icons.css'; ",
+    "",
+    "    npm i -s @angular/flex-layout @angular/cdk",
     "",
     "                                After you have finished the current batch generation",
     "Please include ",
@@ -54,7 +60,7 @@
     {
       "DestinationFolder": "shared\\directives",
       "GeneratorType": "00064-to-binary-formatter.directive.ts",
-      "GeneratorSript": "to-binary-formatter.directive.kendo.ts.t4"
+      "GeneratorSript": "to-binary-formatter.directive.bootstrap.ts.t4"
     },
     {
       "DestinationFolder": "shared\\modules",
@@ -149,12 +155,12 @@
     {
       "DestinationFolder": "shared\\components\\uniq-service-filter",
       "GeneratorType": "00046-uniq-service-filter.component.html",
-      "GeneratorSript": "uniq-service-filter.component.kendo.html.t4"
+      "GeneratorSript": "uniq-service-filter.component.bootstrap.html.t4"
     },
     {
       "DestinationFolder": "shared\\components\\uniq-service-filter",
       "GeneratorType": "00046-uniq-service-filter.component.ts",
-      "GeneratorSript": "uniq-service-filter.component.kendo.ts.t4"
+      "GeneratorSript": "uniq-service-filter.component.bootstrap.ts.t4"
     },
     {
       "DestinationFolder": "shared\\components\\column-selector",
@@ -169,12 +175,12 @@
     {
       "DestinationFolder": "shared\\components\\column-selector",
       "GeneratorType": "00033-column-selector.component.html",
-      "GeneratorSript": "column-selector.component.kendo.html.t4"
+      "GeneratorSript": "column-selector.component.bootstrap.html.t4"
     },
     {
       "DestinationFolder": "shared\\components\\column-selector",
       "GeneratorType": "00033-column-selector.component.ts",
-      "GeneratorSript": "column-selector.component.kendo.ts.t4"
+      "GeneratorSript": "column-selector.component.bootstrap.ts.t4"
     },
     {
       "DestinationFolder": "shared\\components\\column-selector-dlg",
@@ -184,12 +190,12 @@
     {
       "DestinationFolder": "shared\\components\\column-selector-dlg",
       "GeneratorType": "00035-column-selector-dlg.component.html",
-      "GeneratorSript": "column-selector-dlg.component.kendo.html.t4"
+      "GeneratorSript": "column-selector-dlg.component.bootstrap.html.t4"
     },
     {
       "DestinationFolder": "shared\\components\\column-selector-dlg",
       "GeneratorType": "00035-column-selector-dlg.component.ts",
-      "GeneratorSript": "column-selector-dlg.component.kendo.ts.t4"
+      "GeneratorSript": "column-selector-dlg.component.bootstrap.ts.t4"
     },
     {
       "DestinationFolder": "shared\\components\\message-dialog",
@@ -204,12 +210,12 @@
     {
       "DestinationFolder": "shared\\components\\message-dialog",
       "GeneratorType": "00038-message-dialog.component.html",
-      "GeneratorSript": "message-dialog.component.kendo.html.t4"
+      "GeneratorSript": "message-dialog.component.bootstrap.html.t4"
     },
     {
       "DestinationFolder": "shared\\components\\message-dialog",
       "GeneratorType": "00038-message-dialog.component.ts",
-      "GeneratorSript": "message-dialog.component.kendo.ts.t4"
+      "GeneratorSript": "message-dialog.component.bootstrap.ts.t4"
     },
     {
       "DestinationFolder": "shared\\modules",

@@ -1,0 +1,185 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+
+    string AppearancePropName           = "appearance";
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string OverflowSelector             = "ovrflw";
+    string OverflowPropName             = "ovrflw";
+    string containerMenuItemsPropName           = "contMenuItems";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+
+    string OnBackBtnMethodName          = "onBackBtnMd";
+    string OnBackBtnPropName            = "onBackBtn";
+    string showBackBtnPropName          = "showBackBtn";
+    string showBackBtnSelector          = "show-back-btn";
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+    string fltrFlxPropName         = "fltrFlx";
+    string fltrMdPropName          = "fltrMd";
+    string fltrSmPropName          = "fltrSm";
+    string fltrXsPropName          = "fltrXs";
+
+    string tpAheadVarsPropName          = "tpAheadVars";
+    string tpAheadCptnPropName          = "tpAheadCptn";
+
+    string showFilterExPropName         = "showFilterEx";
+    string MaxHeightExPropName          = "maxHeightEx";
+
+    string uniqFilterComponentFolder        = "00046-uniq-service-filter.component.ts";
+    string uniqFilterComponentClassName = GetComponentClassName(Model, uniqFilterComponentFolder);
+
+#>
+
+     <div fxLayout="row" fxLayoutAlign="flex-end space-around"> 
+        <label fxFlex fxLayoutAlign="flex-start space-around">{{<#= captionPropName #>}}</label>
+        <i class="material-icons text-primary mr-5" type="button" data-toggle="tooltip" (click)="<#= OnBackBtnMethodName #>()" *ngIf="<#= showBackBtnPropName #>" 
+<# 
+    if(localize) {
+#>
+        i18n-title="Navigate back to master@@<#= uniqFilterComponentClassName #>.Navigate-back-to-master"  title="Navigate back to master">arrow_back</i>
+<# 
+    } else {
+#>
+        title="Navigate back to master">arrow_back</i>
+<# 
+    }
+#>
+        <span fxFlex="3%"></span>  
+        <i class="material-icons text-primary ml-1" type="button" data-toggle="tooltip" (click)="addFilter()" *ngIf="showFilter && <#= showAddFltItemPropName #>" 
+<# 
+    if(localize) {
+#>
+            i18n-title="Add filter item@@<#= uniqFilterComponentClassName #>.Add-filter-item"  title="Add filter item">filter_9_plus</i> 
+<# 
+    } else {
+#>
+            title="Add filter item">filter_9_plus</i> 
+<# 
+    }
+#>
+        <span fxFlex="1%"></span>   
+        <i class="material-icons text-danger ml-1 " type="button" data-toggle="tooltip" (click)="removeAllFilters()" *ngIf="showFilter && <#= showAddFltItemPropName #>"
+<# 
+    if(localize) {
+#>
+            i18n-title="Remove all filter items@@<#= uniqFilterComponentClassName #>.Remove-all-filter-items"  title="Remove all filter items">filter_none</i>
+<# 
+    } else {
+#>
+            title="Remove all filter items">filter_none</i>
+<# 
+    }
+#>
+        <span fxFlex="1%"></span>  
+        <i class="material-icons text-primary ml-1 mr-3" type="button" data-toggle="tooltip" (click)="onApplyFilterClicked()"
+<# 
+    if(localize) {
+#>
+         i18n-title="Apply filter@@<#= uniqFilterComponentClassName #>.Apply-filter"  title="Apply filter">refresh</i>
+<# 
+    } else {
+#>
+         title="Apply filter">refresh</i>
+<# 
+    }
+#>
+        <span fxFlex="2%"></span>     
+        <ng-template ngFor let-item [ngForOf]="<#= containerMenuItemsPropName #>">
+            <span fxFlex="1%"></span>  
+            <i class="{{'material-icons ml-1 text-'+ item.iconColor}}" type="button" data-toggle="tooltip" title="{{item.caption}}"
+                (click)="<#= onContainerMenuItemClickMethodName #>(item)">{{item.iconName}}</i>
+        </ng-template>            
+        <span fxFlex="1%"></span>
+     </div> 
+
+<div *ngIf="<#= showFilterExPropName #>" [style.maxHeight.em]="<#= MaxHeightExPropName #>" [style.overflow]="<#= OverflowPropName #>"> 
+    <div fxLayout="row wrap" fxLayoutAlign="space-between" style="margin: 0 15px;">
+        <div *ngFor="let flt of webServiceFilters;let i = index" [fxFlex.gt-md]="flt.<#= fltrMdPropName #>" [fxFlex.gt-sm]="flt.<#= fltrSmPropName #>" [fxFlex.gt-xs]="flt.<#= fltrXsPropName #>" [fxFlex]="flt.<#= fltrFlxPropName #>">
+<#
+    for(int iii = 0; iii < 7;iii++) {
+#>
+            <ng-template [ngIf]="(flt.fltrDataType !==  'datetime') && (flt.fltrDataType !==  'bool')  && (flt.fltrDataType !==  'boolean')  && (i === <#= iii #>)">
+                <div class="form-group"  fxFlex="100">
+                    <label>{{flt.fltrCaption}}</label>
+                    <div class="input-group" >
+
+                        <input class="form-control" type="text" placeholder="{{flt.fltrCaption}}" 
+                            [formControl]="flt.fltrValue" 
+                            [ngbTypeahead]=<#= tpAheadVarsPropName #><#= iii #>
+                            [resultFormatter]="<#= tpAheadCptnPropName #><#= iii #>"
+                            [inputFormatter]="<#= tpAheadCptnPropName #><#= iii #>"
+                            [editable]="false">
+                    </div>
+                    <small class="text-danger" *ngIf="flt.fltrValue.invalid">{{getErrorMessage(flt.fltrValue)}}</small>
+                    <small class="text-muted"  *ngIf="flt.fltrMaxLen">{{flt.fltrValue.value?.length || 0}}/{{flt.fltrMaxLen}}</mat-hint>
+                </div>
+            </ng-template>
+<#
+    }
+#>
+
+            <ng-template [ngIf]="flt.fltrDataType === 'boolean' || flt.fltrDataType === 'bool'">
+                <div class="form-group" fxFlex="100">
+                    <label></label>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" [formControl]="flt.fltrValue">
+                            {{flt.fltrCaption}}
+                        </label>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template [ngIf]="flt.fltrDataType === 'datetime'">
+                <div class="form-group" fxFlex="100">
+                    <label>{{flt.fltrCaption}}</label>
+                    <div class="input-group">
+                        <input class="form-control" ngbDatepicker #d="ngbDatepicker" container="body" (click)="d.toggle()"
+                            placeholder="{{flt.fltrCaption}}" 
+                            [formControl]="flt.fltrValue" 
+                            [min]="flt.fltrMin" 
+                            [max]="flt.fltrMax" > 
+                        <div class="input-group-append" >
+                            <button class="btn btn-outline-secondary " type="button"   (click)="d.toggle()" data-toggle="tooltip" 
+<# 
+    if(localize) {
+#>
+                                i18n-title="Show date dialog@@<#= uniqFilterComponentClassName #>.Show-date-dialog"  title="Show date dialog">
+<# 
+    } else {
+#>
+                                title="Show date dialog">
+<# 
+    }
+#>
+                                <i class="material-icons md-18 text-primary" >date_range</i>
+                            </button>
+                        </div>
+                    </div>
+                    <small class="text-danger" *ngIf="flt.fltrValue.invalid">{{getErrorMessage(flt.fltrValue)}}</small>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</div>
+
