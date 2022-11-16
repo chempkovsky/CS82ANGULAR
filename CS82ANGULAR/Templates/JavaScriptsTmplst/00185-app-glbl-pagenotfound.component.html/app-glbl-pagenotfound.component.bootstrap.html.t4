@@ -1,0 +1,50 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+
+    string pagenotfoundComponentFolder        = "00185-app-glbl-pagenotfound.component.ts";
+    string pagenotfoundComponentClassName = GetComponentClassName(Model, pagenotfoundComponentFolder);
+
+#>
+
+
+<div class="pagenotfound-container">
+    <div class="pagenotfound-item-container" fxLayout="column" fxLayoutAlign="center space-between">
+        <h1 fxLayout="row" fxLayoutAlign="center"> 
+            <span class="badge badge-danger">
+              <i class="material-icons" type="button">error</i>
+            </span>
+        </h1>
+<# 
+    if(localize) {
+#>
+        <h1 fxLayout="row" fxLayoutAlign="center" i18n="404 Page Not Found@@<#= pagenotfoundComponentClassName#>.404-Page-Not-Found"> 404 Page Not Found </h1>
+<# 
+    } else {
+#>
+        <h1 fxLayout="row" fxLayoutAlign="center"> 404 Page Not Found </h1>
+<# 
+    }
+#>
+        <router-outlet></router-outlet>
+    </div>
+</div>
+
+
