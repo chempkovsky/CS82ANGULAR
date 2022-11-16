@@ -59,15 +59,15 @@
 <# 
     }
 #>
-                <small class="text-danger" *ngIf="loginFormGroup.controls['username'].invalid">{{getErrorMessage(loginFormGroup.controls['username'])}}</small>
+                <small class="text-danger" *ngIf="(loginFormGroup.controls['username'].invalid && loginFormGroup.controls['username'].touched)">{{getErrorMessage(loginFormGroup.controls['username'])}}</small>
 <# 
     if(localize) {
 #>
-                <small class="text-muted" align="end" i18n="Enter User name@@<#= appLoginComponentClassName #>.Enter-User-name-hint">Enter User name</small>
+                <small class="text-muted" align="end" i18n="Enter User name@@<#= appLoginComponentClassName #>.Enter-User-name-hint" *ngIf="!(loginFormGroup.controls['username'].invalid && loginFormGroup.controls['username'].touched)">Enter User name</small>
 <# 
     } else {
 #>
-                <small class="text-muted" align="end">Enter User name</small>
+                <small class="text-muted" align="end" *ngIf="!(loginFormGroup.controls['username'].invalid && loginFormGroup.controls['username'].touched)">Enter User name</small>
 <# 
     }
 #>
@@ -94,15 +94,15 @@
                         </button>
                     </div>
                 </div>
-                <small class="text-danger" *ngIf="loginFormGroup.controls['password'].invalid">{{getErrorMessage(loginFormGroup.controls['password'])}}</small>
+                <small class="text-danger" *ngIf="(loginFormGroup.controls['password'].invalid && loginFormGroup.controls['password'].touched)">{{getErrorMessage(loginFormGroup.controls['password'])}}</small>
 <# 
     if(localize) {
 #>
-                <small class="text-muted" align="end" i18n="Enter Password@@<#= appLoginComponentClassName #>.Enter-Password-hint">Enter Password</small>
+                <small class="text-muted" align="end" i18n="Enter Password@@<#= appLoginComponentClassName #>.Enter-Password-hint" *ngIf="!(loginFormGroup.controls['password'].invalid && loginFormGroup.controls['password'].touched)">Enter Password</small>
 <# 
     } else {
 #>
-                <small class="text-muted" align="end">Enter Password</small>
+                <small class="text-muted" align="end" *ngIf="!(loginFormGroup.controls['password'].invalid && loginFormGroup.controls['password'].touched)">Enter Password</small>
 <# 
     }
 #>

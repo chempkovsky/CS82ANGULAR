@@ -65,32 +65,6 @@
     }
 #>
         <span fxFlex="3%"></span>  
-        <i class="material-icons text-primary ml-1" type="button" data-toggle="tooltip" (click)="addFilter()" *ngIf="showFilter && <#= showAddFltItemPropName #>" 
-<# 
-    if(localize) {
-#>
-            i18n-title="Add filter item@@<#= uniqFilterComponentClassName #>.Add-filter-item"  title="Add filter item">filter_9_plus</i> 
-<# 
-    } else {
-#>
-            title="Add filter item">filter_9_plus</i> 
-<# 
-    }
-#>
-        <span fxFlex="1%"></span>   
-        <i class="material-icons text-danger ml-1 " type="button" data-toggle="tooltip" (click)="removeAllFilters()" *ngIf="showFilter && <#= showAddFltItemPropName #>"
-<# 
-    if(localize) {
-#>
-            i18n-title="Remove all filter items@@<#= uniqFilterComponentClassName #>.Remove-all-filter-items"  title="Remove all filter items">filter_none</i>
-<# 
-    } else {
-#>
-            title="Remove all filter items">filter_none</i>
-<# 
-    }
-#>
-        <span fxFlex="1%"></span>  
         <i class="material-icons text-primary ml-1 mr-3" type="button" data-toggle="tooltip" (click)="onApplyFilterClicked()"
 <# 
     if(localize) {
@@ -131,7 +105,7 @@
                             [editable]="false">
                     </div>
                     <small class="text-danger" *ngIf="flt.fltrValue.invalid">{{getErrorMessage(flt.fltrValue)}}</small>
-                    <small class="text-muted"  *ngIf="flt.fltrMaxLen">{{flt.fltrValue.value?.length || 0}}/{{flt.fltrMaxLen}}</mat-hint>
+                    <small class="text-muted"  *ngIf="flt.fltrMaxLen">{{flt.fltrValue.value?.length || 0}}/{{flt.fltrMaxLen}}</small>
                 </div>
             </ng-template>
 <#

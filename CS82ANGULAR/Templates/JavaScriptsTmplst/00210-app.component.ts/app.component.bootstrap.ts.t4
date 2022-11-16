@@ -25,15 +25,42 @@
     string appComponentClassName                    = GetComponentClassName(Model, appComponentFolder);
 
     string AppSettingServicePropName                = "appGlblSettings";
+    string toastComponentName                       = "ToastsContainer";
 
 #>
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
 import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, appComponentFolder)#>';
 
+@Component({
+	selector: 'app-toasts',
+	template: `
+		<ngb-toast
+			*ngFor="let toast of toastService.toasts"
+			[class]="toast.classname"
+            [header]="toast.headertext"
+			[autohide]="true"
+			[delay]="toast.delay || 5000"
+			(hidden)="toastService.removeToast(toast)">
+			<ng-template [ngIf]="isTemplate(toast)" [ngIfElse]="text">
+				<ng-template [ngTemplateOutlet]="toast.textOrTpl"></ng-template>
+			</ng-template>
+
+			<ng-template #text>{{ toast.textOrTpl }}</ng-template>
+		</ngb-toast>
+	`,
+	host: { class: 'toast-container position-fixed top-0 end-0 p-3', style: 'z-index: 1200' },
+})
+export class <#= toastComponentName #> {
+	constructor(public toastService: <#= appSettingServiceClassName #>) {}
+
+	isTemplate(toast) {
+		return toast.textOrTpl instanceof TemplateRef;
+	}
+}
 
 
 @Component({

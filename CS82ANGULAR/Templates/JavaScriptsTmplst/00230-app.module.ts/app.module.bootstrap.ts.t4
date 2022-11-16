@@ -1,0 +1,136 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
+<#
+
+    string appModuleFolder                          = "00230-app.module.ts";
+    string appModuleClassName                       = GetModuleClassName(Model, appModuleFolder);    
+
+    string materialModuleFolder                     = "00010-app-material.module.ts";
+    string materialModuleClassName                  = GetModuleClassNameWithAnglr(AngularJsonFile, Model, materialModuleFolder, appModuleFolder);
+    string flexModuleFolder                         = "00011-app-flex-layout.module.ts";
+    string flexModuleClassName                      = GetModuleClassNameWithAnglr(AngularJsonFile, Model, flexModuleFolder, appModuleFolder);
+
+
+    string appConfigServiceFolder                   = "00014-app-config.service.ts";
+    string appConfigServiceClassName                = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appConfigServiceFolder, appModuleFolder);
+
+
+    string formatterModuleFolder                    = "00070-app-formatter.module.ts";
+    string formatterModuleClassName                 = GetModuleClassNameWithAnglr(AngularJsonFile, Model, formatterModuleFolder, appModuleFolder);
+
+    string appInterceptorFolder                     = "00200-app-glbl.interceptor.ts";
+    string appInterceptorClassName                  = GetInterceptorClassNameWithAnglr(AngularJsonFile, Model, appInterceptorFolder, appModuleFolder);
+
+    string appComponentFolder                       = "00210-app.component.ts";
+    string appComponentClassName                    = GetComponentClassNameWithAnglr(AngularJsonFile, Model, appComponentFolder, appModuleFolder);
+    string toastComponentName                       = "ToastsContainer";
+
+
+    string appRoutingModuleFolder                   = "00220-app-routing.module.ts";
+    string appRoutingModuleClassName                = GetModuleClassNameWithAnglr(AngularJsonFile, Model, appRoutingModuleFolder, appModuleFolder);    
+
+    string pagenotfoundComponentFolder              = "00185-app-glbl-pagenotfound.component.ts";
+    string pagenotfoundComponentClassName           = GetComponentClassNameWithAnglr(AngularJsonFile, Model, pagenotfoundComponentFolder, appModuleFolder);
+
+    string homeComponentFolder                      = "00180-app-glbl-home.component.ts";
+    string homeComponentClassName                   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, homeComponentFolder, appModuleFolder);
+
+#>
+
+import { BrowserModule } from '@angular/platform-browser';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+
+
+import { <#= appRoutingModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appRoutingModuleFolder, appModuleFolder)#>';
+import { <#= appComponentClassName #>, <#= toastComponentName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appComponentFolder, appModuleFolder)#>';
+import { <#= materialModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, materialModuleFolder, appModuleFolder)#>';
+import { <#= flexModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, flexModuleFolder, appModuleFolder)#>';
+import { <#= appInterceptorClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appInterceptorFolder, appModuleFolder)#>';
+import { <#= appConfigServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appConfigServiceFolder, appModuleFolder)#>';
+import { <#= formatterModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, formatterModuleFolder, appModuleFolder)#>';
+<#
+    if(! string.IsNullOrEmpty(homeComponentClassName)) {
+#>
+import { <#= homeComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, homeComponentFolder, appModuleFolder)#>';
+<#
+    }
+    if(! string.IsNullOrEmpty(pagenotfoundComponentClassName)) {
+#>
+import { <#= pagenotfoundComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, pagenotfoundComponentFolder, appModuleFolder)#>';
+<#
+    }
+#>
+
+const appInitializerFn = (appConfig: <#= appConfigServiceClassName #>) => {
+  return () => {
+      return appConfig.loadAppConfig();
+  }
+};
+
+
+@NgModule({
+  declarations: [
+    <#= appComponentClassName #>,
+    <#= toastComponentName #>,
+<#
+    if(! string.IsNullOrEmpty(homeComponentClassName)) {
+#>
+    <#= homeComponentClassName #>, 
+<#
+    }
+    if(! string.IsNullOrEmpty(pagenotfoundComponentClassName)) {
+#>
+    <#= pagenotfoundComponentClassName #>, 
+<#
+    }
+#>
+
+  ],
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    <#= appRoutingModuleClassName #>,
+    <#= materialModuleClassName #>,
+    <#= formatterModuleClassName #>,
+    <#= flexModuleClassName #>,
+    HttpClientModule,
+  ],
+  entryComponents: [
+  ],
+  exports: [
+  ],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: <#= appInterceptorClassName #>,
+      multi: true
+    },
+    <#= appConfigServiceClassName #>,
+    {
+        provide: APP_INITIALIZER,
+        useFactory: appInitializerFn,
+        multi: true,
+        deps: [<#= appConfigServiceClassName #>]
+    }        
+  ],
+  bootstrap: [<#= appComponentClassName #>]
+})
+export class <#= appModuleClassName #> { }
+

@@ -60,15 +60,15 @@
 <# 
     }
 #>
-            <small class="text-danger" *ngIf="registerFormGroup.controls['email'].invalid">{{getErrorMessage(registerFormGroup.controls['email'])}}</small>
+            <small class="text-danger" *ngIf="(registerFormGroup.controls['email'].invalid && registerFormGroup.controls['email'].touched)">{{getErrorMessage(registerFormGroup.controls['email'])}}</small>
 <# 
     if(localize) {
 #>
-            <small class="text-muted" align="end" i18n="Enter Email@@<#= appRegisterComponentClassName #>.Enter-Email-hint">Enter Email</small>
+            <small class="text-muted" align="end" i18n="Enter Email@@<#= appRegisterComponentClassName #>.Enter-Email-hint" *ngIf="!(registerFormGroup.controls['email'].invalid && registerFormGroup.controls['email'].touched)">Enter Email</small>
 <# 
     } else {
 #>
-            <small class="text-muted" align="end">Enter Email</small>
+            <small class="text-muted" align="end" *ngIf="!(registerFormGroup.controls['email'].invalid && registerFormGroup.controls['email'].touched)">Enter Email</small>
 <# 
     }
 #>
@@ -95,15 +95,15 @@
                     </button>
                 </div>
             </div>
-            <small class="text-danger" *ngIf="registerFormGroup.controls['password'].invalid">{{getErrorMessage(registerFormGroup.controls['password'])}}</small>
+            <small class="text-danger" *ngIf="(registerFormGroup.controls['password'].invalid && registerFormGroup.controls['password'].touched)">{{getErrorMessage(registerFormGroup.controls['password'])}}</small>
 <# 
     if(localize) {
 #>
-            <small class="text-muted" align="end" i18n="Enter Password@@<#= appRegisterComponentClassName #>.Enter-Password-hint">Enter Password</small>
+            <small class="text-muted" align="end" i18n="Enter Password@@<#= appRegisterComponentClassName #>.Enter-Password-hint" *ngIf="!(registerFormGroup.controls['password'].invalid && registerFormGroup.controls['password'].touched)">Enter Password</small>
 <# 
     } else {
 #>
-            <small class="text-muted" align="end">Enter Password</small>
+            <small class="text-muted" align="end" *ngIf="!(registerFormGroup.controls['password'].invalid && registerFormGroup.controls['password'].touched)">Enter Password</small>
 <# 
     }
 #>
@@ -130,15 +130,15 @@
                     </button>
                 </div>
             </div>
-            <small class="text-danger" *ngIf="registerFormGroup.controls['confirmPassword'].invalid">{{getErrorMessage(registerFormGroup.controls['confirmPassword'])}}</small>
+            <small class="text-danger" *ngIf="(registerFormGroup.controls['confirmPassword'].invalid && registerFormGroup.controls['confirmPassword'].touched)">{{getErrorMessage(registerFormGroup.controls['confirmPassword'])}}</small>
 <# 
     if(localize) {
 #>
-            <small class="text-muted" align="end" i18n="Confirm Password@@<#= appRegisterComponentClassName #>.Confirm-Password-hint">Confirm Password</small>
+            <small class="text-muted" align="end" i18n="Confirm Password@@<#= appRegisterComponentClassName #>.Confirm-Password-hint" *ngIf="!(registerFormGroup.controls['confirmPassword'].invalid && registerFormGroup.controls['confirmPassword'].touched)">Confirm Password</small>
 <# 
     } else {
 #>
-            <small class="text-muted" align="end">Confirm Password</small>
+            <small class="text-muted" align="end" *ngIf="!(registerFormGroup.controls['confirmPassword'].invalid && registerFormGroup.controls['confirmPassword'].touched)">Confirm Password</small>
 <# 
     }
 #>

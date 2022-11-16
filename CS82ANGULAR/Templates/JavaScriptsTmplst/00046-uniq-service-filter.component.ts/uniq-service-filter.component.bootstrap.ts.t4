@@ -115,8 +115,8 @@
 #>
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { FormControl, Validators, ValidatorFn, ValidationErrors } from '@angular/forms';
-import { MatFormFieldAppearance } from '@angular/material/form-field';
-import { debounceTime, Observable, of, switchMap } from 'rxjs';
+// import { MatFormFieldAppearance } from '@angular/material/form-field';
+import { debounceTime, distinctUntilChanged, Observable, of, OperatorFunction, switchMap } from 'rxjs';
 
 import { <#= uniqFilterModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterModelFolder, uniqFilterComponentFolder)#>';
 import { <#= uniqFilterDefModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterDefModelFolder, uniqFilterComponentFolder)#>';
@@ -137,7 +137,7 @@ import { <#= eventEmitterPubModelClassName #> } from '<#= GetFolderNameWithAnglr
 })
 export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #> {
     protected isOnInitCalled: boolean = false;
-    public <#= AppearancePropName #>: MatFormFieldAppearance = 'outline';
+    // public <#= AppearancePropName #>: MatFormFieldAppearance = 'outline';
     
     @Input('<#= captionSelector #>') <#= captionPropName #>: string = '';
     @Input('<#= showBackBtnSelector #>') <#= showBackBtnPropName #>: boolean = false;
@@ -229,7 +229,7 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
     webServiceFilters: Array<<#= uniqFilterModelClassName #>> = [];
 
     constructor(protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, private cd: ChangeDetectorRef) { 
-        this.<#= AppearancePropName #> = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
+        // this.<#= AppearancePropName #> = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
     }
 
     ngOnInit(): void {
@@ -240,7 +240,7 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
 
     onFilterDefsChanged(): void {
         this.webServiceFilterDefs = [];
-        this.<#= clearTpAheadVarsMethodName #>();
+        // this.<#= clearTpAheadVarsMethodName #>();
         if(this.<#= showFilterPropName #>) {
             this.<#= inputFilterDefsExPropName #>.forEach(i => {
                 this.webServiceFilterDefs.push({ fltrName: i.fltrName, fltrCaption: i.fltrCaption, fltrDataType: i.fltrDataType, fltrMaxLen: i.fltrMaxLen, fltrMin: i.fltrMin, fltrMax: i.fltrMax, fltrFlx: i.fltrFlx, fltrMd: i.fltrMd, fltrSm: i.fltrSm, fltrXs: i.fltrXs, fltrSrv: i.fltrSrv });
@@ -518,7 +518,7 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
                 return this.<#= tpAheadFncPropName  #>(this.webServiceFilterDefs[<#= iii #>].fltrSrv, this.webServiceFilters, value, <#= iii #>)
 			})
 		);
-    <#= tpAheadCptnPropName #><#= iii #>: = (v: any) => {
+    <#= tpAheadCptnPropName #><#= iii #> = (v: any) => {
         if (typeof this.<#= tpAheadCptnPropName #> === 'undefined') return '';
         if(this.<#= tpAheadCptnPropName #> === null) return '';
         return this.<#= tpAheadCptnPropName #>(v, <#= iii #>);
@@ -530,6 +530,7 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
     @Input('<#= tpAheadValSelector #>') <#= tpAheadValPropName #>!: (v: any, i: number) => any;
     @Input('<#= tpAheadFncSelector #>') <#= tpAheadFncPropName  #>!: (srv: any, wsfs: Array<<#= uniqFilterModelClassName #>>, value: any, i: number) => Observable<Array<any>>;
     @Input('<#= tpAheadCptnSelector #>') <#= tpAheadCptnPropName #>!: (v: any, i: number) => string;
+/*
     <#= clearTpAheadVarsMethodName #>(): void {
 <#
     for(int iii = 0; iii < 7; iii++) {
@@ -539,7 +540,7 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
     }
 #>
     }
-
+*/
     <#= tpahValChangedMethodName #>(fc: FormControl, indx: number): void {
         fc.valueChanges.subscribe((value)=>{ this.<#= afterObjSelPropName #>.emit({v: value, i: indx}); });
     }
