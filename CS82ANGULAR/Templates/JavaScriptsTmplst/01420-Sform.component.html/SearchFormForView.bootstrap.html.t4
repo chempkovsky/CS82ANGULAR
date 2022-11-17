@@ -1,0 +1,363 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+
+<#
+    bool localize = Context.Localize;
+
+    string OperatorSufix = "Oprtr";
+    string EqualOperator = "eq";
+    int percentEq100 = 99;
+
+    string showAddFltItemSelector           = "show-add-flt-item";
+    string showAddFltItemPropName           = "showAddFltItem";
+
+    string DisplayedColumnsProperty        = "displayedColumns";
+    string ActionColumnDefProperty         = "menuAction";
+    string SelectColumnDefProperty         = "selectAction";
+    string SelectMultColumnDefProperty     = "selectMultAction";
+    string multSelectionProperty           = "multSelection";
+
+    string OnSelectRowMethodName           = "onSelectRow";
+    string MatPaginatorLen                 = "matPaginatorLen";
+    string MatPaginatorPageSize            = "matPaginatorPageSize";
+    string MatPaginatorPageSizeOptions     = "matPaginatorPageSizeOptions"; 
+    
+    string EformModePropName        = "eformMode";
+
+    string DisplayLabelProperty     = "Name";
+    string ShortNameLabelProperty   = "ShortName";
+    string DisplayHintProperty      = "Prompt";
+
+    string MainFormGroupName        = "mainFormGroup";
+    string ComboSufix               = "CmbCntrl";
+    string TypeaheadSufix           = "TphdCntrl";
+    string TypeaheadDisplaySufix    = "DsplFn";
+    string TypeaheadAddDisplaySufix = "AddDsplFn";
+    string TypeaheadUpdDisplaySufix = "UpdDsplFn";
+    string TypeaheadDelDisplaySufix = "DelDsplFn";
+    string SearchClickSufix         = "SrchClck";
+
+    string CanAddSelector           = "can-add";
+    string CanAddPropName           = "canAdd";
+    string CanUpdSelector           = "can-update";
+    string CanUpdPropName           = "canUpdate";
+    string CanDelSelector           = "can-delete";
+    string CanDelPropName           = "canDelete";
+    string HiddenFilterSelector     = "hidden-filter";
+    string HiddenFilterPropName     = "hiddenFilter";
+    string HiddenFilterExPropName   = "hiddenFilterEx";
+    string ShowFilterSelector       = "show-filter";
+    string ShowFilterPropName       = "showFilter";
+
+    string RowCommandsSelector      = "row-commands";
+    string RowCommandsPropName      = "rowCommands";
+    string TableCommandsSelector    = "table-commands";
+    string TableCommandsPropName    = "tableCommands";
+
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string MaxHeightExPropName          = "maxHeightEx";
+    string OverflowSelector             = "ovrflw";
+    string OverflowPropName             = "ovrflw";
+    string FilterMaxHeightPropSelector  = "filter-max-height";
+    string FilterMaxHeightPropName      = "filterMaxHeight";
+
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+
+    string externalFilterSelector               = "external-filter";
+    string externalFilterPropName               = "externalFilter";
+    string externalFilterRsltPropName           = "externalFilterRslt";
+    string selectedRowSelector                  = "selected-row";
+    string selectedRowPropName                  = "selectedRow";
+    string showMultiSelectedRowSelector         = "show-multi-selected-row";
+    string showMultiSelectedRowPropName         = "showMultiSelectedRow";
+    string showMultiSelectedRowExPropName       = "showMultiSelectedRowEx";
+    string notifyAllPropName                    = "notifyAll";
+    string notifyAllSelector                    = "notify-all";
+
+
+    string filterModelFolder            = "00021-web-service-filter.interface.ts";
+    string filterDefModelFolder         = "00022-web-service-filter-def.interface.ts";
+    string filterOperatorModelFolder    = "00023-web-service-filter-operator.interface.ts";
+    string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
+    string filterComponentCssFolder     = "00025-web-service-filter.component.css";
+    string filterComponentHtmlFolder    = "00025-web-service-filter.component.html";
+    string filterComponentFolder        = "00025-web-service-filter.component.ts";
+    string menuItemDataModelFolder      = "00017-menu-item-data.interface.ts";
+    string eventEmitterDataModelFolder  = "00018-event-emitter-data.interface.ts";
+    string uniqFilterComponentFolder    = "00046-uniq-service-filter.component.ts";
+
+    
+    string viewInterfaceFolder      = "01100-.interface.ts";
+    string viewInterfacePageFolder  = "01200-Page.interface.ts";
+    string viewInterfaceFltFolder   = "01300-Filter.interface.ts";
+    string viewServiceFolder        = "01400-.service.ts";
+
+    string sformComponentFolder     = "01420-Sform.component.ts";
+
+    string OnBackBtnMethodName          = "onBackBtnMd";
+    string OnBackBtnPropName            = "onBackBtn";
+    string OnBackBtnSelector            = "on-back-btn";
+    string showBackBtnPropName          = "showBackBtn";
+    string showBackBtnSelector          = "show-back-btn";
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+    string searchShowFilterPropName     = "searchShowFilter";
+    string searchShowAddFltItemPropName = "searchShowAddFltItem";
+    string searchOnSelectRowMethodName  = "srchOnSlctRw";
+    string searchMaxHeightPropName      = "searchMaxHeight";
+    string searchFilterMaxHeightPropName= "searchFilterMaxHeight";
+    string scannByMode                  = "scannBy";
+
+
+    string tpAheadValPropName           = "tpAheadVal";
+    string tpAheadValSelector           = "tp-ahead-val";
+    string tpAheadFncPropName           = "tpAheadFnc";
+    string tpAheadFncSelector           = "tp-ahead-fnc";
+    string tpAheadCptnPropName          = "tpAheadCptn";
+    string tpAheadCptnSelector          = "tp-ahead-cptn";
+    string formServicePrefix            = "frmSrv";
+    string formRootService              = "frmRootSrv";
+    string afterObjSelPropName          = "afterObjSel";
+    string afterObjSelSelector          = "after-obj-sel";
+
+
+    string filterComponentSelectorCommonPart = GetContextComponentSelectorCommonPart(Context, filterComponentFolder);
+    string uniqFilterComponentSelectorCommonPart = GetContextComponentSelectorCommonPart(Context, uniqFilterComponentFolder);
+
+    string sFormComponentClassName = GetComponentClassName(Model, sformComponentFolder);
+
+    List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = GetModelUniqueKeys(Model, new List<ModelViewUniqueKeyOfVwSerializable>());
+    ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
+    if(pk!= null) uniqueKeys.Add(pk);
+
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
+        GetSearchResources(Model, Context);
+
+#>
+<div class="card">
+    <div style="box-sizing: border-box;left: 1px;right: 1px;">
+<#
+  if(searchSchemas != null) {
+    foreach(var sch in searchSchemas) {
+        ModelViewSerializable m2mModel = sch.Item1;
+
+#>
+        <app-<#= uniqFilterComponentSelectorCommonPart #> *ngIf="crIMIDid === '<#= m2mModel.ViewName #>'"
+            [<#= captionSelector #>]="<#= captionPropName #>" 
+            (<#= OnBackBtnSelector #>)="<#= OnBackBtnMethodName #>($event)"
+            [<#= showBackBtnSelector #>]="<#= showBackBtnPropName #>"
+            (on-apply-filter)="onApplyFilter($event)" 
+            [<#= externalFilterSelector #>]="<#= externalFilterRsltPropName #>"
+            [<#= MaxHeightPropSelector #>]="<#= FilterMaxHeightPropName #>"  
+            [filter-defs]="filterDefs"  [show-filter]="<#= ShowFilterPropName #>"
+            [<#= containerMenuItemsSelector #>]="<#= containerMenuItemsPropName #>"
+            (<#= onContainerMenuItemClickSelector #>)="<#= onContainerMenuItemClickMethodName #>($event)"
+            [<#= tpAheadValSelector #>]="<#= tpAheadValPropName + m2mModel.ViewName #>"
+            [<#= tpAheadFncSelector #>]="<#= tpAheadFncPropName + m2mModel.ViewName #>"
+            [<#= tpAheadCptnSelector #>]="<#= tpAheadCptnPropName + m2mModel.ViewName #>"
+            (<#= afterObjSelSelector #>)="<#= afterObjSelPropName + m2mModel.ViewName #>($event)"
+            [<#= notifyAllSelector #>]="false"
+            ></app-<#= uniqFilterComponentSelectorCommonPart #>>
+<#
+    }
+  }
+  if (Model.IsWebApiSelectOneByPrimarykey) {
+    for(int i = 0; i < uniqueKeys.Count; i++) { 
+        string indErrrorText = "";
+        bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
+        if (!indIsCorrect) {
+#>
+
+<!--
+
+         Could not generate fragment of code
+         Primary/Unique Index Is not correct:
+         <#= indErrrorText #>
+
+ -->
+
+<#
+        } else {
+            string caption = "Primary";
+            if(!uniqueKeys[i].IsPrimary) {
+                caption = uniqueKeys[i].UniqueKeyName;
+            }
+
+#>
+        <app-<#= uniqFilterComponentSelectorCommonPart #> *ngIf="crIMIDid === '<#= scannByMode + caption #>'"
+            [<#= captionSelector #>]="<#= captionPropName #>" 
+            (<#= OnBackBtnSelector #>)="<#= OnBackBtnMethodName #>($event)"
+            [<#= showBackBtnSelector #>]="<#= showBackBtnPropName #>"
+            (on-apply-filter)="onApplyFilter($event)" 
+            [<#= externalFilterSelector #>]="<#= externalFilterRsltPropName #>"
+            [<#= MaxHeightPropSelector #>]="<#= FilterMaxHeightPropName #>"  
+            [filter-defs]="filterDefs"  [show-filter]="<#= ShowFilterPropName #>"
+            [<#= containerMenuItemsSelector #>]="<#= containerMenuItemsPropName #>"
+            (<#= onContainerMenuItemClickSelector #>)="<#= onContainerMenuItemClickMethodName #>($event)"
+            [<#= tpAheadValSelector #>]="<#= tpAheadValPropName + caption #>"
+            [<#= tpAheadFncSelector #>]="<#= tpAheadFncPropName + caption #>"
+            [<#= tpAheadCptnSelector #>]="<#= tpAheadCptnPropName + caption #>"
+            (<#= afterObjSelSelector #>)="<#= afterObjSelPropName + caption #>($event)"
+            [<#= notifyAllSelector #>]="true"
+            ></app-<#= uniqFilterComponentSelectorCommonPart #>>
+<#
+
+        } // if (!indIsCorrect) {} else {}
+    } // for(int i = 0; i < uniqueKeys.Count; i++) {} else {}
+}
+#>
+
+        <app-<#= filterComponentSelectorCommonPart #> *ngIf="crIMIDid === 'fullscann'"
+            [<#= captionSelector #>]="<#= captionPropName #>" 
+            (<#= OnBackBtnSelector #>)="<#= OnBackBtnMethodName #>($event)"
+            [<#= showBackBtnSelector #>]="<#= showBackBtnPropName #>"
+            (on-apply-filter)="onApplyFilter($event)" 
+            [<#= externalFilterSelector #>]="<#= externalFilterRsltPropName #>"
+            [<#= showAddFltItemSelector #>]="<#= showAddFltItemPropName #>"  
+            [<#= MaxHeightPropSelector #>]="<#= FilterMaxHeightPropName #>"  
+            [filter-defs]="filterDefs" [hidden-filter]="<#= HiddenFilterExPropName #>" [show-filter]="<#= ShowFilterPropName #>"
+            [<#= containerMenuItemsSelector #>]="<#= containerMenuItemsPropName #>"
+            (<#= onContainerMenuItemClickSelector #>)="<#= onContainerMenuItemClickMethodName #>($event)"
+            ></app-<#= filterComponentSelectorCommonPart #>>
+    </div>
+    <ngb-progressbar type="info" [value]="100" [striped]="true" [animated]="true" [style.visibility]="inQuery ? 'visible': 'hidden'"></ngb-progressbar>
+
+
+    <div class="ngb-tbl-outer-container">  
+        <div  [style.maxHeight.px]="<#= MaxHeightPropName #>X" [style.overflow-y]="<#= OverflowPropName #>"  class="ngb-tbl-container"> 
+            <div ngbRadioGroup>
+                <table class="table table-sm table-striped tblwidthclss">
+                    <thead>
+                        <tr>
+                            <th class="stickyfirsttopclss">
+                                <input type="checkbox" class="form-check-input" style="margin-left: 30px;" *ngIf="<#= showMultiSelectedRowPropName #>"
+                                    (change)="$event ? masterToggle() : null"
+                                    [checked]="<#= multSelectionProperty #>.hasValue() && isAllSelected()"
+                                    [indeterminate]="<#= multSelectionProperty #>.hasValue() && !isAllSelected()"/>
+                            </th>
+<#
+    foreach(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable in Model.UIListProperties) {
+        if (!modelViewUIListPropertySerializable.IsShownInView) {
+            continue;
+        }
+#>
+                          <th class="stickytopclss"
+                            <#= ngbSortHeaderIfNeeded(modelViewUIListPropertySerializable, Model, Context, sortheadDirectiveFolder) #>
+                            *ngIf="<#= DisplayedColumnsProperty #>.includes('<#= GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>')">
+                                {{<#= columnCaptionsPropName + Model.ViewName #>['<#= GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>']}}
+                          </th>
+<#
+    }
+#>
+                          <th class="stickylasttopclss"> 
+                            <span ngbDropdown display="dynamic" placement="bottom-right" container="body">
+                             <i class="material-icons" ngbDropdownToggle type="button" >more_vert</i> 
+                              <div ngbDropdownMenu class="dropdown-menu">
+<# 
+    if(localize) {
+#>
+                                <button  ngbDropdownItem (click)="onFilter()" > 
+                                    <i class="material-icons" type="button">refresh</i>
+                                    <span i18n="Refresh table@@<#= sFormComponentClassName #>.Refreshtable-menu">Refresh table</span>
+                                </button>
+                                <button  ngbDropdownItem (click)="onSettings()"> 
+                                    <i class="material-icons" type="button">settings</i>
+                                    <span i18n="Table columns@@<#= sFormComponentClassName #>.Tablecolumns-menu">Table columns</span>
+                                </button>
+<# 
+    } else {
+#>
+                                <button  ngbDropdownItem (click)="onFilter()"> <i class="material-icons" type="button">refresh</i>Refresh table</button>
+                                <button  ngbDropdownItem (click)="onSettings()"> <i class="material-icons" type="button">settings</i>Table columns</button>
+<# 
+    }
+#>
+                                <button ngbDropdownItem *ngFor="let m of <#= TableCommandsPropName #>;"  [disabled]="!m.enabled" (click)="tableCommand(m.id)">
+                                    <i  class="{{'material-icons text-'+ m.iconColor}}" type="button">{{m.iconName}}</i>
+                                    <span>{{m.caption}}</span>
+                                </button>
+                              </div>
+                            </span> 
+                          </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-template ngFor let-e [ngForOf]="dataSource" >
+                          <td class="stickyfirstclss">
+                            <input type="radio" (change)="<#= OnSelectRowMethodName #>(e)" [value]="e" [checked]="e === currentRow" />
+                            
+                            <mat-checkbox (click)="$event.stopPropagation()"
+                                (change)="$event ? <#= multSelectionProperty #>.toggle(e) : null"
+                                [checked]="<#= multSelectionProperty #>.isSelected(e)">
+                            <input  type="checkbox"  class="form-check-input" style="margin-left: 10px;" *ngIf="<#= showMultiSelectedRowPropName #>"
+                                    (click)="$event.stopPropagation()"
+                                    (change)="$event ? <#= multSelectionProperty #>.toggle(e) : null"
+                                    [checked]="<#= multSelectionProperty #>.isSelected(e)">
+                          </td>
+<#
+    foreach(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable in Model.UIListProperties) {
+        if (!modelViewUIListPropertySerializable.IsShownInView) {
+            continue;
+        }
+#>
+                          <td *ngIf="displayedColumns.includes('<#= GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>')" >
+                            {{e.<#= GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model) #> <#= GetDataPipeEx2(modelViewUIListPropertySerializable, Model) #> }}
+                          </td>
+<#
+    }
+#>
+                          <td  class="stickylastclss">
+                             <span ngbDropdown display="dynamic" placement="bottom-right" container="body">
+                              <i class="material-icons" ngbDropdownToggle type="button" >more_vert</i> 
+                               <div ngbDropdownMenu class="dropdown-menu" >
+                                    <button ngbDropdownItem  *ngFor="let m of <#= RowCommandsPropName #>;"  [disabled]="!m.enabled" (click)="rowCommand(e, m.id)">
+                                        <i  class="{{'material-icons text-'+ m.iconColor}}" type="button">{{m.iconName}}</i>
+                                        <span>{{m.caption}}</span>
+                                    </button>
+                               </div>
+                             </span> 
+                          </td>
+                        </ng-template>
+                    </tbody>
+                </table>
+            </div> 
+        </div> 
+    </div> 
+
+    <div class="pagination-container">
+        <ngb-pagination [boundaryLinks]="true" [directionLinks]="true" [size]="'sm'" [maxSize]="5"
+          [collectionSize]="matPaginatorLen" [(page)]="currentPageIndex" [pageSize]="currentPageSize" (pageChange)="onPage()">
+        </ngb-pagination>
+        <div class="form-group">
+            <select class="custom-select form-control form-control-sm"  (change)="onPage()" [(ngModel)]="currentPageSize">
+                <option *ngFor="let pgszDef of matPaginatorPageSizeOptions;" [value]="pgszDef">{{pgszDef}}</option>
+            </select>
+        </div>
+    </div> 
+
+</div> 
+
+
+

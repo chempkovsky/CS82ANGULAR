@@ -4,15 +4,19 @@
     "                                BEFORE YOU START !!!",
     "Please make sure that you selected [src\\app] folder",
     "",
-    "Please make sure that you executed two commands",
+    "Please make sure that you executed commands",
     "",
-    "    ng add @ng-bootstrap/ng-bootstrap",
+    "    ng add @ng-bootstrap/ng-bootstrap --project XXXXX",
     "",
-    "    npm install material-design-icons",
-    "        in the file styles.css add the following line",
-    "    @import '~material-design-icons/iconfont/material-icons.css'; ",
+    "    ng add @angular/localize --project  XXXXX",
+    "        import '@angular/localize/init'",
     "",
     "    npm i -s @angular/flex-layout @angular/cdk",
+    "",
+    "    npm install material-icons@latest",
+    "        in the file styles.css add the following line",
+    "        @import '~material-design-icons/iconfont/material-icons.css'; ",
+    "",
     "",
     "                                After you have finished the current batch generation",
     "Please include ",
@@ -68,6 +72,17 @@
       "GeneratorSript": "formatter.module.ts.t4"
     },
 
+
+    {
+      "DestinationFolder": "shared\\directives",
+      "GeneratorType": "00082-sorthead.directive.ts",
+      "GeneratorSript": "sorthead.directive.bootstrap.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\modules",
+      "GeneratorType": "00090-app-tbl.module.ts",
+      "GeneratorSript": "tbl.module.bootstrap.ts.t4"
+    },
 
 
 

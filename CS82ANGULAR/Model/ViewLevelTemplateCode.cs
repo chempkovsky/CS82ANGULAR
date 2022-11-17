@@ -2019,6 +2019,166 @@ namespace CS82ANGULAR.Model
             }
             return "";
         }
+        bool hasNgbSortHeader(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable, ModelViewSerializable model)
+        {
+            if ((model == null) || (modelViewUIListPropertySerializable == null))
+            {
+                return false;
+            }
+            if ((model.UIListProperties == null) || (model.ScalarProperties == null))
+            {
+                return false;
+            }
+            return model.ScalarProperties.Any(s => s.ViewPropertyName == modelViewUIListPropertySerializable.ViewPropertyName && s.IsUsedBySorting);
+        }
+        string GetDirectiveSelectorName(DbContextSerializable context, string fileType)
+        {
+            string result = "";
+            if ((context == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (context.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            if (refItem == null)
+            {
+                return result;
+            }
+            if (string.IsNullOrEmpty(refItem.FileName))
+            {
+                return result;
+            }
+            string fn = refItem.FileName.Replace(".directive", "");
+            StringBuilder sb = new StringBuilder();
+            bool toUpper = false; // the name starts from lower case letter
+            foreach (char c in fn)
+            {
+                if (c == '-')
+                {
+                    toUpper = true;
+                }
+                else
+                {
+                    if (toUpper)
+                    {
+                        sb.Append(Char.ToUpper(c));
+                        toUpper = false;
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+            }
+            return sb.ToString();
+        }
+        string ngbSortHeaderIfNeeded(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable, ModelViewSerializable model, DbContextSerializable context, string fileType)
+        {
+            if (hasNgbSortHeader(modelViewUIListPropertySerializable, model))
+            {
+                string selectorName = GetDirectiveSelectorName(context, fileType);
+                return selectorName + "=\"" + GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, model) + "\"  (sort)=\"onSort($event)\"";
+            }
+            return "";
+        }
+        string GetDirectiveClassName(DbContextSerializable context, string fileType)
+        {
+            string result = "";
+            if ((context == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (context.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            if (refItem == null)
+            {
+                return result;
+            }
+            if (string.IsNullOrEmpty(refItem.FileName))
+            {
+                return result;
+            }
+            string fn = refItem.FileName.Replace(".directive", "Directive");
+            StringBuilder sb = new StringBuilder();
+            bool toUpper = true;
+            foreach (char c in fn)
+            {
+                if (c == '-')
+                {
+                    toUpper = true;
+                }
+                else
+                {
+                    if (toUpper)
+                    {
+                        sb.Append(Char.ToUpper(c));
+                        toUpper = false;
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+            }
+            return sb.ToString();
+        }
+        string GetDirectiveClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, DbContextSerializable context, string fileType, string currFolder)
+        {
+            string result = GetDirectiveClassName(context, fileType);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetDirectiveEventName(DbContextSerializable context, string fileType)
+        {
+            string result = GetDirectiveSelectorName(context, fileType);
+            return result + "Event";
+        }
+        string GetDirectiveEventNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, DbContextSerializable context, string fileType, string currFolder)
+        {
+            string result = GetDirectiveEventName(context, fileType);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+
+
         string GetInputTypeToEnumName(int inputType)
         {
             switch (inputType)
