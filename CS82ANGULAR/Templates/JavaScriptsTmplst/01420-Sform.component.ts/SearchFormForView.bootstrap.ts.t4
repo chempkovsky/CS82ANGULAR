@@ -224,8 +224,7 @@
     string sortheadDirectiveFolder                  = "00082-sorthead.directive.ts";
     string sortheadDirectiveEventName               = GetDirectiveEventNameWithAnglr(AngularJsonFile, Model, Context, sortheadDirectiveFolder, sformComponentFolder);
     string sortheadDirectiveClassName               = GetDirectiveClassNameWithAnglr(AngularJsonFile, Model, Context, sortheadDirectiveFolder, sformComponentFolder);
-    
-
+    string sortheadDirectiveSelectorName            = GetDirectiveSelectorNameWithAnglr(AngularJsonFile, Model, Context, sortheadDirectiveFolder, sformComponentFolder);
 
     string viewInterfaceFolder                      = "01100-.interface.ts";
     string viewInterfaceName                        = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, sformComponentFolder);

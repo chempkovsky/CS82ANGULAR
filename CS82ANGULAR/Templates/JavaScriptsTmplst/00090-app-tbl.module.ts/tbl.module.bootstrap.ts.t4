@@ -6,34 +6,43 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
-<#@ import namespace="CS2ANGULAR" #>
-<#@ import namespace="CS2ANGULAR.Model" #>
-<#@ import namespace="CS2ANGULAR.Model.Serializable" #>
-<#@ parameter type="CS2ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
-<#@ parameter type="CS2ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
 
     string appTblModuleFolder                    = "00090-app-tbl.module.ts";
     string appTblModuleClassName                 = GetModuleClassName(Model, appTblModuleFolder);
 
     string sortheadDirectiveFolder               = "00082-sorthead.directive.ts";
-    string sortheadDirectiveClassName            = GetDirectiveClassName(Model, sortheadDirectiveFolder);
+    string sortheadDirectiveClassName            = GetDirectiveClassNameWithAnglr(AngularJsonFile, Model, sortheadDirectiveFolder, appTblModuleFolder);
+    string sortheadDirectiveEventName            = GetDirectiveEventNameWithAnglr(AngularJsonFile, Model, sortheadDirectiveFolder, appTblModuleFolder);
 #>
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { <#= sortheadDirectiveClassName #> } from '<#= GetFolderName(Model, sortheadDirectiveFolder, appTblModuleFolder) #>';
+import { <#= sortheadDirectiveClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, sortheadDirectiveFolder, appTblModuleFolder)#>';
+// import { <#= sortheadDirectiveEventName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, sortheadDirectiveFolder, appTblModuleFolder)#>';
+
 
 @NgModule({
     declarations: [
         <#= sortheadDirectiveClassName #>,
+//        <#= sortheadDirectiveEventName #>
     ],
     imports: [
         CommonModule,
     ],
     exports: [
         <#= sortheadDirectiveClassName #>,
+//        <#= sortheadDirectiveEventName #>
     ],
     entryComponents: [
     ],

@@ -810,6 +810,34 @@
             }
             return sb.ToString();
         }
+        string GetDirectiveEventName(ModelViewSerializable model, string fileType)
+        {
+            string result = GetDirectiveSelectorName(model, fileType);
+            return result + "Event";
+        }
+        string GetDirectiveEventNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = "";
+            if ((model == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            result = GetDirectiveEventName(model, fileType);
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+
+        }
         string GetInterceptorClassName(ModelViewSerializable model, string fileType)
         {
             string result = "";

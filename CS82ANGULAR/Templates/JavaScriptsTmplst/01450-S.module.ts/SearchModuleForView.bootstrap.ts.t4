@@ -50,7 +50,7 @@ import { <#=  filterModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr
 import { <#=  formatterModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  formatterModuleFolder, searchModuleFolder) #>';
 import { <#=  searchComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, sformComponentFolder, searchModuleFolder) #>';
 import { <#=  searchDlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, sdlgComponentFolder, searchModuleFolder) #>';
-import { <#=  appTblModuleClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, Context,  appTblModuleFolder, searchModuleFolder) #>';
+import { <#=  appTblModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appTblModuleFolder, searchModuleFolder) #>';
 
 
 @NgModule({

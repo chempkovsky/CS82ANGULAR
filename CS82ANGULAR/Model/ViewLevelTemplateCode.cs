@@ -2076,6 +2076,27 @@ namespace CS82ANGULAR.Model
             }
             return sb.ToString();
         }
+        string GetDirectiveSelectorNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, DbContextSerializable context, string fileType, string currFolder)
+        {
+            string result = GetDirectiveSelectorName(context, fileType);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                context.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
         string ngbSortHeaderIfNeeded(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable, ModelViewSerializable model, DbContextSerializable context, string fileType)
         {
             if (hasNgbSortHeader(modelViewUIListPropertySerializable, model))

@@ -93,6 +93,7 @@
     string showMultiSelectedRowExPropName       = "showMultiSelectedRowEx";
     string notifyAllPropName                    = "notifyAll";
     string notifyAllSelector                    = "notify-all";
+    string columnCaptionsPropName               = "clmnCptns";
 
 
     string filterModelFolder            = "00021-web-service-filter.interface.ts";
@@ -105,6 +106,7 @@
     string menuItemDataModelFolder      = "00017-menu-item-data.interface.ts";
     string eventEmitterDataModelFolder  = "00018-event-emitter-data.interface.ts";
     string uniqFilterComponentFolder    = "00046-uniq-service-filter.component.ts";
+    string sortheadDirectiveFolder      = "00082-sorthead.directive.ts";
 
     
     string viewInterfaceFolder      = "01100-.interface.ts";
@@ -246,7 +248,7 @@
 
 
     <div class="ngb-tbl-outer-container">  
-        <div  [style.maxHeight.px]="<#= MaxHeightPropName #>X" [style.overflow-y]="<#= OverflowPropName #>"  class="ngb-tbl-container"> 
+        <div  [style.maxHeight.px]="<#= MaxHeightExPropName #>" [style.overflow-y]="<#= OverflowPropName #>"  class="ngb-tbl-container"> 
             <div ngbRadioGroup>
                 <table class="table table-sm table-striped tblwidthclss">
                     <thead>
@@ -307,10 +309,6 @@
                         <ng-template ngFor let-e [ngForOf]="dataSource" >
                           <td class="stickyfirstclss">
                             <input type="radio" (change)="<#= OnSelectRowMethodName #>(e)" [value]="e" [checked]="e === currentRow" />
-                            
-                            <mat-checkbox (click)="$event.stopPropagation()"
-                                (change)="$event ? <#= multSelectionProperty #>.toggle(e) : null"
-                                [checked]="<#= multSelectionProperty #>.isSelected(e)">
                             <input  type="checkbox"  class="form-check-input" style="margin-left: 10px;" *ngIf="<#= showMultiSelectedRowPropName #>"
                                     (click)="$event.stopPropagation()"
                                     (change)="$event ? <#= multSelectionProperty #>.toggle(e) : null"
