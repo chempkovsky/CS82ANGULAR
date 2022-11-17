@@ -1,0 +1,313 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+
+<#
+    bool localize = Context.Localize;
+    string frasesPropName                       = "frases";
+
+    string OperatorSufix = "Oprtr";
+    string EqualOperator = "eq";
+    int percentEq100 = 99;
+
+    
+    string ButtonDisable            = "BttnDsnbl";
+
+    string DisplayLabelProperty     = "Name";
+    string DisplayHintProperty      = "Prompt";
+
+    string MainFormGroupName        = "mainFormGroup";
+    string ComboSufix               = "CmbCntrl";
+    string TypeaheadSufix           = "TphdCntrl";
+    string TypeaheadDisplaySufix    = "DsplFn";
+    string SearchClickSufix         = "SrchClck";
+    string AppearancePropName       = "appearance";
+    string captionPropName          = "caption";
+
+    string containerMenuItemsPropName           = "contMenuItems";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+
+    string updformComponentFolder       = "01504-Uform.component.ts";
+    string componentClassName = GetComponentClassName(Model, updformComponentFolder);
+
+    int typeAheadNo = 0;
+    int dateTmPickNo = 0;
+
+    int XXXCnt = 0;
+    int XXX2Cnt = 0;
+    int XXX3Cnt = 0;
+    int   XXX1Wdth = 0;
+    int[] XXX2Wdth = new int[] {0, 0};
+    int[] XXX3Wdth = new int[] {0, 0};
+
+    int InputTypeId = 2;
+
+#>
+     <div fxLayout="row" fxLayoutAlign="flex-end space-around" style="margin-bottom: 12px;"> 
+        <label fxFlex fxLayoutAlign="flex-start space-around">{{<#= captionPropName #>}}</label>
+        <ng-template ngFor let-item [ngForOf]="<#= containerMenuItemsPropName #>">
+            <span fxFlex="1%"></span>  
+            <button mat-icon-button (click)="<#= onContainerMenuItemClickMethodName #>(item)" 
+                [matTooltip]="item.caption"> 
+                <mat-icon  [color]="item.iconColor" >{{item.iconName}}</mat-icon>
+            </button>     
+        </ng-template>            
+        <span fxFlex="1%"></span>
+     </div> 
+<#
+
+
+#>
+    <div [formGroup]="<#= MainFormGroupName #>" (ngSubmit)="doSubmit()" fxLayout="row wrap" fxLayoutAlign="space-between" style="margin: 0 15px;">
+<#
+
+    bool isNewLine = false;
+    for(int i = 0; i < Model.UIFormProperties.Count; i++) {
+        ModelViewUIFormPropertySerializable 
+                modelViewUIFormPropertySerializable = Model.UIFormProperties[i];
+        if (isNewLine || i == 0) {
+            isNewLine = false;
+
+            for (int k = i; k < Model.UIFormProperties.Count; k++) {
+                if (Model.UIFormProperties[k].IsShownInView && (Model.UIFormProperties[k].InputTypeWhenUpdate != InputTypeEnum.Hidden)) {
+                    XXXCnt++;
+                }
+                if (Model.UIFormProperties[k].IsNewLineAfter) break;
+            }
+
+            if(XXXCnt == 0) {
+                    XXX1Wdth = percentEq100;
+                    XXX2Wdth[0] = percentEq100;
+                    XXX2Wdth[1] = percentEq100;
+                    XXX3Wdth[0] = percentEq100;
+                    XXX3Wdth[1] = percentEq100;
+            } else {
+                XXX1Wdth = 100 / XXXCnt;
+                XXX2Cnt = XXXCnt >> 1;
+                if (XXX2Cnt < 1) { 
+                    XXX2Wdth[0] = percentEq100;
+                } else {
+                    XXX2Wdth[0] = 100 / XXX2Cnt;
+                }
+                XXX2Wdth[1] = 100 / (XXXCnt - XXX2Cnt);
+
+
+                XXX3Cnt = XXXCnt / 3;
+                if(XXX3Cnt < 1) {
+                    XXX3Wdth[0] = percentEq100;
+                    XXX3Wdth[1] = percentEq100;
+                } else {
+                    if(XXX3Cnt == 1) {
+                        XXX3Wdth[0] = percentEq100;
+                    } else {                    
+                        XXX3Wdth[0] = 100 / XXX3Cnt;
+                    }
+                    XXX3Cnt = XXX3Cnt * 3;
+                    if ((XXXCnt - XXX3Cnt) > 1) {
+                        XXX3Wdth[1] = 100 / (XXXCnt - XXX3Cnt);
+                    } else {
+                        XXX3Wdth[1] = percentEq100;
+                    }
+                }
+            }
+
+            XXXCnt = 0;
+        }
+
+        if (modelViewUIFormPropertySerializable.IsShownInView) {
+                if (XXX1Wdth == 100) {
+                    XXX1Wdth = percentEq100;
+                }
+                if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Hidden) {
+#>
+                <input type="hidden"  formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+<#
+                }
+                if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate != InputTypeEnum.Hidden) {
+                    if(modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Combo) {
+#>
+
+                <input type="hidden"  formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+                <div class="form-group"  fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#= GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#= GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#= percentEq100.ToString() #>">
+                    <label>{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</label>
+                    <select class="form-control"  [formControl]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">
+                        <option *ngFor="let aVal of <#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>;" [ngValue]="aVal">{{ aVal.<#= GetComboControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #> }}</option>
+                    </select>
+                    <small class="text-danger" *ngIf="<#= GetExpressionForControlInvalidBootstrap(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</small>
+                    <small class="text-muted" align="end" *ngIf="!(<#= GetExpressionForControlInvalidBootstrap(modelViewUIFormPropertySerializable, Model, ComboSufix) #>)">{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint']}}</small>
+                </div>
+<#
+                    } /// if(modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Combo) {}
+                    else if(modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead) {
+#>
+
+                <input type="hidden"  formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+                <div class="form-group"  fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#= GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#= GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#= percentEq100.ToString() #>">
+                    <label>{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</label>
+                    <input class="form-control" type="text" [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" 
+                        [formControl]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>" 
+                        [ngbTypeahead]="<#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>"
+                        [inputFormatter]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadDisplaySufix) #>"
+                        [resultFormatter]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadDisplaySufix) #>"
+                        [editable]="false">
+                    <small class="text-danger" *ngIf="<#= GetExpressionForControlInvalidBootstrap(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</small>
+                    <small class="text-muted" align="end" *ngIf="!(<#= GetExpressionForControlInvalidBootstrap(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>)" >{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint']}}</small>
+                </div>
+<#
+
+                        typeAheadNo++;
+                    } /// if(modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead) {}
+                    else  
+                    {
+                            bool hasButton = HasButton(modelViewUIFormPropertySerializable.InputTypeWhenUpdate);
+#>
+                <div class="form-group"  fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#=  GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#=  GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#=  percentEq100.ToString() #>">
+<#
+                            if(!IsBooleanInput(modelViewUIFormPropertySerializable, Model)) {
+#>
+                    <label>{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</label>
+<# 
+                            }
+                            if (IsDateInput(modelViewUIFormPropertySerializable, Model)) {
+                                if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.ReadOnly) {
+#>
+                    <div class="input-group" >
+                        <input class="form-control" ngbDatepicker container="body" #apicker<#= dateTmPickNo #>="ngbDatepicker" 
+                            (click)="apicker<#= dateTmPickNo #>.toggle()"
+                            formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true">
+                        <div class="input-group-append" >
+                            <button class="btn btn-outline-secondary " type="button"   (click)="apicker<#= dateTmPickNo #>.toggle()" data-toggle="tooltip" title="Show date dialog" >
+                                <i class="material-icons md-18 text-primary">date_range</i>
+                            </button>
+                        </div>
+<#
+                                } else {
+#>
+                    <div class="input-group" >
+                        <input class="form-control" ngbDatepicker container="body" #apicker<#= dateTmPickNo #>="ngbDatepicker" 
+                            (click)="apicker<#= dateTmPickNo #>.toggle()"
+                            formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+                        <div class="input-group-append" >
+                            <button class="btn btn-outline-secondary " type="button"   (click)="apicker<#= dateTmPickNo #>.toggle()" data-toggle="tooltip" title="Show date dialog" >
+                                <i class="material-icons md-18 text-primary">date_range</i>
+                            </button>
+                        </div>
+<#
+                                }
+#>
+                    </div>
+<#
+                                dateTmPickNo++;
+                            } else {
+                                if(IsMemoInput(modelViewUIFormPropertySerializable, Model)) {
+                                    if (hasButton || (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.ReadOnly)) {
+#>
+                        <textarea  class="form-control" [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true"></textarea>
+<#
+                                    } else {
+#>
+                        <textarea  class="form-control" [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"></textarea>
+<#
+                                    }
+                                } else {
+                                    if( IsBooleanInput(modelViewUIFormPropertySerializable, Model) ) {
+                                        if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.ReadOnly) { 
+#>
+                    <label></label>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"  [disabled]="true">
+                            {{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}
+                        </label>
+                    </div>
+<#
+                                        } else {
+#>
+                    <label></label>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+                            {{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}
+                        </label>
+                    </div>
+<#
+                                        }
+                                    }
+                                    else
+				                    {
+                                        if (hasButton || (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.ReadOnly)) { 
+#>
+                    <div class="input-group">
+                        <input class="form-control" <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #> [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true">
+<#
+                                            if (hasButton) {                           
+#>
+                        <div class="input-group-append" >
+                            <button class="btn btn-outline-secondary" type="button"  
+                                [disabled]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonDisable) #>" 
+                                (click)="<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>()" 
+                                data-toggle="tooltip" title="Search...">
+                                <i class="material-icons md-18 text-primary">search</i>
+                            </button>
+                        </div>
+<#
+                                            }
+#>
+                    </div>
+<#
+                                        } else {
+#>
+                        <input class="form-control" <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #> [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+<#
+                                        }
+                                    }
+
+                                }
+                            }
+#>
+                        <small class="text-danger" *ngIf="<#=  GetExpressionForInvalidBootstrap(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</small>
+                        <small class="text-muted" align="end" *ngIf="!(<#=  GetExpressionForInvalidBootstrap(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)">{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint']}}</small>
+                    </div>
+<#
+                            if (hasButton && false) {
+#>
+                    <button mat-icon-button fxFlex="5" aria-label="Search"
+                        matTooltip="Select Item"
+                        color="primary" (click)="<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, SearchClickSufix) #>()">
+                        <mat-icon>search</mat-icon>
+                    </button>
+                </div>
+<#
+                            }
+                    } // if (!((modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Combo) || (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead))) {}
+                    XXXCnt++;
+                } // if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate != InputTypeEnum.Hidden) {
+        } // if (modelViewUIFormPropertySerializable.IsShownInView) {
+
+        if(modelViewUIFormPropertySerializable.IsNewLineAfter) {
+#>
+                <hr fxFlex="100"/>
+<#
+            isNewLine = true;
+            XXXCnt = 0;
+        }
+
+            }   // for(int i = 0; i < Model.UIFormProperties.Count; i++) {
+
+#> 
+    </div>
+

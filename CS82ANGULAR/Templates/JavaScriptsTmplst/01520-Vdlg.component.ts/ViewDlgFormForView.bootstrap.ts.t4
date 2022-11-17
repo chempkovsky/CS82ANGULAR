@@ -1,0 +1,71 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+
+    string FormControlNewModelPropName  = "eformNewControlModel";
+    string OnAfterSubmitMethodName      = "onAfterSubmit";
+
+    string viewdlgCssFolder             = "01520-Vdlg.component.css";
+    string viewdlgHtmlFolder            = "01520-Vdlg.component.html";
+    string viewdlgComponentFolder      = "01520-Vdlg.component.ts";
+    string componentSelectorCommonPart  = GetComponentSelectorCommonPart(Model, viewdlgComponentFolder);
+    string componentClassName           = GetComponentClassName(Model, viewdlgComponentFolder);
+
+    string viewInterfaceFolder          = "01100-.interface.ts";
+    string viewInterfaceName            = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, viewdlgComponentFolder);
+
+    string viewformComponentFolder      = "01500-Vform.component.ts";
+    string viewformComponentClassName   = GetComponentClassNameWithAnglr(AngularJsonFile, Model,  viewformComponentFolder, viewdlgComponentFolder);
+
+    string viewInterfaceVDlgFolder      = "01510-Vdlg.interface.ts";
+    string viewInterfaceVDlgClassName   = GetInterfaceVDlgNameWithAnglr(AngularJsonFile, Model,  viewInterfaceVDlgFolder, viewdlgComponentFolder);
+
+#>
+
+import { Component,  Input, Output, EventEmitter, ViewChild, Inject } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+
+import { <#= viewInterfaceVDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceVDlgFolder, viewdlgComponentFolder)#>';
+import { <#= viewformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewformComponentFolder, viewdlgComponentFolder) #>';
+import { <#= viewInterfaceName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, viewdlgComponentFolder) #>';
+
+@Component({
+  selector: 'app-<#= componentSelectorCommonPart #>',
+  templateUrl: '<#= GetFolderName(Model, viewdlgHtmlFolder, viewdlgComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderName(Model, viewdlgCssFolder, viewdlgComponentFolder) #>.css']
+})
+export class <#= componentClassName #>  {
+    @ViewChild(<#= viewformComponentClassName #>) childForm: <#= viewformComponentClassName #>|any;
+    @Input('data')
+    public data: <#= viewInterfaceVDlgClassName #> | any;
+
+    constructor(public dialogRef: NgbActiveModal) { }
+    <#= OnAfterSubmitMethodName #>(newVal: <#= viewInterfaceName #>) {
+        this.data.<#= FormControlNewModelPropName #> = newVal; 
+        this.dialogRef.close(this.data);
+    }
+    onCancel() {
+        this.dialogRef.dismiss();
+    }
+    onOk() {
+        if (typeof this.childForm === 'undefined') return;
+        if (this.childForm === null) return;
+        this.childForm.doSubmit();
+    }
+}
+

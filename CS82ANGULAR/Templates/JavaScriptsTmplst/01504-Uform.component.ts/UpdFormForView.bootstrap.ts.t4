@@ -1,0 +1,921 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+    string frasesPropName           = "frases";
+    string DisplayLabelProperty     = "Name";
+    string DisplayHintProperty      = "Prompt";
+
+    string OperatorSufix        = "Oprtr";
+    string EqualOperator        = "eq";
+
+    // WebApi service's method names
+
+    string GetAllMethodName         = "getall";
+    string GetWithFilterMethodName  = "getwithfilter";
+    string GetOneMethodName         = "getone";
+    string UpdateOneMethodName      = "updateone";
+    string AddOneMethodName         = "addone";
+    string DeleteOneMethodName      = "deleteone";
+// set _IsDefined
+
+    Dictionary<string, string> RegExps = new Dictionary<string, string>() {
+            { "RegExpGuid"       , @"/(?im)^[{(]?[0-9A-F]{8}[-]?(?:[0-9A-F]{4}[-]?){3}[0-9A-F]{12}[)}]?$/" },
+            { "RegExpInteger"    , @"/^[-+]?\d+$/" },
+            { "RegExpFloat"      , @"/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/" },
+            { "RegExpEmail"      , @"/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/" },
+            { "RegExpCurrency"   , @"/(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/" }
+            };
+
+    string ComboSufix                   = "CmbCntrl";
+    string ButtonSufix                  = "BttnItm";
+    string ButtonDisable                = "BttnDsnbl";
+    string TypeaheadSufix               = "TphdCntrl";
+    string DataSourceSufix              = "DtSrc";
+    string TypeaheadDisplaySufix        = "DsplFn";
+
+    string SearchClickSufix             = "SrchClck";
+
+    string formServicePrefix            = "frmSrv";
+
+    string MainFormGroupName            = "mainFormGroup";
+    string RootDataSource               = "rootDataSource";
+
+    
+    string FormControlModelSelector     = "eform-control-model";
+    string FormControlModelPropName     = "eformControlModel";
+
+    string HiddenFilterSelector         = "hidden-filter";
+    string HiddenFilterPropName         = "hiddenFilter";
+    string CanAddSelector               = "can-add";
+    string CanAddPropName               = "canAdd";
+    string CanUpdSelector               = "can-update";
+    string CanUpdPropName               = "canUpdate";
+    string CanDelSelector               = "can-delete";
+    string CanDelPropName               = "canDelete";
+    string BeforeSubmitSelector         = "before-submit";
+    string BeforeSubmitPropName         = "beforeSubmit";
+    string AfterSubmitSelector          = "after-submit";
+    string AfterSubmitPropName          = "afterSubmit";
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string FilterMaxHeightPropSelector  = "filter-max-height";
+    string FilterMaxHeightPropName      = "filterMaxHeight";
+
+    string SubscriptionsPropName                = "Subscriptions";
+    string OnMasterChangedPropName              = "OnMasterChanged";
+    string submitOnMasterChangedMethodName      = "submitOnMasterChanged";
+    string OnDetailChangedPropName              = "OnDetailChanged";
+    string submitOnDetailChangedMethodName      = "submitOnDetailChanged";
+    string AfterMasterChangedPropName           = "AfterMasterChanged";
+    string AfterPropsChangedPropName            = "AfterPropsChanged";
+    string OnIsDefinedChangedPropName           = "OnIsDefinedChanged";
+    string OnUpdatePropName                     = "OnUpdate";
+    string OnAddPropName                        = "OnAdd";
+    string OnDeletePropName                     = "OnDelete";
+    string ClearPartiallyMethodName             = "clearPartially";
+    string GetCllctByFldFilterMethodName        = "getCllctionByFldFilter";
+    string Interface2ValuesMethodName           = "interface2Values";
+    string GetCllctByCurrDirMstrsMethodName     = "getCllctionByCurrDirMstrs";
+    string ValueSuffix                          = "Value";
+    string IsSetFilterByCurrDirMstrsMethodName  = "isSetFilterByCurrDirMstrs";
+    string GetWSFltrRsltByCurrDirMstrsMethodName= "getWSFltrRsltByCurrDirMstrs";
+    string Values2InterfaceMethodName           = "values2Interface";
+    string UpdateByHiddenFilterFieldsMethodName = "updateByHiddenFilterFields";
+    string ClearMethodName                      = "clear";
+    string HiddenFilterFieldName                = "HiddenFilter";
+    string HiddenFilterByFltRsltSuffix          = "HiddenFilterByFltRslt";
+    string HiddenFilterAsFltRsltSuffix          = "HiddenFilterAsFltRslt";
+    string RefreshMethodName                    = "refresh";
+    string DoEmitEventMethodName                = "doEmitEvent";
+    string DoSubmitMethodName                   = "doSubmit";
+    string IsDefinedFieldName                   = "IsDefined";
+    string IsNewSuffix                          = "IsNew";
+    string RefreshIsDefinedMethodName           = "refreshIsDefined";
+    string CalcIsDefinedMethodName              = "calcIsDefined";
+    string UnderHiddenFilterFieldsFieldName     = "UnderHiddenFilterFields";
+
+    string TitlePropName                        = "title";
+    string TitleCaptionVal                      = "Select Item";
+    string SelectedItemsPropName                = "selectedItems";
+    string AppSettingServicePropName            = "appGlblSettings";
+    string ShowErrorMethodName                  = "showError";
+    string AppearancePropName                   = "appearance";
+    string ShowFilterPropName                   = "showFilter";
+
+
+
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+    
+    string captionPropName                      = "caption";
+    string captionSelector                      = "caption";
+
+
+    int CurrentInputTypeId = 2;
+
+
+    List<string> SearchDialogViewsList = new List<string>();
+    List<string> ViewsList = new List<string>();
+    // ForeignKeyNameChain is a first argument
+    // ModelView is a second argument
+    // ModelViewUIFormPropertySerializable is a third argument
+    // InputTypeEnum is a fourth argument
+    List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> ForeignKeyNameChainList = 
+        GetForeignKeyNameChainStructList(Model, Context, CurrentInputTypeId, new List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>>());
+    foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+        if (string.IsNullOrEmpty(fk.Item1)) {
+            throw new Exception("[Foreign Key Name Chain] Can not be empty string");
+        }
+        if (fk.Item2 == null) {
+            throw new Exception("For [Foreign Key Name Chain]=" + ForeignKeyNameChainList + " can not find ViewModel");
+        }
+        
+        if (ForeignKeyNameChainList.Count(f => f.Item1 == fk.Item1) > 1) {
+            throw new Exception("[Foreign Key Name Chain]=" +  fk + " occurs more than once");
+        }
+
+        if (fk.Item3.InputTypeWhenUpdate == InputTypeEnum.SearchDialog) {
+            if(!SearchDialogViewsList.Contains(fk.Item2.ViewName)) {
+                SearchDialogViewsList.Add(fk.Item2.ViewName);
+            }
+        }
+        if(!ViewsList.Contains(fk.Item2.ViewName)) {
+            ViewsList.Add(fk.Item2.ViewName);
+        }
+    }
+    if(!ViewsList.Contains(Model.ViewName)) {
+        ViewsList.Add(Model.ViewName);
+    }
+    foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+        string[] fks = fk.Item1.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+        if (fks.Length <= 1) continue;
+        string subfk = string.Join(".", fks, 0, fks.Length - 1);
+        if( !ForeignKeyNameChainList.Any(f => f.Item1 == subfk) ) {
+            throw new Exception("[Foreign Key Name Chain]=" +  fk.Item1 + " could not find direct detail with [Foreign Key Name Chain] = " + subfk);
+        }
+    }
+    //
+    // check if the list of available fields is enough to insert/update/delete the ModelView entity 
+    //
+    foreach(ModelViewEntityPropertySerializable entityProp in Model.AllProperties) {
+        bool isNotExists = true;
+        if(!entityProp.IsRequired) continue;
+        ModelViewPropertyOfVwSerializable scalarProp = Model.ScalarProperties.Where(s => ((s.OriginalPropertyName == entityProp.OriginalPropertyName) && string.IsNullOrEmpty(s.ForeignKeyNameChain))).FirstOrDefault();
+        if (scalarProp != null) {
+            //if(Model.UIFormProperties.Any(u => (u.IsShownInView &&  (u.InputTypeWhenUpdate != InputTypeEnum.Hidden) && (u.ViewPropertyName == scalarProp.ViewPropertyName)))) continue;
+            if(Model.UIFormProperties.Any(u => (u.IsShownInView &&  (u.ViewPropertyName == scalarProp.ViewPropertyName)))) continue;
+            if(Model.ForeignKeys != null) {
+                foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+                    if(ForeignKeyNameChainList.Any(f => f.Item1 == fk.NavigationName)) {
+                        if ((fk.PrincipalKeyProps != null) && (fk.ForeignKeyProps != null)) {
+                            for(int i =0; i <  fk.ForeignKeyProps.Count; i++) {
+                                if(i < fk.PrincipalKeyProps.Count) {
+                                    if(fk.ForeignKeyProps[i].OriginalPropertyName == entityProp.OriginalPropertyName) {
+//                                        if(fk.ScalarProperties.Any(s => (s.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && s.IsSelected && (s.ForeignKeyNameChain == fk.NavigationName))) {
+                                            isNotExists = false;                             
+//                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if(!isNotExists) break;
+                }
+            }
+            if(isNotExists) {
+                if(!IsDatabaseGeneratedProperty(scalarProp, Model)) {
+                    throw new Exception("For the [Not Database Generated Required Entity Property] =" +  entityProp.OriginalPropertyName + " could not find mapped UIFormProperty which is not hidden and which is shown In View");
+                }
+            }
+            continue;
+        }
+        foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+//
+// we have to applay check only for Add operation
+// if(ForeignKeyNameChainList.Any(f => f.Item1 == fk.NavigationName))
+//
+//
+//            if(ForeignKeyNameChainList.Any(f => f.Item1 == fk.NavigationName)) {
+                if ((fk.PrincipalKeyProps != null) && (fk.ForeignKeyProps != null)) {
+                    for(int i =0; i <  fk.ForeignKeyProps.Count; i++) {
+                        if(i < fk.PrincipalKeyProps.Count) {
+                            if(fk.ForeignKeyProps[i].OriginalPropertyName == entityProp.OriginalPropertyName) {
+//                                if(fk.ScalarProperties.Any(s => (s.OriginalPropertyName == fk.PrincipalKeyProps[i].OriginalPropertyName) && s.IsSelected && (s.ForeignKeyNameChain == fk.NavigationName))) {
+                                    isNotExists = false;                             
+//                                }
+                            }
+                        }
+                    }
+                }
+//            }
+            if(!isNotExists) break;
+        }
+        if(isNotExists) {
+            throw new Exception("For the [Required Entity Property] =" +  entityProp.OriginalPropertyName + " could not find mapped UIFormProperty which is not hidden and which is shown In View");
+        }
+    }
+
+    string updformCssFolder                         = "01504-Uform.component.css";
+    string updformHtmlFolder                        = "01504-Uform.component.html";
+    string updformComponentFolder                   = "01504-Uform.component.ts";
+    string componentSelectorCommonPart              = GetComponentSelectorCommonPart(Model, updformComponentFolder);
+    string componentClassName                       = GetComponentClassName(Model, updformComponentFolder);
+
+
+    string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName               = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, updformComponentFolder);
+    
+    string eventEmitterDataModelFolder              = "00018-event-emitter-data.interface.ts";
+    string eventEmitterDataModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterDataModelFolder, updformComponentFolder);
+
+    string menuItemDataModelFolder                  = "00017-menu-item-data.interface.ts";
+    string menuItemDataModelClassName               = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, menuItemDataModelFolder, updformComponentFolder);
+
+    string eventEmitterPubModelFolder               = "00019-event-emitter-pub.interface.ts";
+    string eventEmitterPubModelClassName            = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, updformComponentFolder);
+
+    string filterResultModelFolder                  = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName               = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, filterResultModelFolder, updformComponentFolder);
+
+    string viewModelDatasourceInterfaceFolder       = "00600-view-model-datasource.interface.ts";
+    string viewModelDatasourceInterfaceClassName    = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, viewModelDatasourceInterfaceFolder, updformComponentFolder);
+
+
+    string viewInterfaceFolder                      = "01100-.interface.ts";
+    string viewInterfacePageFolder                  = "01200-Page.interface.ts";
+    string viewInterfaceFltFolder                   = "01300-Filter.interface.ts";
+
+    string viewServiceFolder                        = "01400-.service.ts";
+
+    string viewDatasourceClassFolder                = "01418-Datasource.class.ts";
+
+
+    string viewInterfaceDlgFolder                   = "01430-Dlg.interface.ts";
+    string sdlgComponentFolder                      = "01440-Sdlg.component.ts";
+
+#>
+
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { FormControl, Validators, ValidatorFn, FormGroup, AbstractControl, ValidationErrors } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Observable, Subscription, OperatorFunction, switchMap, distinctUntilChanged, debounceTime, of } from 'rxjs';
+
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, updformComponentFolder)#>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterResultModelFolder, updformComponentFolder)#>';
+import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  eventEmitterDataModelFolder, updformComponentFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  menuItemDataModelFolder, updformComponentFolder)#>';
+import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  eventEmitterPubModelFolder, updformComponentFolder)#>';
+import { <#= viewModelDatasourceInterfaceClassName #> } from '<#= GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  viewModelDatasourceInterfaceFolder, updformComponentFolder)#>';
+
+<#
+    foreach(string viewNm in ViewsList) {
+#>
+import { <#=  GetInterfaceNameExWithAnglrEx(AngularJsonFile, Context, viewNm, viewInterfaceFolder, Model, updformComponentFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, updformComponentFolder, Context, viewNm, viewInterfaceFolder) #>';
+// import { <#=  GetInterfacePageNameExWithAnglrEx(AngularJsonFile, Context, viewNm, viewInterfacePageFolder, Model, updformComponentFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, updformComponentFolder, Context, viewNm, viewInterfacePageFolder) #>';
+// import { <#=  GetInterfaceFilterNameExWithAnglrEx(AngularJsonFile, Context, viewNm, viewInterfaceFltFolder, Model, updformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, updformComponentFolder, Context, viewNm, viewInterfaceFltFolder) #>';
+import { <#=  GetServiceClassNameExWithAnglrEx(AngularJsonFile, Context, viewNm, viewServiceFolder, Model, updformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, updformComponentFolder, Context, viewNm, viewServiceFolder) #>';
+import { <#=  GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile,Context, viewNm, viewDatasourceClassFolder, Model, updformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, updformComponentFolder, Context, viewNm, viewDatasourceClassFolder) #>';
+
+<#
+    }
+    foreach(string viewNm in SearchDialogViewsList) {
+#>
+import { <#=  GetComponentClassNameExWithAnglrEx(AngularJsonFile, Context, viewNm, sdlgComponentFolder, Model, updformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, updformComponentFolder, Context, viewNm, sdlgComponentFolder) #>';
+import { <#=  GetInterfaceDlgNameExWithAnglrEx(AngularJsonFile, Context, viewNm, viewInterfaceDlgFolder, Model, updformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, updformComponentFolder, Context, viewNm, viewInterfaceDlgFolder) #>';
+<#
+    }
+#>
+
+@Component({
+  selector: 'app-<#= componentSelectorCommonPart#>',
+  templateUrl: '<#= GetFolderName(Model, updformHtmlFolder, updformComponentFolder)#>.html',
+  styleUrls: ['<#= GetFolderName(Model, updformCssFolder, updformComponentFolder)#>.css']
+})
+export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEmitterPubModelClassName #> {
+<# 
+    if(localize) {
+#>
+    <#= frasesPropName #>: {[key:string]: string}  = {
+        'Not-all-props': $localize`:Not all properties are set@@<#= componentClassName #>.Not-all-props:Not all properties are set`,
+        '<#= captionPropName #>': $localize`:Update <#= Model.Title #>@@<#= componentClassName #>.Update-Item:Update <#= Model.Title #>`,
+        '<#= TitlePropName #>': $localize`:<#= TitleCaptionVal #>@@<#= componentClassName #>.SelItem:<#= TitleCaptionVal #>`,
+        'Not-all-masters': $localize`:Not all masters have been set@@<#= componentClassName #>.Not-all-masters:Not all masters have been set`,
+<#
+        for(int i = 0; i < Model.UIFormProperties.Count; i++) {
+            ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable = Model.UIFormProperties[i];
+#>
+        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label': $localize`:<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>@@<#= Model.ViewName #>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label:<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>`,
+        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint': $localize`:<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#>@@<#= Model.ViewName #>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint:<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#>`,
+        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder': $localize`:<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>@@<#= Model.ViewName #>.<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder:<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>`,
+<#
+        }
+#>
+    }
+<# 
+    } else {
+#>
+    <#= frasesPropName #>: {[key:string]: string}  = {
+        'Not-all-props': 'Not all properties are set',
+        '<#= captionPropName #>': 'Update <#= Model.Title #>',
+        '<#= TitlePropName #>': '<#= TitleCaptionVal #>',
+        'Not-all-masters': 'Not all masters have been set',
+<#
+        for(int i = 0; i < Model.UIFormProperties.Count; i++) {
+            ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable = Model.UIFormProperties[i];
+#>
+        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label': '<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>',
+        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint': '<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#>',
+        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder': '<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>',
+<#
+        }
+#>
+    }
+<# 
+    }
+#>
+
+    @Output('<#= BeforeSubmitSelector #>') <#= BeforeSubmitPropName #> = new EventEmitter();
+    @Output('<#= AfterSubmitSelector #>') <#= AfterSubmitPropName #> = new EventEmitter<<#= GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, updformComponentFolder) #>>();
+    public <#= DoSubmitMethodName #>(): void {
+        if (this.<#= MainFormGroupName #>.invalid || (!this.<#= RootDataSource #>.<#= RefreshIsDefinedMethodName #>())) {
+            this.<#= MainFormGroupName #>.markAllAsTouched();
+<#
+    {
+        foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+            if (fk.Item4 == InputTypeEnum.Combo) {
+#>
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.markAllAsTouched();
+<#
+            } else if (fk.Item4 == InputTypeEnum.Typeahead) {  
+#>
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.markAllAsTouched();
+<#
+            }
+        }
+    }
+#>
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: this.<#= frasesPropName #>['Not-all-props']});
+            return;
+        }
+        this.<#= BeforeSubmitPropName #>.emit(this.<#= RootDataSource #>.<#= Values2InterfaceMethodName #>());
+        this.<#= RootDataSource #>.<#= UpdateOneMethodName #>();
+    }
+    public <#= RootDataSource + OnUpdatePropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void { 
+        this.<#= AfterSubmitPropName #>.emit(this.<#= RootDataSource #>.<#= Values2InterfaceMethodName #>());
+    }
+    ngOnDestroy(): void {
+        this._<#= SubscriptionsPropName #>.forEach((s: Subscription) => { s.unsubscribe(); });
+    }
+    ngOnInit(): void {
+        this.ngOnInitCalled = true;
+        this.<#= RootDataSource #>.<#= RefreshMethodName #>();
+<#
+    {
+        foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+            if( !ForeignKeyNameChainList.Any(f => f.Item1.StartsWith(fk.Item1+".")) ) {
+#>
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= AfterMasterChangedPropName #>.emit(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>);
+<#
+            }
+        }
+    }
+#>
+    }
+    public getErrorMessage(fc: AbstractControl): string {
+        return this.<#= AppSettingServicePropName #>.getValidationErrorMessage(fc);
+    } 
+    // start: variable declaration section
+    @Input('<#= captionSelector #>') <#= captionPropName #>: string|any = this.<#= frasesPropName #>['<#= captionPropName #>'];
+    @Output('<#= onContainerMenuItemClickSelector #>') <#= onContainerMenuItemClickEmitter #> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
+    @Input('<#= containerMenuItemsSelector #>') <#= containerMenuItemsPropName #>: Array<<#= menuItemDataModelClassName #>> = [];
+    <#= onContainerMenuItemClickMethodName #>(v: <#= menuItemDataModelClassName #>)  {
+        let e: <#= eventEmitterDataModelClassName #> = {
+            id: v.id,
+            sender: this,
+            value: null
+        }
+        this.<#= onContainerMenuItemClickEmitter #>.emit(e);
+    }
+    private ngOnInitCalled: boolean = false;
+    public <#= MainFormGroupName #>: FormGroup|any = null;
+    public <#= RootDataSource #>: <#=  GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, Model.ViewName, viewDatasourceClassFolder, Model, updformComponentFolder) #> | any = null;
+<#    
+    //////////////////////////// start helper variable and FormControl -generator 
+    foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+        ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable = fk.Item3;
+        if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Combo) { 
+#>
+    public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>: FormControl | any = null;
+    public <#=  GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #> : <#= string.Join(" | ", CollectComboListInterfacesEx(Context, modelViewUIFormPropertySerializable, Model, CurrentInputTypeId)) #> | any = null;
+    public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>: <#=  GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, fk.Item2.ViewName, viewDatasourceClassFolder, Model, updformComponentFolder) #> | any = null;
+<#
+        } // if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Combo) { ... }
+        else if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.SearchDialog) {  
+#>
+    public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ButtonDisable) #>: boolean = true;
+    public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>: <#=  GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, fk.Item2.ViewName, viewDatasourceClassFolder, Model, updformComponentFolder) #> | any = null;
+<#
+        } // if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.SearchDialog) { ... }
+        else if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead) {  
+#>
+    public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>: FormControl | any = null;
+    public <#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>: <#=  GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, fk.Item2.ViewName, viewDatasourceClassFolder, Model, updformComponentFolder) #> | any = null;
+    public <#=  GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>: 
+        OperatorFunction<string, readonly any[]> = (text$: Observable<string>) =>
+		text$.pipe(
+			debounceTime(200),
+			distinctUntilChanged(),
+			// filter((term) => term.length >= 2),
+            switchMap((value: string) => 
+                return this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= GetCllctByFldFilterMethodName #>('<#= GetControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, CurrentInputTypeId) #>', value);
+            ),
+		);
+<#
+        } // if (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Typeahead) { ... } 
+    } // end of foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
+    //////////////////////////// end helper variable and FormControl -generator 
+#>
+
+    _<#= SubscriptionsPropName #> : Subscription[] = [];
+    // end: variable declaration section
+
+    // start: input variable declaration section
+<#    //////////////////////////// start Input Model -generator 
+#>
+    @Input('<#= FormControlModelSelector #>') 
+        set <#= FormControlModelPropName #> (inFormControlModel : <#= GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, updformComponentFolder) #> | any) {
+            let hasChanged: boolean = this.<#= RootDataSource #>.<#= Interface2ValuesMethodName #>(inFormControlModel, false);
+            hasChanged = this.<#= RootDataSource #>.<#= UpdateByHiddenFilterFieldsMethodName #>(false) || hasChanged;
+            if(this.ngOnInitCalled && hasChanged) {
+                this.<#= RootDataSource #>.<#= RefreshMethodName #>();
+            }
+        }
+        get <#=  FormControlModelPropName #>(): <#= GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, updformComponentFolder) #> | any {
+            return this.<#= RootDataSource #>.<#= Values2InterfaceMethodName #>();
+        } // end of get <#= FormControlModelPropName #>
+<#    //////////////////////////// end Input Model -generator 
+#>
+    @Input('<#= HiddenFilterSelector #>') 
+        get <#= HiddenFilterPropName #>(): Array<<#= filterResultModelClassName #>> {
+          return this.<#= RootDataSource #>.get<#= HiddenFilterAsFltRsltSuffix #>();
+        }
+        set <#= HiddenFilterPropName #>(inDef: Array<<#= filterResultModelClassName #>>) {
+            this.<#= RootDataSource #>.set<#= HiddenFilterFieldName #>(this.<#= RootDataSource #>.get<#= HiddenFilterByFltRsltSuffix #>(inDef));
+            let hasChanged: boolean = this.<#= RootDataSource #>.<#= UpdateByHiddenFilterFieldsMethodName #>(false);
+            if(this.ngOnInitCalled && hasChanged) {
+                this.<#= RootDataSource #>.<#= DoEmitEventMethodName #>(false);
+            }
+        } 
+
+    // end: input variable declaration section
+
+
+<#    
+    {
+        string constructorParams = "";
+        foreach(string viewNm in ViewsList) {
+            if (constructorParams != "") {
+                constructorParams += ", ";
+            }
+            constructorParams += "private " +  formServicePrefix + viewNm + ": " + GetServiceClassNameExWithAnglrEx(AngularJsonFile, Context, viewNm, viewServiceFolder, Model, updformComponentFolder);
+        } 
+#>
+    constructor(<#= constructorParams #>, public dialog: NgbModal, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #> ) {
+        this.<#=        MainFormGroupName #> =  new FormGroup({});
+        let locValidators: ValidatorFn[]; 
+        let v: any;
+        let frmcntrl: FormControl|any;
+<#
+        foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
+            // if ((!modelViewUIFormPropertySerializable.IsShownInView) || (modelViewUIFormPropertySerializable.InputTypeWhenUpdate == InputTypeEnum.Hidden)) continue;
+            if ((!modelViewUIFormPropertySerializable.IsShownInView)) continue;
+            bool isDbGenProp = IsDatabaseGeneratedPropertyEx(modelViewUIFormPropertySerializable, Model);
+            string defval = "null";
+            if (IsBooleanInput(modelViewUIFormPropertySerializable, Model)) {
+                defval = "false";
+#>
+        locValidators = [ ];
+<#    
+            } else {
+                if (isDbGenProp) {
+#>
+        locValidators = [ ];
+<#    
+                } else {
+#>
+        locValidators = [ <#= string.Join(",", GetValidators(modelViewUIFormPropertySerializable, Model, RegExps)) #> ];
+<#    
+                }
+            }
+            if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.Combo) {
+        // disabled: false is correct
+#>
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: false}, locValidators));
+        this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #> = new FormControl({ value: null, disabled: true }, [ 
+                (fc)=>{  //if ((typeof fc.value === 'string') || (typeof fc.value === 'undefined') || (fc.value === null)) { 
+                        if (!this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= CalcIsDefinedMethodName #>()) {
+                            this.<#=  MainFormGroupName #>.patchValue({'<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>': null });
+                            return  this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].errors; 
+                        }  
+                        return null; }]);
+        this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>.valueChanges
+            .subscribe({
+                next: (val: any) => { 
+                    if(val) {
+                        this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= Interface2ValuesMethodName #>(val, true); 
+                    } else {
+                        this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= ClearPartiallyMethodName #>(true);
+                    }
+                }
+            });
+
+<#    
+            } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.Typeahead) {
+        // disabled: false is correct
+#>
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: false}, locValidators));
+        this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #> = new FormControl({ value: null, disabled: true }, [ 
+            (fc)=>{  //if ((typeof fc.value === 'string') || (typeof fc.value === 'undefined') || (fc.value === null)) { 
+                    if (!this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= CalcIsDefinedMethodName #>()) {
+                        this.<#=  MainFormGroupName #>.patchValue({'<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>': null });
+                        return  this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].errors; 
+                    }  
+                return null; }]);
+<#
+            } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.SearchDialog) {
+        // disabled: false is correct
+#>
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: false}, locValidators));
+<#
+            } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.ReadOnly) {
+        // disabled: false is correct
+#>
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: false}, locValidators));
+<#
+            } else {
+                string isDisabled = "false";
+                bool isNtRoot = false;
+                string fknc = modelViewUIFormPropertySerializable.ForeignKeyNameChain;
+                if (string.IsNullOrEmpty(fknc)) {
+                    if(Model.ForeignKeys != null) {
+                        foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+                            if(ForeignKeyNameChainList.Any(f => f.Item1 == fk.NavigationName) && fk.ForeignKeyProps != null) {
+                                isNtRoot = fk.ForeignKeyProps.Any(f => f.OriginalPropertyName == modelViewUIFormPropertySerializable.OriginalPropertyName);
+                                if(isNtRoot) break;
+                            }
+                        }
+                    }
+                    if(!isNtRoot) {
+                        if(Model.PrimaryKeyProperties != null) {
+                            if(Model.PrimaryKeyProperties.Any(p => p.OriginalPropertyName == modelViewUIFormPropertySerializable.OriginalPropertyName)) isDisabled = "true";
+                        }
+                    }
+                } else {
+                    isNtRoot = ForeignKeyNameChainList.Any(f => (f.Item1 == fknc) && (fknc.Contains(f.Item1 + ".")));
+                }
+                if((isNtRoot || isDbGenProp) && false) {
+#>
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', new FormControl({ value: <#= defval #>, disabled: true}, locValidators));
+<#
+                } else {
+                    isDisabled = "false";
+#>
+        frmcntrl = new FormControl({ value: <#= defval #>, disabled: <#= isDisabled #>}, locValidators);
+        this.<#= MainFormGroupName #>.addControl('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', frmcntrl);
+        frmcntrl.valueChanges.subscribe({next: (val: any) => { 
+            this.<#= RootDataSource #>.set<#= ValueSuffix #>('<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>', val);
+        }});
+<#
+                }
+            }
+        } // foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) { ... }
+#>
+        this.<#= RootDataSource #> = new <#= GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, Model.ViewName, viewDatasourceClassFolder, Model, updformComponentFolder) #> (this.<#= formServicePrefix + Model.ViewName #>,
+            this.<#= AppSettingServicePropName #>, null, null, [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, "") #>],'');
+        this.<#= RootDataSource #>.set<#= IsNewSuffix #>(false);
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#= RootDataSource #>
+                .<#= AfterPropsChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + AfterPropsChangedPropName #>(v) } })
+        );
+<#
+        if ((ForeignKeyNameChainList.Count > 0) && false) {
+#>
+        this._<#= SubscriptionsPropName #>.push(this.<#= RootDataSource #>.<#= AfterMasterChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + AfterMasterChangedPropName #>(v) } }));
+<#
+        }
+#>
+//        this._<#= SubscriptionsPropName #>.push(this.<#= RootDataSource #>.<#= OnIsDefinedChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnIsDefinedChangedPropName #>(v) } }));
+        this._<#= SubscriptionsPropName #>.push(this.<#= RootDataSource #>.<#= OnUpdatePropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnUpdatePropName #>(v) } }));
+//        this._<#= SubscriptionsPropName #>.push(this.<#= RootDataSource #>.<#= OnAddPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnAddPropName #>(v) } }));
+//        this._<#= SubscriptionsPropName #>.push(this.<#= RootDataSource #>.<#= OnDeletePropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnDeletePropName #>(v) } }));
+<#
+        foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+            Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> detailFk = GetDirectDetail(ForeignKeyNameChainList, fk.Item1);
+            string detailViewName = Model.ViewName;
+            string directNavigation = GetDirectNavName(fk.Item1);
+            if(detailFk != null) {
+                detailViewName = detailFk.Item2.ViewName;
+            }
+            if(string.IsNullOrEmpty(directNavigation)){
+                throw new Exception("For [Foreign Key Name Chain]=" + fk.Item1 + " can not find direct detail");
+            }
+#>
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #> = new <#= GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, fk.Item2.ViewName, viewDatasourceClassFolder, Model, updformComponentFolder) #> (this.<#= formServicePrefix + fk.Item2.ViewName #>,
+            this.<#= AppSettingServicePropName #>, '<#= detailViewName #>', '<#= directNavigation #>', [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, fk.Item1) #>],'<#= fk.Item1 #>');
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.set<#= IsNewSuffix #>(false);
+<#
+        }
+        foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+            Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> detailFk = GetDirectDetail(ForeignKeyNameChainList, fk.Item1);
+            string detailViewName = Model.ViewName;
+            string directNavigation = GetDirectNavName(fk.Item1);
+            if(detailFk != null) {
+                detailViewName = detailFk.Item2.ViewName;
+            } 
+            if(string.IsNullOrEmpty(directNavigation)){
+                throw new Exception("For [Foreign Key Name Chain]=" + fk.Item1 + " can not find direct detail");
+            }
+#>
+//        this._<#= SubscriptionsPropName #>.push(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= OnIsDefinedChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, OnIsDefinedChangedPropName) #>(v) } }));
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>
+                .<#= AfterPropsChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterPropsChangedPropName) #>(v) } })
+        );
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>
+                .<#= AfterMasterChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(v) } })
+        );
+<#
+            if(detailFk == null) {
+#>
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>
+                .<#= OnMasterChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource #>.<#= submitOnMasterChangedMethodName #>(v) } })
+        );
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#= RootDataSource #>
+            .<#= OnDetailChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= submitOnDetailChangedMethodName #>(v) } })
+        );
+
+<#
+            } else {
+#>
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>
+                .<#= OnMasterChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= GetTypeScriptPropertyNameWithSufix(detailFk.Item3, Model, DataSourceSufix) #>.<#= submitOnMasterChangedMethodName #>(v) } })
+        );
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#= GetTypeScriptPropertyNameWithSufix(detailFk.Item3, Model, DataSourceSufix) #>
+            .<#= OnDetailChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= submitOnDetailChangedMethodName #>(v) } })
+        );
+<#
+            }
+        }
+#>
+    }
+<#
+    }
+#>
+//    public <#= RootDataSource + OnUpdatePropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void { }
+//    public <#= RootDataSource + OnAddPropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void { }
+//    public <#= RootDataSource + OnDeletePropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void { }
+//    public <#= RootDataSource + OnIsDefinedChangedPropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void { }
+<#
+        if ((ForeignKeyNameChainList.Count > 0) && false) {
+#>
+    public <#= RootDataSource + AfterMasterChangedPropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
+        this.<#= RootDataSource + AfterPropsChangedPropName #>(v);
+    }
+<#
+        }
+#>
+    public <#= RootDataSource + AfterPropsChangedPropName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
+<#
+    {
+        foreach(ModelViewUIFormPropertySerializable mvUIFormProp in Model.UIFormProperties) {
+            // if ((!mvUIFormProp.IsShownInView) || (mvUIFormProp.InputTypeWhenUpdate == InputTypeEnum.Hidden)) continue;
+            if ((!mvUIFormProp.IsShownInView)) continue;
+            if (ForeignKeyNameChainList.Any(f => ((f.Item1 == mvUIFormProp.ForeignKeyName) || (f.Item3 == mvUIFormProp)))) continue;
+#>
+        this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(mvUIFormProp, Model) #>': this.<#=  RootDataSource #>.get<#= ValueSuffix #>('<#= GetTypeScriptPropertyNameEx(mvUIFormProp, Model) #>')}, {emitEvent: false});
+<#
+        } 
+        foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+            if(fk.Item4 == InputTypeEnum.Typeahead) {
+#>
+        if(this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>')) {
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.disable({emitEvent: false});
+        } else {
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.enable({emitEvent: false});
+        }
+<#
+            } else if(fk.Item4 == InputTypeEnum.Combo) {
+#>
+        if(this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>')) {
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.disable({emitEvent: false});
+        } else {
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.enable({emitEvent: false});
+        }
+<#
+            } else if(fk.Item4 == InputTypeEnum.SearchDialog) {
+#>
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ButtonDisable) #> = this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>');
+<#
+            }
+        }
+    }
+#>
+    }
+    
+<#
+    {
+        foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+            if(fk.Item4 == InputTypeEnum.Typeahead) {
+                string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
+#>
+    public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
+        if(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>() &&
+          (!this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>'))) {
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.enable({emitEvent: false});
+        } else {
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.disable({emitEvent: false});
+        }
+        if(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= CalcIsDefinedMethodName #>()) {
+            this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.get<#= ValueSuffix #>('<#= dispPropName #>')}, {emitEvent: false});
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.patchValue(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Values2InterfaceMethodName #>(), {emitEvent: false});
+        } else {
+            this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': undefined}, {emitEvent: false});
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.patchValue(undefined, {emitEvent: false});
+        }
+    }
+    public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadDisplaySufix) #>(val: any): string {
+        if(typeof val === 'undefined') {
+            return '';
+        }
+        return val && val.<#= dispPropName #> ? val.<#= dispPropName #> : '';
+    }
+<#
+            } else if(fk.Item4 == InputTypeEnum.Combo) {
+                string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
+#>
+    public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= GetCllctByCurrDirMstrsMethodName #>().subscribe({
+            next: (data: Array<<#= GetInterfaceNameExWithAnglrEx(AngularJsonFile, Context, fk.Item2.ViewName, viewInterfaceFolder, Model, updformComponentFolder) #>> ) => {
+                this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #> = data;
+                let lfc: any = this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Values2InterfaceMethodName #>();
+                let ind: number = -1;
+                if(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= CalcIsDefinedMethodName #>()) {
+                    ind = data.findIndex((e: any) => { return  <#= GetPrimKeyFilterForFindIndexMethod(Context, fk.Item2.ViewName, "e","lfc") #> ; });
+                }
+                if (ind > -1) {
+                    this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(data[ind], {emitEvent: false});
+                    this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>[ind].<#= dispPropName #>}, {emitEvent: false});
+                } else {
+                    this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(undefined, {emitEvent: false});
+                    this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': undefined}, {emitEvent: false});
+                }
+            },
+            error: (error: any) => {
+                this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #> = [];
+                this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(undefined, {emitEvent: false});
+                this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': undefined}, {emitEvent: false});
+                this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
+            }
+        });
+        if(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>() &&
+          (!this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>'))) {
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.enable({emitEvent: false});
+        } else {
+            this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.disable({emitEvent: false});
+        }
+    }
+
+<#
+            } else if(fk.Item4 == InputTypeEnum.SearchDialog) {
+#>
+    public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, AfterMasterChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ButtonDisable) #> = 
+            this.<#= RootDataSource #>.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>') ||
+            (!this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= IsSetFilterByCurrDirMstrsMethodName #>());
+    }
+    public <#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, SearchClickSufix) #>(): void {
+        if(!this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#=  IsSetFilterByCurrDirMstrsMethodName #>()) {
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message:this.<#= frasesPropName #>['Not-all-masters'],});
+            return;
+        }
+        let flt: <#= GetInterfaceDlgNameWithAnglrEx(AngularJsonFile, fk.Item2, viewInterfaceDlgFolder, Model, updformComponentFolder) #> = {
+            <#= TitlePropName #>: this.<#= frasesPropName #>['<#= TitlePropName #>'],
+            <#= ShowFilterPropName #>: true,
+            <#= CanAddPropName #>: false,
+            <#= CanUpdPropName #>: false,
+            <#= CanDelPropName #>: false,
+            <#= HiddenFilterPropName #>: [], // Array<IWebServiceFilterRslt>
+            <#= SelectedItemsPropName #>: null,
+            <#= MaxHeightPropName #>: 6,
+            <#= FilterMaxHeightPropName #>: 2
+        };
+        flt.<#= HiddenFilterPropName #> = this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= GetWSFltrRsltByCurrDirMstrsMethodName #>();
+        let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
+        let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
+        let dialogRef = this.dialog.open(<#= GetComponentClassNameWithAnglrEx(AngularJsonFile, fk.Item2, sdlgComponentFolder, Model, updformComponentFolder) #>);
+//        , {
+//            data: flt,
+//            maxWidth: mw,
+//            width: w,
+//        });
+        dialogRef.componentInstance.data = flt;
+        dialogRef.result.then((rslt) => {
+            if (!(typeof rslt === 'undefined')) {
+                if (!(rslt === null)) {
+                    if (!(rslt.<#= SelectedItemsPropName #> === 'undefined')) {
+                        if(Array.isArray(rslt.<#= SelectedItemsPropName #>)) {
+                            if(rslt.<#= SelectedItemsPropName #>.length > 0) {
+                                this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Interface2ValuesMethodName #>(rslt.<#= SelectedItemsPropName #>[0], true);
+                            }
+                        }
+                    }
+                }
+            }
+        },()=>{});
+    }
+<#
+            }  // if(fk.Item4 == InputTypeEnum.Typeahead) {} else if(fk.Item4 == InputTypeEnum.Combo) {}else if(fk.Item4 == InputTypeEnum.SearchDialog) {}
+#>
+//    public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, OnIsDefinedChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void { }
+    public <#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model,  AfterPropsChangedPropName) #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
+<#
+    {
+        foreach(ModelViewUIFormPropertySerializable mvUIFormProp in Model.UIFormProperties) {
+            //if ((!mvUIFormProp.IsShownInView) || (mvUIFormProp.InputTypeWhenUpdate == InputTypeEnum.Hidden) || string.IsNullOrEmpty(mvUIFormProp.ForeignKeyNameChain)) continue;
+            if ((!mvUIFormProp.IsShownInView) || string.IsNullOrEmpty(mvUIFormProp.ForeignKeyNameChain)) continue;
+            if ((!mvUIFormProp.ForeignKeyNameChain.StartsWith(fk.Item1)) || ForeignKeyNameChainList.Any(f => (f.Item3 == mvUIFormProp))) continue;
+            if ((mvUIFormProp.ForeignKeyNameChain != fk.Item1) && (ForeignKeyNameChainList.Any(f => f.Item1.StartsWith(fk.Item1 + ".")))) continue;
+            string navChain = "";
+            if(mvUIFormProp.ForeignKeyNameChain != fk.Item1) {
+                navChain = mvUIFormProp.ForeignKeyNameChain.Replace(fk.Item1 + ".", "");
+            }
+            
+#>
+        this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(mvUIFormProp, Model) #>': this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.getByOrg<#= ValueSuffix #>('<#= mvUIFormProp.OriginalPropertyName #>', '<#= navChain #>')}, {emitEvent: false});
+<#
+        } // foreach(ModelViewUIFormPropertySerializable mvUIFormProp in Model.UIFormProperties) {...}
+        if(fk.Item4 == InputTypeEnum.Typeahead) {
+            string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
+#>
+        this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.get<#= ValueSuffix #>('<#= dispPropName #>')}, {emitEvent: false});
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, TypeaheadSufix) #>.patchValue(this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Values2InterfaceMethodName #>(), {emitEvent: false});
+<#
+        } else if(fk.Item4 == InputTypeEnum.Combo) {
+            string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
+#>
+        if(this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>) {
+            let lfc: any = this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Values2InterfaceMethodName #>();
+            let ind: number = this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>.findIndex((e: any) => { return  <#= GetPrimKeyFilterForFindIndexMethod(Context, fk.Item2.ViewName, "e","lfc") #> ; });
+            if (ind > -1) {
+                this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>[ind], {emitEvent: false});
+                this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>[ind].<#= dispPropName #>}, {emitEvent: false});
+            } else {
+                this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(undefined, {emitEvent: false});
+                this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': undefined}, {emitEvent: false});
+            }
+        } else {
+            this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(undefined, {emitEvent: false});
+            this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': undefined}, {emitEvent: false});
+        }
+<#
+        } else if(fk.Item4 == InputTypeEnum.SearchDialog) {
+            string dispPropName = GetControlListPropertyName(fk.Item3, Model, Context, CurrentInputTypeId);
+#>
+        this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.get<#= ValueSuffix #>('<#= dispPropName #>')}, {emitEvent: false});
+<#
+        } // if(fk.Item4 == InputTypeEnum.Typeahead) {...} else  if(fk.Item4 == InputTypeEnum.Combo) {...} else if(fk.Item4 == InputTypeEnum.SearchDialog) {...}
+    }
+#>
+    }
+<#
+        } // foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {}
+    }
+#>
+
+} // the end of the <#= componentClassName #> class body
+
+

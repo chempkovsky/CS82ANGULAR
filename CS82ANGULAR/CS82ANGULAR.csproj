@@ -3298,6 +3298,102 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01500-Vform.component.html\ViewFormForView.bootstrap.html.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01502-Aform.component.html\AddFormForView.bootstrap.html.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01504-Uform.component.html\UpdFormForView.bootstrap.html.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01506-Dform.component.html\DelFormForView.bootstrap.html.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01500-Vform.component.ts\ViewFormForView.bootstrap.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01502-Aform.component.ts\AddFormForView.bootstrap.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01504-Uform.component.ts\UpdFormForView.bootstrap.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01506-Dform.component.ts\DelFormForView.bootstrap.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01500-Vform.component.css\ViewFormForView.bootstrap.css.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01502-Aform.component.css\AddFormForView.bootstrap.css.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01504-Uform.component.css\UpdFormForView.bootstrap.css.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01506-Dform.component.css\DelFormForView.bootstrap.css.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\BatchJavaScriptsTmplst\01000-ViewModelLevelTmplts\01500-Vform.bootstrap.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\BatchJavaScriptsTmplst\01000-ViewModelLevelTmplts\01502-Aform.bootstrap.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\BatchJavaScriptsTmplst\01000-ViewModelLevelTmplts\01504-Uform.bootstrap.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\BatchJavaScriptsTmplst\01000-ViewModelLevelTmplts\01506-Dform.bootstrap.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01520-Vdlg.component.html\ViewDlgFormForView.bootstrap.html.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01522-Adlg.component.html\AddDlgFormForView.bootstrap.html.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01524-Udlg.component.html\UpdDlgFormForView.bootstrap.html.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01526-Ddlg.component.html\DelDlgFormForView.bootstrap.html.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01520-Vdlg.component.ts\ViewDlgFormForView.bootstrap.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01522-Adlg.component.ts\AddDlgFormForView.bootstrap.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01524-Udlg.component.ts\UpdDlgFormForView.bootstrap.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01526-Ddlg.component.ts\DelDlgFormForView.bootstrap.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />

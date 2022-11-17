@@ -3661,6 +3661,11 @@ namespace CS82ANGULAR.Model
         {
             return GetExpressionForFormControl(prop, model, mainFormGroupName) + ".invalid";
         }
+        string GetExpressionForInvalidBootstrap(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string mainFormGroupName)
+        {
+            return GetExpressionForFormControl(prop, model, mainFormGroupName) + ".invalid && " + GetExpressionForFormControl(prop, model, mainFormGroupName) + ".touched";
+        }
+
         string GetExpressionForControlListOpen(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string sufix)
         {
             return GetTypeScriptPropertyNameWithSufix(prop, model, sufix) + "OnOpen";
@@ -3668,6 +3673,10 @@ namespace CS82ANGULAR.Model
         string GetExpressionForControlInvalid(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string sufix)
         {
             return GetTypeScriptPropertyNameWithSufix(prop, model, sufix) + ".invalid";
+        }
+        string GetExpressionForControlInvalidBootstrap(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, string sufix)
+        {
+            return GetTypeScriptPropertyNameWithSufix(prop, model, sufix) + ".invalid && " + GetTypeScriptPropertyNameWithSufix(prop, model, sufix) + ".touched";
         }
         string GetComboControlListPropertyName(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, DbContextSerializable context, int inputType)
         {
