@@ -61,10 +61,9 @@
         <label fxFlex fxLayoutAlign="flex-start space-around">{{<#= captionPropName #>}}</label>
         <ng-template ngFor let-item [ngForOf]="<#= containerMenuItemsPropName #>">
             <span fxFlex="1%"></span>  
-            <button mat-icon-button (click)="<#= onContainerMenuItemClickMethodName #>(item)" 
-                [matTooltip]="item.caption"> 
-                <mat-icon  [color]="item.iconColor" >{{item.iconName}}</mat-icon>
-            </button>     
+            <i class="{{'material-icons ml-1 text-'+ item.iconColor}}" type="button" data-toggle="tooltip" title="{{item.caption}}"
+            (click)="<#= onContainerMenuItemClickMethodName #>(item)">{{item.iconName}}</i>
+            <span></span>
         </ng-template>            
         <span fxFlex="1%"></span>
      </div> 
