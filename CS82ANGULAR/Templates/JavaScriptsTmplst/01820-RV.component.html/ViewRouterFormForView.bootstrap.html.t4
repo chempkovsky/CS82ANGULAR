@@ -1,0 +1,87 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string HiddenFilterSelector         = "hidden-filter";
+    string HiddenFilterPropName         = "hiddenFilter";
+    string FormControlModelSelector     = "eform-control-model";
+    string FormControlModelPropName     = "eformControlModel";
+    string BeforeSubmitSelector         = "before-submit";
+    string BeforeSubmitPropName         = "beforeSubmit";
+    string AfterSubmitSelector          = "after-submit";
+    string AfterSubmitPropName          = "afterSubmit";
+    string OnAfterSubmitMethodName      = "onAfterSubmit";
+    string TitlePropName                = "title";
+    string AppearancePropName           = "appearance";
+    string OutletNamePrefix             = "oltnm";
+    string SelectedDetailPropName       = "selectedDetail";
+    string DetailViewsPropName          = "detailViews";
+    string OnDetailChangedMethodName    = "onDetailChanged";
+    string ShowDetailsPropName          = "showDetails";
+    string NavBackToMasterPropName      = "NavBackToMaster";
+    string frasesPropName               = "frases";
+
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+
+
+
+    string vformComponentFolder         = "01500-Vform.component.ts";
+    string componentSelectorCommonPart  = GetComponentSelectorCommonPart(Model, vformComponentFolder);
+    string rvComponentFolder            = "01820-RV.component.ts";
+    string rvcomponentClassName         = GetComponentClassName(Model, rvComponentFolder);
+
+#>
+<div class="card">
+    
+    <div class="card-header">
+        <div fxLayout>
+            <i class="material-icons text-primary mr-5" type="button" color="primary" (click)="onCancel()" fxFlex="19%" data-toggle="tooltip" title="<#= frasesPropName #>['<#= NavBackToMasterPropName #>']"> 
+                arrow_back
+            </i>
+            <div class="form-group" fxFlex="79%" *ngIf="<#= ShowDetailsPropName #>">
+                <select class="form-control" (change)="<#= OnDetailChangedMethodName #>()" [(ngModel)]="<#= SelectedDetailPropName #>">
+                    <option *ngFor="let v of  <#= DetailViewsPropName #>;" [ngValue]="v">{{ v.caption }}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card-body">
+        <app-<#= componentSelectorCommonPart #> 
+            [<#= captionSelector #>]="<#= TitlePropName #>" 
+            [<#= HiddenFilterSelector #>]="<#= HiddenFilterPropName #>"
+            [<#= FormControlModelSelector #>]="<#= FormControlModelPropName #>"
+            (<#= AfterSubmitSelector #>)="<#= OnAfterSubmitMethodName #>($event)"
+            [<#= containerMenuItemsSelector #>]="<#= containerMenuItemsPropName #>"
+            (<#= onContainerMenuItemClickSelector #>)="<#= onContainerMenuItemClickMethodName #>($event)"
+        ></app-<#= componentSelectorCommonPart #>>
+    </div>
+
+</div>
+ 
+ <router-outlet></router-outlet>
+
