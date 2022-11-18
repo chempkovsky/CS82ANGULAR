@@ -377,25 +377,25 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
         return rslt;
     } // end of getErrorMessage
     public getDialogWidth(vwNm: string): string {
-        let rslt: string = '99vw';
+        let rslt: string = 'xl';
         if(!(vwNm === null)) {
             if(!(vwNm === null)) {
                 //
                 // here: set dialog width for the given ViewName
                 //
-                return '99vw';        
+                return 'xl';
             }
         }
         return rslt;
     }
     public getDialogMaxWidth(vwNm: string): string {
-        let rslt: string = '100vw';
+        let rslt: string = 'xl';
         if(!(vwNm === null)) {
             if(!(vwNm === null)) {
                 //
                 // here: set dialog max width for the given ViewName
                 //
-                return '100vw';        
+                return 'xl';
             }
         }
         return rslt;

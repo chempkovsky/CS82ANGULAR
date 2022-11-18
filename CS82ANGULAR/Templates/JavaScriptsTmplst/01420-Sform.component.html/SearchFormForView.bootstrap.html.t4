@@ -296,7 +296,7 @@
 <# 
     }
 #>
-                                <button ngbDropdownItem *ngFor="let m of <#= TableCommandsPropName #>;"  [disabled]="!m.enabled" (click)="tableCommand(m.id)">
+                                <button ngbDropdownItem *ngFor="let m of tableMenuItemsData;"  [disabled]="!m.enabled" (click)="tableCommand(m.id)">
                                     <i  class="{{'material-icons text-'+ m.iconColor}}" type="button">{{m.iconName}}</i>
                                     <span>{{m.caption}}</span>
                                 </button>
@@ -306,7 +306,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <ng-template ngFor let-e [ngForOf]="dataSource" >
+                      <ng-template ngFor let-e [ngForOf]="dataSource" >
+                        <tr>
+
                           <td class="stickyfirstclss">
                             <input type="radio" (change)="<#= OnSelectRowMethodName #>(e)" [value]="e" [checked]="e === currentRow" />
                             <input  type="checkbox"  class="form-check-input" style="margin-left: 10px;" *ngIf="<#= showMultiSelectedRowPropName #>"
@@ -337,7 +339,8 @@
                                </div>
                              </span> 
                           </td>
-                        </ng-template>
+                        </tr>
+                      </ng-template>
                     </tbody>
                 </table>
             </div> 

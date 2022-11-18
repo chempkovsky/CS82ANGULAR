@@ -53,7 +53,7 @@ export class <#= componentClassName #>  {
     @ViewChild(<#= delformComponentClassName #>) childForm: <#= delformComponentClassName #>|any;
     @Input('data')
     public data: <#= viewInterfaceDDlgClassName #> | any;
-    constructor((public dialogRef: NgbActiveModal) { }
+    constructor(public dialogRef: NgbActiveModal) { }
     <#= OnAfterSubmitMethodName #>(newVal: <#= viewInterfaceName #>) {
         this.data.<#= FormControlNewModelPropName #> = newVal; 
         this.dialogRef.close(this.data);

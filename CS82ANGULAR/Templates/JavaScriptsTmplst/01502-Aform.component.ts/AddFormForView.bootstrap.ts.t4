@@ -452,8 +452,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 			debounceTime(200),
 			distinctUntilChanged(),
 			// filter((term) => term.length >= 2),
-            switchMap((value: string) => 
-                return this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= GetCllctByFldFilterMethodName #>('<#= GetControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, CurrentInputTypeId) #>', value);
+            switchMap<string, readonly any[]>((value: string) => 
+                this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= GetCllctByFldFilterMethodName #>('<#= GetControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, CurrentInputTypeId) #>', value)
             ),
 		);
 <#
@@ -566,7 +566,16 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                         return  this.<#=  MainFormGroupName #>.controls['<#=  GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>'].errors; 
                     }  
                 return null; }]);
-
+        this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, TypeaheadSufix) #>.valueChanges
+            .subscribe({
+                next: (val: any) => { 
+                    if(val) {
+                        this.<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= Interface2ValuesMethodName #>(val, true); 
+                    } else {
+                        this.<#=  GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, DataSourceSufix) #>.<#= ClearPartiallyMethodName #>(true);
+                    }
+                }
+            });
 <#
             } else if (GetInputTypeWhenXXX(modelViewUIFormPropertySerializable, CurrentInputTypeId) == InputTypeEnum.SearchDialog) {
         // disabled: false is correct
@@ -844,7 +853,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         flt.<#= HiddenFilterPropName #> = this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= GetWSFltrRsltByCurrDirMstrsMethodName #>();
         let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
         let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
-        let dialogRef = this.dialog.open(<#= GetComponentClassNameWithAnglrEx(AngularJsonFile, fk.Item2, sdlgComponentFolder, Model, addformComponentFolder) #>);
+        let dialogRef = this.dialog.open(<#= GetComponentClassNameWithAnglrEx(AngularJsonFile, fk.Item2, sdlgComponentFolder, Model, addformComponentFolder) #>, {size: w});
 //        , {
 //            data: flt,
 //            maxWidth: mw,

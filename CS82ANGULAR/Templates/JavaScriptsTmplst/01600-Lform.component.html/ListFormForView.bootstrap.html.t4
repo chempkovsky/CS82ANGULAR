@@ -1,0 +1,91 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+    
+    string showAddFltItemSelector   = "show-add-flt-item";
+    string showAddFltItemPropName   = "showAddFltItem";
+    string CanAddSelector           = "can-add";
+    string CanAddPropName           = "canAdd";
+    string CanUpdSelector           = "can-update";
+    string CanUpdPropName           = "canUpdate";
+    string CanDelSelector           = "can-delete";
+    string CanDelPropName           = "canDelete";
+    string HiddenFilterSelector     = "hidden-filter";
+    string HiddenFilterPropName     = "hiddenFilter";
+    string ShowFilterSelector       = "show-filter";
+    string ShowFilterPropName       = "showFilter";
+
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string FilterMaxHeightPropSelector  = "filter-max-height";
+    string FilterMaxHeightPropName      = "filterMaxHeight";
+
+
+    string RowCommandsSelector      = "row-commands";
+    string RowCommandsPropName      = "rowCommands";
+    string TableCommandsSelector    = "table-commands";
+    string TableCommandsPropName    = "tableCommands";
+
+    string OnRowCommandSelector     = "on-row-command";
+    string OnRowCommandPropName     = "onRowCommand";
+    string OnTableCommandSelector   = "on-table-command";
+    string OnTableCommandPropName   = "onTableCommand";
+
+    string selectedRowSelector        = "selected-row";
+    string selectedRowPropName        = "selectedRow";
+    string OnSelectRowMethodName      = "onSelectRow";
+
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+    string showMultiSelectedRowSelector = "show-multi-selected-row";
+    string showMultiSelectedRowPropName = "showMultiSelectedRow";
+    string multiSelectedRowSelector     = "multi-selected-row";
+    string multiSelectedRowPropName     = "multiSelectedRow";
+    string onMultiSelectedRowPropName   = "onMultiSelectedRow";
+    string currentMultiRowPropName      = "currentMultiRow";
+
+
+    string sformComponentFolder         = "01420-Sform.component.ts";
+    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, sformComponentFolder);
+#>
+
+<app-<#= componentSelectorCommonPart #>
+    [<#= captionSelector #>]="<#= captionPropName #>" 
+    [<#= RowCommandsSelector #>]="rowMenuItemsData" 
+    [<#= TableCommandsSelector #>]="tableMenuItemsData"
+    [<#= ShowFilterSelector #>]="<#= ShowFilterPropName #>"
+    [<#= showAddFltItemSelector #>]="<#= showAddFltItemPropName #>" 
+    [<#= HiddenFilterSelector #>] ="<#= HiddenFilterPropName #>"
+    (<#= OnRowCommandSelector #>)="rowCommand($event)"
+    (<#= OnTableCommandSelector #>)="tableCommand($event)"
+    (<#= selectedRowSelector #>)="<#= OnSelectRowMethodName #>($event)"
+    [<#= containerMenuItemsSelector #>]="<#= containerMenuItemsPropName #>"
+    (<#= onContainerMenuItemClickSelector #>)="<#= onContainerMenuItemClickMethodName #>($event)"
+    [<#= MaxHeightPropSelector #>]="<#= MaxHeightPropName #>"  
+    [<#= FilterMaxHeightPropSelector #>]="<#= FilterMaxHeightPropName #>"  
+    [<#= showMultiSelectedRowSelector #>]="<#= showMultiSelectedRowPropName #>"  
+    (<#= multiSelectedRowSelector #>)="<#= onMultiSelectedRowPropName #>($event)"  
+ ></app-<#= componentSelectorCommonPart #>>
+

@@ -1481,7 +1481,7 @@ if (Model.IsWebApiSelectOneByPrimarykey) {
                 locdata[ind].checked = true;
             }
         }
-        let dialogRef = this.dialog.open(<#=  componentSelectorDlgComponentClassName #>);
+        let dialogRef = this.dialog.open(<#=  componentSelectorDlgComponentClassName #>, {size: 'xl'});
            // , {
            //   data: locdata,
            //   maxWidth: '100vw',
