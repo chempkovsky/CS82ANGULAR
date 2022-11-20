@@ -1,0 +1,71 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "ng add @ng-bootstrap/ng-bootstrap",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "",
+    "ng generate library XXXXX-lform",
+    "",
+    "where XXXXX is a name of the selected ViewModel",
+    "",
+    "Please make sure that you selected [src\\lib] folder of the created library !!!"
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "lform",
+      "GeneratorType": "01600-Lform.component.css",
+      "GeneratorSript": "ListFormForView.css.t4"
+    },
+    {
+      "DestinationFolder": "lform",
+      "GeneratorType": "01600-Lform.component.html",
+      "GeneratorSript": "ListFormForView.bootstrap.html.t4"
+    },
+    {
+      "DestinationFolder": "lform",
+      "GeneratorType": "01600-Lform.component.ts",
+      "GeneratorSript": "ListFormForView.bootstrap.ts.t4"
+    },
+    {
+      "DestinationFolder": "lform",
+      "GeneratorType": "01600-Lform.component.txt",
+      "GeneratorSript": "ListFormForView.txt.t4"
+    },
+    {
+      "DestinationFolder": "ldlg",
+      "GeneratorType": "01620-Ldlg.component.css",
+      "GeneratorSript": "ListDlgFormForView.css.t4"
+    },
+    {
+      "DestinationFolder": "ldlg",
+      "GeneratorType": "01620-Ldlg.component.html",
+      "GeneratorSript": "ListDlgFormForView.bootstrap.html.t4"
+    },
+    {
+      "DestinationFolder": "ldlg",
+      "GeneratorType": "01620-Ldlg.component.ts",
+      "GeneratorSript": "ListDlgFormForView.bootstrap.ts.t4"
+    },
+    {
+      "DestinationFolder": "ldlg",
+      "GeneratorType": "01620-Ldlg.component.txt",
+      "GeneratorSript": "ListDlgFormForView.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01650-L.module.ts",
+      "GeneratorSript": "lformModuleForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01650-L.module.txt",
+      "GeneratorSript": "lformModuleForView.txt.t4"
+    }
+  ]
+}

@@ -113,6 +113,7 @@
     string FilterMaxHeightPropName      = "filterMaxHeight";
     string frasesPropName               = "frases";
 
+
     string rlistCssFolder                       = "01920-Rlist.component.css";
     string rlistHtmlFolder                      = "01920-Rlist.component.html";
     string rlistComponentFolder                 = "01920-Rlist.component.ts";
@@ -152,20 +153,18 @@
     string sformComponentFolder                 = "01420-Sform.component.ts";
     string searchComponentClassName             = GetComponentClassNameWithAnglr(AngularJsonFile, Model, sformComponentFolder, rlistComponentFolder);
 
-
-
-
     string ActionColumnDefProperty      = "menuAction";
     string SelectColumnDefProperty      = "selectAction";
     string DisplayedColumnsProperty     = "displayedColumns";
     string MatPaginatorPageSize         = "10";
     string MatPaginatorPageSizeOptions  = "[10, 25, 50, 100]";
 
-
-
     List<ModelViewPropertyOfVwSerializable> primKeys= GetModelPrimaryKeyProps(Model);
     List<string> detailViewNames =  GetDetailViews(Model, Context, null);
-    List<string> detailViewNamesToExclude = new List<string>();
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// the current script differs from the default one in only one line: List<string> detailViewNamesToExclude = new List<string>() { "aspnetuserView"}; 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    List<string> detailViewNamesToExclude = new List<string>() { "aspnetuserView"}; 
     // m2mMdl, m2mFk, searchFks, otherFks, externalFks
     Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
     // m2mMdl, m2mFk, searchFks, otherFks, externalFks
@@ -205,10 +204,9 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap, UrlSegment, ActivatedRouteSnapshot, NavigationStart } from '@angular/router';
 
-import { MatSelectChange } from '@angular/material/select';
 import { MatDialog } from '@angular/material/dialog';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { firstValueFrom, takeWhile } from 'rxjs';
-import { MatFormFieldAppearance } from '@angular/material/form-field';
 
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, rlistComponentFolder)#>';
 import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterResultModelFolder, rlistComponentFolder) #>';
@@ -247,7 +245,6 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     if(localize) {
 #>
     <#= frasesPropName #>: {[key:string]: string}  = {
-        'Hide-details': $localize`:Hide details@@<#= componentClassName #>.Hide-details:Hide details`,
         '<#= ActionParamNavM2mNotAllwd #>':  $localize`:Navigating to detail form is not allowed in One-to-Many mode@@<#= componentClassName #>.<#= ActionParamNavM2mNotAllwd #>:Navigating to detail form is not allowed in One-to-Many mode`,
         '<#= captionPropName #>': $localize`:<#= Model.PluralTitle #>@@<#= componentClassName #>.<#= captionPropName #>:<#= Model.PluralTitle #>`,
         '<#= ActionParamUpdateMode #>': $localize`:Modify Item@@<#= componentClassName #>.<#= ActionParamUpdateMode #>:Modify Item`,
@@ -302,7 +299,6 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     } else {
 #>
     <#= frasesPropName #>: {[key:string]: string}  = {
-        'Hide-details': 'Hide details',
         '<#= ActionParamNavM2mNotAllwd #>':  'Navigating to detail form is not allowed in One-to-Many mode',
         '<#= captionPropName #>': '<#= Model.PluralTitle #>',
         '<#= ActionParamUpdateMode #>': 'Modify Item',
@@ -360,7 +356,6 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 
     public <#= ShowDetailsPropName #>: boolean = false;
     @Input('<#= showMultiSelectedRowSelector #>') <#= showMultiSelectedRowPropName #>: boolean = true;
-    public <#= AppearancePropName #>: MatFormFieldAppearance = 'outline';
 
     @Output('<#= multiSelectedRowSelector #>') <#= multiSelectedRowPropName #>: EventEmitter<Array<<#= viewInterfaceName #>>> = new EventEmitter<Array<<#= viewInterfaceName #>>>();
     <#= onMultiSelectedRowPropName #>(e: Array<<#= viewInterfaceName #>>): void {
@@ -424,10 +419,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             }
         } // if(searchSchemas!= null) {...}
 #>    
-        public dialog: MatDialog, 
+        public dialog: NgbModal, 
         protected cd: ChangeDetectorRef) {
-        this.<#= AppearancePropName #> = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
-
     }
     permMask: number = 0;
     extfltrOn: boolean = false;
@@ -637,7 +630,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     @ViewChild(<#= GetComponentClassName(Model, sformComponentFolder) #>) childForm!: <#= GetComponentClassName(Model, sformComponentFolder) #>;
     public <#= SelectedDetailPropName #>: {caption: string, vw: string|null, nv: string|null, addon: string|null}|null = null;
     public <#= DetailViewsPropName #>: Array<{caption: string, vw: string|null, nv: string|null, addon: string|null}> = [
-        {caption:this.<#= frasesPropName #>['Hide-details'], vw:null, nv:null, addon: null},
+        {caption:'Hide details', vw:null, nv:null, addon: null},
 <#
     {
         foreach(string detailVwnm in detailViewNames) {
@@ -679,12 +672,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     }
 #>
     ];
-    public <#= OnDetailChangedMethodName #>(v: MatSelectChange) {
-        if(v) {
-            this.<#= SelectedDetailPropName #> = v.value;
-        } else {
-            this.<#= SelectedDetailPropName #> = this.<#= DetailViewsPropName #>[0];
-        }
+    public <#= OnDetailChangedMethodName #>() {
         this.<#= ToDetailMethodName #>();
     }
     public <#= ToDetailMethodName #>() {
@@ -729,10 +717,12 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             iconname: 'warning',
             iconcolor: 'warn'
         };
-        let dialogRef = this.dialog.open(<#=  messageDialogComponentClassName #>, {
-              data: locdata,
-            });
-        dialogRef.afterClosed().subscribe(async rslt => {
+        let dialogRef = this.dialog.open(<#=  messageDialogComponentClassName #>);
+//        , {
+//              data: locdata,
+//            });
+        dialogRef.componentInstance.data = locdata;
+        dialogRef.result.then(async rslt => {
             if (typeof rslt === 'undefined') return;
             if (rslt === null) return;
             let currRowsCp: Array<<#= viewInterfaceName #>> = sender.<#= currentMultiRowPropName #>.slice();

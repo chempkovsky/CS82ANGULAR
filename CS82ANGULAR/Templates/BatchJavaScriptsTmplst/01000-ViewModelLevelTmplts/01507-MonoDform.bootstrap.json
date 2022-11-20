@@ -7,21 +7,7 @@
     "",
     "ng new ang-monorepo --no-create-application",
     "cd ang-monorepo",
-    "ng add @progress/kendo-angular-buttons",
-    "ng add @progress/kendo-angular-layout",
-    "ng add @progress/kendo-angular-icons",
-    "ng add @progress/kendo-angular-inputs",
-    "ng add @progress/kendo-angular-dropdowns",
-    "ng add @progress/kendo-angular-menu",
-    "ng add @progress/kendo-angular-progressbar",
-    "ng add @progress/kendo-angular-dialog",
-    "ng add @progress/kendo-angular-notification",
-    "ng add @progress/kendo-angular-toolbar",
-    "ng add @progress/kendo-angular-tooltip",
-    "ng add @progress/kendo-angular-listview",
-    "ng add @progress/kendo-angular-dateinputs",
-    "ng add @progress/kendo-angular-label",
-    "ng add @progress/kendo-angular-grid",
+    "ng add @ng-bootstrap/ng-bootstrap",
     "npm i -s @angular/flex-layout @angular/cdk",
     "",
     "ng generate library XXXXX-dform",
@@ -34,17 +20,17 @@
     {
       "DestinationFolder": "dform",
       "GeneratorType": "01506-Dform.component.css",
-      "GeneratorSript": "DelFormForView.css.t4"
+      "GeneratorSript": "DelFormForView.bootstrap.css.t4"
     },
     {
       "DestinationFolder": "dform",
       "GeneratorType": "01506-Dform.component.html",
-      "GeneratorSript": "DelFormForView.kendo.html.t4"
+      "GeneratorSript": "DelFormForView.bootstrap.html.t4"
     },
     {
       "DestinationFolder": "dform",
       "GeneratorType": "01506-Dform.component.ts",
-      "GeneratorSript": "DelFormForView.kendo.ts.t4"
+      "GeneratorSript": "DelFormForView.bootstrap.ts.t4"
     },
     {
       "DestinationFolder": "dform",
@@ -69,12 +55,12 @@
     {
       "DestinationFolder": "ddlg",
       "GeneratorType": "01526-Ddlg.component.html",
-      "GeneratorSript": "DelDlgFormForView.kendo.html.t4"
+      "GeneratorSript": "DelDlgFormForView.bootstrap.html.t4"
     },
     {
       "DestinationFolder": "ddlg",
       "GeneratorType": "01526-Ddlg.component.ts",
-      "GeneratorSript": "DelDlgFormForView.kendo.ts.t4"
+      "GeneratorSript": "DelDlgFormForView.bootstrap.ts.t4"
     },
     {
       "DestinationFolder": "ddlg",

@@ -1,0 +1,71 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "ng add @ng-bootstrap/ng-bootstrap",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "",
+    "ng generate library XXXXX-ru",
+    "",
+    "where XXXXX is a name of the selected ViewModel",
+    "",
+    "Please make sure that you selected [src\\lib] folder of the created library !!!"
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "ruform",
+      "GeneratorType": "01824-RU.component.css",
+      "GeneratorSript": "UpdRouterFormForView.css.t4"
+    },
+    {
+      "DestinationFolder": "ruform",
+      "GeneratorType": "01824-RU.component.html",
+      "GeneratorSript": "UpdRouterFormForView.bootstrap.html.t4"
+    },
+    {
+      "DestinationFolder": "ruform",
+      "GeneratorType": "01824-RU.component.ts",
+      "GeneratorSript": "UpdRouterFormForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "ruform",
+      "GeneratorType": "01824-RU.component.txt",
+      "GeneratorSript": "UpdRouterFormForView.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01954-Ru.module.ts",
+      "GeneratorSript": "ruformModuleForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01954-Ru.module.txt",
+      "GeneratorSript": "ruformModuleForView.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01964-Ru.routing.module.ts",
+      "GeneratorSript": "ru.routing.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01964-Ru.routing.module.txt",
+      "GeneratorSript": "ru.routing.module.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01974-Ru-lazy.routing.module.ts",
+      "GeneratorSript": "ru-lazy.routing.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01974-Ru-lazy.routing.module.txt",
+      "GeneratorSript": "ru-lazy.routing.module.txt.t4"
+    }
+  ]
+}

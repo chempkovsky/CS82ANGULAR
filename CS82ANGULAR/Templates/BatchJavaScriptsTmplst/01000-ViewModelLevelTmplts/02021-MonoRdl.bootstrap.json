@@ -7,21 +7,7 @@
     "",
     "ng new ang-monorepo --no-create-application",
     "cd ang-monorepo",
-    "ng add @progress/kendo-angular-buttons",
-    "ng add @progress/kendo-angular-layout",
-    "ng add @progress/kendo-angular-icons",
-    "ng add @progress/kendo-angular-inputs",
-    "ng add @progress/kendo-angular-dropdowns",
-    "ng add @progress/kendo-angular-menu",
-    "ng add @progress/kendo-angular-progressbar",
-    "ng add @progress/kendo-angular-dialog",
-    "ng add @progress/kendo-angular-notification",
-    "ng add @progress/kendo-angular-toolbar",
-    "ng add @progress/kendo-angular-tooltip",
-    "ng add @progress/kendo-angular-listview",
-    "ng add @progress/kendo-angular-dateinputs",
-    "ng add @progress/kendo-angular-label",
-    "ng add @progress/kendo-angular-grid",
+    "ng add @ng-bootstrap/ng-bootstrap",
     "npm i -s @angular/flex-layout @angular/cdk",
     "",
     "ng generate library XXXXX-rdl",
@@ -39,12 +25,12 @@
     {
       "DestinationFolder": "rdlist",
       "GeneratorType": "02020-Rdlist.component.html",
-      "GeneratorSript": "DListRouterFormForView.kendo.html.t4"
+      "GeneratorSript": "DListRouterFormForView.bootstrap.html.t4"
     },
     {
       "DestinationFolder": "rdlist",
       "GeneratorType": "02020-Rdlist.component.ts",
-      "GeneratorSript": "DListRouterFormForView.kendo.ts.t4"
+      "GeneratorSript": "DListRouterFormForView.bootstrap.ts.t4"
     },
     {
       "DestinationFolder": "rdlist",

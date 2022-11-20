@@ -205,10 +205,9 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap, UrlSegment, ActivatedRouteSnapshot, NavigationStart } from '@angular/router';
 
-import { MatSelectChange } from '@angular/material/select';
-import { MatDialog } from '@angular/material/dialog';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
 import { firstValueFrom, takeWhile } from 'rxjs';
-import { MatFormFieldAppearance } from '@angular/material/form-field';
 
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, rlistComponentFolder)#>';
 import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterResultModelFolder, rlistComponentFolder) #>';
@@ -360,7 +359,6 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 
     public <#= ShowDetailsPropName #>: boolean = false;
     @Input('<#= showMultiSelectedRowSelector #>') <#= showMultiSelectedRowPropName #>: boolean = true;
-    public <#= AppearancePropName #>: MatFormFieldAppearance = 'outline';
 
     @Output('<#= multiSelectedRowSelector #>') <#= multiSelectedRowPropName #>: EventEmitter<Array<<#= viewInterfaceName #>>> = new EventEmitter<Array<<#= viewInterfaceName #>>>();
     <#= onMultiSelectedRowPropName #>(e: Array<<#= viewInterfaceName #>>): void {
@@ -424,10 +422,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             }
         } // if(searchSchemas!= null) {...}
 #>    
-        public dialog: MatDialog, 
+        public dialog: NgbModal, 
         protected cd: ChangeDetectorRef) {
-        this.<#= AppearancePropName #> = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
-
     }
     permMask: number = 0;
     extfltrOn: boolean = false;
@@ -679,12 +675,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     }
 #>
     ];
-    public <#= OnDetailChangedMethodName #>(v: MatSelectChange) {
-        if(v) {
-            this.<#= SelectedDetailPropName #> = v.value;
-        } else {
-            this.<#= SelectedDetailPropName #> = this.<#= DetailViewsPropName #>[0];
-        }
+    public <#= OnDetailChangedMethodName #>() {
         this.<#= ToDetailMethodName #>();
     }
     public <#= ToDetailMethodName #>() {
@@ -729,10 +720,12 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             iconname: 'warning',
             iconcolor: 'warn'
         };
-        let dialogRef = this.dialog.open(<#=  messageDialogComponentClassName #>, {
-              data: locdata,
-            });
-        dialogRef.afterClosed().subscribe(async rslt => {
+        let dialogRef = this.dialog.open(<#=  messageDialogComponentClassName #>);
+//        , {
+//              data: locdata,
+//            });
+        dialogRef.componentInstance.data = locdata;
+        dialogRef.result.then(async rslt => {
             if (typeof rslt === 'undefined') return;
             if (rslt === null) return;
             let currRowsCp: Array<<#= viewInterfaceName #>> = sender.<#= currentMultiRowPropName #>.slice();
