@@ -1,0 +1,219 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "1.",
+    "  Please make sure that you selected src\\app folder",
+    "",
+    "2.",
+    " Please make that AspNet ModelViews has the following names",
+    " (Names are case sensitive)",
+    "     aspnetmodelView",
+    "     aspnetuserView",
+    "     aspnetroleView",
+    "     aspnetuserrolesView",
+    "     aspnetrolemaskView",
+    "     aspnetusermaskView",
+    "     aspnetuserpermsView",
+    "",
+    "",
+    ""
+  ],
+  "BatchItems": [
+
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\rvform",
+      "GeneratorType": "01820-RV.component.css",
+      "GeneratorSript": "ViewRouterFormForView.css.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\rvform",
+      "GeneratorType": "01820-RV.component.html",
+      "GeneratorSript": "ViewRouterFormForView.bootstrap.html.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view\\rvform",
+      "GeneratorType": "01820-RV.component.ts",
+      "GeneratorSript": "ViewRouterFormForView.ForAspNetModel.bootstrap.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01950-Rv.module.ts",
+      "GeneratorSript": "rvformModuleForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01960-Rv.routing.module.ts",
+      "GeneratorSript": "rv.routing.module.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetmodel-view",
+      "GeneratorType": "01970-Rv-lazy.routing.module.ts",
+      "GeneratorSript": "rv-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+
+
+
+
+
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\rvform",
+      "GeneratorType": "01820-RV.component.css",
+      "GeneratorSript": "ViewRouterFormForView.css.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\rvform",
+      "GeneratorType": "01820-RV.component.html",
+      "GeneratorSript": "ViewRouterFormForView.bootstrap.html.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view\\rvform",
+      "GeneratorType": "01820-RV.component.ts",
+      "GeneratorSript": "ViewRouterFormForView.bootstrap.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01950-Rv.module.ts",
+      "GeneratorSript": "rvformModuleForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01960-Rv.routing.module.ts",
+      "GeneratorSript": "rv.routing.module.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuser-view",
+      "GeneratorType": "01970-Rv-lazy.routing.module.ts",
+      "GeneratorSript": "rv-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+
+
+
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\rvform",
+      "GeneratorType": "01820-RV.component.css",
+      "GeneratorSript": "ViewRouterFormForView.css.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\rvform",
+      "GeneratorType": "01820-RV.component.html",
+      "GeneratorSript": "ViewRouterFormForView.bootstrap.html.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view\\rvform",
+      "GeneratorType": "01820-RV.component.ts",
+      "GeneratorSript": "ViewRouterFormForView.ForAspNetRole.bootstrap.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01950-Rv.module.ts",
+      "GeneratorSript": "rvformModuleForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01960-Rv.routing.module.ts",
+      "GeneratorSript": "rv.routing.module.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrole-view",
+      "GeneratorType": "01970-Rv-lazy.routing.module.ts",
+      "GeneratorSript": "rv-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+
+
+
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\rvform",
+      "GeneratorType": "01820-RV.component.css",
+      "GeneratorSript": "ViewRouterFormForView.css.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\rvform",
+      "GeneratorType": "01820-RV.component.html",
+      "GeneratorSript": "ViewRouterFormForView.bootstrap.html.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view\\rvform",
+      "GeneratorType": "01820-RV.component.ts",
+      "GeneratorSript": "ViewRouterFormForView.bootstrap.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01950-Rv.module.ts",
+      "GeneratorSript": "rvformModuleForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01960-Rv.routing.module.ts",
+      "GeneratorSript": "rv.routing.module.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetuserroles-view",
+      "GeneratorType": "01970-Rv-lazy.routing.module.ts",
+      "GeneratorSript": "rv-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\rvform",
+      "GeneratorType": "01820-RV.component.css",
+      "GeneratorSript": "ViewRouterFormForView.css.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\rvform",
+      "GeneratorType": "01820-RV.component.html",
+      "GeneratorSript": "ViewRouterFormForView.bootstrap.html.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view\\rvform",
+      "GeneratorType": "01820-RV.component.ts",
+      "GeneratorSript": "ViewRouterFormForView.bootstrap.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01950-Rv.module.ts",
+      "GeneratorSript": "rvformModuleForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01960-Rv.routing.module.ts",
+      "GeneratorSript": "rv.routing.module.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    },
+    {
+      "DestinationFolder": "components\\aspnetrolemask-view",
+      "GeneratorType": "01970-Rv-lazy.routing.module.ts",
+      "GeneratorSript": "rv-lazy.routing.module.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    }
+
+
+  ]
+}
