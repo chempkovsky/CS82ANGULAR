@@ -1,0 +1,316 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.AllowedFileTypesSerializable" name="AllowedFileTypes" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureContextSerializable" name="FeatureContext" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.FeatureSerializable" name="Feature" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+
+<#
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+    string MaxHeightPropSelector                = "max-height";
+    string MaxHeightPropName                    = "maxHeight";
+    string FilterMaxHeightPropSelector          = "filter-max-height";
+    string FilterMaxHeightPropName              = "filterMaxHeight";
+    string colspanPropName                      = "colSpan";
+    string rowspanPropName                      = "rowSpan";
+    string onActivateMethodName                 = "onActivate";
+    string onDeActivateMethodName               = "onDeActivate";
+
+    string ftrFeatureHtmlFolder                 = "30100-.ftr.component.css";
+    string ftrFeatureCssFolder                  = "30100-.ftr.component.html";
+    string ftrFeatureComponentFolder            = "30100-.ftr.component.ts";
+    string featureSelectorCommonPart            = GetFeatureComponentSelectorCommonPart(Feature, ftrFeatureComponentFolder);
+    string featureClassName                     = GetFeatureComponentClassName(Feature, ftrFeatureComponentFolder);
+
+
+    string AppSettingServicePropName            = "appGlblSettings";
+    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName           = GetCommonServiceClassNameForFeatureWithAnglr(AngularJsonFile, Feature, Context, appSettingServiceFolder, ftrFeatureComponentFolder);
+
+    string itemHeightDataModelFolder            = "00016-item-height-data.interface.ts";
+    string itemHeightDataModelClassName         = GetModelClassNameForFeatureWithAnglr(AngularJsonFile, Feature, Context, itemHeightDataModelFolder, ftrFeatureComponentFolder);
+
+    string menuItemDataModelFolder              = "00017-menu-item-data.interface.ts";
+    string menuItemDataModelClassName           = GetModelClassNameForFeatureWithAnglr(AngularJsonFile, Feature, Context, menuItemDataModelFolder, ftrFeatureComponentFolder);
+
+    string eventEmitterPubModelFolder           = "00019-event-emitter-pub.interface.ts";
+    string eventEmitterPubModelClassName        = GetModelClassNameForFeatureWithAnglr(AngularJsonFile, Feature, Context, eventEmitterPubModelFolder, ftrFeatureComponentFolder);
+    
+
+
+    int FeatureItemsCount = 0;
+    int rotedId= -1;
+    if(Feature.FeatureItems!=null) {
+        FeatureItemsCount = Feature.FeatureItems.Count;
+        int currId=-1;
+        foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
+            currId++;
+            if(isRoutedItem(AllowedFileTypes, featureItemSerializable.FileType)) {
+                rotedId = currId;
+                break;
+            }
+        }
+    }
+
+#>
+import { Component, OnInit } from '@angular/core';
+import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
+import { <#= appSettingServiceClassName #> } from '<#=  GetFeatureCommonFolderNameWithAnglr(AngularJsonFile, Feature, Context, appSettingServiceFolder, ftrFeatureComponentFolder) #>';
+import { <#= menuItemDataModelClassName #> } from '<#=  GetFeatureCommonFolderNameWithAnglr(AngularJsonFile, Feature, Context, menuItemDataModelFolder, ftrFeatureComponentFolder) #>';
+import { <#= itemHeightDataModelClassName #> } from '<#=  GetFeatureCommonFolderNameWithAnglr(AngularJsonFile, Feature, Context, itemHeightDataModelFolder, ftrFeatureComponentFolder) #>';
+import { <#= eventEmitterPubModelClassName #> } from '<#=  GetFeatureCommonFolderNameWithAnglr(AngularJsonFile, Feature, Context, eventEmitterPubModelFolder, ftrFeatureComponentFolder) #>';
+
+import { Subscription } from 'rxjs';
+
+@Component({
+  selector: 'app-<#= featureSelectorCommonPart #>',
+  templateUrl: '<#= GetFeatureFolderName(Feature, ftrFeatureHtmlFolder, ftrFeatureComponentFolder) #>.html',
+  styleUrls: ['<#= GetFeatureFolderName(Feature, ftrFeatureCssFolder, ftrFeatureComponentFolder) #>.css']
+})
+export class <#= featureClassName #>  {
+    curBreakpoint: number = 1;
+    isExp: boolean[] = [<#= GetAllFeatureDefaultIsExp(Feature) #>];
+    <#= colspanPropName #>: number[][]= [
+<#
+    {
+        int curItem = -1;
+        bool rotedInserted = false;
+        foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
+            curItem++;
+            AllowedFileTypeSerializable allowedFileType = GetAllowedFileType(AllowedFileTypes, featureItemSerializable.FileType);
+            if(allowedFileType == null) {
+#>
+// Error: Could not find file AllowedFileType by given FileType= <#= featureItemSerializable.FileType #>
+            [0, 0, 0, 0, 0, 0],
+<#
+            } else {
+#>
+            [<#= allowedFileType.ColLargeBreakpointMult * allowedFileType.DefaultCols #>, <#= allowedFileType.ColLargeBreakpointMult #>, <#= allowedFileType.ColSmallBreakpointMult #>, <#= allowedFileType.DefaultCols #>, <#= allowedFileType.DefaultCols #>, <#= allowedFileType.ExpandCols #>],
+<#
+            }
+        }
+    }
+#>
+        ];
+    <#= rowspanPropName #>: number[][]= [
+<#
+    {
+        int curItem = -1;
+        bool rotedInserted = false;
+        foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
+            curItem++;
+            AllowedFileTypeSerializable allowedFileType = GetAllowedFileType(AllowedFileTypes, featureItemSerializable.FileType);
+            if(allowedFileType == null) {
+#>
+// Error: Could not find file AllowedFileType by given FileType= <#= featureItemSerializable.FileType #>
+            [0, 0, 0, 0, 0, 0],
+<#
+            } else {
+#>
+            [<#= allowedFileType.RowLargeBreakpointMult * allowedFileType.DefaultRows #>,  <#= allowedFileType.RowLargeBreakpointMult #>, <#= allowedFileType.RowSmallBreakpointMult #>, <#= allowedFileType.DefaultRows #>, <#= allowedFileType.DefaultRows #>, <#= allowedFileType.ExpandRows #>],
+<#
+            }
+        }
+    }
+#>
+        ];
+    <#= MaxHeightPropName #>: number[][]= [
+<#
+    {
+        int curItem = -1;
+        bool rotedInserted = false;
+        foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
+            curItem++;
+            AllowedFileTypeSerializable allowedFileType = GetAllowedFileType(AllowedFileTypes, featureItemSerializable.FileType);
+            if(allowedFileType == null) {
+#>
+// Error: Could not find file AllowedFileType by given FileType= <#= featureItemSerializable.FileType #>
+            [0, 0, 0],
+<#
+            } else {
+#>
+            [<#= allowedFileType.DefaultMaxHeight #>, <#= allowedFileType.DefaultMaxHeight #>, <#= allowedFileType.ExpandMaxHeight #>],
+<#
+            }
+        }
+    }
+#>
+        ];
+    <#= FilterMaxHeightPropName #>: number[][]= [
+<#
+    {
+        int curItem = -1;
+        bool rotedInserted = false;
+        foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
+            curItem++;
+            AllowedFileTypeSerializable allowedFileType = GetAllowedFileType(AllowedFileTypes, featureItemSerializable.FileType);
+            if(allowedFileType == null) {
+#>
+// Error: Could not find file AllowedFileType by given FileType= <#= featureItemSerializable.FileType #>
+            [0, 0, 0],
+<#
+            } else {
+#>
+            [<#= allowedFileType.DefaultFilterMaxHeight #>, <#= allowedFileType.DefaultFilterMaxHeight #>, <#= allowedFileType.ExpandFilterMaxHeight #>],
+<#
+            }
+        }
+    }
+#>
+        ];
+    <#= containerMenuItemsPropName #>: <#= menuItemDataModelClassName #>[][]=[
+<#
+    {
+        int curItem = -1;
+        foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
+            curItem++;
+#>
+            [  {id: '<#= curItem #>', caption: 'expand(collapse)', iconName: 'aspect_ratio', iconColor: 'primary', enabled: true } ],
+<#
+        }
+    }
+#>
+        ];
+
+    updateSettings() {
+        let i: number;
+        for (i = 0; i <  <#= FeatureItemsCount #>; i++) {
+            this.<#= colspanPropName #>[i][0] = this.isExp[i] ? this.<#= colspanPropName #>[i][3] : this.<#= colspanPropName #>[i][this.curBreakpoint] * this.<#= colspanPropName #>[i][3];
+            this.<#= rowspanPropName #>[i][0] = this.isExp[i] ? this.<#= rowspanPropName #>[i][3] : this.<#= rowspanPropName #>[i][this.curBreakpoint] * this.<#= rowspanPropName #>[i][3];
+        }
+    }
+    constructor(private breakpointObserver: BreakpointObserver, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {
+        breakpointObserver.observe([
+            Breakpoints.Medium,
+            Breakpoints.Large,
+            Breakpoints.XLarge
+          ]).subscribe(result => {
+            if (result.matches) {
+                this.curBreakpoint = 1;
+            } else {
+                this.curBreakpoint = 2;
+            }
+            this.updateSettings();
+       });        
+    }
+    isVisible: boolean[] = [<#= GetAllFeatureDefaultIsExp(Feature) #>];
+    ngOnInit(): void {
+        let msk: number = 0;
+<#
+        {
+            int curItem = -1;
+            foreach(FeatureItemSerializable featureItemSerializable in Feature.FeatureItems) {
+                curItem++;
+#>
+        msk = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= featureItemSerializable.ViewName #>');
+        this.isVisible[<#= curItem #>] = (msk & 1) === 1;
+<#
+            }
+        }
+#>
+    }
+
+    <#= onContainerMenuItemClickMethodName #>(v: <#= menuItemDataModelClassName #> | any) {
+        let setDefault = true;
+        let locId = parseInt(v.id);
+        this.isExp[locId] = !(this.isExp[locId]);
+        if(this.isExp[locId]) {
+            setDefault = false;
+            this.<#= colspanPropName #>[locId][3] = this.<#= colspanPropName #>[locId][5];
+            this.<#= rowspanPropName #>[locId][3] = this.<#= rowspanPropName #>[locId][5];
+            this.<#= MaxHeightPropName #>[locId][0] = this.<#= MaxHeightPropName #>[locId][2];
+            this.<#= FilterMaxHeightPropName #>[locId][0] = this.<#= FilterMaxHeightPropName #>[locId][2];
+            let i: number;
+            for (i = 0; i < locId; i++) {
+                this.<#= colspanPropName #>[i][3] = 0;
+                this.<#= rowspanPropName #>[i][3] = 0;
+            }
+            for (i = locId+1; i < <#= FeatureItemsCount #>; i++) {
+                this.<#= colspanPropName #>[i][3] = 0;
+                this.<#= rowspanPropName #>[i][3] = 0;
+            }
+<#
+    if(rotedId > -1) {
+#>
+            if(locId === <#= rotedId #>) {
+                if (!(this.routForm === null)) {
+                    if( 'maxHeight' in this.routForm ) {
+                        this.routForm.maxHeight = this.<#= MaxHeightPropName #>[locId][0];  
+                    }
+                    if( 'filterMaxHeight' in this.routForm ) {
+                        this.routForm.filterMaxHeight = this.<#= FilterMaxHeightPropName #>[locId][0];  
+                    }
+                }
+            }
+<#            
+    }
+#>
+        }
+        if(setDefault) {
+            let i: number;
+            for (i = 0; i <  <#= FeatureItemsCount #>; i++) {
+                this.<#= colspanPropName #>[i][3] = this.<#= colspanPropName #>[i][4];
+                this.<#= rowspanPropName #>[i][3] = this.<#= rowspanPropName #>[i][4];
+                this.<#= MaxHeightPropName #>[i][0] = this.<#= MaxHeightPropName #>[i][1];
+                this.<#= FilterMaxHeightPropName #>[i][0] = this.<#= FilterMaxHeightPropName #>[i][1];
+            }
+<#
+    if(rotedId > -1) {
+#>
+            if (!(this.routForm === null)) {
+                if( 'maxHeight' in this.routForm ) {
+                    this.routForm.maxHeight = this.<#= MaxHeightPropName #>[<#= rotedId #>][0];  
+                }
+                if( 'filterMaxHeight' in this.routForm ) {
+                    this.routForm.filterMaxHeight = this.<#= FilterMaxHeightPropName #>[<#= rotedId #>][0];  
+                }
+            }
+<#            
+    }
+#>
+        }
+        this.updateSettings();
+    }
+
+<#
+    if(rotedId > -1) {
+#>
+
+    routForm: any = null;
+    routSbscrptn: Subscription | any;
+    <#= onActivateMethodName #>(r: any) {
+        this.routForm = r;
+        (r as <#= itemHeightDataModelClassName #>).maxHeight = this.<#= MaxHeightPropName #>[<#= rotedId #>][0];  
+        (r as <#= itemHeightDataModelClassName #>).filterMaxHeight = this.<#= FilterMaxHeightPropName #>[<#= rotedId #>][0];  
+        (r as <#= eventEmitterPubModelClassName #>).contMenuItems = this.<#= containerMenuItemsPropName #>[<#= rotedId #>];
+        this.routSbscrptn = (r as <#= eventEmitterPubModelClassName #>).onContMenuItemEmitter.subscribe((v: any) => {
+            this.<#= onContainerMenuItemClickMethodName #>(v);
+        });   
+    }
+    <#= onDeActivateMethodName #>(v: any) {
+        this.routForm = null;
+        this.routSbscrptn.unsubscribe();
+    }
+<#            
+    }
+#>
+
+}
+
