@@ -1,0 +1,113 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "",
+    "ng add @ng-bootstrap/ng-bootstrap",
+    "",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "",
+    "ng generate library common-modules",
+    "ng generate library common-interfaces",
+    "ng generate library common-services",
+    "ng generate library common-formatters",
+    "ng generate library common-components",
+    "ng generate library common-auth",
+    "",
+    "ng generate application ang-monorepo-app",
+    "ng add @ng-bootstrap/ng-bootstrap --project ang-monorepo-app",
+    "",
+    "npm i -s @angular/flex-layout @angular/cdk  --project ang-monorepo-app",
+    "",
+    "Please make sure that you selected [src\\app] folder of the ang-monorepo-app library !!!",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-home",
+      "GeneratorType": "00180-app-glbl-home.component.css",
+      "GeneratorSript": "app-glbl-home.component.css.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-home",
+      "GeneratorType": "00180-app-glbl-home.component.html",
+      "GeneratorSript": "app-glbl-home.component.bootstrap.html.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-home",
+      "GeneratorType": "00180-app-glbl-home.component.ts",
+      "GeneratorSript": "app-glbl-home.component.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-home",
+      "GeneratorType": "00180-app-glbl-home.component.txt",
+      "GeneratorSript": "app-glbl-home.component.txt.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-pagenotfound",
+      "GeneratorType": "00185-app-glbl-pagenotfound.component.css",
+      "GeneratorSript": "app-glbl-pagenotfound.component.css.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-pagenotfound",
+      "GeneratorType": "00185-app-glbl-pagenotfound.component.html",
+      "GeneratorSript": "app-glbl-pagenotfound.component.bootstrap.html.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-pagenotfound",
+      "GeneratorType": "00185-app-glbl-pagenotfound.component.ts",
+      "GeneratorSript": "app-glbl-pagenotfound.component.ts.t4"
+    },
+    {
+      "DestinationFolder": "shared\\components\\app-glbl-pagenotfound",
+      "GeneratorType": "00185-app-glbl-pagenotfound.component.txt",
+      "GeneratorSript": "app-glbl-pagenotfound.component.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00210-app.component.css",
+      "GeneratorSript": "app.component.bootstrap.css.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00210-app.component.html",
+      "GeneratorSript": "app.component.bootstrap.html.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00210-app.component.ts",
+      "GeneratorSript": "app.component.bootstrap.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00210-app.component.txt",
+      "GeneratorSript": "app.component.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00220-app-routing.module.ts",
+      "GeneratorSript": "app-routing.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00220-app-routing.module.txt",
+      "GeneratorSript": "app-routing.module.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00230-app.module.ts",
+      "GeneratorSript": "app.module.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "00230-app.module.txt",
+      "GeneratorSript": "app.module.txt.t4"
+    }
+  ]
+
+}

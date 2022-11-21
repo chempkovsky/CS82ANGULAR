@@ -1,0 +1,136 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "",
+    "ng add @ng-bootstrap/ng-bootstrap",
+    "",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "ng generate library common-modules",
+    "ng generate library common-interfaces",
+    "ng generate library common-services",
+    "ng generate library common-formatters",
+    "ng generate library common-components",
+    "",
+    "Please make sure that you selected [src\\lib] folder of the common-components library !!!",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "web-service-filter",
+      "GeneratorType": "00025-web-service-filter.component.css",
+      "GeneratorSript": "web-service-filter.component.bootstrap.css.t4"
+    },
+    {
+      "DestinationFolder": "web-service-filter",
+      "GeneratorType": "00025-web-service-filter.component.html",
+      "GeneratorSript": "web-service-filter.component.bootstrap.html.t4"
+    },
+    {
+      "DestinationFolder": "web-service-filter",
+      "GeneratorType": "00025-web-service-filter.component.ts",
+      "GeneratorSript": "web-service-filter.component.bootstrap.ts.t4"
+    },
+    {
+      "DestinationFolder": "web-service-filter",
+      "GeneratorType": "00025-web-service-filter.component.txt",
+      "GeneratorSript": "web-service-filter.component.txt.t4"
+    },
+    {
+      "DestinationFolder": "uniq-service-filter",
+      "GeneratorType": "00046-uniq-service-filter.component.css",
+      "GeneratorSript": "uniq-service-filter.component.bootstrap.css.t4"
+    },
+    {
+      "DestinationFolder": "uniq-service-filter",
+      "GeneratorType": "00046-uniq-service-filter.component.html",
+      "GeneratorSript": "uniq-service-filter.component.bootstrap.html.t4"
+    },
+    {
+      "DestinationFolder": "uniq-service-filter",
+      "GeneratorType": "00046-uniq-service-filter.component.ts",
+      "GeneratorSript": "uniq-service-filter.component.bootstrap.ts.t4"
+    },
+    {
+      "DestinationFolder": "uniq-service-filter",
+      "GeneratorType": "00046-uniq-service-filter.component.txt",
+      "GeneratorSript": "uniq-service-filter.component.txt.t4"
+    },
+    {
+      "DestinationFolder": "column-selector",
+      "GeneratorType": "00033-column-selector.component.css",
+      "GeneratorSript": "column-selector.component.css.t4"
+    },
+    {
+      "DestinationFolder": "column-selector",
+      "GeneratorType": "00033-column-selector.component.html",
+      "GeneratorSript": "column-selector.component.bootstrap.html.t4"
+    },
+    {
+      "DestinationFolder": "column-selector",
+      "GeneratorType": "00033-column-selector.component.ts",
+      "GeneratorSript": "column-selector.component.bootstrap.ts.t4"
+    },
+    {
+      "DestinationFolder": "column-selector",
+      "GeneratorType": "00033-column-selector.component.txt",
+      "GeneratorSript": "column-selector.component.txt.t4"
+    },
+    {
+      "DestinationFolder": "column-selector-dlg",
+      "GeneratorType": "00035-column-selector-dlg.component.css",
+      "GeneratorSript": "column-selector-dlg.component.css.t4"
+    },
+    {
+      "DestinationFolder": "column-selector-dlg",
+      "GeneratorType": "00035-column-selector-dlg.component.html",
+      "GeneratorSript": "column-selector-dlg.component.bootstrap.html.t4"
+    },
+    {
+      "DestinationFolder": "column-selector-dlg",
+      "GeneratorType": "00035-column-selector-dlg.component.ts",
+      "GeneratorSript": "column-selector-dlg.component.bootstrap.ts.t4"
+    },
+    {
+      "DestinationFolder": "column-selector-dlg",
+      "GeneratorType": "00035-column-selector-dlg.component.txt",
+      "GeneratorSript": "column-selector-dlg.component.txt.t4"
+    },
+    {
+      "DestinationFolder": "message-dialog",
+      "GeneratorType": "00038-message-dialog.component.css",
+      "GeneratorSript": "message-dialog.component.css.t4"
+    },
+    {
+      "DestinationFolder": "message-dialog",
+      "GeneratorType": "00038-message-dialog.component.html",
+      "GeneratorSript": "message-dialog.component.bootstrap.html.t4"
+    },
+    {
+      "DestinationFolder": "message-dialog",
+      "GeneratorType": "00038-message-dialog.component.ts",
+      "GeneratorSript": "message-dialog.component.bootstrap.ts.t4"
+    },
+    {
+      "DestinationFolder": "message-dialog",
+      "GeneratorType": "00038-message-dialog.component.txt",
+      "GeneratorSript": "message-dialog.component.txt.t4"
+    },
+    {
+      "DestinationFolder": "modules",
+      "GeneratorType": "00050-web-service-filter.module.ts",
+      "GeneratorSript": "WebServiceFilterModule.ts.t4"
+    },
+    {
+      "DestinationFolder": "modules",
+      "GeneratorType": "00050-web-service-filter.module.txt",
+      "GeneratorSript": "WebServiceFilterModule.txt.t4"
+    }
+  ]
+
+}
