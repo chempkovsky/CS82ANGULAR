@@ -672,7 +672,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     }
 #>
     ];
-    public <#= OnDetailChangedMethodName #>() {
+    public <#= OnDetailChangedMethodName #>(e: any) {
         this.<#= ToDetailMethodName #>();
     }
     public <#= ToDetailMethodName #>() {

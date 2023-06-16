@@ -49,6 +49,7 @@
     string MasterToClientFieldsMapFieldName     = "m2cfm";
 
     string OnDetailChangedPropName              = "OnDetailChanged";
+    string OnDetailHFChangedPropName            = "OnDetailHFChanged";
     string OnMasterChangedPropName              = "OnMasterChanged";
     string AfterMasterChangedPropName           = "AfterMasterChanged";
     string AfterPropsChangedPropName            = "AfterPropsChanged";
@@ -57,6 +58,7 @@
     string OnAddPropName                        = "OnAdd";
     string OnDeletePropName                     = "OnDelete";
     string submitOnDetailChangedMethodName      = "submitOnDetailChanged";
+    string submitOnDetailHFChangedMethodName    = "submitOnDetailHFChanged";
     string submitOnMasterChangedMethodName      = "submitOnMasterChanged";
     string LengthSuffix                         = "Length";
     string KeysSuffix                           = "Keys";
@@ -69,6 +71,7 @@
     string CurrDirectMasterNavsFieldName        = "CurrentlyDirectMasterNavs";
     string HiddenFilterFieldName                = "HiddenFilter";
     string HiddenFilterByFltRsltSuffix          = "HiddenFilterByFltRslt";
+    string HiddenFilterByUndHFSuffix            = "HiddenFilterByUndHF";
     string HiddenFilterAsFltRsltSuffix          = "HiddenFilterAsFltRslt";
     string GetCllctByCurrDirMstrsMethodName     = "getCllctionByCurrDirMstrs";
     string GetCllctByFldFilterMethodName        = "getCllctionByFldFilter";
@@ -82,7 +85,7 @@
     string DoEmitEventMethodName                = "doEmitEvent";
     string RefreshMethodName                    = "refresh";
     string HiddenFilterByRowSuffix              = "HiddenFilterByRow";
-    
+    string ClearIgnorFlds                       = "clearIgnorFlds";
 
     string viewDatasourceClassFolder                = "01418-Datasource.class.ts";
     string viewDatasourceClassName                  = GetJavaScriptClassName(Model, viewDatasourceClassFolder);
@@ -139,6 +142,7 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
     protected _<#= IsDefinedFieldName #>: boolean = false;
     // master name, navigation names
     protected _<#= CurrDirectMasterNavsFieldName #>: string[];
+    protected _<#= ClearIgnorFlds #>: string[];
     // master name, navigation name, master filed, master filed value
     protected _<#= HiddenFilterFieldName #>: {[key: string]: {[key: string]: {[key: string]: any}}} | any = {};
     protected _<#= UnderHiddenFilterFieldsFieldName #>: string[] = [];
@@ -163,15 +167,18 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
                 <#= ClientViewNameFieldName #>: string | null | undefined, 
                 <#= DirectNavigationFieldName #>: string | any,
                 <#= CurrDirectMasterNavsFieldName #>: string[],
-                <#= UIFormChainFieldName #>: string) {
+                <#= UIFormChainFieldName #>: string,
+                <#= ClearIgnorFlds #>: string[]) {
         this._<#= ClientViewNameFieldName #> = <#= ClientViewNameFieldName #>;
         this._<#= DirectNavigationFieldName #> = <#= DirectNavigationFieldName #>;
         this._<#= CurrDirectMasterNavsFieldName #> = <#= CurrDirectMasterNavsFieldName #>;
         this._<#= UIFormChainFieldName #> = <#= UIFormChainFieldName #>;
+        this._<#= ClearIgnorFlds #> = <#= ClearIgnorFlds #>;
     }
 
     public <#= OnDetailChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
     public <#= OnMasterChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
+    public <#= OnDetailHFChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
     public <#= AfterMasterChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
     public <#= AfterPropsChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
     
@@ -197,6 +204,20 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
 
     public get<#= HiddenFilterByFltRsltSuffix #>(fr:  Array<<#= filterResultModelClassName #>> | any): {[key: string]: {[key: string]: {[key: string]: any}}} {
         return this.<#= formRootService #>.get<#= HiddenFilterByFltRsltSuffix #>(fr);
+    }
+    public get<#= HiddenFilterByUndHFSuffix #>(): Array<<#= filterResultModelClassName #>> {
+        let rslt: Array<<#= filterResultModelClassName #>> = [];
+        this._<#= UnderHiddenFilterFieldsFieldName #>.forEach((fnm) => {
+            if (this.isSet<#= ValueSuffix #>(fnm)) {
+                rslt.push({
+                    fltrName: fnm,
+                    fltrDataType: this.getDtTp<#= ValueSuffix #>(fnm),
+                    fltrOperator: 'eq',
+                    fltrValue: this.get<#= ValueSuffix #>(fnm)
+                });
+            }
+        });
+        return rslt;
     }
     public <#= RefreshIsDefinedMethodName #>(): boolean {
         this._<#= IsDefinedFieldName #> = this.<#= CalcIsDefinedMethodName #>();
@@ -292,12 +313,14 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
     public <#= ClearMethodName #>(doNotify: boolean = true): boolean {
         let hasChanged: boolean = false;
         for(let i in this._<#= ValuesSuffix #>) {
-            if( this.<#= formRootService #>.getDtTp<#= ValueSuffix #>(i) === 'boolean' ) {
-                if (this._<#= ValuesSuffix #>[i] !== false) hasChanged = true;
-                this._<#= ValuesSuffix #>[i] = false;
-            } else {
-                if (typeof this._<#= ValuesSuffix #>[i] !== 'undefined') hasChanged = true;
-                this._<#= ValuesSuffix #>[i] = undefined;
+            if (!this._<#= ClearIgnorFlds #>.includes(i)) {
+                if( this.<#= formRootService #>.getDtTp<#= ValueSuffix #>(i) === 'boolean' ) {
+                    if (this._<#= ValuesSuffix #>[i] !== false) hasChanged = true;
+                    this._<#= ValuesSuffix #>[i] = false;
+                } else {
+                    if (typeof this._<#= ValuesSuffix #>[i] !== 'undefined') hasChanged = true;
+                    this._<#= ValuesSuffix #>[i] = undefined;
+                }
             }
         }
         if(!hasChanged) return hasChanged;
@@ -534,6 +557,29 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
 #>
     }
 
+
+    public <#= submitOnDetailHFChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
+        if ((typeof this._<#= ClientViewNameFieldName #> === 'undefined') || (typeof this._<#= DirectNavigationFieldName #> === 'undefined')) return;
+        if ((this._<#= ClientViewNameFieldName #> === null) || (this._<#= DirectNavigationFieldName #> === null)) return;
+        if(v.get<#= CurrentViewNameFieldName #>() !== this._<#= ClientViewNameFieldName #>) return;
+        this._<#= UnderHiddenFilterFieldsFieldName #> = [];
+        let <#= ClientToMasterFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = this.<#= formRootService #>.get<#= ClientToMasterFieldsMapFieldName #>();
+        if( Object.keys(<#= ClientToMasterFieldsMapFieldName #>).indexOf(this._<#= ClientViewNameFieldName #>) > -1) {
+            if( Object.keys(<#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>]).indexOf(this._<#= DirectNavigationFieldName #>) > -1) {
+                for(let i in <#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>][this._<#= DirectNavigationFieldName #>]) {
+                    if(v.is<#= UnderHiddenFilterFieldsFieldName #>(i)) {
+                        let fldNm: string = <#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>][this._<#= DirectNavigationFieldName #>][i];
+                        if(!this._<#= UnderHiddenFilterFieldsFieldName #>.includes(fldNm)) {
+                            this._<#= UnderHiddenFilterFieldsFieldName #>.push(fldNm);
+                        }
+                    }
+                }
+            }
+        }
+        this.<#= OnDetailHFChangedPropName #>.emit(this);
+    }
+
+
     public <#= ClearPartiallyMethodName #>(doNotify: boolean): boolean {
         let hasChanged: boolean = false;
 <#
@@ -660,6 +706,19 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
                 }
             }
         }
+        this._<#= UnderHiddenFilterFieldsFieldName #>.forEach((fnm) => {
+            let fr = rslt.find(itm => itm.fltrName === fnm);
+            if(typeof fr === 'undefined') {
+                if (this.isSet<#= ValueSuffix #>(fnm)) {
+                    rslt.push({
+                        fltrName: fnm,
+                        fltrDataType: this.getDtTp<#= ValueSuffix #>(fnm),
+                        fltrOperator: 'eq',
+                        fltrValue: this.get<#= ValueSuffix #>(fnm)
+                    });
+                }
+            }
+        });
         return rslt;
     }
     protected <#= GetFilterByCurrDirMstrsMethodName #>(): <#=  viewInterfaceFilterName #> {
@@ -684,6 +743,18 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
                 }
             }
         }
+        this._<#= UnderHiddenFilterFieldsFieldName #>.forEach((nmx) => {
+            let opx: string = nmx + '<#= OperatorSufix #>';
+            // if (this.isSet<#= ValueSuffix #>(nmx)) {
+                if (typeof flt[nmx as keyof <#=  viewInterfaceFilterName #>] === 'undefined') { 
+                    flt[nmx as keyof <#=  viewInterfaceFilterName #>] = [this.get<#= ValueSuffix #>(nmx)]; 
+                    flt[opx as keyof <#=  viewInterfaceFilterName #>] = ['<#= EqualOperator #>'];
+                } else { 
+                    flt[nmx as keyof <#=  viewInterfaceFilterName #>].push(this.get<#= ValueSuffix #>(nmx)); 
+                    flt[opx as keyof <#=  viewInterfaceFilterName #>].push('<#= EqualOperator #>');
+                }
+            // }
+        });
         return flt;
     }
     private handleError<T> (result?: T) {
@@ -1140,20 +1211,55 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
             for(let j in this._<#= HiddenFilterFieldName #>[i]) {
                 if( Object.keys(<#= MasterToClientKeyFieldsMapFieldName #>).indexOf(i) > -1 ) {
                     if( Object.keys(<#= MasterToClientKeyFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
-                        for(let k in <#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
-                            this._<#= UnderHiddenFilterFieldsFieldName #>.push(<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm);
+//                        for(let k in <#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
+//                            this._<#= UnderHiddenFilterFieldsFieldName #>.push(<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm);
+//                        }
+                        for(let k in this._<#= HiddenFilterFieldName #>[i][j]) {
+                            for(let m in <#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
+                                if (m === k) {
+                                    if(!this._<#= UnderHiddenFilterFieldsFieldName #>.includes(<#= MasterToClientKeyFieldsMapFieldName #>[i][j][m].propNm)) {
+                                        this._<#= UnderHiddenFilterFieldsFieldName #>.push(<#= MasterToClientKeyFieldsMapFieldName #>[i][j][m].propNm);
+                                    }
+                                    break;        
+                                }
+                            }
                         }
+
+
                     }
                 }
-                if( Object.keys(<#= MasterToClientFieldsMapFieldName #>).indexOf(i) > -1 ) {
-                    if( Object.keys(<#= MasterToClientFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
-                        for(let k in <#= MasterToClientFieldsMapFieldName #>[i][j]) {
-                            this._<#= UnderHiddenFilterFieldsFieldName #>.push(<#= MasterToClientFieldsMapFieldName #>[i][j][k]);
+//                if( Object.keys(<#= MasterToClientFieldsMapFieldName #>).indexOf(i) > -1 ) {
+//                    if( Object.keys(<#= MasterToClientFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
+//                        for(let k in <#= MasterToClientFieldsMapFieldName #>[i][j]) {
+//                            this._<#= UnderHiddenFilterFieldsFieldName #>.push(<#= MasterToClientFieldsMapFieldName #>[i][j][k]);
+//                        }
+//                    }
+//                }
+            }
+        }
+        for(let i in <#= MasterToClientKeyFieldsMapFieldName #>) {
+            for(let j in <#= MasterToClientKeyFieldsMapFieldName #>[i]) {
+                let doins: Boolean = true;
+                for(let m in <#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
+                    if(!this._<#= UnderHiddenFilterFieldsFieldName #>.includes(<#= MasterToClientKeyFieldsMapFieldName #>[i][j][m].propNm)) {
+                        doins = false;
+                        break;
+                    }
+                }
+                if (doins) {
+                    if( Object.keys(<#= MasterToClientFieldsMapFieldName #>).indexOf(i) > -1 ) {
+                        if( Object.keys(<#= MasterToClientFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
+                            for(let k in <#= MasterToClientFieldsMapFieldName #>[i][j]) {
+                                if(!this._<#= UnderHiddenFilterFieldsFieldName #>.includes(<#= MasterToClientFieldsMapFieldName #>[i][j][k])) {
+                                    this._<#= UnderHiddenFilterFieldsFieldName #>.push(<#= MasterToClientFieldsMapFieldName #>[i][j][k]);
+                                }
+                            }
                         }
                     }
                 }
             }
         }
+        this.<#= OnDetailHFChangedPropName #>.emit(this);
     }
     public is<#= UnderHiddenFilterFieldsFieldName #>(fld: string|any): boolean {
         if(typeof fld === 'undefined') return false;

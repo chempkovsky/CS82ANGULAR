@@ -7540,4 +7540,78 @@
             return GetNameByAngularJson(result, anglJson, refItem, curItem);
         }
 
+        string GetDsClearIgnoryFields(ModelViewSerializable RootModel, Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> CurrFk,
+                                     List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> foreignKeyNameChainList)
+        {
+            string rslt = "";
+            if ((RootModel == null) || (CurrFk == null) || (foreignKeyNameChainList == null))
+            {
+                return null;
+            }
+            string currFkChain = CurrFk.Item1;
+            if(string.IsNullOrEmpty(currFkChain)) { return rslt; }
+            string[] curFks = currFkChain.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+            if (curFks.Length < 1) { return rslt; }
+            ModelViewSerializable directDetailModel = null;
+            string directDetailFk = null;
+            string directDetailChain = "";
+            if (curFks.Length < 2) {
+                directDetailFk = curFks[0];
+                directDetailModel = RootModel;
+            } 
+            else
+            {
+                directDetailFk = curFks[curFks.Length-1];
+                directDetailChain = string.Join(".", curFks, 0, curFks.Length - 1);
+                Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> t = 
+                    foreignKeyNameChainList.Where(itm => itm.Item1 == directDetailChain).FirstOrDefault();
+                if (t == null)
+                {
+                    return rslt;
+                }
+                else
+                {
+                    directDetailModel = t.Item2;
+                }
+            }
+            if(directDetailModel is null) return rslt;
+            if (directDetailModel.ForeignKeys is null) return rslt;
+            ModelViewForeignKeySerializable currFk = directDetailModel.ForeignKeys.Where(f => f.NavigationName == directDetailFk).FirstOrDefault();
+            if(currFk is null) return rslt;
+            if(currFk.ForeignKeyProps is null) return rslt;
+            List<string> flds  = new List<string>();
+            foreach (ModelViewForeignKeySerializable fk in directDetailModel.ForeignKeys)
+            {
+                if (fk.NavigationName == directDetailFk) continue;
+                if(fk.ForeignKeyProps is null) continue;
+                for(int i = 0; i < fk.ForeignKeyProps.Count; i++)
+                {
+                    string vpn = fk.ForeignKeyProps[i].ViewPropertyName;
+                    int k = -1;
+                    for(int j = 0; j < currFk.ForeignKeyProps.Count; j++)
+                    {
+                        if(currFk.ForeignKeyProps[j].ViewPropertyName == vpn)
+                        {
+                            k=j; 
+                            break;
+                        }
+                    }
+                    if(k == -1) continue;
+                    if(!flds.Any(fld => fld == currFk.PrincipalKeyProps[k].ViewPropertyName))
+                    {
+                        flds.Add(currFk.PrincipalKeyProps[k].ViewPropertyName);
+                    }
+                }
+            }
+            foreach(string lfld in flds)
+            {
+                ModelViewPropertyOfVwSerializable sclprp = GetScalarPropertyByViewPropertyName(CurrFk.Item2, lfld);
+                if(sclprp is null) continue;
+                string propNm = GetTypeScriptPropertyName(sclprp, CurrFk.Item2);
+                if(string.IsNullOrEmpty(propNm)) continue;
+                if (rslt == "") rslt = "'" + propNm + "'"; else rslt += ", '" + propNm + "'";
+            }
+            return rslt;
+        }
+
 #>

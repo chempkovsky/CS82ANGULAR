@@ -693,6 +693,7 @@ namespace CS82ANGULAR.Helpers
                 return null;
             }
             int order = -1;
+            List<FluentAPIExtendedProperty> tmpProps = new List<FluentAPIExtendedProperty>();
             foreach (CodeElement codeElement in srcClass.Members)
             {
                 order++;
@@ -749,8 +750,10 @@ namespace CS82ANGULAR.Helpers
                     IsNullable = IsNullable,
                     IsRequired = IsRequired
                 };
-                properties.Add(outProp);
+                tmpProps.Add(outProp);
             }
+            tmpProps.Sort((a, b) => a.PropOrder - b.PropOrder);
+            foreach(var t in tmpProps) properties.Add(t);
             return properties;
         }
         // ready
@@ -764,6 +767,7 @@ namespace CS82ANGULAR.Helpers
                 return srcClass.CollectCodeClassAllMappedScalarProperties(properties, filter);
             List<FluentAPIEntityNode> localFAENs = srcClass.GetFAPIAttributesAndIgnoreForScalarProperties(dbContext);
             int order = -1;
+            List <FluentAPIExtendedProperty> tmpLst = new List<FluentAPIExtendedProperty>();
             foreach (CodeElement codeElement in srcClass.Members)
             {
                 order++;
@@ -820,8 +824,10 @@ namespace CS82ANGULAR.Helpers
                     IsNullable = IsNullable,
                     IsRequired = IsRequired
                 };
-                properties.Add(outProp);
+                tmpLst.Add(outProp);
             }
+            tmpLst.Sort((a, b) => a.PropOrder - b.PropOrder);
+            foreach(var t in tmpLst) properties.Add(t);
             return properties;
         }
         // ready

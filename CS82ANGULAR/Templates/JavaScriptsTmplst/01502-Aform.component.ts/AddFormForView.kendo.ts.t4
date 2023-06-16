@@ -86,6 +86,9 @@
     string AfterPropsChangedPropName            = "AfterPropsChanged";
     string OnIsDefinedChangedPropName           = "OnIsDefinedChanged";
     string RefreshIsDefinedMethodName           = "refreshIsDefined";
+    string OnDetailHFChangedPropName            = "OnDetailHFChanged";
+    string submitOnDetailHFChangedMethodName    = "submitOnDetailHFChanged";
+    string HiddenFilterByUndHFSuffix            = "HiddenFilterByUndHF";
 
     string OnUpdatePropName                     = "OnUpdate";
     string OnAddPropName                        = "OnAdd";
@@ -510,6 +513,27 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 #>
     constructor(<#= constructorParams #>, public dialog: DialogService, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #> ) {
         this.<#= AppearancePropName #> = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
+        this.<#= RootDataSource #> = new <#= GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, Model.ViewName, viewDatasourceClassFolder, Model, addformComponentFolder) #> (this.<#= formServicePrefix + Model.ViewName #>,
+            this.<#= AppSettingServicePropName #>, null, null, [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, "") #>],'');
+        this.<#= RootDataSource #>.set<#= IsNewSuffix #>(false);
+<#
+        foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+            Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> detailFk = GetDirectDetail(ForeignKeyNameChainList, fk.Item1);
+            string detailViewName = Model.ViewName;
+            string directNavigation = GetDirectNavName(fk.Item1);
+            if(detailFk != null) {
+                detailViewName = detailFk.Item2.ViewName;
+            }
+            if(string.IsNullOrEmpty(directNavigation)){
+                throw new Exception("For [Foreign Key Name Chain]=" + fk.Item1 + " can not find direct detail");
+            }
+#>
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #> = new <#= GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, fk.Item2.ViewName, viewDatasourceClassFolder, Model, addformComponentFolder) #> (this.<#= formServicePrefix + fk.Item2.ViewName #>,
+            this.<#= AppSettingServicePropName #>, '<#= detailViewName #>', '<#= directNavigation #>', [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, fk.Item1) #>],'<#= fk.Item1 #>');
+        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.set<#= IsNewSuffix #>(false);
+<#
+        }
+#>
         this.<#=        MainFormGroupName #> =  new FormGroup({});
         let locValidators: ValidatorFn[]; 
         let frmcntrl: FormControl|any;
@@ -640,9 +664,6 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             }
         } // foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) { ... }
 #>
-        this.<#= RootDataSource #> = new <#= GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, Model.ViewName, viewDatasourceClassFolder, Model, addformComponentFolder) #> (this.<#= formServicePrefix + Model.ViewName #>,
-            this.<#= AppSettingServicePropName #>, null, null, [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, "") #>],'');
-        this.<#= RootDataSource #>.set<#= IsNewSuffix #>(false);
         this._<#= SubscriptionsPropName #>.push(
             this.<#= RootDataSource #>
                 .<#= AfterPropsChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + AfterPropsChangedPropName #>(v) } })
@@ -659,22 +680,6 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         this._<#= SubscriptionsPropName #>.push(this.<#= RootDataSource #>.<#= OnAddPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnAddPropName #>(v) } }));
 //        this._<#= SubscriptionsPropName #>.push(this.<#= RootDataSource #>.<#= OnDeletePropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#= RootDataSource + OnDeletePropName #>(v) } }));
 <#
-        foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
-            Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> detailFk = GetDirectDetail(ForeignKeyNameChainList, fk.Item1);
-            string detailViewName = Model.ViewName;
-            string directNavigation = GetDirectNavName(fk.Item1);
-            if(detailFk != null) {
-                detailViewName = detailFk.Item2.ViewName;
-            }
-            if(string.IsNullOrEmpty(directNavigation)){
-                throw new Exception("For [Foreign Key Name Chain]=" + fk.Item1 + " can not find direct detail");
-            }
-#>
-        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #> = new <#= GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, fk.Item2.ViewName, viewDatasourceClassFolder, Model, addformComponentFolder) #> (this.<#= formServicePrefix + fk.Item2.ViewName #>,
-            this.<#= AppSettingServicePropName #>, '<#= detailViewName #>', '<#= directNavigation #>', [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, fk.Item1) #>],'<#= fk.Item1 #>');
-        this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.set<#= IsNewSuffix #>(false);
-<#
-        }
         foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
             Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> detailFk = GetDirectDetail(ForeignKeyNameChainList, fk.Item1);
             string detailViewName = Model.ViewName;
@@ -706,7 +711,10 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             this.<#= RootDataSource #>
             .<#= OnDetailChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= submitOnDetailChangedMethodName #>(v) } })
         );
-
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#= RootDataSource #>
+            .<#= OnDetailHFChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= submitOnDetailHFChangedMethodName #>(v) } })
+        );
 <#
             } else {
 #>
@@ -717,6 +725,10 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         this._<#= SubscriptionsPropName #>.push(
             this.<#= GetTypeScriptPropertyNameWithSufix(detailFk.Item3, Model, DataSourceSufix) #>
             .<#= OnDetailChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= submitOnDetailChangedMethodName #>(v) } })
+        );
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#= GetTypeScriptPropertyNameWithSufix(detailFk.Item3, Model, DataSourceSufix) #>
+            .<#= OnDetailHFChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= submitOnDetailHFChangedMethodName #>(v) } })
         );
 <#
             }

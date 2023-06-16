@@ -415,7 +415,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         
     }
 
-    public <#= OnDetailChangedMethodName #>() {
+    public <#= OnDetailChangedMethodName #>(e: any) {
         if(this.<#= ShowDetailsPropName #>) {
             this.<#= ToDetailMethodName #>();
         }

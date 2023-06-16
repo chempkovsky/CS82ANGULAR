@@ -549,7 +549,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
     protected currentFilter: Array<<#= filterResultModelClassName #>> = [];
     protected <#= currentSortColumnPropName #>: string = '';
     protected currentSortdirection: string = '';
-    public currentPageIndex: number = 0;
+    public currentPageIndex: number = 1;
     public currentPageSize: number = <#= MatPaginatorPageSize #>;
     public dataSource: Array<<#= viewInterfaceName #>> = [];
     matPaginatorLen: number = 0;
@@ -1011,7 +1011,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
         this.<#= currentSortColumnPropName #> = '';
         // since if(this.isOnInitCalled) return; we ned to reset props if input is defined
         if(ef.csc) { this.<#= currentSortColumnPropName #> = ef.csc; } else { this.<#= currentSortColumnPropName #> = ''; } 
-        if(ef.pgi) { this.currentPageIndex = ef.pgi; } else { this.currentPageIndex = 0; }
+        if(ef.pgi) { this.currentPageIndex = ef.pgi; } else { this.currentPageIndex = 1; }
         if(ef.pgsz) { this.currentPageSize = ef.pgsz; } else { this.currentPageSize = <#= MatPaginatorPageSize #>; }
         if(typeof ef.id === 'undefined') return;
         let mi: <#= menuItemDataModelClassName #>|any = this.tableIndexMenuItemsData.find((e: <#= menuItemDataModelClassName #>) => e.id === ef.id);
@@ -1251,7 +1251,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
             fltrOperator: hf.fltrOperator,
             fltrValue: hf.fltrValue,
         }); });
-        this.currentPageIndex = 0;
+        this.currentPageIndex = 1;
         this.onFilter();
     }
 
@@ -1279,7 +1279,9 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
             }
         }
 #>
-        let flt: <#= viewInterfaceFilterName #>|any = { page: this.currentPageIndex, pagesize: this.currentPageSize };
+        let pgind: number  = this.currentPageIndex;
+        if(pgind > 0) pgind = pgind-1;
+        let flt: <#= viewInterfaceFilterName #>|any = { page: pgind, pagesize: this.currentPageSize };
         if (!(typeof this.<#= currentSortColumnPropName #> === 'undefined')) {
             if (!(this.<#= currentSortColumnPropName #> === null)) {
                 if(!(this.<#= currentSortColumnPropName #> === '')) {
