@@ -133,6 +133,7 @@
                 <div class="form-group"  fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#= GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#= GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#= percentEq100.ToString() #>">
                     <label>{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</label>
                     <select class="form-control"  [formControl]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">
+                        <option [ngValue]="null"></option>
                         <option *ngFor="let aVal of <#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>;" [ngValue]="aVal">{{ aVal.<#= GetComboControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #> }}</option>
                     </select>
                     <small class="text-danger" *ngIf="<#= GetExpressionForControlInvalidBootstrap(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">{{getErrorMessage(<#=  GetExpressionForFormControl(modelViewUIFormPropertySerializable, Model, MainFormGroupName) #>)}}</small>

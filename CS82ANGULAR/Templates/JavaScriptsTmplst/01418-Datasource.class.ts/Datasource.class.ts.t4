@@ -312,6 +312,7 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
     }
     public <#= ClearMethodName #>(doNotify: boolean = true): boolean {
         let hasChanged: boolean = false;
+        let hasIgnorFlds: boolean = false;
         for(let i in this._<#= ValuesSuffix #>) {
             if (!this._<#= ClearIgnorFlds #>.includes(i)) {
                 if( this.<#= formRootService #>.getDtTp<#= ValueSuffix #>(i) === 'boolean' ) {
@@ -321,9 +322,14 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
                     if (typeof this._<#= ValuesSuffix #>[i] !== 'undefined') hasChanged = true;
                     this._<#= ValuesSuffix #>[i] = undefined;
                 }
+            } else {
+                hasIgnorFlds = hasIgnorFlds || this.isSetValue(i);
             }
         }
-        if(!hasChanged) return hasChanged;
+        if(!hasChanged) { 
+            if(hasIgnorFlds && doNotify) this.<#= OnDetailChangedPropName #>.emit(this);
+            return hasChanged;
+        }
         if(doNotify) this.<#= DoEmitEventMethodName #>(true);
         return hasChanged;
     }
@@ -530,7 +536,12 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
 #>
                     ).subscribe({
                         next: (data: <#= viewInterfaceName #> ) => {
-                            this.<#= Interface2ValuesMethodName #>(data, true);
+                            if(this.<#= Interface2ValuesMethodName #>(data, true) === false) {
+                                if(this._<#= ClearIgnorFlds #>.length > 0) {
+                                    this.<#= DoEmitEventMethodName #>(true);
+                                    
+                                };
+                            };
                         },
                         error: (error) => { // error path
                             this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
@@ -666,7 +677,13 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
                 }
             }
         }
-        if (clntNtChngd) return;
+        if (clntNtChngd) {
+            if(this._<#= ClearIgnorFlds #>.length > 0) {
+                this.<#= AfterMasterChangedPropName #>.emit(this);
+            }
+            return;
+        }
+        if (this.<#= RefreshMethodName #>(false)) return;
         // clear primary and unique key props of the current ViewModel. Eliminate those associated with the current direct master props.
         if(!this.get<#= IsTopDetailFieldName #>()) {
             this.<#= ClearPartiallyMethodName #>(false);
@@ -909,6 +926,8 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
                 next: (data: <#= viewInterfaceName #> ) => { 
                     if(!this.<#= Interface2ValuesMethodName #>(data, true)) {
                         this.<#= DoEmitEventMethodName #>(true);
+                    } else if(this._<#= ClearIgnorFlds #>.length > 0) {
+                        this.<#= DoEmitEventMethodName #>(true);
                     };
                 },
                 error: (error) => { 
@@ -921,7 +940,7 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
         } // foreach(ModelViewUniqueKeyOfVwSerializable pk in uniqueKeys) { ... }
     } // if (Model.IsWebApiSelectOneByPrimarykey) { ... }
 #>
-    public <#= RefreshMethodName #>(): void {
+    public <#= RefreshMethodName #>(shwErr: boolean = true): boolean {
 <#
     if (Model.IsWebApiSelectOneByPrimarykey) {
         ModelViewUniqueKeyOfVwSerializable prk = GetModelPrimaryKey(Model);
@@ -962,7 +981,7 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
             }
 #>
                 );
-                return;
+                return true;
             }
 <#
         } // if(prk != null) {...}
@@ -1006,23 +1025,26 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
             }
 #>
                 );
-                return;
+                return true;
             }
 <#
         } // foreach(ModelViewUniqueKeyOfVwSerializable pk in uniqueKeys) {...}
     } // if (Model.IsWebApiSelectOneByPrimarykey) {...}
 #>
+        if(shwErr) {
 <# 
     if(localize) {
 #>
-        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Not all Unique or Primary key properties are defined to call Refresh-method@@<#= viewDatasourceClassName + RefreshMethodName #>.Not-all-Unique-Primary:Not all Unique or Primary key properties are defined to call Refresh-method`});
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Not all Unique or Primary key properties are defined to call Refresh-method@@<#= viewDatasourceClassName + RefreshMethodName #>.Not-all-Unique-Primary:Not all Unique or Primary key properties are defined to call Refresh-method`});
 <# 
     } else {
 #>
-        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Not all Unique or Primary key properties are defined to call Refresh-method'});
+            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Not all Unique or Primary key properties are defined to call Refresh-method'});
 <# 
     }
 #>
+        }
+        return false;
     }
     public <#= UpdateOneMethodName #>(): void {
 <#
