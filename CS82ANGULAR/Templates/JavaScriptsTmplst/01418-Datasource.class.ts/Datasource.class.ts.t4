@@ -176,12 +176,28 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
         this._<#= ClearIgnorFlds #> = <#= ClearIgnorFlds #>;
     }
 
+    // it is used to notify direct master datasources if currect datasource has changed
+    // it is datasource-to-datasource notification
     public <#= OnDetailChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
+    
+    // it is used to notify direct detail datasources if currect datasource has changed.
+    // it is datasource-to-datasource notification
     public <#= OnMasterChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
-    public <#= OnDetailHFChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
+
+    // it is used to notify the form component to update the UI controls that are associated with the current data source.
+    // this EventEmitter looks like <#= AfterPropsChangedPropName #>
+    // the form component must update collections (if any) of items like combobox collections
+    // it is datasource-to-UI notification
     public <#= AfterMasterChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
+
+    // it is used to notify the form component to update the UI controls that are associated with the current data source.
+    // this EventEmitter looks like <#= AfterPropsChangedPropName #>
+    // the form component must copy data from the current datasource into UI
+    // the form component does not update collections of items like combobox collections
+    // it is datasource-to-UI notification
     public <#= AfterPropsChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
     
+    public <#= OnDetailHFChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
     public <#= OnIsDefinedChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
     public <#= OnUpdatePropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
     public <#= OnAddPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
