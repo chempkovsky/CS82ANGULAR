@@ -211,6 +211,7 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
         }
         this.<#= OnDetailChangedPropName #>.emit(this);
         this.<#= OnMasterChangedPropName #>.emit(this);
+        this.<#= OnCommonDSChangedPropName #>.emit(this);
         if(aftrMstrChngd) this.<#= AfterMasterChangedPropName #>.emit(this);
         this.<#= AfterPropsChangedPropName #>.emit(this);
     }

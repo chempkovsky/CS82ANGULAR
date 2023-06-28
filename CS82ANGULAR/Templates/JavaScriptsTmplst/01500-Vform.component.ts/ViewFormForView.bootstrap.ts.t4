@@ -108,6 +108,8 @@
     string OnDetailHFChangedPropName            = "OnDetailHFChanged";
     string submitOnDetailHFChangedMethodName    = "submitOnDetailHFChanged";
     string HiddenFilterByUndHFSuffix            = "HiddenFilterByUndHF";
+    string OnCommonDSChangedPropName            = "OnCommonDSChanged";
+    string submitOnCommonDSChangedMethodName    = "submitOnCommonDSChanged";
 
 
     string TitlePropName                        = "title";
@@ -236,6 +238,7 @@
             throw new Exception("For the [Required Entity Property] =" +  entityProp.OriginalPropertyName + " could not find mapped UIFormProperty which is not hidden and which is shown In View");
         }
     }
+    List<Tuple<string, string, ModelViewSerializable>> intersectFkMdls = GetIntersectedForeigKeysMappings("", Model, "", new List<string>(), Context, null);
 
     string viewformCssFolder                        = "01500-Vform.component.css";
     string viewformHtmlFolder                       = "01500-Vform.component.html";
@@ -503,7 +506,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 #>
     constructor(<#= constructorParams #>, public dialog: NgbModal, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #> ) {
         this.<#= RootDataSource #> = new <#= GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, Model.ViewName, viewDatasourceClassFolder, Model, viewformComponentFolder) #> (this.<#= formServicePrefix + Model.ViewName #>,
-            this.<#= AppSettingServicePropName #>, null, null, [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, "") #>],'',[]);
+            this.<#= AppSettingServicePropName #>, null, null, [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, "") #>],'');
         this.<#= RootDataSource #>.set<#= IsNewSuffix #>(false);
 <#
         foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
@@ -516,12 +519,33 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             if(string.IsNullOrEmpty(directNavigation)){
                 throw new Exception("For [Foreign Key Name Chain]=" + fk.Item1 + " can not find direct detail");
             }
-            string ClearIgnorFlds = GetDsClearIgnoryFields(Model, fk, ForeignKeyNameChainList);
 #>
         this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #> = new <#= GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, fk.Item2.ViewName, viewDatasourceClassFolder, Model, viewformComponentFolder) #> (this.<#= formServicePrefix + fk.Item2.ViewName #>,
-            this.<#= AppSettingServicePropName #>, '<#= detailViewName #>', '<#= directNavigation #>', [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, fk.Item1) #>],'<#= fk.Item1 #>',[<#= ClearIgnorFlds #>]);
+            this.<#= AppSettingServicePropName #>, '<#= detailViewName #>', '<#= directNavigation #>', [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, fk.Item1) #>],'<#= fk.Item1 #>');
         this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.set<#= IsNewSuffix #>(false);
 <#
+        }
+        foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+            Tuple<string, string, ModelViewSerializable> commonFldRec = 
+                intersectFkMdls.FirstOrDefault(cfr => (cfr.Item2 == fk.Item1) && (cfr.Item3 == fk.Item2));
+            if(commonFldRec == null) continue;
+            List<Tuple<string, string, ModelViewSerializable>> othrcmmnFldRcs = 
+                intersectFkMdls.Where(cfr => (cfr.Item1 == commonFldRec.Item1) && 
+                                        (cfr.Item2 != commonFldRec.Item2) &&
+                                        (cfr.Item3 == commonFldRec.Item3)).ToList();
+            foreach(Tuple<string, string, ModelViewSerializable> othrcmmnFldRc in othrcmmnFldRcs) {
+               Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> ofk = 
+                    ForeignKeyNameChainList.FirstOrDefault(f => (f.Item1 == othrcmmnFldRc.Item2) && (f.Item2 == othrcmmnFldRc.Item3));
+               if (ofk != null) {
+
+#>
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>
+            .<#= OnCommonDSChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#=  GetTypeScriptPropertyNameWithSufix(ofk.Item3, Model, DataSourceSufix) #>.<#= submitOnCommonDSChangedMethodName #>(v) } })
+        );
+<#
+               }
+            }
         }
 #>
         this.<#= MainFormGroupName #> =  new FormGroup({});

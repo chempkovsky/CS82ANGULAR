@@ -7734,10 +7734,8 @@ namespace CS82ANGULAR.Model
                             }
                         }
                     }
-
                 }
             }
-
             return rslt;
         }
 
