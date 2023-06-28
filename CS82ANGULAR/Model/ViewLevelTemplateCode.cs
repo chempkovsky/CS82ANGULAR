@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Runtime.Remoting.Contexts;
 using System.Text;
+using System.Windows.Controls;
 using System.Windows.Forms;
 
 namespace CS82ANGULAR.Model
@@ -7628,6 +7629,115 @@ namespace CS82ANGULAR.Model
                 if(string.IsNullOrEmpty(propNm)) continue;
                 if (rslt == "") rslt = "'" + propNm + "'"; else rslt += ", '" + propNm + "'";
             }
+            return rslt;
+        }
+        // ForeignKeyNameChain of the ModelView with intercected Foreign Keys fileds - is a first argument
+        // ForeignKeyNameChain of the ModelView with a primary(unique) key fields which are mapped into intercected Foreign Keys fileds - is a second argument
+        // ModelView with a primary(unique) key fields which are mapped into intercected Foreign Keys fileds - is a third argument
+        List<Tuple<string, string, ModelViewSerializable>> GetIntersectedForeigKeysMappings(
+            string initialForeignKeyNameChain,
+            ModelViewSerializable currModel,
+            string currForeignKeyNameChain,
+            List<string> currMapflds,
+            DbContextSerializable context,
+            List<Tuple<string, string, ModelViewSerializable>> rslt = null)
+        {
+            if(rslt == null)
+                rslt = new List<Tuple<string, string, ModelViewSerializable>>();
+
+            if ((currModel == null) || (context == null) || (initialForeignKeyNameChain == null) || (currForeignKeyNameChain == null) || (currMapflds == null))
+            {
+                return rslt;
+            }
+            if ((currMapflds.Count > 0) && (currModel.ForeignKeys?.Count > 0))
+            {
+                bool shouldBeAdded = true;
+                foreach (ModelViewKeyPropertySerializable pkp in currModel.PrimaryKeyProperties)
+                {
+                    shouldBeAdded = currMapflds.Contains(pkp.OriginalPropertyName);
+                    if (!shouldBeAdded) break;
+                }
+                if ((!shouldBeAdded) && (currModel.UniqueKeys?.Count > 0))
+                {
+                    foreach (ModelViewUniqueKeySerializable uk in currModel.UniqueKeys)
+                    {
+                        if(uk.UniqueKeyProperties?.Count > 0)
+                        {
+                            foreach (ModelViewKeyPropertySerializable ukp in uk.UniqueKeyProperties)
+                            {
+                                shouldBeAdded = currMapflds.Contains(ukp.OriginalPropertyName);
+                                if (!shouldBeAdded) break;
+                            }
+
+                        }
+                        if (shouldBeAdded) break;
+                    }
+                }
+                if (shouldBeAdded)
+                {
+                    if(!rslt.Any(r => (r.Item1 == initialForeignKeyNameChain) && (r.Item2 == currForeignKeyNameChain) && (r.Item3 == currModel)))
+                        rslt.Add(new Tuple<string, string, ModelViewSerializable>(initialForeignKeyNameChain, currForeignKeyNameChain, currModel));
+                }
+                foreach (ModelViewForeignKeySerializable fk in currModel.ForeignKeys)
+                {
+                    if(fk.ForeignKeyProps?.Count > 0)
+                    {
+                        List<string> opnms = new List<string>();
+                        for(int i = 0; i < fk.ForeignKeyProps.Count; i++)
+                        {
+                            if (currMapflds.Contains(fk.ForeignKeyProps[i].OriginalPropertyName))
+                            {
+                                if(!opnms.Contains(fk.PrincipalKeyProps[i].OriginalPropertyName))
+                                {
+                                    opnms.Add(fk.PrincipalKeyProps[i].OriginalPropertyName);
+                                }
+                            }
+                        }
+                        if(opnms.Count > 0)
+                        {
+                            ModelViewSerializable mv = context.ModelViews.Where(v => v.ViewName == fk.ViewName).FirstOrDefault();
+                            string nfkch = currForeignKeyNameChain;
+                            if (nfkch != "") nfkch += ".";
+                            nfkch += fk.NavigationName;
+                            GetIntersectedForeigKeysMappings(initialForeignKeyNameChain, mv, nfkch, opnms, context, rslt);
+                        }
+                    }
+                }
+            }
+            if(currModel.ForeignKeys?.Count > 1)
+            {
+                for(int i = 0; i < currModel.ForeignKeys.Count-1; i++)
+                {
+                    if (currModel.ForeignKeys[i].ForeignKeyProps?.Count > 0) {
+                        for (int j = i + 1; j < currModel.ForeignKeys.Count; j++)
+                        {
+                            if (currModel.ForeignKeys[j].ForeignKeyProps?.Count > 0)
+                            {
+                                List<string> prpNms = new List<string>();
+                                foreach(ModelViewKeyPropertySerializable iprp in currModel.ForeignKeys[i].ForeignKeyProps)
+                                {
+                                    if (currModel.ForeignKeys[j].ForeignKeyProps.Any(p => p.OriginalPropertyName == iprp.OriginalPropertyName))
+                                        prpNms.Add(iprp.OriginalPropertyName);
+                                }
+                                if(prpNms.Count > 0)
+                                {
+                                    ModelViewSerializable mv = context.ModelViews.Where(v => v.ViewName == currModel.ForeignKeys[i].ViewName).FirstOrDefault();
+                                    string nfkch = currForeignKeyNameChain;
+                                    if (nfkch != "") nfkch += ".";
+                                    nfkch += currModel.ForeignKeys[i].NavigationName;
+                                    GetIntersectedForeigKeysMappings(currForeignKeyNameChain, mv, nfkch, prpNms, context, rslt);
+                                    nfkch = currForeignKeyNameChain;
+                                    if (nfkch != "") nfkch += ".";
+                                    nfkch += currModel.ForeignKeys[j].NavigationName;
+                                    GetIntersectedForeigKeysMappings(currForeignKeyNameChain, mv, nfkch, prpNms, context, rslt);
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+
             return rslt;
         }
 

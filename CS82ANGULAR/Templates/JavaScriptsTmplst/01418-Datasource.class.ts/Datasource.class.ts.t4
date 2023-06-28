@@ -85,7 +85,8 @@
     string DoEmitEventMethodName                = "doEmitEvent";
     string RefreshMethodName                    = "refresh";
     string HiddenFilterByRowSuffix              = "HiddenFilterByRow";
-    string ClearIgnorFlds                       = "clearIgnorFlds";
+    string OnCommonDSChangedPropName            = "OnCommonDSChanged";
+    string submitOnCommonDSChangedMethodName    = "submitOnCommonDSChanged";
 
     string viewDatasourceClassFolder                = "01418-Datasource.class.ts";
     string viewDatasourceClassName                  = GetJavaScriptClassName(Model, viewDatasourceClassFolder);
@@ -142,7 +143,6 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
     protected _<#= IsDefinedFieldName #>: boolean = false;
     // master name, navigation names
     protected _<#= CurrDirectMasterNavsFieldName #>: string[];
-    protected _<#= ClearIgnorFlds #>: string[];
     // master name, navigation name, master filed, master filed value
     protected _<#= HiddenFilterFieldName #>: {[key: string]: {[key: string]: {[key: string]: any}}} | any = {};
     protected _<#= UnderHiddenFilterFieldsFieldName #>: string[] = [];
@@ -167,13 +167,11 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
                 <#= ClientViewNameFieldName #>: string | null | undefined, 
                 <#= DirectNavigationFieldName #>: string | any,
                 <#= CurrDirectMasterNavsFieldName #>: string[],
-                <#= UIFormChainFieldName #>: string,
-                <#= ClearIgnorFlds #>: string[]) {
+                <#= UIFormChainFieldName #>: string) {
         this._<#= ClientViewNameFieldName #> = <#= ClientViewNameFieldName #>;
         this._<#= DirectNavigationFieldName #> = <#= DirectNavigationFieldName #>;
         this._<#= CurrDirectMasterNavsFieldName #> = <#= CurrDirectMasterNavsFieldName #>;
         this._<#= UIFormChainFieldName #> = <#= UIFormChainFieldName #>;
-        this._<#= ClearIgnorFlds #> = <#= ClearIgnorFlds #>;
     }
 
     // it is used to notify direct master datasources if currect datasource has changed
@@ -197,6 +195,8 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
     // it is datasource-to-UI notification
     public <#= AfterPropsChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
     
+    public <#= OnCommonDSChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
+
     public <#= OnDetailHFChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
     public <#= OnIsDefinedChangedPropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
     public <#= OnUpdatePropName #>: EventEmitter<<#= viewModelDatasourceInterfaceClassName #>> = new EventEmitter<<#= viewModelDatasourceInterfaceClassName #>>();
@@ -328,24 +328,16 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
     }
     public <#= ClearMethodName #>(doNotify: boolean = true): boolean {
         let hasChanged: boolean = false;
-        let hasIgnorFlds: boolean = false;
         for(let i in this._<#= ValuesSuffix #>) {
-            if (!this._<#= ClearIgnorFlds #>.includes(i)) {
-                if( this.<#= formRootService #>.getDtTp<#= ValueSuffix #>(i) === 'boolean' ) {
-                    if (this._<#= ValuesSuffix #>[i] !== false) hasChanged = true;
-                    this._<#= ValuesSuffix #>[i] = false;
-                } else {
-                    if (typeof this._<#= ValuesSuffix #>[i] !== 'undefined') hasChanged = true;
-                    this._<#= ValuesSuffix #>[i] = undefined;
-                }
+            if( this.<#= formRootService #>.getDtTp<#= ValueSuffix #>(i) === 'boolean' ) {
+                if (this._<#= ValuesSuffix #>[i] !== false) hasChanged = true;
+                this._<#= ValuesSuffix #>[i] = false;
             } else {
-                hasIgnorFlds = hasIgnorFlds || this.isSetValue(i);
+                if (typeof this._<#= ValuesSuffix #>[i] !== 'undefined') hasChanged = true;
+                this._<#= ValuesSuffix #>[i] = undefined;
             }
         }
-        if(!hasChanged) { 
-            if(hasIgnorFlds && doNotify) this.<#= OnDetailChangedPropName #>.emit(this);
-            return hasChanged;
-        }
+        if(!hasChanged) return hasChanged;
         if(doNotify) this.<#= DoEmitEventMethodName #>(true);
         return hasChanged;
     }
@@ -552,12 +544,7 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
 #>
                     ).subscribe({
                         next: (data: <#= viewInterfaceName #> ) => {
-                            if(this.<#= Interface2ValuesMethodName #>(data, true) === false) {
-                                if(this._<#= ClearIgnorFlds #>.length > 0) {
-                                    this.<#= DoEmitEventMethodName #>(true);
-                                    
-                                };
-                            };
+                            this.<#= Interface2ValuesMethodName #>(data, true);
                         },
                         error: (error) => { // error path
                             this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
@@ -584,6 +571,10 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
 #>
     }
 
+    public <#= submitOnCommonDSChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
+        let src: <#= viewDatasourceClassName #> = v as <#= viewDatasourceClassName #>;
+        this.<#= Interface2ValuesMethodName #>(src.<#= Values2InterfaceMethodName #>(), true);
+    }
 
     public <#= submitOnDetailHFChangedMethodName #>(v: <#= viewModelDatasourceInterfaceClassName #>): void {
         if ((typeof this._<#= ClientViewNameFieldName #> === 'undefined') || (typeof this._<#= DirectNavigationFieldName #> === 'undefined')) return;
@@ -693,13 +684,7 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
                 }
             }
         }
-        if (clntNtChngd) {
-            if(this._<#= ClearIgnorFlds #>.length > 0) {
-                this.<#= AfterMasterChangedPropName #>.emit(this);
-            }
-            return;
-        }
-        if (this.<#= RefreshMethodName #>(false)) return;
+        if (clntNtChngd) return;
         // clear primary and unique key props of the current ViewModel. Eliminate those associated with the current direct master props.
         if(!this.get<#= IsTopDetailFieldName #>()) {
             this.<#= ClearPartiallyMethodName #>(false);
@@ -942,8 +927,6 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
                 next: (data: <#= viewInterfaceName #> ) => { 
                     if(!this.<#= Interface2ValuesMethodName #>(data, true)) {
                         this.<#= DoEmitEventMethodName #>(true);
-                    } else if(this._<#= ClearIgnorFlds #>.length > 0) {
-                        this.<#= DoEmitEventMethodName #>(true);
                     };
                 },
                 error: (error) => { 
@@ -956,7 +939,7 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
         } // foreach(ModelViewUniqueKeyOfVwSerializable pk in uniqueKeys) { ... }
     } // if (Model.IsWebApiSelectOneByPrimarykey) { ... }
 #>
-    public <#= RefreshMethodName #>(shwErr: boolean = true): boolean {
+    public <#= RefreshMethodName #>(): void {
 <#
     if (Model.IsWebApiSelectOneByPrimarykey) {
         ModelViewUniqueKeyOfVwSerializable prk = GetModelPrimaryKey(Model);
@@ -997,7 +980,7 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
             }
 #>
                 );
-                return true;
+                return;
             }
 <#
         } // if(prk != null) {...}
@@ -1041,26 +1024,23 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
             }
 #>
                 );
-                return true;
+                return;
             }
 <#
         } // foreach(ModelViewUniqueKeyOfVwSerializable pk in uniqueKeys) {...}
     } // if (Model.IsWebApiSelectOneByPrimarykey) {...}
 #>
-        if(shwErr) {
 <# 
     if(localize) {
 #>
-            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Not all Unique or Primary key properties are defined to call Refresh-method@@<#= viewDatasourceClassName + RefreshMethodName #>.Not-all-Unique-Primary:Not all Unique or Primary key properties are defined to call Refresh-method`});
+        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: $localize`:Not all Unique or Primary key properties are defined to call Refresh-method@@<#= viewDatasourceClassName + RefreshMethodName #>.Not-all-Unique-Primary:Not all Unique or Primary key properties are defined to call Refresh-method`});
 <# 
     } else {
 #>
-            this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Not all Unique or Primary key properties are defined to call Refresh-method'});
+        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', {message: 'Not all Unique or Primary key properties are defined to call Refresh-method'});
 <# 
     }
 #>
-        }
-        return false;
     }
     public <#= UpdateOneMethodName #>(): void {
 <#
@@ -1273,8 +1253,8 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
 //                        }
 //                    }
 //                }
-            }
-        }
+                    }
+                }
         for(let i in <#= MasterToClientKeyFieldsMapFieldName #>) {
             for(let j in <#= MasterToClientKeyFieldsMapFieldName #>[i]) {
                 let doins: Boolean = true;
