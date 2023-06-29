@@ -87,6 +87,7 @@
     string HiddenFilterByRowSuffix              = "HiddenFilterByRow";
     string OnCommonDSChangedPropName            = "OnCommonDSChanged";
     string submitOnCommonDSChangedMethodName    = "submitOnCommonDSChanged";
+    string ClearIgnorFldsPropName               = "clearIgnorFlds";
 
     string viewDatasourceClassFolder                = "01418-Datasource.class.ts";
     string viewDatasourceClassName                  = GetJavaScriptClassName(Model, viewDatasourceClassFolder);
@@ -146,6 +147,7 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
     // master name, navigation name, master filed, master filed value
     protected _<#= HiddenFilterFieldName #>: {[key: string]: {[key: string]: {[key: string]: any}}} | any = {};
     protected _<#= UnderHiddenFilterFieldsFieldName #>: string[] = [];
+    protected _<#= ClearIgnorFldsPropName #>: string[] = [];
     protected _<#= IsNewSuffix #>: boolean = true;
     protected _<#= UIFormChainFieldName #>: string = '';
     protected _<#= ValuesSuffix #>: {[key: string]: any} = {
@@ -167,11 +169,13 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
                 <#= ClientViewNameFieldName #>: string | null | undefined, 
                 <#= DirectNavigationFieldName #>: string | any,
                 <#= CurrDirectMasterNavsFieldName #>: string[],
-                <#= UIFormChainFieldName #>: string) {
+                <#= UIFormChainFieldName #>: string,
+                <#= ClearIgnorFldsPropName #>: string[]) {
         this._<#= ClientViewNameFieldName #> = <#= ClientViewNameFieldName #>;
         this._<#= DirectNavigationFieldName #> = <#= DirectNavigationFieldName #>;
         this._<#= CurrDirectMasterNavsFieldName #> = <#= CurrDirectMasterNavsFieldName #>;
         this._<#= UIFormChainFieldName #> = <#= UIFormChainFieldName #>;
+        this._<#= ClearIgnorFldsPropName #> = <#= ClearIgnorFldsPropName #>;
     }
 
     // it is used to notify direct master datasources if currect datasource has changed
@@ -330,12 +334,14 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
     public <#= ClearMethodName #>(doNotify: boolean = true): boolean {
         let hasChanged: boolean = false;
         for(let i in this._<#= ValuesSuffix #>) {
-            if( this.<#= formRootService #>.getDtTp<#= ValueSuffix #>(i) === 'boolean' ) {
-                if (this._<#= ValuesSuffix #>[i] !== false) hasChanged = true;
-                this._<#= ValuesSuffix #>[i] = false;
-            } else {
-                if (typeof this._<#= ValuesSuffix #>[i] !== 'undefined') hasChanged = true;
-                this._<#= ValuesSuffix #>[i] = undefined;
+            if(this._<#= ClearIgnorFldsPropName #>.includes(i) === false) {
+                if( this.<#= formRootService #>.getDtTp<#= ValueSuffix #>(i) === 'boolean' ) {
+                    if (this._<#= ValuesSuffix #>[i] !== false) hasChanged = true;
+                    this._<#= ValuesSuffix #>[i] = false;
+                } else {
+                    if (typeof this._<#= ValuesSuffix #>[i] !== 'undefined') hasChanged = true;
+                    this._<#= ValuesSuffix #>[i] = undefined;
+                }
             }
         }
         if(!hasChanged) return hasChanged;

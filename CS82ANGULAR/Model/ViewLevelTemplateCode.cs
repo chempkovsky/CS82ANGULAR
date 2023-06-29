@@ -331,7 +331,7 @@ namespace CS82ANGULAR.Model
         string GetInterfaceNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
         {
             string result = GetInterfaceName(model);
-            if (model == null) 
+            if (model == null)
             {
                 return result;
             }
@@ -385,7 +385,7 @@ namespace CS82ANGULAR.Model
         }
         string GetInterfaceNameExWithAnglrEx(AngularJson anglJson, DbContextSerializable context, string viewName, string fileType, ModelViewSerializable currModel, string currFolder)
         {
-            if (context==null)
+            if (context == null)
             {
                 return GetInterfaceNameEx(context, viewName);
             }
@@ -5056,7 +5056,8 @@ namespace CS82ANGULAR.Model
             }
             return GetTypeScriptPropertyName(propForSel, mv);
         }
-        ModelViewSerializable GetViewForControlList(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, DbContextSerializable context, int inputType) {
+        ModelViewSerializable GetViewForControlList(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, DbContextSerializable context, int inputType)
+        {
             if ((prop == null) || (model == null) || (context == null))
             {
                 return null;
@@ -5186,7 +5187,8 @@ namespace CS82ANGULAR.Model
         }
         List<ModelViewUIFormPropertySerializable> GetDirectMasters(ModelViewUIFormPropertySerializable prop,
                              ModelViewSerializable model,
-                             DbContextSerializable context, int inputType) {
+                             DbContextSerializable context, int inputType)
+        {
             List<ModelViewUIFormPropertySerializable> result = new List<ModelViewUIFormPropertySerializable>();
             if ((prop == null) || (model == null) || (context == null))
             {
@@ -5258,7 +5260,8 @@ namespace CS82ANGULAR.Model
         }
         List<ModelViewUIFormPropertySerializable> GetDependentScalarProps(ModelViewUIFormPropertySerializable prop,
                                     ModelViewSerializable model,
-                                    DbContextSerializable context, int inputType) {
+                                    DbContextSerializable context, int inputType)
+        {
             List<ModelViewUIFormPropertySerializable> result = new List<ModelViewUIFormPropertySerializable>();
             if ((prop == null) || (model == null) || (context == null))
             {
@@ -5306,7 +5309,8 @@ namespace CS82ANGULAR.Model
         }
         List<ModelViewUIFormPropertySerializable> GetDirectDetails(ModelViewUIFormPropertySerializable prop,
                              ModelViewSerializable model,
-                             DbContextSerializable context, int inputType) {
+                             DbContextSerializable context, int inputType)
+        {
             List<ModelViewUIFormPropertySerializable> result = new List<ModelViewUIFormPropertySerializable>();
             if ((prop == null) || (model == null) || (context == null))
             {
@@ -5357,7 +5361,8 @@ namespace CS82ANGULAR.Model
             }
             return result;
         }
-        bool MustHaveDirectDetails(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, DbContextSerializable context) {
+        bool MustHaveDirectDetails(ModelViewUIFormPropertySerializable prop, ModelViewSerializable model, DbContextSerializable context)
+        {
             bool result = false;
             if ((prop == null) || (model == null) || (context == null))
             {
@@ -5383,8 +5388,9 @@ namespace CS82ANGULAR.Model
         {
             return "pkp" + pkpModelViewUIFormPropertySerializable.ViewPropertyName;
         }
-        ModelViewPropertyOfVwSerializable GetOnValChangeViewPropName(DbContextSerializable context, ModelViewSerializable model, 
-                                    ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable, ModelViewUIFormPropertySerializable dependentScalarProp, int inputType) {
+        ModelViewPropertyOfVwSerializable GetOnValChangeViewPropName(DbContextSerializable context, ModelViewSerializable model,
+                                    ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable, ModelViewUIFormPropertySerializable dependentScalarProp, int inputType)
+        {
             if ((dependentScalarProp == null) || (modelViewUIFormPropertySerializable == null))
             {
                 return null;
@@ -5420,7 +5426,8 @@ namespace CS82ANGULAR.Model
             return
                 view.ScalarProperties.Where(p => (p.OriginalPropertyName == dependentScalarProp.OriginalPropertyName) && (p.ForeignKeyNameChain == dependentForeignKeyNameChain)).FirstOrDefault();
         }
-        bool HasOnValChangedMethod(DbContextSerializable context, ModelViewSerializable model, ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable) {
+        bool HasOnValChangedMethod(DbContextSerializable context, ModelViewSerializable model, ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable)
+        {
             bool result = false;
             for (int inputType = 1; inputType < 4; inputType++)
             {
@@ -5456,7 +5463,8 @@ namespace CS82ANGULAR.Model
         List<string> GetForeignKeyViewsList(ModelViewSerializable model,
                                     DbContextSerializable context,
                                     int currentInputTypeId,
-                                    List<string> fkViewsDict) {
+                                    List<string> fkViewsDict)
+        {
             if ((model == null) || (context == null) || (fkViewsDict == null))
             {
                 return fkViewsDict;
@@ -5544,7 +5552,8 @@ namespace CS82ANGULAR.Model
             }
             return fkViewsDict;
         }
-        List<string> GetSearchDialogViewsList(ModelViewSerializable model,DbContextSerializable context,int currentInputTypeId,List<string> sdViewsDict) {
+        List<string> GetSearchDialogViewsList(ModelViewSerializable model, DbContextSerializable context, int currentInputTypeId, List<string> sdViewsDict)
+        {
             if ((model == null) || (context == null) || (sdViewsDict == null))
             {
                 return sdViewsDict;
@@ -5629,7 +5638,8 @@ namespace CS82ANGULAR.Model
         List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> GetForeignKeyNameChainStructList(ModelViewSerializable model,
                                                                                             DbContextSerializable context,
                                                                                             int currentInputTypeId,
-                                                                                            List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> foreignKeyNameChainList) {
+                                                                                            List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> foreignKeyNameChainList)
+        {
             if ((model == null) || (context == null) || (foreignKeyNameChainList == null))
             {
                 return foreignKeyNameChainList;
@@ -6766,7 +6776,7 @@ namespace CS82ANGULAR.Model
             return "[sortable]=\"false\"";
         }
 
-//////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////
         bool isRoutedItem(AllowedFileTypesSerializable allowedFileTypes, string fileType)
         {
             if ((allowedFileTypes == null) || string.IsNullOrEmpty(fileType))
@@ -7247,7 +7257,7 @@ namespace CS82ANGULAR.Model
             {
                 return result;
             }
-            if (feature.CommonStaffs == null) 
+            if (feature.CommonStaffs == null)
             {
                 return result;
             }
@@ -7567,21 +7577,22 @@ namespace CS82ANGULAR.Model
                 return rslt;
             }
             string currFkChain = CurrFk.Item1;
-            if(string.IsNullOrEmpty(currFkChain)) { return rslt; }
+            if (string.IsNullOrEmpty(currFkChain)) { return rslt; }
             string[] curFks = currFkChain.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
             if (curFks.Length < 1) { return rslt; }
             ModelViewSerializable directDetailModel = null;
             string directDetailFk = null;
             string directDetailChain = "";
-            if (curFks.Length < 2) {
+            if (curFks.Length < 2)
+            {
                 directDetailFk = curFks[0];
                 directDetailModel = RootModel;
-            } 
+            }
             else
             {
-                directDetailFk = curFks[curFks.Length-1];
+                directDetailFk = curFks[curFks.Length - 1];
                 directDetailChain = string.Join(".", curFks, 0, curFks.Length - 1);
-                Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> t = 
+                Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> t =
                     foreignKeyNameChainList.Where(itm => itm.Item1 == directDetailChain).FirstOrDefault();
                 if (t == null)
                 {
@@ -7592,45 +7603,62 @@ namespace CS82ANGULAR.Model
                     directDetailModel = t.Item2;
                 }
             }
-            if(directDetailModel is null) return rslt;
+            if (directDetailModel is null) return rslt;
             if (directDetailModel.ForeignKeys is null) return rslt;
             ModelViewForeignKeySerializable currFk = directDetailModel.ForeignKeys.Where(f => f.NavigationName == directDetailFk).FirstOrDefault();
-            if(currFk is null) return rslt;
-            if(currFk.ForeignKeyProps is null) return rslt;
-            List<string> flds  = new List<string>();
+            if (currFk is null) return rslt;
+            if (currFk.ForeignKeyProps is null) return rslt;
+            List<string> flds = new List<string>();
             foreach (ModelViewForeignKeySerializable fk in directDetailModel.ForeignKeys)
             {
                 if (fk.NavigationName == directDetailFk) continue;
-                if(fk.ForeignKeyProps is null) continue;
-                for(int i = 0; i < fk.ForeignKeyProps.Count; i++)
+                if (fk.ForeignKeyProps is null) continue;
+                for (int i = 0; i < fk.ForeignKeyProps.Count; i++)
                 {
                     string vpn = fk.ForeignKeyProps[i].ViewPropertyName;
                     int k = -1;
-                    for(int j = 0; j < currFk.ForeignKeyProps.Count; j++)
+                    for (int j = 0; j < currFk.ForeignKeyProps.Count; j++)
                     {
-                        if(currFk.ForeignKeyProps[j].ViewPropertyName == vpn)
+                        if (currFk.ForeignKeyProps[j].ViewPropertyName == vpn)
                         {
-                            k=j; 
+                            k = j;
                             break;
                         }
                     }
-                    if(k == -1) continue;
-                    if(!flds.Any(fld => fld == currFk.PrincipalKeyProps[k].ViewPropertyName))
+                    if (k == -1) continue;
+                    if (!flds.Any(fld => fld == currFk.PrincipalKeyProps[k].ViewPropertyName))
                     {
                         flds.Add(currFk.PrincipalKeyProps[k].ViewPropertyName);
                     }
                 }
             }
-            foreach(string lfld in flds)
+            if ((directDetailModel.PrimaryKeyProperties?.Count > 0) && (currFk.ForeignKeyProps?.Count > 0))
+            {
+                foreach(ModelViewKeyPropertySerializable pkp in directDetailModel.PrimaryKeyProperties)
+                {
+                    for (int i = 0; i < currFk.ForeignKeyProps.Count; i++)
+                    {
+                        if (currFk.ForeignKeyProps[i].OriginalPropertyName == pkp.OriginalPropertyName)
+                        {
+                            if (!flds.Any(fld => fld == currFk.PrincipalKeyProps[i].ViewPropertyName))
+                            {
+                                flds.Add(currFk.PrincipalKeyProps[i].ViewPropertyName);
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (string lfld in flds)
             {
                 ModelViewPropertyOfVwSerializable sclprp = GetScalarPropertyByViewPropertyName(CurrFk.Item2, lfld);
-                if(sclprp is null) continue;
+                if (sclprp is null) continue;
                 string propNm = GetTypeScriptPropertyName(sclprp, CurrFk.Item2);
-                if(string.IsNullOrEmpty(propNm)) continue;
+                if (string.IsNullOrEmpty(propNm)) continue;
                 if (rslt == "") rslt = "'" + propNm + "'"; else rslt += ", '" + propNm + "'";
             }
             return rslt;
         }
+
         // ForeignKeyNameChain of the ModelView with intercected Foreign Keys fileds - is a first argument
         // ForeignKeyNameChain of the ModelView with a primary(unique) key fields which are mapped into intercected Foreign Keys fileds - is a second argument
         // ModelView with a primary(unique) key fields which are mapped into intercected Foreign Keys fileds - is a third argument
@@ -7642,16 +7670,116 @@ namespace CS82ANGULAR.Model
             DbContextSerializable context,
             List<Tuple<string, string, ModelViewSerializable>> rslt = null)
         {
-            if(rslt == null)
+            if (rslt == null)
                 rslt = new List<Tuple<string, string, ModelViewSerializable>>();
-
-            if ((currModel == null) || (context == null) || (initialForeignKeyNameChain == null) || (currForeignKeyNameChain == null) || (currMapflds == null))
+            if (initialForeignKeyNameChain == null) initialForeignKeyNameChain = "";
+            if (currForeignKeyNameChain == null) currForeignKeyNameChain = "";
+            if ((currModel == null) || (context == null))
             {
                 return rslt;
             }
-            if ((currMapflds.Count > 0) && (currModel.ForeignKeys?.Count > 0))
+            if ((currMapflds == null) || (currMapflds?.Count < 1))
             {
-                bool shouldBeAdded = true;
+                if (currModel.ForeignKeys?.Count > 0)
+                {
+                    if (currModel.ForeignKeys?.Count > 1)
+                    {
+                        for (int i = 0; i < currModel.ForeignKeys.Count - 1; i++)
+                        {
+                            if (currModel.ForeignKeys[i].ForeignKeyProps?.Count > 0)
+                            {
+                                for (int j = i + 1; j < currModel.ForeignKeys.Count; j++)
+                                {
+                                    if (currModel.ForeignKeys[j].ForeignKeyProps?.Count > 0)
+                                    {
+                                        List<string> prpNms = new List<string>();
+                                        foreach (ModelViewKeyPropertySerializable iprp in currModel.ForeignKeys[i].ForeignKeyProps)
+                                        {
+                                            if (currModel.ForeignKeys[j].ForeignKeyProps.Any(p => p.OriginalPropertyName == iprp.OriginalPropertyName))
+                                                prpNms.Add(iprp.OriginalPropertyName);
+                                        }
+                                        if (prpNms.Count > 0)
+                                        {
+                                            ModelViewSerializable mv = context.ModelViews.Where(v => v.ViewName == currModel.ForeignKeys[i].ViewName).FirstOrDefault();
+                                            string nfkch = currForeignKeyNameChain;
+                                            if (nfkch != "") nfkch += ".";
+                                            nfkch += currModel.ForeignKeys[i].NavigationName;
+                                            GetIntersectedForeigKeysMappings(currForeignKeyNameChain, mv, nfkch, prpNms, context, rslt);
+                                            nfkch = currForeignKeyNameChain;
+                                            if (nfkch != "") nfkch += ".";
+                                            nfkch += currModel.ForeignKeys[j].NavigationName;
+                                            GetIntersectedForeigKeysMappings(currForeignKeyNameChain, mv, nfkch, prpNms, context, rslt);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (currModel.PrimaryKeyProperties?.Count > 0)
+                    {
+                        foreach (ModelViewKeyPropertySerializable pkp in currModel.PrimaryKeyProperties)
+                        {
+                            //pk.OriginalPropertyName
+                            foreach (var fk in currModel.ForeignKeys)
+                            {
+                                List<string> prpNms = new List<string>();
+                                for (int i = 0; i < fk.ForeignKeyProps.Count; i++)
+                                {
+                                    if (fk.ForeignKeyProps[i].OriginalPropertyName == pkp.OriginalPropertyName)
+                                    {
+                                        prpNms.Add(fk.PrincipalKeyProps[i].OriginalPropertyName);
+                                    }
+                                }
+                                if (prpNms.Count > 0)
+                                {
+                                    ModelViewSerializable mv = context.ModelViews.Where(v => v.ViewName == fk.ViewName).FirstOrDefault();
+                                    string nfkch = currForeignKeyNameChain;
+                                    if (nfkch != "") nfkch += ".";
+                                    nfkch += fk.NavigationName;
+                                    GetIntersectedForeigKeysMappings(currForeignKeyNameChain, mv, nfkch, prpNms, context, rslt);
+                                }
+                            }
+                        }
+                    }
+                    if (currModel.UniqueKeys?.Count > 0)
+                    {
+                        foreach (ModelViewUniqueKeySerializable uk in currModel.UniqueKeys)
+                        {
+                            if (uk.UniqueKeyProperties?.Count > 0)
+                            {
+                                foreach (ModelViewKeyPropertySerializable pkp in uk.UniqueKeyProperties)
+                                {
+                                    //pk.OriginalPropertyName
+                                    foreach (var fk in currModel.ForeignKeys)
+                                    {
+                                        List<string> prpNms = new List<string>();
+                                        for (int i = 0; i < fk.ForeignKeyProps.Count; i++)
+                                        {
+                                            if (fk.ForeignKeyProps[i].OriginalPropertyName == pkp.OriginalPropertyName)
+                                            {
+                                                prpNms.Add(fk.PrincipalKeyProps[i].OriginalPropertyName);
+                                            }
+                                        }
+                                        if (prpNms.Count > 0)
+                                        {
+                                            ModelViewSerializable mv = context.ModelViews.Where(v => v.ViewName == fk.ViewName).FirstOrDefault();
+                                            string nfkch = currForeignKeyNameChain;
+                                            if (nfkch != "") nfkch += ".";
+                                            nfkch += fk.NavigationName;
+                                            GetIntersectedForeigKeysMappings(currForeignKeyNameChain, mv, nfkch, prpNms, context, rslt);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return rslt;
+            }
+
+            bool shouldBeAdded = false;
+            if (currModel.PrimaryKeyProperties?.Count > 0)
+            {
                 foreach (ModelViewKeyPropertySerializable pkp in currModel.PrimaryKeyProperties)
                 {
                     shouldBeAdded = currMapflds.Contains(pkp.OriginalPropertyName);
@@ -7661,7 +7789,7 @@ namespace CS82ANGULAR.Model
                 {
                     foreach (ModelViewUniqueKeySerializable uk in currModel.UniqueKeys)
                     {
-                        if(uk.UniqueKeyProperties?.Count > 0)
+                        if (uk.UniqueKeyProperties?.Count > 0)
                         {
                             foreach (ModelViewKeyPropertySerializable ukp in uk.UniqueKeyProperties)
                             {
@@ -7673,27 +7801,30 @@ namespace CS82ANGULAR.Model
                         if (shouldBeAdded) break;
                     }
                 }
-                if (shouldBeAdded)
-                {
-                    if(!rslt.Any(r => (r.Item1 == initialForeignKeyNameChain) && (r.Item2 == currForeignKeyNameChain) && (r.Item3 == currModel)))
-                        rslt.Add(new Tuple<string, string, ModelViewSerializable>(initialForeignKeyNameChain, currForeignKeyNameChain, currModel));
-                }
+            }
+            if (shouldBeAdded)
+            {
+                if (!rslt.Any(r => (r.Item1 == initialForeignKeyNameChain) && (r.Item2 == currForeignKeyNameChain) && (r.Item3 == currModel)))
+                    rslt.Add(new Tuple<string, string, ModelViewSerializable>(initialForeignKeyNameChain, currForeignKeyNameChain, currModel));
+            }
+            if (currModel.ForeignKeys?.Count > 0)
+            {
                 foreach (ModelViewForeignKeySerializable fk in currModel.ForeignKeys)
                 {
-                    if(fk.ForeignKeyProps?.Count > 0)
+                    if (fk.ForeignKeyProps?.Count > 0)
                     {
                         List<string> opnms = new List<string>();
-                        for(int i = 0; i < fk.ForeignKeyProps.Count; i++)
+                        for (int i = 0; i < fk.ForeignKeyProps.Count; i++)
                         {
                             if (currMapflds.Contains(fk.ForeignKeyProps[i].OriginalPropertyName))
                             {
-                                if(!opnms.Contains(fk.PrincipalKeyProps[i].OriginalPropertyName))
+                                if (!opnms.Contains(fk.PrincipalKeyProps[i].OriginalPropertyName))
                                 {
                                     opnms.Add(fk.PrincipalKeyProps[i].OriginalPropertyName);
                                 }
                             }
                         }
-                        if(opnms.Count > 0)
+                        if (opnms.Count > 0)
                         {
                             ModelViewSerializable mv = context.ModelViews.Where(v => v.ViewName == fk.ViewName).FirstOrDefault();
                             string nfkch = currForeignKeyNameChain;
@@ -7704,41 +7835,33 @@ namespace CS82ANGULAR.Model
                     }
                 }
             }
-            if(currModel.ForeignKeys?.Count > 1)
-            {
-                for(int i = 0; i < currModel.ForeignKeys.Count-1; i++)
-                {
-                    if (currModel.ForeignKeys[i].ForeignKeyProps?.Count > 0) {
-                        for (int j = i + 1; j < currModel.ForeignKeys.Count; j++)
-                        {
-                            if (currModel.ForeignKeys[j].ForeignKeyProps?.Count > 0)
-                            {
-                                List<string> prpNms = new List<string>();
-                                foreach(ModelViewKeyPropertySerializable iprp in currModel.ForeignKeys[i].ForeignKeyProps)
-                                {
-                                    if (currModel.ForeignKeys[j].ForeignKeyProps.Any(p => p.OriginalPropertyName == iprp.OriginalPropertyName))
-                                        prpNms.Add(iprp.OriginalPropertyName);
-                                }
-                                if(prpNms.Count > 0)
-                                {
-                                    ModelViewSerializable mv = context.ModelViews.Where(v => v.ViewName == currModel.ForeignKeys[i].ViewName).FirstOrDefault();
-                                    string nfkch = currForeignKeyNameChain;
-                                    if (nfkch != "") nfkch += ".";
-                                    nfkch += currModel.ForeignKeys[i].NavigationName;
-                                    GetIntersectedForeigKeysMappings(currForeignKeyNameChain, mv, nfkch, prpNms, context, rslt);
-                                    nfkch = currForeignKeyNameChain;
-                                    if (nfkch != "") nfkch += ".";
-                                    nfkch += currModel.ForeignKeys[j].NavigationName;
-                                    GetIntersectedForeigKeysMappings(currForeignKeyNameChain, mv, nfkch, prpNms, context, rslt);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
             return rslt;
         }
 
+        List<Tuple<string, string, ModelViewSerializable>> GetIntersectedForeigKeysMappingsEx(
+            ModelViewSerializable model,
+            DbContextSerializable context,
+            List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> ForeignKeyNameChainList,
+            List<Tuple<string, string, ModelViewSerializable>> rslt = null)
+        {
+            if (rslt == null)
+                rslt = new List<Tuple<string, string, ModelViewSerializable>>();
 
+            if ((model == null) || (context == null) || (ForeignKeyNameChainList == null))
+            {
+                return rslt;
+            }
+            foreach (Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fkcl in ForeignKeyNameChainList)
+            {
+                GetIntersectedForeigKeysMappings(
+                            null,
+                            fkcl.Item2,
+                            fkcl.Item1,
+                            null,
+                            context,
+                            rslt);
+            }
+            return rslt;
         }
     }
+}
