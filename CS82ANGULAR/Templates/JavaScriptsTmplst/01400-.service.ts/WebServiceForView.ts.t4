@@ -498,7 +498,7 @@ export class <#= serviceClassName #> {
 <#          if(prop.IsNullable) { #>
                         let hasNull: boolean = false;
 <#          } #>
-                        filter.<#= GetTypeScriptPropertyName(prop, Model)#>.forEach(function (value) {
+                        filter.<#= GetTypeScriptPropertyName(prop, Model)#>.forEach(function (value: any) {
                             if(!(typeof value === 'undefined')) {
                                 if(!(value === null)) {
                                     params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', value<#= GetJavaScriptToStringMethod(prop) #>);
@@ -531,7 +531,7 @@ export class <#= serviceClassName #> {
 #>
                 if (!(typeof  filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> === 'undefined')) {
                     if (Array.isArray(filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> )) {
-                        filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#>.forEach(function (value) {
+                        filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#>.forEach(function (value: any) {
                             if(!(typeof value === 'undefined')) {
                                 if(value === null) {
                                     params = params.append('<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>', '<#= EqualOperator #>');
@@ -549,7 +549,7 @@ export class <#= serviceClassName #> {
 
                 if (!(typeof filter.orderby === 'undefined')) {
                     if ( Array.isArray(filter.orderby)) {
-                        filter.orderby.forEach(function (value) {
+                        filter.orderby.forEach(function (value: any) {
                             if (!(typeof value === 'undefined')) {
                                 if(!(value === null)) {
                                     params = params.append('orderby', value);
@@ -679,7 +679,7 @@ export class <#= serviceClassName #> {
 <#          if(prop.IsNullable) { #>
                         let hasNull: boolean = false;
 <#          } #>
-                        filter.<#= GetTypeScriptPropertyName(prop, Model)#>.forEach(function (value) {
+                        filter.<#= GetTypeScriptPropertyName(prop, Model)#>.forEach(function (value: any) {
                             if(!(typeof value === 'undefined')) {
                                 if(!(value === null)) {
                                     params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', value<#= GetJavaScriptToStringMethod(prop) #>);
@@ -711,7 +711,7 @@ export class <#= serviceClassName #> {
 <#          if(prop.IsNullable) { #>
                         let hasNull: boolean = false;
 <#          } #>
-                        filter.<#= GetTypeScriptPropertyName(prop, Model)#>.forEach(function (value) {
+                        filter.<#= GetTypeScriptPropertyName(prop, Model)#>.forEach(function (value: any) {
                             if(!(typeof value === 'undefined')) {
                                 if(!(value === null)) {
                                     params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', value<#= GetJavaScriptToStringMethod(prop) #>);
@@ -738,7 +738,7 @@ export class <#= serviceClassName #> {
 #>
                 if (!(typeof  filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> === 'undefined')) {
                     if (Array.isArray(filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> )) {
-                        filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#>.forEach(function (value) {
+                        filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#>.forEach(function (value: any) {
                             if(!(typeof value === 'undefined')) {
                                 if(value === null) {
                                     params = params.append('<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>', '<#= EqualOperator #>');
@@ -756,7 +756,7 @@ export class <#= serviceClassName #> {
 
                 if (!(typeof filter.orderby === 'undefined')) {
                     if ( Array.isArray(filter.orderby)) {
-                        filter.orderby.forEach(function (value) {
+                        filter.orderby.forEach(function (value: any) {
                             if (!(typeof value === 'undefined')) {
                                 if(!(value === null)) {
                                     params = params.append('orderby', value);

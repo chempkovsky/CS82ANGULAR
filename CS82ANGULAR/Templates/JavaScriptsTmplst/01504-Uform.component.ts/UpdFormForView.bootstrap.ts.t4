@@ -844,7 +844,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 if (ind > -1) {
                     this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(data[ind], {emitEvent: false});
                     this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>[ind].<#= dispPropName #>}, {emitEvent: false});
-                    this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Interface2ValuesMethodName #>(data[ind] as <#= GetInterfaceNameExWithAnglrEx(AngularJsonFile, Context, fk.Item2.ViewName, viewInterfaceFolder, Model, addformComponentFolder) #>, false);
+                    this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Interface2ValuesMethodName #>(data[ind] as <#= GetInterfaceNameExWithAnglrEx(AngularJsonFile, Context, fk.Item2.ViewName, viewInterfaceFolder, Model, updformComponentFolder) #>, false);
                     this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model,  AfterPropsChangedPropName) #>(this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>);
                 } else {
                     this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(undefined, {emitEvent: false});

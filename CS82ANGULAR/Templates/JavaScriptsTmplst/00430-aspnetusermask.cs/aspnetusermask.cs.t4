@@ -14,6 +14,7 @@
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ parameter type="System.String" name="DefaultProjectNameSpace" #>
 <#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
 <#
     string aspnetuserFolder             = "00410-aspnetuser.cs";
