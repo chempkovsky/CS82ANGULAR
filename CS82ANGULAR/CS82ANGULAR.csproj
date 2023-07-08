@@ -3690,7 +3690,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Templates\WebApiServiceTmplst\WebApiAspNetUserService.Netframework.cs.t4">
+    <Content Include="Templates\WebApiServiceTmplst\DefaultWebApiAspNetUserService.Netframework.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -3699,6 +3699,10 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\WebApiServiceTmplst\WebApiAspNetUserPermsService.Netframework.cs.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\WebApiServiceTmplst\WebApiAspNetUserRolesService.Netframework.cs.t4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

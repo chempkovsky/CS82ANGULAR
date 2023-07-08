@@ -72,6 +72,15 @@ namespace <#= webApiServiceNameSpace #> {
                 _db = _db ?? new <#= Context.DbContextClassName #>(); 
                 return _db;
             } }
+        private ApplicationUserManager _userManager;
+        private ApplicationUserManager UserManager
+        {
+            get
+            {
+                _userManager = _userManager ?? Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
+                return _userManager;
+            }
+        }
 
 
         [HttpGet]
@@ -82,7 +91,10 @@ namespace <#= webApiServiceNameSpace #> {
             string[] roles = null;
             try
             {
-                roles = Roles.GetRolesForUser(); // question ???
+                // roles = Roles.GetRolesForUser(); 
+                string uid = RequestContext.Principal?.Identity?.GetUserId();
+                if (!String.IsNullOrEmpty(uid))
+                    roles = UserManager.GetRoles(uid).ToArray();
             } catch 
             {
                 roles = null;

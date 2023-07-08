@@ -21,8 +21,21 @@ using System.Web.Http.Description;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using System.Net.Http;
+using Microsoft.AspNet.Identity.Owin;
 using LinqKit;
 
+            //
+            // please reset 
+            // ApplicationUser.LockoutEnd = view.LockoutEndDateUtc;
+            // with
+            // ApplicationUser.LockoutEndDateUtc =  view.LockoutEnd?.LockoutEndDate;
+            //
+            // please reset
+            // view.LockoutEnd = ApplicationUser.LockoutEnd;
+            // with
+            // view.LockoutEnd = ApplicationUser.LockoutEndDateUtc;
+            //
 
 <#
 
@@ -663,7 +676,7 @@ namespace <#= webApiServiceNameSpace #> {
                 return BadRequest(ModelState);
             }
 
-            IdentityUser iu = await UserManager.FindByIdAsync(viewToUpdate.Id);
+            ApplicationUser iu = await UserManager.FindByIdAsync(viewToUpdate.Id);
             if(iu == null)
             {
                 return NotFound();
@@ -723,8 +736,20 @@ namespace <#= webApiServiceNameSpace #> {
             {
                 return BadRequest(ModelState);
             }
-            IdentityUser entityToAdd = new IdentityUser()  { UserName = viewToAdd.Email, Email = viewToAdd.Email, SecurityStamp = Guid.NewGuid().ToString() };
-/*
+            ApplicationUser entityToAdd = new ApplicationUser()  { UserName = viewToAdd.Email, Email = viewToAdd.Email };
+            IdentityResult rslt = await UserManager.CreateAsync(entityToAdd, "Qwerty?123");
+            if (!rslt.Succeeded)
+            {
+                return BadRequest(rslt.ToString());
+            }
+            entityToAdd = await UserManager.FindByEmailAsync(viewToAdd.Email);
+            if (entityToAdd == null)
+            {
+                return NotFound();
+            }
+
+
+
 <#
         foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
             if( IsRootEntityProperty(prop, Model) ) {
@@ -742,28 +767,26 @@ namespace <#= webApiServiceNameSpace #> {
 
         }
 #>
-*/
-            IdentityResult rslt = await UserManager.CreateAsync(entityToAdd, "Qqw?123");
+            rslt = await UserManager.UpdateAsync(entityToAdd);
             if (!rslt.Succeeded)
             {
                 return BadRequest(rslt.ToString());
             }
-            IdentityUser iu = await UserManager.FindByNameAsync(viewToAdd.Email);
-            if(iu == null)
+            entityToAdd = await UserManager.FindByEmailAsync(viewToAdd.Email);
+            if(entityToAdd == null)
             {
                 return NotFound();
             }
-
             <#= Model.ViewName#> result = new <#= Model.ViewName#>() {
 <#
                 int cnt = Model.ScalarProperties.Count-1;
                 for(int i = 0; i < cnt; i++) {
 #>
-                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = iu.<#= GetForeignKeyNameChain(Model.ScalarProperties[i].ForeignKeyNameChain) #><#= Model.ScalarProperties[i].OriginalPropertyName #>,
+                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[i], Model)#> = entityToAdd.<#= GetForeignKeyNameChain(Model.ScalarProperties[i].ForeignKeyNameChain) #><#= Model.ScalarProperties[i].OriginalPropertyName #>,
 <#
         } 
 #>
-                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = iu.<#= GetForeignKeyNameChain(Model.ScalarProperties[cnt].ForeignKeyNameChain) #><#= Model.ScalarProperties[cnt].OriginalPropertyName #>
+                            <#=GetTypeScriptPropertyName(Model.ScalarProperties[cnt], Model)#> = entityToAdd.<#= GetForeignKeyNameChain(Model.ScalarProperties[cnt].ForeignKeyNameChain) #><#= Model.ScalarProperties[cnt].OriginalPropertyName #>
                     };
             return Ok(result);
         }
