@@ -57,7 +57,7 @@ import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(An
 export class <#= toastComponentName #> {
 	constructor(public toastService: <#= appSettingServiceClassName #>) {}
 
-	isTemplate(toast) {
+	isTemplate(toast: any) {
 		return toast.textOrTpl instanceof TemplateRef;
 	}
 }
