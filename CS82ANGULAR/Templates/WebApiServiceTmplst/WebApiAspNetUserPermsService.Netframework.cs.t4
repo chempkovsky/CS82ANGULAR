@@ -18,8 +18,10 @@ using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Description;
 using System.Threading.Tasks;
-
-using System.Web.Security;
+using System.Net.Http;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNet.Identity;
+using System;
 
 <#
 
@@ -80,6 +82,20 @@ namespace <#= webApiServiceNameSpace #> {
                 _userManager = _userManager ?? Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
                 return _userManager;
             }
+        }
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && _db != null)
+            {
+                _db.Dispose();
+                _db = null;
+            }
+            if (disposing && _userManager != null)
+            {
+                _userManager.Dispose();
+                _userManager = null;
+            }
+            base.Dispose(disposing);
         }
 
 

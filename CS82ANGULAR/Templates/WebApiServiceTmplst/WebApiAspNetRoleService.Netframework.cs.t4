@@ -95,6 +95,15 @@ namespace <#= webApiServiceNameSpace #> {
                 return _RoleManager;
             }
         }
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && _RoleManager != null)
+            {
+                _RoleManager.Dispose();
+                _RoleManager = null;
+            }
+            base.Dispose(disposing);
+        }
 
 <# 
     if (Model.IsWebApiSelectAll) { 

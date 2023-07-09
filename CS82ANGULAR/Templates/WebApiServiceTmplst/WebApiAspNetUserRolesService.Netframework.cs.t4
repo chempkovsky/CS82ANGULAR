@@ -138,6 +138,20 @@ namespace <#= webApiServiceNameSpace #> {
                 return _userManager;
             }
         }
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && _RoleManager != null)
+            {
+                _RoleManager.Dispose();
+                _RoleManager = null;
+            }
+            if (disposing && _userManager != null)
+            {
+                _userManager.Dispose();
+                _userManager = null;
+            }
+            base.Dispose(disposing);
+        }
 
 
 <# 
