@@ -331,10 +331,10 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
             this._<#= ValuesSuffix #>[key] = undefined;
         }
     }
-    public <#= ClearMethodName #>(doNotify: boolean = true): boolean {
+    public <#= ClearMethodName #>(doNotify: boolean = true, ignrFlds: Array<string>=[]): boolean {
         let hasChanged: boolean = false;
         for(let i in this._<#= ValuesSuffix #>) {
-            if(this._<#= ClearIgnorFldsPropName #>.includes(i) === false) {
+            if(ignrFlds.includes(i) === false) {
                 if( this.<#= formRootService #>.getDtTp<#= ValueSuffix #>(i) === 'boolean' ) {
                     if (this._<#= ValuesSuffix #>[i] !== false) hasChanged = true;
                     this._<#= ValuesSuffix #>[i] = false;
@@ -364,7 +364,7 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
         }
         return src === dest;
     }
-    public <#= Interface2ValuesMethodName #>(data: <#= viewInterfaceName #> | null, doNotify: boolean = true): boolean {
+    public <#= Interface2ValuesMethodName #>(data: <#= viewInterfaceName #> | null, doNotify: boolean = true, aftrMstrChngd: boolean = false): boolean {
         if(typeof data === 'undefined') {
             return this.<#= ClearMethodName #>(doNotify);
         }
@@ -372,7 +372,6 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
             return this.<#= ClearMethodName #>(doNotify);
         }
         let hasChanged: boolean = false;
-        let aftrMstrChngd: boolean = false;
 <#
         if (Model.ScalarProperties != null) {
             foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
@@ -438,19 +437,62 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
         if ((this._<#= ClientViewNameFieldName #> === null) || (this._<#= DirectNavigationFieldName #> === null)) return;
         if(v.get<#= CurrentViewNameFieldName #>() !== this._<#= ClientViewNameFieldName #>) return;
         let clntNtChngd = true;
+        let ignrFlds: Array<string> = [];
+        let aftrMstrChngd: boolean = false;
         let <#= ClientToMasterFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = this.<#= formRootService #>.get<#= ClientToMasterFieldsMapFieldName #>();
         if( Object.keys(<#= ClientToMasterFieldsMapFieldName #>).indexOf(this._<#= ClientViewNameFieldName #>) > -1) {
             if( Object.keys(<#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>]).indexOf(this._<#= DirectNavigationFieldName #>) > -1) {
                 for(let i in <#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>][this._<#= DirectNavigationFieldName #>]) {
                     let src: any = v.get<#= ValueSuffix #>(i);
-                    let dst: any = this.get<#= ValueSuffix #>(<#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>][this._<#= DirectNavigationFieldName #>][i]);
+                    let dstnm: string = <#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>][this._<#= DirectNavigationFieldName #>][i];
+                    let dst: any = this.get<#= ValueSuffix #>(dstnm);
+                    ignrFlds.push(dstnm);
                     if (this.isEqual(src, dst)) continue;
                     clntNtChngd = false;
-                    this.set<#= ValueSuffix #>(<#= ClientToMasterFieldsMapFieldName #>[this._<#= ClientViewNameFieldName #>][this._<#= DirectNavigationFieldName #>][i], src);
+                    this.set<#= ValueSuffix #>(dstnm, src);
+                    // if(this._<#= ClearIgnorFldsPropName #>.indexOf(dstnm) > -1) ignrFlds.push(dstnm);
+<#
+            {
+                if ((Model.ScalarProperties != null) && (Model.ForeignKeys != null) && (Model.ForeignKeys.Count > 0)) {
+                    foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+                        string nvName = "";
+                        if(string.IsNullOrEmpty(prop.ForeignKeyName)) {
+                            if (Model.ForeignKeys != null) {
+                                foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+                                    if (fk.ForeignKeyProps.Any(p => p.OriginalPropertyName == prop.OriginalPropertyName)) {
+                                        nvName = fk.NavigationName;
+                                        break;
+                                    }
+                                }
+                            }
+                        } else {
+                            if ((Model.ForeignKeys != null) && (prop.ForeignKeyName == prop.ForeignKeyNameChain)) {
+                                foreach(ModelViewForeignKeySerializable fk in Model.ForeignKeys) {
+                                    if (fk.PrincipalKeyProps.Any(p => p.OriginalPropertyName == prop.OriginalPropertyName)) {
+                                        nvName = fk.NavigationName;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if(!string.IsNullOrEmpty(nvName)) {
+#>              
+                    if (aftrMstrChngd === false) {
+                        if('<#= GetTypeScriptPropertyName(prop, Model) #>' === dstnm) {
+                            aftrMstrChngd = this._<#= CurrDirectMasterNavsFieldName #>.indexOf('<#= nvName #>') >= 0;
+                        }
+                    }
+<#
+                        }
+                    }
+                }
+            }
+#>
                 }
             }
         }
         if (clntNtChngd) return;
+        this.<#= ClearMethodName #>(false, ignrFlds);
 <#
         {
             List<string> errors = new List<string>();
@@ -551,15 +593,16 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
 #>
                     ).subscribe({
                         next: (data: <#= viewInterfaceName #> ) => {
-                            this.<#= Interface2ValuesMethodName #>(data, true);
+                            this.<#= Interface2ValuesMethodName #>(data, true, aftrMstrChngd);
                         },
                         error: (error) => { // error path
                             this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
-                            this.<#= ClearMethodName #>(true);
+                            this.<#= ClearMethodName #>(false, this._<#= ClearIgnorFldsPropName #>);
+                            this.<#= DoEmitEventMethodName #>(aftrMstrChngd);
                         }
                     });
                 } else {
-                    this.<#= ClearMethodName #>(true);
+                    this.<#= DoEmitEventMethodName #>(aftrMstrChngd);
                 }
 <#
                                 }
@@ -605,7 +648,7 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
     }
 
 
-    public <#= ClearPartiallyMethodName #>(doNotify: boolean): boolean {
+    public <#= ClearPartiallyMethodName #>(doNotify: boolean, ignrFlds: Array<string> = []): boolean {
         let hasChanged: boolean = false;
 <#
     {
@@ -617,11 +660,13 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
                             if (fk.ForeignKeyProps.Any(p => p.OriginalPropertyName == sclrProp.OriginalPropertyName)) {
                                 codenotadded = false;
 #>
-        if(!this.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>')) {
-            if(this._<#= CurrDirectMasterNavsFieldName #>.indexOf('<#= fk.NavigationName #>') < 0) {
-                if(this.isSet<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>')) {
-                    this.clear<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>');
-                    hasChanged = true;
+        if(ignrFlds.includes('<#= GetTypeScriptPropertyName(sclrProp, Model) #>') === false) {
+            if(!this.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>')) {
+                if(this._<#= CurrDirectMasterNavsFieldName #>.indexOf('<#= fk.NavigationName #>') < 0) {
+                    if(this.isSet<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>')) {
+                        this.clear<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>');
+                        hasChanged = true;
+                    }
                 }
             }
         }
@@ -631,21 +676,25 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
                     }
                     if(codenotadded) {
 #>
-        if(!this.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>')) {
-            if(this.isSet<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>')) {
-                this.clear<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>');
-                hasChanged = true;
+        if(ignrFlds.includes('<#= GetTypeScriptPropertyName(sclrProp, Model) #>') === false) {
+            if(!this.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>')) {
+                if(this.isSet<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>')) {
+                    this.clear<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>');
+                    hasChanged = true;
+                }
             }
         }
 <#
                     }
                 } else {
 #>
-        if(!this.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>')) {
-            if(this._<#= CurrDirectMasterNavsFieldName #>.indexOf(this.<#= formRootService #>.getFk<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>')) < 0) {
-                if(this.isSet<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>')) {
-                    this.clear<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>');
-                    hasChanged = true;
+        if(ignrFlds.includes('<#= GetTypeScriptPropertyName(sclrProp, Model) #>') === false) {
+            if(!this.is<#= UnderHiddenFilterFieldsFieldName #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>')) {
+                if(this._<#= CurrDirectMasterNavsFieldName #>.indexOf(this.<#= formRootService #>.getFk<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>')) < 0) {
+                    if(this.isSet<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>')) {
+                        this.clear<#= ValueSuffix #>('<#= GetTypeScriptPropertyName(sclrProp, Model) #>');
+                        hasChanged = true;
+                    }
                 }
             }
         }
@@ -667,6 +716,7 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
         if ((masterDirNav === null) || (masterClnt === null)) return;
         if (masterClnt !== this.get<#= CurrentViewNameFieldName #>()) return;
         let clntNtChngd = true;
+        let ignrFlds: Array<string> = [];
         let masterVw: string | any = v.getCurrentViewName();
         let <#= MasterToClientKeyFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}}} = this.<#= formRootService #>.get<#= MasterToClientKeyFieldsMapFieldName #>();
         let <#= MasterToClientFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = this.<#= formRootService #>.get<#= MasterToClientFieldsMapFieldName #>();
@@ -674,10 +724,13 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
             if( Object.keys(<#= MasterToClientKeyFieldsMapFieldName #>[masterVw]).indexOf(masterDirNav) > -1) {
                 for(let i in <#= MasterToClientKeyFieldsMapFieldName #>[masterVw][masterDirNav]) {
                     let src: any = v.get<#= ValueSuffix #>(i);
-                    let dst: any = this.get<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[masterVw][masterDirNav][i].propNm);
+                    let dstnm: string = <#= MasterToClientKeyFieldsMapFieldName #>[masterVw][masterDirNav][i].propNm;
+                    let dst: any = this.get<#= ValueSuffix #>(dstnm);
+                    ignrFlds.push(dstnm);
                     if (this.isEqual(src, dst)) continue;
                     clntNtChngd = false;
-                    this.set<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[masterVw][masterDirNav][i].propNm, src);
+                    this.set<#= ValueSuffix #>(dstnm, src);
+                    // if(this._<#= ClearIgnorFldsPropName #>.indexOf(dstnm) > -1) ignrFlds.push(dstnm);
                 }
             }
         }
@@ -685,16 +738,19 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
             if( Object.keys(<#= MasterToClientFieldsMapFieldName #>[masterVw]).indexOf(masterDirNav) > -1) {
                 for(let i in <#= MasterToClientFieldsMapFieldName #>[masterVw][masterDirNav]) {
                     let src: any = v.get<#= ValueSuffix #>(i);
-                    if (this.isEqual(src, this.get<#= ValueSuffix #>(<#= MasterToClientFieldsMapFieldName #>[masterVw][masterDirNav][i]))) continue;
+                    let dstnm: string = <#= MasterToClientFieldsMapFieldName #>[masterVw][masterDirNav][i];
+                    ignrFlds.push(dstnm);
+                    if (this.isEqual(src, this.get<#= ValueSuffix #>(dstnm))) continue;
                     clntNtChngd = false;
-                    this.set<#= ValueSuffix #>(<#= MasterToClientFieldsMapFieldName #>[masterVw][masterDirNav][i], src);
+                    this.set<#= ValueSuffix #>(dstnm, src);
+                    // if(this._<#= ClearIgnorFldsPropName #>.indexOf(dstnm) > -1) ignrFlds.push(dstnm);
                 }
             }
         }
         if (clntNtChngd) return;
         // clear primary and unique key props of the current ViewModel. Eliminate those associated with the current direct master props.
         if(!this.get<#= IsTopDetailFieldName #>()) {
-            this.<#= ClearPartiallyMethodName #>(false);
+            this.<#= ClearPartiallyMethodName #>(false, ignrFlds);
         }
         this.<#= DoEmitEventMethodName #>(true);
     }

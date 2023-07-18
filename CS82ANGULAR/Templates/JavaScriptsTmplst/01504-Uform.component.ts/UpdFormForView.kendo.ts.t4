@@ -112,6 +112,8 @@
     string OnDetailHFChangedPropName            = "OnDetailHFChanged";
     string submitOnDetailHFChangedMethodName    = "submitOnDetailHFChanged";
     string HiddenFilterByUndHFSuffix            = "HiddenFilterByUndHF";
+    string OnCommonDSChangedPropName            = "OnCommonDSChanged";
+    string submitOnCommonDSChangedMethodName    = "submitOnCommonDSChanged";
 
     string TitlePropName                        = "title";
     string TitleCaptionVal                      = "Select Item";
@@ -236,6 +238,7 @@
             throw new Exception("For the [Required Entity Property] =" +  entityProp.OriginalPropertyName + " could not find mapped UIFormProperty which is not hidden and which is shown In View");
         }
     }
+    List<Tuple<string, string, ModelViewSerializable>> intersectFkMdls = GetIntersectedForeigKeysMappingsEx(Model, Context, ForeignKeyNameChainList);
 
     string updformCssFolder                         = "01504-Uform.component.css";
     string updformHtmlFolder                        = "01504-Uform.component.html";
@@ -504,7 +507,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     constructor(<#= constructorParams #>, public dialog: DialogService, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #> ) {
         this.<#= AppearancePropName #> = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
         this.<#= RootDataSource #> = new <#= GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, Model.ViewName, viewDatasourceClassFolder, Model, updformComponentFolder) #> (this.<#= formServicePrefix + Model.ViewName #>,
-            this.<#= AppSettingServicePropName #>, null, null, [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, "") #>],'');
+            this.<#= AppSettingServicePropName #>, null, null, [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, "") #>],'',[]);
         this.<#= RootDataSource #>.set<#= IsNewSuffix #>(false);
 <#
         foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
@@ -517,11 +520,39 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             if(string.IsNullOrEmpty(directNavigation)){
                 throw new Exception("For [Foreign Key Name Chain]=" + fk.Item1 + " can not find direct detail");
             }
+            string clearIgnotFlds = GetDsClearIgnoryFields(Model, fk, ForeignKeyNameChainList);
 #>
         this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #> = new <#= GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, fk.Item2.ViewName, viewDatasourceClassFolder, Model, updformComponentFolder) #> (this.<#= formServicePrefix + fk.Item2.ViewName #>,
-            this.<#= AppSettingServicePropName #>, '<#= detailViewName #>', '<#= directNavigation #>', [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, fk.Item1) #>],'<#= fk.Item1 #>');
+            this.<#= AppSettingServicePropName #>, '<#= detailViewName #>', '<#= directNavigation #>', [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, fk.Item1) #>],'<#= fk.Item1 #>',[<#= clearIgnotFlds #>]);
         this.<#=  GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.set<#= IsNewSuffix #>(false);
 <#
+        }
+        {
+            foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {
+                Tuple<string, string, ModelViewSerializable> commonFldRec = 
+                    intersectFkMdls.FirstOrDefault(cfr => (cfr.Item2 == fk.Item1) && (cfr.Item3 == fk.Item2));
+                if(commonFldRec == null) continue;
+                List<Tuple<string, string, ModelViewSerializable>> othrcmmnFldRcs = 
+                    intersectFkMdls.Where(cfr => (cfr.Item1 == commonFldRec.Item1) && 
+                                            (cfr.Item2 != commonFldRec.Item2) &&
+                                            (cfr.Item3 == commonFldRec.Item3)).ToList();
+                List<string> addedDs = new List<string>();
+                foreach(Tuple<string, string, ModelViewSerializable> othrcmmnFldRc in othrcmmnFldRcs) {
+                   if(!addedDs.Contains(othrcmmnFldRc.Item2)) {
+                       Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> ofk = 
+                            ForeignKeyNameChainList.FirstOrDefault(f => (f.Item1 == othrcmmnFldRc.Item2) && (f.Item2 == othrcmmnFldRc.Item3));
+                       if (ofk != null) {
+                            addedDs.Add(othrcmmnFldRc.Item2);
+#>
+        this._<#= SubscriptionsPropName #>.push(
+            this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>
+            .<#= OnCommonDSChangedPropName #>.subscribe({next: (v: <#= viewModelDatasourceInterfaceClassName #>) => { this.<#=  GetTypeScriptPropertyNameWithSufix(ofk.Item3, Model, DataSourceSufix) #>.<#= submitOnCommonDSChangedMethodName #>(v) } })
+        );
+<#
+                       }
+                    }
+                }
+            }
         }
 #>
         this.<#= MainFormGroupName #> =  new FormGroup({});
@@ -842,6 +873,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 if (ind > -1) {
                     this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(data[ind], {emitEvent: false});
                     this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': this.<#= GetExpressionForControlList(fk.Item3, Model, ComboSufix) #>[ind].<#= dispPropName #>}, {emitEvent: false});
+                    this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Interface2ValuesMethodName #>(data[ind] as <#= GetInterfaceNameExWithAnglrEx(AngularJsonFile, Context, fk.Item2.ViewName, viewInterfaceFolder, Model, updformComponentFolder) #>, false);
+                    this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model,  AfterPropsChangedPropName) #>(this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>);
                 } else {
                     this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, ComboSufix) #>.patchValue(undefined, {emitEvent: false});
                     this.<#=  MainFormGroupName #>.patchValue({'<#= GetTypeScriptPropertyNameEx(fk.Item3, Model) #>': undefined}, {emitEvent: false});

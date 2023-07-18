@@ -134,6 +134,7 @@
                 <mat-form-field  [appearance]="<#= AppearancePropName #>" fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#= GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#= GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#= percentEq100.ToString() #>">
                     <mat-label>{{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}</mat-label>
                     <mat-select [formControl]="<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">
+                        <mat-option [value]="null"></mat-option>
                         <mat-option *ngFor="let aVal of <#= GetExpressionForControlList(modelViewUIFormPropertySerializable, Model, ComboSufix) #>;" [value]="aVal">{{ aVal.<#= GetComboControlListPropertyName(modelViewUIFormPropertySerializable, Model, Context, InputTypeId) #> }}</mat-option>
                     </mat-select>
                     <!-- <mat-error *ngIf="<#= GetExpressionForControlInvalid(modelViewUIFormPropertySerializable, Model, ComboSufix) #>">{{getErrorMessage(<#= GetTypeScriptPropertyNameWithSufix(modelViewUIFormPropertySerializable, Model, ComboSufix) #>)}}</mat-error> -->

@@ -322,6 +322,22 @@ namespace CS82ANGULAR.ViewModel
                                             (SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassAllMappedScalarPropertiesWithDbContext(UniqueKeyProperties, unkKey.KeyProperties, SelectedDbContext.CodeElementRef as CodeClass);
                                         }
                                     }
+                                    mthdNd = enttNd.Methods.FirstOrDefault(m => m.MethodName == "HasIndex");
+                                    if (mthdNd != null)
+                                    {
+                                        if (mthdNd.MethodArguments != null)
+                                        {
+                                            FluentAPIKey unkKey = new FluentAPIKey();
+                                            unkKey.KeyProperties = new List<FluentAPIProperty>();
+                                            int ord = 0;
+                                            foreach (string arg in mthdNd.MethodArguments)
+                                            {
+                                                ord++;
+                                                unkKey.KeyProperties.Add(new FluentAPIProperty() { PropOrder = ord, PropName = arg.Replace("\"", "") });
+                                            }
+                                            (SelectedEntity.CodeElementRef as CodeClass).CollectCodeClassAllMappedScalarPropertiesWithDbContext(UniqueKeyProperties, unkKey.KeyProperties, SelectedDbContext.CodeElementRef as CodeClass);
+                                        }
+                                    }
                                 }
                             }
                         }

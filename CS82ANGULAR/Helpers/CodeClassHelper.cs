@@ -483,6 +483,10 @@ namespace CS82ANGULAR.Helpers
             if(dbContext == null) return UniqueKeys;
             CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
             if (codeFunction == null) return UniqueKeys;
+            List<string> mappedProps = null;
+            List<FluentAPIEntityNode> ignoreNodes = null;
+            List<FluentAPIEntityNode> entityNodes = null;
+
             string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
             List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
             {
@@ -496,35 +500,85 @@ namespace CS82ANGULAR.Helpers
                     }
                 }
             };
-            List<FluentAPIEntityNode> entityNodes = codeFunction.DoAnalyzeWithFilter(classNames, filter);
-            if(entityNodes == null) return UniqueKeys;
-            if (entityNodes.Count < 1) return UniqueKeys;
-            filter[0].Methods[0].MethodName = "Ignore";
-            List<FluentAPIEntityNode> ignoreNodes = codeFunction.DoAnalyzeWithFilter(classNames, filter);
-            List<string> mappedProps = new List<string>();
-            srcClass.CollectCodeClassAllMappedScalarProperties(mappedProps);
-            foreach (FluentAPIEntityNode enttnd in entityNodes)
+            entityNodes = codeFunction.DoAnalyzeWithFilter(classNames, filter);
+            if (entityNodes != null)
             {
-                if (enttnd.Methods == null) continue;
-                if (enttnd.Methods.Count < 1) continue;
-                foreach(FluentAPIMethodNode mthd in enttnd.Methods)
+                if (entityNodes.Count > 0)
                 {
-                    if (!("HasAlternateKey".Equals(mthd.MethodName, StringComparison.OrdinalIgnoreCase))) continue;
-                    if(mthd.MethodArguments == null) continue;
-                    if (mthd.MethodArguments.Count < 1) continue;
-                    List<String> newLst = new List<String>();
-                    foreach (string mthdarg in mthd.MethodArguments)
+                    filter[0].Methods[0].MethodName = "Ignore";
+                    ignoreNodes = codeFunction.DoAnalyzeWithFilter(classNames, filter);
+                    mappedProps = new List<string>();
+                    srcClass.CollectCodeClassAllMappedScalarProperties(mappedProps);
+                    foreach (FluentAPIEntityNode enttnd in entityNodes)
                     {
-                        if (ignoreNodes != null)
+                        if (enttnd.Methods == null) continue;
+                        if (enttnd.Methods.Count < 1) continue;
+                        foreach (FluentAPIMethodNode mthd in enttnd.Methods)
                         {
-                            if (ignoreNodes.HoldsIgnore(mthdarg)) continue;
+                            if (!("HasAlternateKey".Equals(mthd.MethodName, StringComparison.OrdinalIgnoreCase))) continue;
+                            if (mthd.MethodArguments == null) continue;
+                            if (mthd.MethodArguments.Count < 1) continue;
+                            List<String> newLst = new List<String>();
+                            foreach (string mthdarg in mthd.MethodArguments)
+                            {
+                                if (ignoreNodes != null)
+                                {
+                                    if (ignoreNodes.HoldsIgnore(mthdarg)) continue;
+                                }
+                                if (!mappedProps.Any(x => x.Equals(mthdarg))) continue;
+                                newLst.Add(mthdarg);
+                            }
+                            mthd.MethodArguments = newLst;
                         }
-                        if(!mappedProps.Any(x => x.Equals(mthdarg))) continue;
-                        newLst.Add(mthdarg);
+                        UniqueKeys.Add(enttnd);
                     }
-                    mthd.MethodArguments = newLst;
                 }
-                UniqueKeys.Add(enttnd);
+            }
+            filter = new List<FluentAPIEntityNode>()
+            {
+                new FluentAPIEntityNode()
+                {
+                    Methods = new List<FluentAPIMethodNode>()
+                    {
+                        new FluentAPIMethodNode() {
+                            MethodName = "HasIndex"
+                        }
+                    }
+                }
+            };
+            entityNodes = codeFunction.DoAnalyzeWithFilter(classNames, filter);
+            if (entityNodes != null)
+            {
+                if (entityNodes.Count > 0)
+                {
+                    filter[0].Methods[0].MethodName = "Ignore";
+                    ignoreNodes = codeFunction.DoAnalyzeWithFilter(classNames, filter);
+                    mappedProps = new List<string>();
+                    srcClass.CollectCodeClassAllMappedScalarProperties(mappedProps);
+                    foreach (FluentAPIEntityNode enttnd in entityNodes)
+                    {
+                        if (enttnd.Methods == null) continue;
+                        if (enttnd.Methods.Count < 1) continue;
+                        foreach (FluentAPIMethodNode mthd in enttnd.Methods)
+                        {
+                            if (!("HasIndex".Equals(mthd.MethodName, StringComparison.OrdinalIgnoreCase))) continue;
+                            if (mthd.MethodArguments == null) continue;
+                            if (mthd.MethodArguments.Count < 1) continue;
+                            List<String> newLst = new List<String>();
+                            foreach (string mthdarg in mthd.MethodArguments)
+                            {
+                                if (ignoreNodes != null)
+                                {
+                                    if (ignoreNodes.HoldsIgnore(mthdarg)) continue;
+                                }
+                                if (!mappedProps.Any(x => x.Equals(mthdarg))) continue;
+                                newLst.Add(mthdarg);
+                            }
+                            mthd.MethodArguments = newLst;
+                        }
+                        UniqueKeys.Add(enttnd);
+                    }
+                }
             }
             return UniqueKeys;
         }
@@ -564,6 +618,37 @@ namespace CS82ANGULAR.Helpers
                 key.KeySource = InfoSourceEnum.ByOnModelCreating;
                 UniqueKeys.Add(key);
             }
+            foreach (FluentAPIEntityNode fApind in fApinds)
+            {
+                FluentAPIMethodNode mthd = fApind.Methods.FirstOrDefault(m => "HasIndex".Equals(m.MethodName));
+                if (mthd == null) continue;
+                if (mthd.MethodArguments == null) continue;
+                if (mthd.MethodArguments.Count < 1) continue;
+
+                FluentAPIKey key = new FluentAPIKey() { KeyProperties = new List<FluentAPIProperty>() };
+                int ord = 0;
+                foreach (string mthdarg in mthd.MethodArguments)
+                {
+                    ord++;
+                    key.KeyProperties.Add(new FluentAPIProperty() { PropOrder = ord, PropName = mthdarg });
+                }
+                mthd = fApind.Methods.FirstOrDefault(m => "HasName".Equals(m.MethodName));
+                if (mthd != null)
+                {
+                    if (mthd.MethodArguments != null)
+                    {
+                        if (mthd.MethodArguments.Count > 0)
+                        {
+                            key.KeyName = mthd.MethodArguments[0];
+                            if (!string.IsNullOrEmpty(key.KeyName)) key.KeyName = key.KeyName.Replace("\"", "");
+                        }
+                    }
+                }
+                key.SourceCount = key.KeyProperties.Count;
+                key.KeySource = InfoSourceEnum.ByOnModelCreating;
+                UniqueKeys.Add(key);
+            }
+
             return UniqueKeys;
         }
         // ready
@@ -880,12 +965,13 @@ namespace CS82ANGULAR.Helpers
         public static void RemoveUniqueKeyDeclarations(this CodeClass srcClass, CodeClass dbContext, string UniqueKeyName)
         {
             if ((srcClass == null) || (dbContext == null)) return;
+            List<FluentAPIEntityNode> filter = null;
             CodeFunction codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
             if (codeFunction != null)
             {
                 string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
                 if (!string.IsNullOrEmpty(UniqueKeyName)) UniqueKeyName = "\"" + UniqueKeyName.Replace("\"", "") + "\"";
-                List<FluentAPIEntityNode> filter = new List<FluentAPIEntityNode>()
+                filter = new List<FluentAPIEntityNode>()
                     {
                         new FluentAPIEntityNode()
                         {
@@ -897,6 +983,34 @@ namespace CS82ANGULAR.Helpers
                                 new FluentAPIMethodNode() {
                                     MethodName = "HasName",
                                     MethodArguments = new List<string> { UniqueKeyName }
+                                },
+                            }
+                        }
+                    };
+                codeFunction.DoRemoveInvocationWithFilter(classNames, filter);
+                dbContext.StartPoint.CreateEditPoint().SmartFormat(dbContext.EndPoint);
+                if (dbContext.ProjectItem != null) dbContext.ProjectItem.Save();
+            }
+            codeFunction = dbContext.GetCodeFunctionByName(vsCMAccess.vsCMAccessProtected, "OnModelCreating");
+            if (codeFunction != null)
+            {
+                string[] classNames = new string[] { srcClass.Name, srcClass.FullName };
+                if (!string.IsNullOrEmpty(UniqueKeyName)) UniqueKeyName = "\"" + UniqueKeyName.Replace("\"", "") + "\"";
+                filter = new List<FluentAPIEntityNode>()
+                    {
+                        new FluentAPIEntityNode()
+                        {
+                            Methods = new List<FluentAPIMethodNode>()
+                            {
+                                new FluentAPIMethodNode() {
+                                    MethodName = "HasIndex"
+                                },
+                                new FluentAPIMethodNode() {
+                                    MethodName = "HasName",
+                                    MethodArguments = new List<string> { UniqueKeyName }
+                                },
+                                new FluentAPIMethodNode() {
+                                    MethodName = "IsUnique"
                                 },
                             }
                         }
