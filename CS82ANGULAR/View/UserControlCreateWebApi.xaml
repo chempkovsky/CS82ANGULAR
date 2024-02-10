@@ -366,8 +366,8 @@
                     <TextBlock  Grid.Row="9"  Grid.Column="0" Text="Plural Title"  />
                     <TextBlock  Grid.Row="9"  Grid.Column="1" Text="{Binding SelectedModel.PluralTitle}" />
 
-                    <TextBlock Grid.Row="10"  Grid.Column="0" Text="Webapi Service Name"  FontWeight="Bold"/>
-                    <TextBox   Grid.Row="10"  Grid.Column="1" Text="{Binding WebApiServiceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsWebServiceEditable}" Margin="0 0 10 0" />
+                    <TextBlock  Grid.Row="10"  Grid.Column="0" Text="Plural Title"  />
+                    <TextBlock  Grid.Row="10"  Grid.Column="1" Text="{Binding SelectedModel.PluralTitle}" />
 
                     <TextBlock Grid.Row="11"  Grid.Column="0" Text="Webapi Route Prefix"  FontWeight="Bold"/>
                     <TextBox   Grid.Row="11"  Grid.Column="1" Text="{Binding WebApiRoutePrefix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsWebServiceEditable}" Margin="0 0 10 0" />
