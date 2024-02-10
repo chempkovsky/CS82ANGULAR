@@ -153,8 +153,10 @@ namespace CS82ANGULAR.ViewModel
                 RootVisibility = Visibility.Visible;
             }
         }
-        public string ViewNameSufix { get; set; } = "View";
-        public string PageViewNameSufix { get; set; } = "ViewPage";
+        public string ViewNameSufix { get; set; } = "Dto";
+        public string PageViewNameSufix { get; set; } = "DtoPage";
+        public string DomainViewNameSufix { get; set; } = "DDto";
+        public string DomainPageViewNameSufix { get; set; } = "DDtoPage";
         public string CheckErrorsText
         {
             get
@@ -332,8 +334,9 @@ namespace CS82ANGULAR.ViewModel
                 SelectedModel.ClearModelView();
             }
             (SelectedEntity.CodeElementRef as CodeClass).
-                DefineModelView(SelectedDbContext.CodeElementRef as CodeClass, SelectedModel, ViewNameSufix, PageViewNameSufix);
-            SelectedModel.ViewProject = DestinationProject;
+                DefineModelView(SelectedDbContext.CodeElementRef as CodeClass, SelectedModel, ViewNameSufix, PageViewNameSufix, DomainViewNameSufix, DomainPageViewNameSufix);
+
+        SelectedModel.ViewProject = DestinationProject;
             SelectedModel.ViewDefaultProjectNameSpace = DefaultProjectNameSpace;
             SelectedModel.ViewFolder = DestinationFolder;
             if (srcModel != null)

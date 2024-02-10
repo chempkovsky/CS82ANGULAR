@@ -8,6 +8,9 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows;
+using System.Collections.ObjectModel;
+using CS82ANGULAR.Model;
 
 
 namespace CS82ANGULAR.ViewModel
@@ -20,6 +23,10 @@ namespace CS82ANGULAR.ViewModel
         protected ITextTemplating TextTemplating;
         protected IVsThreadedWaitDialogFactory DialogFactory;
         protected UserControlInvitation InvitationUC = null;
+        protected Visibility _GenTypeComboVisibility = Visibility.Collapsed;
+        protected bool _GenTypeComboEnabled = false;
+        protected object _GenTypeComboSelectedItem = null;
+        protected ObservableCollection<GenTypeItem> _GenTypeItems = new ObservableCollection<GenTypeItem>();
         #endregion
 
         public MainWindowBase(DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory)
@@ -62,7 +69,63 @@ namespace CS82ANGULAR.ViewModel
             }
         }
         public string SolutionDirectory { get; set; } = "";
+        public Visibility GenTypeComboVisibility
+        {
+            get { 
+                return _GenTypeComboVisibility; 
+            }
+            set { 
+                if (_GenTypeComboVisibility != value) {
+                    _GenTypeComboVisibility = value;
+                    OnPropertyChanged();
+                } 
+            }
+        }
+        public bool GenTypeComboEnabled
+        {
+            get
+            {
+                return _GenTypeComboEnabled;
+            }
+            set
+            {
+                if (_GenTypeComboEnabled != value) {  
+                    _GenTypeComboEnabled = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
+        public object GenTypeComboSelectedItem
+        {
+            get
+            {
+                return _GenTypeComboSelectedItem;
+            }
+            set
+            {
+                if (_GenTypeComboSelectedItem != value) { 
+                    _GenTypeComboSelectedItem = value; 
+                    OnPropertyChanged(); 
+                }
+            }
+        }
+
+        public ObservableCollection<GenTypeItem> GenTypeItems
+        {
+            get
+            {
+                return _GenTypeItems;
+            }
+            set
+            {
+                if (_GenTypeItems != value)
+                {
+                    _GenTypeItems = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         #region Button Command States
         public int CurrentUiStepId { get; set; } = 0;

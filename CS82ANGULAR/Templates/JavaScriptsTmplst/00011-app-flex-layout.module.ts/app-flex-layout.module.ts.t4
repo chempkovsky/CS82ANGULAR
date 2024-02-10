@@ -22,10 +22,18 @@
 
 #>
 
+//
+// instead of @angular/flex-layout
+// we should use ngx-flexible-layout
+// https://www.npmjs.com/package/ngx-flexible-layout
+// read discussion
+// https://github.com/angular/flex-layout/issues/1426
+//
+
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FlexLayoutModule } from '@angular/flex-layout';
-
+// import { FlexLayoutModule } from '@angular/flex-layout';
+import { FlexLayoutModule } from 'ngx-flexible-layout';
 
 @NgModule({
   declarations: [],

@@ -105,8 +105,8 @@ import { <#= securityDashboardComponentClassName #> } from '<#= GetFolderNameWit
         <#= appChangePasswordComponentClassName #>,
         <#= securityDashboardComponentClassName #>,
     ],
-    entryComponents: [
-    ]
+//    entryComponents: [
+//    ]
 })
 export class <#= securityModuleClassName #> { }
 

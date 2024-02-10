@@ -1,0 +1,113 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string columnSelectorItemInterfaceFolder    = "00032-column-selector-item.interface.ts";
+    string columnSelectorComponentFolder        = "00033-column-selector.component.ts";
+    string columnSelectorDlgCssComponentFolder  = "00035-column-selector-dlg.component.css";
+    string columnSelectorDlgHtmlComponentFolder = "00035-column-selector-dlg.component.html";
+    string columnSelectorDlgComponentFolder     = "00035-column-selector-dlg.component.ts";
+
+    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, columnSelectorDlgComponentFolder);
+    string columnSelectorDlgComponentClassName  = GetComponentClassName(Model, columnSelectorDlgComponentFolder);
+
+#>
+
+import { Component, ViewChild, Input  } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+<# 
+    if(localize) {
+#>
+import { LocalizationService } from '@abp/ng.core';
+<# 
+    }
+#>
+
+import { <#= GetModelClassNameWithAnglr(AngularJsonFile, Model, columnSelectorItemInterfaceFolder, columnSelectorDlgComponentFolder) #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorItemInterfaceFolder, columnSelectorDlgComponentFolder)#>';
+import { <#= GetComponentClassNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentFolder, columnSelectorDlgComponentFolder) #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentFolder, columnSelectorDlgComponentFolder)#>';
+
+/* eslint-disable @angular-eslint/no-input-rename */
+
+@Component({
+  selector: 'app-<#= componentSelectorCommonPart #>',
+  templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorDlgHtmlComponentFolder, columnSelectorDlgComponentFolder)#>.html',
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorDlgCssComponentFolder, columnSelectorDlgComponentFolder)#>.css']
+})
+
+export class <#= columnSelectorDlgComponentClassName #> { 
+    @ViewChild(<#= GetComponentClassName(Model, columnSelectorComponentFolder) #>) childForm: <#= GetComponentClassName(Model, columnSelectorComponentFolder) #>|any;
+
+    @Input('data')
+    public data: Array<<#=  GetModelClassNameWithAnglr(AngularJsonFile, Model, columnSelectorItemInterfaceFolder, columnSelectorDlgComponentFolder) #>>|any;
+
+<# 
+    if(localize) {
+#>
+    NoClSel: string | null = null;
+<# 
+    }
+#>
+
+    constructor(
+<# 
+    if(localize) {
+#>
+        private L: LocalizationService, 
+<# 
+    }
+#>
+        public dialogRef: NgbActiveModal
+        ) { 
+<# 
+    if(localize) {
+#>
+        this.NoClSel = this.L.instant({
+          key: 'CmSt::NoClSel',
+          defaultValue: "No columns selected",
+        });
+<# 
+    }
+#>
+        }
+    onCancel() {
+        this.dialogRef.dismiss();
+    }
+    onOk() {
+        if (typeof this.childForm === 'undefined') return;
+        if (this.childForm === null) return;
+        let ind = this.childForm.colums.findIndex((e: { checked: boolean; }) => { return e.checked === true; })
+        if(ind < 0) {
+<# 
+    if(localize) {
+#>
+            this.childForm.shwoError(this.NoClSel);
+<# 
+    } else {
+#>
+            this.childForm.shwoError('No columns selected');
+<# 
+    }
+#>
+            return;
+        }
+        this.dialogRef.close(this.childForm.colums);
+    }
+}
+
+

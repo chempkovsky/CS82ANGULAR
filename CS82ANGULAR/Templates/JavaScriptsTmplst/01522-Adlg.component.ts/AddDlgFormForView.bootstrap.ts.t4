@@ -45,6 +45,10 @@ import { <#= viewInterfaceADlgClassName #> } from '<#= GetFolderNameWithAnglr(An
 import { <#= addformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, addformComponentFolder, adddlgComponentFolder) #>';
 import { <#= viewInterfaceName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, adddlgComponentFolder) #>';
 
+/* eslint-disable @angular-eslint/no-output-on-prefix */
+/* eslint-disable @angular-eslint/no-output-rename */
+/* eslint-disable @angular-eslint/no-input-rename */
+
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, adddlgHtmlFolder, adddlgComponentFolder) #>.html',

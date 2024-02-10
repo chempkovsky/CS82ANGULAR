@@ -23,6 +23,10 @@ namespace <#= GetModelNameSpace(Model) #> {
     public class <#= Model.ViewName #> {
 <#
         foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(Model.UseOnlyRootPropsForSelect) {
+                if(!string.IsNullOrEmpty(prop.ForeignKeyName)) continue;
+                if(!string.IsNullOrEmpty(prop.ForeignKeyNameChain)) continue;
+            }
             if(Model.GenerateJSonAttribute) { 
 #>
         [JsonProperty(PropertyName = "<#= prop.JsonPropertyName #>")]

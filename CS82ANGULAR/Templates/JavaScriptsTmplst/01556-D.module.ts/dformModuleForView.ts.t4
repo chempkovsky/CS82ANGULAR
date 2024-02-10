@@ -103,10 +103,10 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
     exports: [
         <#=  dformComponentClassName #>,
         <#=  dformDlgComponentClassName #>
-    ],
-    entryComponents: [
-        <#=  dformDlgComponentClassName #>
     ]
+//    entryComponents: [
+//        <#=  dformDlgComponentClassName #>
+//    ]
 })
 export class <#= dformModuleClassName #> { }
 

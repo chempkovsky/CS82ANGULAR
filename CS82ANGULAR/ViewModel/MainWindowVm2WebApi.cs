@@ -1,4 +1,5 @@
 ﻿using CS82ANGULAR.Helpers;
+using CS82ANGULAR.Model;
 using CS82ANGULAR.Model.Serializable;
 using CS82ANGULAR.View;
 using EnvDTE80;
@@ -7,6 +8,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -22,10 +24,20 @@ namespace CS82ANGULAR.ViewModel
         UserControlT4Editor T4EditorUC = null;
         UserControlSelectSource SelectDbContextUC = null;
         UserControlCreateWebApi CreateWebApiUC = null;
+        GenTypeItem gti = null;
         #endregion
 
         public MainWindowVm2WebApi(DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory) : base(dte, textTemplating, dialogFactory)
         {
+            GenTypeItems.Add(new GenTypeItem() { GtDisplayName = "1 IRepository(Interface)", GtType = "IRepo", GtItmPath = "WebApiRepoInterfaceTmplst", GtLstPath = "" });
+            GenTypeItems.Add(new GenTypeItem() { GtDisplayName = "2 Repository(Class)", GtType = "Repo", GtItmPath = "WebApiRepoClassTmplst", GtLstPath = "" });
+            GenTypeItems.Add(new GenTypeItem() { GtDisplayName = "3 Manager(Class)", GtType = "Manager", GtItmPath = "WebApiManagerClassTmplst", GtLstPath = "" });
+            GenTypeItems.Add(new GenTypeItem() { GtDisplayName = "4 IAppService(Interface)", GtType = "IService", GtItmPath = "WebApiAppServiceInterfaceTmplst", GtLstPath = "" });
+            GenTypeItems.Add(new GenTypeItem() { GtDisplayName = "5 AppService(Class)", GtType = "Service", GtItmPath = "WebApiAppServiceClassTmplst", GtLstPath = "" });
+            GenTypeItems.Add(new GenTypeItem() { GtDisplayName = "6 WebApi(Class)", GtType = "WebApi", GtItmPath = "WebApiControllerTmplst", GtLstPath = "" });
+            GenTypeComboSelectedItem = GenTypeItems[5];
+            gti = GenTypeItems[5];
+
             InvitationViewModel InvitationVM = new InvitationViewModel();
             InvitationVM.WizardName = "#3 WebApi Wizard";
             InvitationVM.IsReady.IsReadyEvent += InvitationViewModel_IsReady;
@@ -44,6 +56,9 @@ namespace CS82ANGULAR.ViewModel
                     PrevBtnEnabled = false;
                     NextBtnEnabled = true;
                     SaveBtnEnabled = false;
+                    GenTypeComboVisibility = Visibility.Collapsed;
+                    GenTypeComboEnabled = false;
+
                     this.CurrentUserControl = InvitationUC;
                     this.OnPropertyChanged("CurrentUserControl");
                     break;
@@ -52,6 +67,8 @@ namespace CS82ANGULAR.ViewModel
                     PrevBtnEnabled = true;
                     NextBtnEnabled = false;
                     SaveBtnEnabled = false;
+                    GenTypeComboVisibility = Visibility.Collapsed;
+                    GenTypeComboEnabled = false;
                     (SelectDbContextUC.DataContext as SelectDbContextViewModel).CheckIsReady();
                     this.CurrentUserControl = SelectDbContextUC;
                     this.OnPropertyChanged("CurrentUserControl");
@@ -61,6 +78,8 @@ namespace CS82ANGULAR.ViewModel
                     PrevBtnEnabled = true;
                     NextBtnEnabled = false;
                     SaveBtnEnabled = false;
+                    GenTypeComboVisibility = Visibility.Visible;
+                    GenTypeComboEnabled = true;
                     (CreateWebApiUC.DataContext as CreateWebApiViewModel).CheckIsReady();
                     this.CurrentUserControl = CreateWebApiUC;
                     this.OnPropertyChanged("CurrentUserControl");
@@ -70,6 +89,8 @@ namespace CS82ANGULAR.ViewModel
                     PrevBtnEnabled = true;
                     NextBtnEnabled = true;
                     SaveBtnEnabled = false;
+                    GenTypeComboVisibility = Visibility.Visible;
+                    GenTypeComboEnabled = false;
                     (T4EditorUC.DataContext as T4EditorViewModel).CheckIsReady();
                     this.CurrentUserControl = T4EditorUC;
                     this.OnPropertyChanged("CurrentUserControl");
@@ -90,6 +111,8 @@ namespace CS82ANGULAR.ViewModel
                     PrevBtnEnabled = true;
                     NextBtnEnabled = false;
                     SaveBtnEnabled = false;
+                    GenTypeComboVisibility = Visibility.Collapsed;
+                    GenTypeComboEnabled = false;
                     if (SelectDbContextUC == null)
                     {
                         SelectDbContextViewModel dataContext = new SelectDbContextViewModel(Dte);
@@ -111,6 +134,8 @@ namespace CS82ANGULAR.ViewModel
                     CurrentUiStepId = 2;
                     PrevBtnEnabled = true;
                     NextBtnEnabled = false;
+                    GenTypeComboVisibility = Visibility.Visible;
+                    GenTypeComboEnabled = true;
                     if (CreateWebApiUC == null)
                     {
                         CreateWebApiViewModel dataContext = new CreateWebApiViewModel(Dte);
@@ -130,15 +155,19 @@ namespace CS82ANGULAR.ViewModel
                     CurrentUiStepId = 3;
                     PrevBtnEnabled = true;
                     NextBtnEnabled = false;
+                    GenTypeComboVisibility = Visibility.Visible;
+                    GenTypeComboEnabled = false;
                     if (T4EditorUC == null)
                     {
                         //string templatePath = Path.Combine("Templates", "ViewModel.cs.t4");
                         string TemplatesFld = TemplatePathHelper.GetTemplatePath();
-                        string templatePath = Path.Combine(TemplatesFld, "WebApiServiceTmplst");
+                        string templatePath = Path.Combine(TemplatesFld, "WebApiControllerTmplst");
                         T4EditorViewModel dataContext = new T4EditorViewModel(templatePath);
                         dataContext.IsReady.IsReadyEvent += CallBack_IsReady;
                         T4EditorUC = new UserControlT4Editor(dataContext);
                     }
+                    gti = (GenTypeComboSelectedItem as GenTypeItem);
+                    (T4EditorUC.DataContext as T4EditorViewModel).T4TemplateFolder = Path.Combine(TemplatePathHelper.GetTemplatePath(), gti.GtItmPath);
                     (T4EditorUC.DataContext as T4EditorViewModel).CheckIsReady();
                     this.CurrentUserControl = T4EditorUC;
                     this.OnPropertyChanged("CurrentUserControl");
@@ -147,6 +176,9 @@ namespace CS82ANGULAR.ViewModel
                     CurrentUiStepId = 4;
                     PrevBtnEnabled = true;
                     NextBtnEnabled = true;
+                    GenTypeComboVisibility = Visibility.Visible;
+                    GenTypeComboEnabled = false;
+                    (T4EditorUC.DataContext as T4EditorViewModel).T4TemplateFolder = Path.Combine(TemplatePathHelper.GetTemplatePath(), gti.GtItmPath);
                     IVsThreadedWaitDialog2 aDialog = null;
                     bool aDialogStarted = false;
                     if (this.DialogFactory != null)
@@ -199,6 +231,8 @@ namespace CS82ANGULAR.ViewModel
                     PrevBtnEnabled = true;
                     NextBtnEnabled = false;
                     SaveBtnEnabled = false;
+                    GenTypeComboVisibility = Visibility.Visible;
+                    GenTypeComboEnabled = true;
                     (CreateWebApiUC.DataContext as CreateWebApiViewModel).CheckIsReady();
                     this.CurrentUserControl = CreateWebApiUC;
                     this.OnPropertyChanged("CurrentUserControl");
@@ -215,6 +249,48 @@ namespace CS82ANGULAR.ViewModel
             ModelViewSerializable modelViewSerializable = (GenerateUC.DataContext as GenerateCommonStaffViewModel).GeneratedModelView;
             ModelViewSerializable existedModelViewSerializable =
                 localDbContext.ModelViews.FirstOrDefault(mv => mv.ViewName == modelViewSerializable.ViewName);
+
+            GenTypeItem si = (this.GenTypeComboSelectedItem as GenTypeItem);
+            string GtType = "WebApi";
+            if (si != null)
+            {
+                GtType = si.GtType;
+            }
+            if(modelViewSerializable.GeneratedServices == null)
+            {
+                modelViewSerializable.GeneratedServices = new List<GeneratedServiceSerializable>();
+            }
+            GeneratedServiceSerializable gss = modelViewSerializable.GeneratedServices.FirstOrDefault(d => d.SrvType == GtType);
+            if (gss == null)
+            {
+                gss = new GeneratedServiceSerializable();
+                modelViewSerializable.GeneratedServices.Add(gss);
+            }
+            gss.SrvDefaultProjectNameSpace = modelViewSerializable.WebApiServiceDefaultProjectNameSpace;
+            gss.SrvFolder = modelViewSerializable.WebApiServiceFolder;
+            gss.SrvType = GtType;
+            switch(GtType)
+            {
+                case "IRepo":
+                    gss.SrvClassName = "I" + modelViewSerializable.ViewName + "Repo";
+                    break;
+                case "Repo":
+                    gss.SrvClassName = modelViewSerializable.ViewName + "Repo";
+                    break;
+                case "Manager":
+                    gss.SrvClassName = modelViewSerializable.ViewName + "Manager";
+                    break;
+                case "IService":
+                    gss.SrvClassName = "I" + modelViewSerializable.ViewName + "Service";
+                    break;
+                case "Service":
+                    gss.SrvClassName = modelViewSerializable.ViewName + "Service";
+                    break;
+                default:
+                    gss.SrvClassName = modelViewSerializable.WebApiServiceName;
+                    break;
+            }
+
 
             if (existedModelViewSerializable != null)
             {
@@ -268,7 +344,8 @@ namespace CS82ANGULAR.ViewModel
                         SolutionDirectory,
                         Path.GetDirectoryName(modelViewSerializable.WebApiServiceProject),
                         modelViewSerializable.WebApiServiceFolder,
-                        modelViewSerializable.WebApiServiceName
+                        //modelViewSerializable.WebApiServiceName
+                        gss.SrvClassName
                         + (GenerateUC.DataContext as GenerateCommonStaffViewModel).FileExtension);
                     File.WriteAllText(FlNm, (GenerateUC.DataContext as GenerateCommonStaffViewModel).GenerateText);
                 }

@@ -690,11 +690,11 @@
         string GetCommonServiceClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, DbContextSerializable context, string fileType, string currFolder)
         {
             string result = GetCommonServiceClassName(context, fileType);
-            if (model == null)
+            if ((model == null) || (context == null))
             {
                 return result;
             }
-            if (model.CommonStaffs == null)
+            if ((model.CommonStaffs == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -761,7 +761,7 @@
             {
                 return result;
             }
-            if (model.CommonStaffs == null)
+            if ((model.CommonStaffs == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -897,7 +897,7 @@
             {
                 return result;
             }
-            if ((model.CommonStaffs == null) || (context.ModelViews == null))
+            if ((model.CommonStaffs == null) || (context.ModelViews == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -1049,7 +1049,7 @@
             {
                 return result;
             }
-            if ((model.CommonStaffs == null) || (context.ModelViews == null))
+            if ((model.CommonStaffs == null) || (context.ModelViews == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -1518,6 +1518,94 @@
         string GetModuleClassNameWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
         {
             string result = GetModuleClassName(model, fileType);
+            if ((model == null) || (currModel == null))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (currModel.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                currModel.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+
+        string GetModuleServiceClassName(ModelViewSerializable model, string fileType)
+        {
+            string result = "";
+            if ((model == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            if (refItem == null)
+            {
+                return result;
+            }
+            if (string.IsNullOrEmpty(refItem.FileName))
+            {
+                return result;
+            }
+            string fn = refItem.FileName.Replace(".module", "Module").Replace(".routing", "Routing").Replace(".service", "Service");
+            StringBuilder sb = new StringBuilder();
+            bool toUpper = true;
+            foreach (char c in fn)
+            {
+                if (c == '-')
+                {
+                    toUpper = true;
+                }
+                else
+                {
+                    if (toUpper)
+                    {
+                        sb.Append(Char.ToUpper(c));
+                        toUpper = false;
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+            }
+            return sb.ToString();
+        }
+        string GetModuleServiceClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetModuleServiceClassName(model, fileType);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetModuleServiceClassNameWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            string result = GetModuleServiceClassName(model, fileType);
             if ((model == null) || (currModel == null))
             {
                 return result;
@@ -2068,7 +2156,7 @@
             {
                 return result;
             }
-            if (model.CommonStaffs == null)
+            if ((model.CommonStaffs == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -2143,7 +2231,7 @@
             {
                 return result;
             }
-            if (model.CommonStaffs == null)
+            if ((model.CommonStaffs == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -2169,7 +2257,7 @@
             {
                 return result;
             }
-            if (model.CommonStaffs == null)
+            if ((model.CommonStaffs == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -7051,7 +7139,7 @@
             {
                 return result;
             }
-            if (feature.CommonStaffs == null)
+            if ((feature.CommonStaffs == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -7072,7 +7160,7 @@
             {
                 return result;
             }
-            if (feature.CommonStaffs == null)
+            if ((feature.CommonStaffs == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -7835,5 +7923,18 @@
             return rslt;
         }
 
+        string AbpFirstItemOfNameSpace(string inpt)
+        {
+            string rslt = "";
+            if (!string.IsNullOrEmpty(inpt))
+            {
+                string[] itms = inpt.Split('.');
+                if(itms.Length > 0)
+                {
+                    rslt = itms[0];
+                }
+            }
+            return rslt;
+        }
 
 #>

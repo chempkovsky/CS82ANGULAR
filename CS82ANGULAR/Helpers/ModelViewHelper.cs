@@ -38,6 +38,7 @@ namespace CS82ANGULAR.Helpers
             selectedModel.RootEntityClassName = "";
             selectedModel.RootEntityFullClassName = "";
             selectedModel.RootEntityUniqueProjectName = "";
+            selectedModel.BaseClass = "";
             if (selectedModel.ScalarProperties == null)
             {
                 selectedModel.ScalarProperties = new ObservableCollection<ModelViewProperty>();
@@ -63,6 +64,16 @@ namespace CS82ANGULAR.Helpers
                 selectedModel.UniqueKeys = new ObservableCollection<ModelViewUniqueKey>();
             }
             selectedModel.UniqueKeys.Clear();
+            if(selectedModel.GeneratedDtos == null)
+            {
+                selectedModel.GeneratedDtos = new ObservableCollection<GeneratedDto>();
+            }
+            selectedModel.GeneratedDtos.Clear();
+            if (selectedModel.GeneratedServices == null)
+            {
+                selectedModel.GeneratedServices = new ObservableCollection<GeneratedService>();
+            }
+            selectedModel.GeneratedServices.Clear();
             return selectedModel;
         }
         public static ModelViewSerializable ClearModelViewSerializable(this ModelViewSerializable selectedModel)
@@ -74,6 +85,7 @@ namespace CS82ANGULAR.Helpers
             selectedModel.RootEntityUniqueProjectName = "";
             selectedModel.Title = "";
             selectedModel.PluralTitle = "";
+            selectedModel.BaseClass = "";
 
             if (selectedModel.ScalarProperties == null)
             {
@@ -111,6 +123,17 @@ namespace CS82ANGULAR.Helpers
                 selectedModel.UniqueKeys = new List<ModelViewUniqueKeySerializable>();
             }
             selectedModel.UniqueKeys.Clear();
+            if (selectedModel.GeneratedDtos == null)
+            {
+                selectedModel.GeneratedDtos = new List<GeneratedDtoSerializable>();
+            }
+            selectedModel.GeneratedDtos.Clear();
+
+            if (selectedModel.GeneratedServices == null)
+            {
+                selectedModel.GeneratedServices = new List<GeneratedServiceSerializable>();
+            }
+            selectedModel.GeneratedServices.Clear();
 
             return selectedModel;
         }
@@ -458,9 +481,13 @@ namespace CS82ANGULAR.Helpers
             destModel.ViewDefaultProjectNameSpace = srcModel.ViewDefaultProjectNameSpace;
             destModel.ViewFolder = srcModel.ViewFolder;
             destModel.GenerateJSonAttribute = srcModel.GenerateJSonAttribute;
+            destModel.UseOnlyRootPropsForSelect = srcModel.UseOnlyRootPropsForSelect;
             destModel.PageViewName = srcModel.PageViewName;
+            destModel.DomainPageViewName = srcModel.DomainPageViewName;
+            destModel.DomainViewName = srcModel.DomainViewName;
             destModel.Title = srcModel.Title;
             destModel.PluralTitle = srcModel.PluralTitle;
+            destModel.BaseClass = srcModel.BaseClass;
             if (srcModel.ScalarProperties != null)
             {
                 foreach (ModelViewProperty prop in srcModel.ScalarProperties)
@@ -525,7 +552,20 @@ namespace CS82ANGULAR.Helpers
                     destModel.UIListProperties.Add(prop.ModelViewUIListPropertyAssignTo(new ModelViewUIListPropertySerializable()));
                 }
             }
-
+            if (srcModel.GeneratedDtos != null)
+            {
+                foreach (GeneratedDto prop in srcModel.GeneratedDtos)
+                {
+                    destModel.GeneratedDtos.Add(prop.ModelViewGeneratedDtoAssignTo(new GeneratedDtoSerializable()));
+                }
+            }
+            if (srcModel.GeneratedServices != null)
+            {
+                foreach (GeneratedService prop in srcModel.GeneratedServices)
+                {
+                    destModel.GeneratedServices.Add(prop.ModelViewGeneratedServiceAssignTo(new GeneratedServiceSerializable()));
+                }
+            }
 
             return destModel;
         }
@@ -575,6 +615,25 @@ namespace CS82ANGULAR.Helpers
             destProp.JsonPropertyName = srcProp.JsonPropertyName;
             destProp.IsRequiredInView = srcProp.IsRequiredInView;
             return destProp;
+        }
+        public static GeneratedDto GeneratedDtoSerializableAssingTo(this GeneratedDtoSerializable src, GeneratedDto dest)
+        {
+            if ((src == null) || (dest == null)) return null;
+            dest.ViewDefaultProjectNameSpace = src.ViewDefaultProjectNameSpace;
+            dest.ViewProject = src.ViewProject;
+            dest.ViewType = src.ViewType;
+            dest.ViewClassName = src.ViewClassName;
+            dest.PageViewClassName = src.ViewClassName;
+            return dest;
+        }
+        public static GeneratedService GeneratedServiceSerializableAssingTo(this GeneratedServiceSerializable src, GeneratedService dest)
+        {
+            if ((src == null) || (dest == null)) return null;
+            dest.SrvClassName = src.SrvClassName;
+            dest.SrvType = src.SrvType;
+            dest.SrvFolder = src.SrvFolder;
+            dest.SrvDefaultProjectNameSpace = src.SrvDefaultProjectNameSpace;
+            return dest;
         }
         public static ModelViewProperty ModelViewPropertySerializableAssingTo(this ModelViewPropertyOfVwSerializable srcProp, ModelViewProperty destProp)
         {
@@ -823,6 +882,8 @@ namespace CS82ANGULAR.Helpers
             {
                 ViewName = srcModelViewSerializable.ViewName,
                 PageViewName = srcModelViewSerializable.PageViewName,
+                DomainViewName = srcModelViewSerializable.DomainViewName,
+                DomainPageViewName = srcModelViewSerializable.DomainPageViewName,
                 Title = srcModelViewSerializable.Title,
                 PluralTitle = srcModelViewSerializable.PluralTitle,
                 RootEntityClassName = srcModelViewSerializable.RootEntityClassName,
@@ -830,8 +891,11 @@ namespace CS82ANGULAR.Helpers
                 RootEntityUniqueProjectName = srcModelViewSerializable.RootEntityUniqueProjectName,
                 ViewProject = srcModelViewSerializable.ViewProject,
                 ViewDefaultProjectNameSpace = srcModelViewSerializable.ViewDefaultProjectNameSpace,
+                GeneratedDtos = srcModelViewSerializable.GeneratedDtos,
                 ViewFolder = srcModelViewSerializable.ViewFolder,
+                BaseClass = srcModelViewSerializable.BaseClass,
                 GenerateJSonAttribute = srcModelViewSerializable.GenerateJSonAttribute,
+                UseOnlyRootPropsForSelect = srcModelViewSerializable.UseOnlyRootPropsForSelect,
                 ScalarProperties = srcModelViewSerializable.ScalarProperties,
                 ForeignKeys = srcModelViewSerializable.ForeignKeys,
                 UniqueKeys = srcModelViewSerializable.UniqueKeys,
@@ -903,7 +967,11 @@ namespace CS82ANGULAR.Helpers
             destModelView.Title = srcModelView.Title;
             destModelView.PluralTitle = srcModelView.PluralTitle;
             destModelView.GenerateJSonAttribute = srcModelView.GenerateJSonAttribute;
+            destModelView.UseOnlyRootPropsForSelect = srcModelView.UseOnlyRootPropsForSelect;
             destModelView.PageViewName = srcModelView.PageViewName;
+            destModelView.DomainViewName = srcModelView.DomainViewName;
+            destModelView.DomainPageViewName = srcModelView.DomainPageViewName;
+            destModelView.BaseClass = srcModelView.BaseClass;
             if (srcModelView.ScalarProperties != null)
             {
                 if (destModelView.ScalarProperties == null)
@@ -922,6 +990,30 @@ namespace CS82ANGULAR.Helpers
                     }
                 }
             }
+            if (srcModelView.GeneratedDtos != null)
+            {
+                if (destModelView.GeneratedDtos == null)
+                {
+                    destModelView.GeneratedDtos = new ObservableCollection<GeneratedDto>();
+                } else destModelView.GeneratedDtos.Clear();
+                foreach (GeneratedDtoSerializable srcProp in srcModelView.GeneratedDtos)
+                {
+                    destModelView.GeneratedDtos.Add(srcProp.GeneratedDtoSerializableAssingTo(new GeneratedDto()));
+                }
+            }
+            if (srcModelView.GeneratedServices != null)
+            {
+                if (destModelView.GeneratedServices == null)
+                {
+                    destModelView.GeneratedServices = new ObservableCollection<GeneratedService>();
+                }
+                else destModelView.GeneratedServices.Clear();
+                foreach (GeneratedServiceSerializable srcProp in srcModelView.GeneratedServices)
+                {
+                    destModelView.GeneratedServices.Add(srcProp.GeneratedServiceSerializableAssingTo(new GeneratedService()));
+                }
+            }
+
             if (srcModelView.ForeignKeys != null)
             {
                 if (destModelView.ForeignKeys == null)
@@ -1236,6 +1328,26 @@ namespace CS82ANGULAR.Helpers
             dest.IsNewLineAfter = src.IsNewLineAfter;
             return dest;
         }
+        public static GeneratedDtoSerializable ModelViewGeneratedDtoAssignTo(this GeneratedDto src, GeneratedDtoSerializable dest)
+        {
+            if ((src == null) || (dest == null)) return dest;
+            dest.ViewProject = src.ViewProject;
+            dest.ViewDefaultProjectNameSpace = src.ViewDefaultProjectNameSpace;
+            dest.ViewType = src.ViewType;
+            dest.ViewClassName = src.ViewClassName;
+            dest.PageViewClassName = src.ViewClassName;
+            return dest;
+        }
+        public static GeneratedServiceSerializable ModelViewGeneratedServiceAssignTo(this GeneratedService src, GeneratedServiceSerializable dest)
+        {
+            if ((src == null) || (dest == null)) return dest;
+            dest.SrvClassName = src.SrvClassName;
+            dest.SrvType = src.SrvType;
+            dest.SrvFolder = src.SrvFolder;
+            dest.SrvDefaultProjectNameSpace = src.SrvDefaultProjectNameSpace;
+            return dest;
+        }
+
         public static List<ModelViewSerializable> GetViewsByForeignNameChain(this DbContextSerializable context, string ViewName, string foreignKeyNameChain)
         {
             if ((context == null) || (string.IsNullOrEmpty(ViewName)))
@@ -1539,13 +1651,17 @@ namespace CS82ANGULAR.Helpers
 
                 ViewName = srcModelViewSerializable.ViewName,
                 PageViewName = srcModelViewSerializable.PageViewName,
+                DomainViewName = srcModelViewSerializable.DomainViewName,
+                DomainPageViewName = srcModelViewSerializable.DomainPageViewName,
                 Title = srcModelViewSerializable.Title,
                 PluralTitle = srcModelViewSerializable.PluralTitle,
+                BaseClass = srcModelViewSerializable.BaseClass,
 
                 ViewProject = destinationProject,
                 ViewDefaultProjectNameSpace = defaultProjectNameSpace,
                 ViewFolder = destinationFolder,
                 GenerateJSonAttribute = srcModelViewSerializable.GenerateJSonAttribute,
+                UseOnlyRootPropsForSelect = srcModelViewSerializable.UseOnlyRootPropsForSelect,
 
                 WebApiRoutePrefix = srcModelViewSerializable.WebApiRoutePrefix,
                 WebApiServiceName = srcModelViewSerializable.WebApiServiceName,
@@ -1582,12 +1698,16 @@ namespace CS82ANGULAR.Helpers
 
                 ViewName = srcModelViewSerializable.ViewName,
                 PageViewName = srcModelViewSerializable.PageViewName,
+                DomainViewName = srcModelViewSerializable.DomainViewName,
+                DomainPageViewName = srcModelViewSerializable.DomainPageViewName,
                 Title = srcModelViewSerializable.Title,
+                BaseClass = srcModelViewSerializable.BaseClass,
                 PluralTitle = srcModelViewSerializable.PluralTitle,
                 ViewProject = destinationProject,
                 ViewDefaultProjectNameSpace = defaultProjectNameSpace,
                 ViewFolder = destinationFolder,
                 GenerateJSonAttribute = srcModelViewSerializable.GenerateJSonAttribute,
+                UseOnlyRootPropsForSelect = srcModelViewSerializable.UseOnlyRootPropsForSelect,
 
                 WebApiRoutePrefix = srcModelViewSerializable.WebApiRoutePrefix,
                 WebApiServiceName = srcModelViewSerializable.WebApiServiceName,

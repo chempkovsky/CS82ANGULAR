@@ -43,9 +43,9 @@ import { <#= rlComponentRoutingModuleClassName #> } from '<#= GetFolderNameWithA
         <#= rlComponentRoutingModuleClassName #>,
     ],
     exports: [
-    ],
-    entryComponents: [
     ]
+//    entryComponents: [
+//    ]
 })
 export class <#= rlComponentLazyRoutingModuleClassName #> { }
 

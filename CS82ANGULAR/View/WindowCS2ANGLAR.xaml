@@ -37,11 +37,26 @@
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
         <!--<local:UserControlVMCFS Grid.Row="0"/>-->
+        <!--
+                      ItemsSource ="{Binding ModelViews, Mode=TwoWay}"
+                      SelectedValue="{Binding SelectedItemViewName}"
+                      SelectedValuePath="ViewName"
+                      DisplayMemberPath="ViewName"
+                    -->
         <StackPanel Orientation="Horizontal" Grid.Row="1" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+            <ComboBox x:Name="GenTypeCombo"  Width="267"  Margin="10, 7, 1, 7" 
+                      Visibility="{Binding GenTypeComboVisibility, Mode=TwoWay}" 
+                      IsEnabled="{Binding GenTypeComboEnabled, Mode=TwoWay}"
+                      SelectedItem ="{Binding GenTypeComboSelectedItem, Mode=TwoWay}"
+                      DisplayMemberPath="GtDisplayName"
+                      ItemsSource="{Binding Path=GenTypeItems, Mode=TwoWay}"
+                      IsEditable="False" >
+            </ComboBox>
             <Button x:Name="PrevBtn"     Margin="10, 7, 1, 7" Command="{Binding PrevBtnCommand}" Content=" &lt;&lt; Previous "></Button>
             <Button x:Name="NextBtn"     Margin="1,  7, 1,  7" Command="{Binding NextBtnCommand}" Content=" Next &gt;&gt; "/>
             <Button x:Name="SaveBtn"     Margin="1,  7, 1, 7" Command="{Binding SaveBtnCommand}" Content=" Save " Style="{StaticResource SaveButtonStyle}"/>
             <Button x:Name="CancelBtn"   Margin="7,  7, 1, 7" Command="{Binding CancelBtnCommand}" Content=" Cancel " />
+            
         </StackPanel>
         <ContentControl Grid.Row="0" Content="{Binding CurrentUserControl}" />
     </Grid>

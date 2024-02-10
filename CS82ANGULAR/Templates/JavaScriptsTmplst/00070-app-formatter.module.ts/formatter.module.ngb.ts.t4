@@ -44,8 +44,8 @@ import { <#= toBinaryFormatterDirectiveClassName #> } from '<#= GetFolderName(Mo
         <#= toBinaryPipeClassName #>,
         <#= toBinaryFormatterDirectiveClassName #>,
     ],
-    entryComponents: [
-    ],
+//    entryComponents: [
+//    ],
     providers: [
         <#= toBinaryPipeClassName #>,
     ]

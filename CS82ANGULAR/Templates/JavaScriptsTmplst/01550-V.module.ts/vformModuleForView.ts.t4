@@ -103,11 +103,12 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
     exports: [
         <#=  vformComponentClassName #>,
         <#=  vformDlgComponentClassName #>
-    ],
-    entryComponents: [
-        <#=  vformDlgComponentClassName #>
     ]
+//    entryComponents: [
+//        <#=  vformDlgComponentClassName #>
+//    ]
 })
-export class <#= vformModuleClassName #> { }
+export class <#= vformModuleClassName #> { 
+}
 
 

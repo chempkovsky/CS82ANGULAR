@@ -69,10 +69,10 @@ import { <#=  appTblModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr
     exports: [
         <#=  searchComponentClassName #>,
         <#=  searchDlgComponentClassName #>
-    ],
-    entryComponents: [
-        <#=  searchDlgComponentClassName #>
     ]
+//    entryComponents: [
+//        <#=  searchDlgComponentClassName #>
+//    ]
 })
 export class <#= searchModuleClassName #> { }
 

@@ -1,0 +1,1081 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+
+<#
+    string OperatorSufix = "Oprtr";
+    string EqualOperator = "eq";
+
+
+    string GetAllMethodName                     = "getall";
+    string GetWithFilterMethodName              = "getwithfilter";
+    string GetOneMethodName                     = "getone";
+    string GetOneByMethodNamePrefix             = "getoneby";
+    string UpdateOneMethodName                  = "updateone";
+    string AddOneMethodName                     = "addone";
+    string DeleteOneMethodName                  = "deleteone";
+    string GetManyByRepPrimMethodNamePrefix     = "getmanybyrepprim";
+    string GetManyByRepUnqMethodNamePrefix      = "getmanybyrepunq";
+
+
+    string AppSettingServicePropName            = "appGlblSettings";
+    string MasterToClientKeyFieldsMapFieldName  = "m2cKeyfm";
+    string MasterToClientFieldsMapFieldName     = "m2cfm";
+    string ClientToMasterFieldsMapFieldName     = "c2mfm";
+    string HiddenFilterByFltRsltSuffix          = "HiddenFilterByFltRslt";
+    string HiddenFilterAsFltRsltSuffix          = "HiddenFilterAsFltRslt";
+    string HiddenFilterByRowSuffix              = "HiddenFilterByRow";
+    string HiddenFilterFieldName                = "hf";
+
+    string LengthSuffix                         = "Length";
+    string KeysSuffix                           = "Keys";
+    string ValueSuffix                          = "Value";
+    string ValuesSuffix                         = "Values";
+    string row2FilterRsltMethodName             = "row2FilterRslt";
+    string filterRslt2rowMethodName             = "filterRslt2row";
+    string row2FilterMethodName                 = "row2Filter";
+    string filter2rowMethodName                 = "filter2row";
+
+    string src2destMethodName                   = "src2dest";
+
+    string viewServiceFolder                    = "01400-.service.ts";
+    string serviceClassName                     = GetServiceClassName(Model, viewServiceFolder);
+
+
+    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName           = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, viewServiceFolder);
+
+    string filterResultModelFolder              = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, filterResultModelFolder, viewServiceFolder);
+
+    string viewInterfaceFolder                  = "01100-.interface.ts";
+    string viewInterfaceName                    = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, viewServiceFolder);
+
+    string viewInterfacePageFolder              = "01200-Page.interface.ts";
+    string viewInterfacePageName                = GetInterfacePageNameWithAnglr(AngularJsonFile, Model, viewInterfacePageFolder, viewServiceFolder);
+
+    string viewInterfaceFltFolder               = "01300-Filter.interface.ts";
+    string viewInterfaceFilterName              = GetInterfaceFilterNameWithAnglr(AngularJsonFile, Model, viewInterfaceFltFolder, viewServiceFolder);
+
+    string apiName                              = AbpFirstItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
+
+    List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
+    {
+        ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
+        if (pk != null) uniqueKeys.Add(pk);
+        GetModelUniqueKeys(Model, uniqueKeys);
+    } 
+
+#>
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs/internal/Observable';
+import { RestService, Rest } from '@abp/ng.core';
+import { <#= viewInterfaceName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, viewServiceFolder) #>';
+import { <#= viewInterfacePageName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfacePageFolder, viewServiceFolder) #>';
+import { <#= viewInterfaceFilterName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFltFolder, viewServiceFolder) #>';
+
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, viewServiceFolder) #>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterResultModelFolder, viewServiceFolder) #>';
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class <#= serviceClassName #> {
+    apiName: string = '<#= apiName #>';
+    serviceUrl: string;  
+    constructor(private restService: RestService, private http: HttpClient, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {
+       this.serviceUrl = this.<#= AppSettingServicePropName #>.getWebApiPrefix('<#= Model.ViewName #>') + '<#= GetWebApiServicePrefix(Model) #>';  
+    }
+    protected _<#= ValuesSuffix #>: {[key: string]: {org: string, fk: string, fkchain: string, isinprimkey: boolean, isinunqkey: boolean, required: boolean, dbgenerated: boolean, dttp: string}} = {
+<#
+    if (Model.ScalarProperties != null) {
+        List<ModelViewPropertyOfVwSerializable> primKeyProps = GetModelPrimaryKeyProps(Model);
+        List<ModelViewPropertyOfVwSerializable> allUnkKeyProps = GetModelAllUniqueKeysProps(Model);
+        foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+            string IsInPrimKey = "false";
+            string IsInUnkKey = "false";
+            if(primKeyProps != null) {
+                if (primKeyProps.Any(k => k == prop)) {
+                    IsInPrimKey = "true";
+                }
+            }
+            if(allUnkKeyProps != null) {
+                if (allUnkKeyProps.Any(k => k == prop)) {
+                    IsInUnkKey = "true";
+                }
+            }
+            string IsDatabaseGenerated = IsDatabaseGeneratedProperty(prop, Model) ? "true" : "false";
+            string IsRequiredInView = prop.IsRequiredInView ? "true" : "false";
+            string fk = string.IsNullOrEmpty( prop.ForeignKeyName ) ? "" : prop.ForeignKeyName;
+            string fkchain = string.IsNullOrEmpty( prop.ForeignKeyNameChain ) ? "" : prop.ForeignKeyNameChain;
+#>
+      '<#= GetTypeScriptPropertyName(prop, Model) #>': {org: '<#= prop.OriginalPropertyName #>', fk: '<#= fk #>', fkchain: '<#= fkchain #>', isinprimkey: <#= IsInPrimKey #>, isinunqkey: <#= IsInUnkKey #>, required: <#= IsRequiredInView #>, dbgenerated: <#= IsDatabaseGenerated #>, dttp: '<#= GetCCharpDatatype(prop, Model) #>'},  // <#= GetPropertyTypeScriptTypeName(prop) #>, <#= GetPropertyTypeName(prop) #>
+<#
+
+        }
+    }
+#>
+    };
+    // master name, navigation name, master filed, master filed value
+    public get<#= HiddenFilterByRowSuffix #>(rw: <#= viewInterfaceName #>|any, nvNm: string|any): {[key: string]: {[key: string]: {[key: string]: any}}} {
+        let rslt: {[key: string]: {[key: string]: {[key: string]: any}}} = {}
+        if((typeof rw === 'undefined') || (typeof nvNm === 'undefined')) return rslt;
+        if((rw === null) || (nvNm === null)) return rslt;
+        for(let i in this._<#= ValuesSuffix #>) {
+            if(this.isInPrimkey<#= ValueSuffix #>(i) || this.IsInUnkKey<#= ValueSuffix #>(i)) {
+                if(typeof rslt['<#= Model.ViewName #>'] === 'undefined') rslt['<#= Model.ViewName #>'] = {};
+                if(typeof rslt['<#= Model.ViewName #>'][nvNm] === 'undefined') rslt['<#= Model.ViewName #>'][nvNm] = {};
+                rslt['<#= Model.ViewName #>'][nvNm][i] = rw[i];
+            }
+        }
+        return rslt;
+    }
+    public get<#= LengthSuffix #>(): number {
+        return Object.keys(this._<#= ValuesSuffix #>).length;
+    }
+    public get<#= KeysSuffix #>(): string[] {
+        return Object.keys(this._<#= ValuesSuffix #>);
+    }
+    public getDtTp<#= ValueSuffix #>(key: string): string {
+        return this._<#= ValuesSuffix #>[key].dttp;
+    }
+    public getFk<#= ValueSuffix #>(key: string): string {
+        return this._<#= ValuesSuffix #>[key].fk;
+    }
+    public required<#= ValueSuffix #>(key: string): boolean {
+        return this._<#= ValuesSuffix #>[key].required;
+    }
+    public dbgenerated<#= ValueSuffix #>(key: string): boolean {
+        return this._<#= ValuesSuffix #>[key].dbgenerated;
+    }
+    public isInPrimkey<#= ValueSuffix #>(key: string): boolean {
+        return this._<#= ValuesSuffix #>[key].isinprimkey;
+    }
+    public IsInUnkKey<#= ValueSuffix #>(key: string): boolean {
+        return this._<#= ValuesSuffix #>[key].isinunqkey;
+    }
+    public getKeyByOrg<#= ValueSuffix #>(org: string, fkchain: string): string|any {
+        for(let i in this._<#= ValuesSuffix #>) {
+            if(this._<#= ValuesSuffix #>[i].org === org && this._<#= ValuesSuffix #>[i].fkchain ===fkchain) return i;
+        }
+        return undefined;
+    }
+    public get<#= HiddenFilterAsFltRsltSuffix #>(<#= HiddenFilterFieldName #>: {[key: string]: {[key: string]: {[key: string]: any}}} | any): Array<<#= filterResultModelClassName #>> {
+        let rslt: Array<<#= filterResultModelClassName #>> = [];
+        if(typeof <#= HiddenFilterFieldName #> === 'undefined') return rslt;
+        if(<#= HiddenFilterFieldName #> === null) return rslt;
+        let <#= MasterToClientKeyFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}}} = this.get<#= MasterToClientKeyFieldsMapFieldName #>();
+        let <#= MasterToClientFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = this.get<#= MasterToClientFieldsMapFieldName #>();
+        for(let i in <#= HiddenFilterFieldName #>) {
+            for(let j in <#= HiddenFilterFieldName #>[i]) {
+                if( Object.keys(<#= MasterToClientKeyFieldsMapFieldName #>).indexOf(i) > -1 ) {
+                    if( Object.keys(<#= MasterToClientKeyFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
+                        for(let k in <#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
+                          if(!(typeof hf[i][j][k] === 'undefined' )) {
+                            rslt.push({
+                                fltrName: <#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm,
+                                fltrDataType: this.getDtTp<#= ValueSuffix #>(<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k].propNm),
+                                fltrOperator: 'eq',
+                                fltrValue: <#= HiddenFilterFieldName #>[i][j][k]
+                            });
+                          }
+                        }
+                    }
+                }
+/*
+                if( Object.keys(<#= MasterToClientFieldsMapFieldName #>).indexOf(i) > -1 ) {
+                    if( Object.keys(<#= MasterToClientFieldsMapFieldName #>[i]).indexOf(j) > -1 ) {
+                        for(let k in <#= MasterToClientFieldsMapFieldName #>[i][j]) {
+                          if(!(typeof hf[i][j][k] === 'undefined' )) {
+                            rslt.push({
+                                fltrName: <#= MasterToClientFieldsMapFieldName #>[i][j][k],
+                                fltrDataType: this.getDtTp<#= ValueSuffix #>(<#= MasterToClientFieldsMapFieldName #>[i][j][k]),
+                                fltrOperator: 'eq',
+                                fltrValue: <#= HiddenFilterFieldName #>[i][j][k]
+                            });
+                          }
+                        }
+                    }
+                }
+*/
+            }
+        }
+        return rslt;
+    }
+
+<#
+    {
+        List<string> errors = new List<string>();
+        List<ModelViewForeignKeySerializable> mtcfks = CollectMasterToClientFieldsMap(Model, errors);
+        foreach(string error in  errors) {
+#>
+<#= error #>
+<#
+        }
+#>
+
+    //
+    // first key is Master View Name, 
+    // second key is Direct Navigation Name, 
+    // third key is Master View Property Name, 
+    // value is a  Client View Property Name, i.e. Property Name of the Current View 
+    protected _<#= MasterToClientKeyFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}}} = {
+<#
+        if (mtcfks != null) {
+            string currentMasterView = "";
+            bool isOpened = false;
+            ModelViewSerializable masterModel = null;
+            foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) {
+                if (currentMasterView != mtcfk.ViewName) {
+                    masterModel = GetModelViewByViewName(Context, mtcfk.ViewName);
+                    if(currentMasterView == "") {
+#>
+                '<#= mtcfk.ViewName #>' : {
+<#
+                    } else {
+#>
+                },
+                '<#= mtcfk.ViewName #>' : {
+<#
+                    } // if(currentMasterView == "") {...} else {...}
+                } // if (currentMasterView != mtcfk.ViewName) {...}
+#>
+                    '<#= mtcfk.NavigationName #>' : {
+<#
+                for(int i = 0; i < mtcfk.PrincipalKeyProps.Count; i++) {
+                    ModelViewPropertyOfVwSerializable mstrProp = GetModelScalarPropByKeyProp(masterModel, mtcfk.PrincipalKeyProps[i]);
+                    if(mstrProp == null) {
+#>
+//
+// Errror: for the ModelView = <#= mtcfk.ViewName #> and PrincipalKey = <#= mtcfk.PrincipalKeyProps[i].OriginalPropertyName #>
+//         could not find scalar property
+//
+<#
+                    }
+                    string isReq = "true";
+                    if(mstrProp != null) {
+                        isReq = mstrProp.IsRequiredInView ? "true" : "false";
+                    }
+                    ModelViewPropertyOfVwSerializable cProp = GetModelScalarPropByKeyProp(Model, mtcfk.ForeignKeyProps[i]);
+                    ModelViewPropertyOfVwSerializable mProp = GetModelScalarPropByKeyProp(masterModel, mtcfk.PrincipalKeyProps[i]);
+                    if(mProp == null || cProp == null) {
+#>
+// for the foreign key <#= mtcfk.NavigationName #> not all props have included into ViewModel
+<#
+                        continue;
+                    }
+
+#>
+                        '<#= GetTypeScriptPropertyNameByKeyProperty(masterModel, mtcfk.PrincipalKeyProps[i]) #>' : {isMstrReq: <#= isReq #>, propNm:'<#= GetTypeScriptPropertyNameByKeyProperty(Model, mtcfk.ForeignKeyProps[i]) #>'},
+<#
+                }
+#>
+                    },
+<#
+                currentMasterView = mtcfk.ViewName;
+            } // foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) { ... }
+            if (currentMasterView != "") {
+#>
+                }
+<#
+            }
+        } // if (mtcfks != null) {...}
+#>
+    }; 
+    public get<#= MasterToClientKeyFieldsMapFieldName #>(): {[key: string]: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}}} {
+        return this._<#= MasterToClientKeyFieldsMapFieldName #>;
+    }
+    //
+    // first key is Master View Name, 
+    // second key is Direct Navigation Name, 
+    // third key is Master View Property Name, 
+    // value is a  Client View Property Name, i.e. Property Name of the Current View 
+    protected _<#= MasterToClientFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = {
+<#
+        if (mtcfks != null) {
+            string currentMasterView = "";
+            ModelViewSerializable masterModel = null;
+            foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) {
+                if (currentMasterView != mtcfk.ViewName) {
+                    masterModel = GetModelViewByViewName(Context, mtcfk.ViewName);
+                    if(currentMasterView == "") {
+#>
+                '<#= mtcfk.ViewName #>' : {
+<#
+                    } else {
+#>
+                },
+                '<#= mtcfk.ViewName #>' : {
+<#
+                    }
+                } // if (currentMasterView != mtcfk.ViewName) { ... }
+#>
+                    '<#= mtcfk.NavigationName #>' : {
+<#
+                List<ModelViewPropertyOfVwSerializable> sclrProperties = Model.ScalarProperties.Where(p => p.ForeignKeyName == mtcfk.NavigationName).ToList();
+                foreach(ModelViewPropertyOfVwSerializable modelPrp in sclrProperties) {
+                    if(modelPrp.IsSelected) {
+                        // ModelViewPropertyOfVwSerializable modelPrp = GetScalarPropertyByViewPropertyName(Model, clntPrp.ViewPropertyName);
+                        ModelViewPropertyOfVwSerializable masterProp = GetDirectMasterScalarPropertyByViewPropertyName(Model, modelPrp.ViewPropertyName, Context);
+                        if ((modelPrp != null) && (masterProp != null)) {
+#>
+                        '<#= GetTypeScriptPropertyName(masterProp, masterModel) #>' : '<#= GetTypeScriptPropertyName(modelPrp, Model) #>',
+<#
+                        } 
+                    }
+                }
+#>
+                    },
+<#
+                currentMasterView = mtcfk.ViewName;
+            } // foreach(ModelViewForeignKeySerializable mtcfk in mtcfks) { ... }
+            if (currentMasterView != "") {
+#>
+                }
+<#
+            }
+        } // if (mtcfks != null) { ... }
+#>
+    };
+    public get<#= MasterToClientFieldsMapFieldName #>(): {[key: string]: {[key: string]: {[key: string]: string}}} {
+        return this._<#= MasterToClientFieldsMapFieldName #>;
+    }
+<#
+    }
+#>
+    public get<#= HiddenFilterByFltRsltSuffix #>(fr:  Array<<#= filterResultModelClassName #>> | any): {[key: string]: {[key: string]: {[key: string]: any}}} {
+        let rslt: {[key: string]: {[key: string]: {[key: string]: any}}} = {};
+        if ((typeof fr === 'undefined') || (typeof this._<#= MasterToClientKeyFieldsMapFieldName #> === 'undefined')) return rslt;
+        if ((fr === null) || (this._<#= MasterToClientKeyFieldsMapFieldName #> === null)) return rslt;
+        let currMstr: string = "";
+        let currNav: string = "";
+        for(let i in this._<#= MasterToClientKeyFieldsMapFieldName #>) {
+            for(let j in this._<#= MasterToClientKeyFieldsMapFieldName #>[i]) {
+                for(let k in this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j]) {
+                    let fld = this._<#= MasterToClientKeyFieldsMapFieldName #>[i][j][k];
+                    let r: <#= filterResultModelClassName #> = fr.find((e:<#= filterResultModelClassName #> | any) => e.fltrName === fld.propNm);
+                    if (typeof r === 'undefined') continue;
+                    if (currMstr !== i) { currMstr = i; rslt[currMstr] = {} }
+                    if (currNav !== j) { currNav = j; rslt[currMstr][currNav] = {} }
+                    rslt[currMstr][currNav][k] = r.fltrValue;
+                }
+            }
+        }
+        return rslt;
+    }
+<#
+    {
+        List<string> errors = new List<string>();
+        List<ModelViewSerializable> clVms = CollectClientToMasterFieldsMapModelViews(Model, Context, errors);
+        foreach(string error in  errors) {
+#>
+<#= error #>
+<#
+        }
+#>
+
+    // first key is Client View Name, 
+    // second key is Direct Navigation Name, 
+    // third key is Client View Property Name, 
+    // value is a Master View Property Name, i.e. Property Name of the Current View 
+    protected _<#= ClientToMasterFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: string}}} = {
+<#
+        if(clVms != null) {
+            foreach(ModelViewSerializable clVm in clVms) {
+                errors.Clear();
+                List<ModelViewForeignKeySerializable> mlFks = CollectMasterToClientFieldsMapForMasterView(clVm, Model.ViewName, errors);
+                foreach(string error in  errors) {
+#>
+<#= error #>
+<#
+                }
+                if (mlFks != null) {
+#>
+                '<#= clVm.ViewName #>' : {
+<#
+                    foreach(ModelViewForeignKeySerializable mlFk in mlFks) {
+#>
+                    '<#= mlFk.NavigationName #>' : {
+<#
+                        for(int i = 0; i < mlFk.ForeignKeyProps.Count; i++) {
+                            ModelViewPropertyOfVwSerializable cProp = GetModelScalarPropByKeyProp(clVm, mlFk.ForeignKeyProps[i]);
+                            ModelViewPropertyOfVwSerializable mProp = GetModelScalarPropByKeyProp(Model, mlFk.PrincipalKeyProps[i]);
+                            if(mProp == null || cProp == null) {
+#>
+// for the foreign key <#= mlFk.NavigationName #> not all props have included into ViewModel
+<#
+                                continue;
+                            }
+#>
+                        '<#= GetTypeScriptPropertyNameByKeyProperty(clVm, mlFk.ForeignKeyProps[i]) #>' : '<#= GetTypeScriptPropertyNameByKeyProperty(Model, mlFk.PrincipalKeyProps[i]) #>',
+<#
+                        }
+#>
+                    },
+<#
+                    }
+#>
+                },
+<#
+                }
+            } // end of: foreach(ModelViewSerializable clVm in clVms) {...}
+        } // end of: if(clVms != null) {...}
+#>
+    }
+    public get<#= ClientToMasterFieldsMapFieldName #>(): {[key: string]: {[key: string]: {[key: string]: string}}} {
+        return this._<#= ClientToMasterFieldsMapFieldName #>;
+    }
+<#
+    }
+#>
+
+<# 
+    if (Model.IsWebApiSelectAll) { 
+#>
+
+    // 
+    // HowTo:
+    //
+    // this.serviceRefInYourCode.<#= GetAllMethodName #>().subscibe(value =>{
+    //    // handling value of type <#= viewInterfaceName #>[] 
+    // },
+    // error => {
+    //    // handling error 
+    // });
+    // 
+    <#= GetAllMethodName #>(config?: Partial<Rest.Config>): Observable<<#= viewInterfaceName #>[]> {
+        // return this.http.get<<#= viewInterfaceName #>[]>(this.serviceUrl+'/<#= GetAllMethodName #>');
+
+        //    .pipe(
+        //        catchError(this.handleError('<#= GetAllMethodName #>', []))
+        //    );
+
+        return this.restService.request<any, <#= viewInterfaceName #>[]>(
+            {
+              method: 'GET',
+              url: this.serviceUrl+'/<#= GetAllMethodName #>',
+            },
+            { apiName: this.apiName,...config }
+        );
+    }
+
+<#
+    }
+#>
+
+
+<# 
+    if (Model.IsWebApiSelectManyWithPagination) { 
+#>
+    // 
+    // HowTo: flt is of type <#= viewInterfaceFilterName #> 
+    //
+    // this.serviceRefInYourCode.<#= GetWithFilterMethodName #>(flt).subscibe(value =>{
+    //    // handling value of type <#= viewInterfacePageName #>
+    // },
+    // error => {
+    //    // handling error 
+    // });
+    // 
+    <#= GetWithFilterMethodName #>(filter: <#= viewInterfaceFilterName #>, config?: Partial<Rest.Config>): Observable<<#= viewInterfacePageName #>> {
+        let params: HttpParams  = new HttpParams({encoder: this.<#= AppSettingServicePropName #>});
+        let hasFilter: boolean = false;
+        if (!(typeof filter === 'undefined')) {
+            if (!(filter === null )) {
+<#
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if (! prop.IsUsedByfilter) {
+                continue;
+            }
+#>
+                if (!(typeof filter.<#= GetTypeScriptPropertyName(prop, Model)#> === 'undefined')) {
+                    if ( Array.isArray(filter.<#= GetTypeScriptPropertyName(prop, Model)#> )) {
+<#          if(prop.IsNullable) { #>
+                        let hasNull: boolean = false;
+<#          } #>
+                        filter.<#= GetTypeScriptPropertyName(prop, Model)#>.forEach(function (value: any) {
+                            if(!(typeof value === 'undefined')) {
+                                if(!(value === null)) {
+                                    params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', value<#= GetJavaScriptToStringMethod(prop) #>);
+                                    hasFilter = true;
+                                } 
+<#          if(prop.IsNullable) { #>
+                                else {
+                                    hasNull = true;
+                                }
+<#          } #>
+                            }
+                        });
+<#          if(prop.IsNullable) { #>
+                        if(hasNull) {
+                            params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', '');
+                        }
+<#          } #>
+                    } // if ( Array.isArray(filter.<#= GetTypeScriptPropertyName(prop, Model)#> ))
+                } // if (!(typeof filter.<#= GetTypeScriptPropertyName(prop, Model)#> === 'undefined'))
+<#
+        }
+#>
+
+
+<#
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if (! prop.IsUsedByfilter) {
+                continue;
+            }
+#>
+                if (!(typeof  filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> === 'undefined')) {
+                    if (Array.isArray(filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> )) {
+                        filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#>.forEach(function (value: any) {
+                            if(!(typeof value === 'undefined')) {
+                                if(value === null) {
+                                    params = params.append('<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>', '<#= EqualOperator #>');
+                                } 
+                                else {
+                                    params = params.append('<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>', value<#=GetJavaScriptToStringMethod(prop)#>);
+                                }
+                            }
+                        });
+                    } // if (Array.isArray(filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#>))
+                } // if (!(typeof  filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> === 'undefined'))
+<#
+        }
+#>
+
+                if (!(typeof filter.orderby === 'undefined')) {
+                    if ( Array.isArray(filter.orderby)) {
+                        filter.orderby.forEach(function (value: any) {
+                            if (!(typeof value === 'undefined')) {
+                                if(!(value === null)) {
+                                    params = params.append('orderby', value);
+                                    hasFilter = true;
+                                }
+                            }
+                        });
+                    }
+                }
+                if (!(typeof filter.page === 'undefined')) {
+                    if (!(filter.page === null)) {
+                        params = params.append('page', filter.page.toString());
+                        hasFilter = true;
+                    }
+                }
+                if (!(typeof filter.pagesize === 'undefined')) {
+                    if (!(filter.pagesize === null)) {
+                        params = params.append('pagesize', filter.pagesize.toString());
+                        hasFilter = true;
+                    }
+                }
+            } // if (!(filter === null ))
+        } // if (!(typeof filter === 'undefined'))
+        // const options = hasFilter ? { params } : {};
+        // return this.http.get<<#= viewInterfacePageName #>>(this.serviceUrl+'/<#= GetWithFilterMethodName #>', options);
+          //    .pipe(
+          //        catchError(this.handleError('<#= GetWithFilterMethodName #>', []))
+          //    );
+
+        return this.restService.request<any, <#= viewInterfacePageName #>>(
+            {
+              method: 'GET',
+              url: this.serviceUrl+'/<#= GetWithFilterMethodName #>',
+              params: params,
+            },
+            { apiName: this.apiName,...config }
+        );
+    }
+<#
+    }
+#>
+
+<# 
+    if (Model.IsWebApiSelectOneByPrimarykey) { 
+        foreach(ModelViewUniqueKeyOfVwSerializable pk in uniqueKeys) {
+            List<ModelViewPropertyOfVwSerializable> primKeys = null;
+            string indErrrorText = "";
+            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, pk, out indErrrorText);
+            string localRouteName = GetOneMethodName;
+            string localRouteManyName = GetManyByRepPrimMethodNamePrefix;
+            if (!pk.IsPrimary) {
+                    
+                localRouteName = GetOneByMethodNamePrefix + pk.UniqueKeyName;
+                localRouteManyName = GetManyByRepUnqMethodNamePrefix + pk.UniqueKeyName;
+            }
+            if (!indIsCorrect) {
+#>
+
+//
+// Could not generate <#= localRouteName #>
+// Primary/Unique Index Is not correct:
+// <#= indErrrorText #>
+//
+
+<#
+            } else {
+                primKeys = pk.UniqueKeyProperties;
+#>
+
+    // 
+    // HowTo: {prm1, prm2, ..., prmN} -- primary/unique key
+    //
+    // this.serviceRefInYourCode.<#= localRouteName #>(prm1, prm2, ..., prmN ).subscibe(value =>{
+    //    // handling value of type <#= viewInterfaceName #>
+    // },
+    // error => {
+    //    // handling error 
+    // });
+    // 
+    <#= localRouteName #>(
+<# 
+                {
+                    int counter = 0;
+                    foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+                        if(counter > 0) { 
+#>
+                , <#= GetTypeScriptPropertyName(prop, Model) #>: <#= GetPropertyTypeScriptTypeName(prop) #>|any 
+<#
+                        } else {
+#>
+                  <#= GetTypeScriptPropertyName(prop, Model) #>: <#= GetPropertyTypeScriptTypeName(prop) #>|any 
+<#
+                            counter++;
+                        }
+                    }
+                }
+#>
+                , config?: Partial<Rest.Config>
+        ): Observable<<#= viewInterfaceName #>> {
+        let params: HttpParams  = new HttpParams({encoder: this.<#= AppSettingServicePropName #>});
+        let hasFilter: boolean = false;
+<#
+                foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+                    if(!(primKeys.Contains(prop))) {
+                        continue;
+                    }
+#>
+        if (!(typeof <#= GetTypeScriptPropertyName(prop, Model) #> === 'undefined')) {
+            if (!(<#= GetTypeScriptPropertyName(prop, Model) #> === null)) {
+                params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', <#= GetTypeScriptPropertyName(prop, Model) #><#= GetJavaScriptToStringMethod(prop) #>);
+                hasFilter = true;
+            }
+        }
+<#
+                }
+#>
+        // const options = hasFilter ? { params } : {};
+        // return this.http.get<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= localRouteName #>', options);
+          // .pipe(
+          //   catchError(this.handleError('<#= localRouteName #>', []))
+          // );
+        return this.restService.request<any, <#= viewInterfaceName #>>(
+            {
+              method: 'GET',
+              url: this.serviceUrl+'/<#= localRouteName #>',
+              params: params,
+            },
+            { apiName: this.apiName,...config }
+        );
+    }
+
+    <#= localRouteManyName #>(filter: <#= viewInterfaceFilterName #>, config?: Partial<Rest.Config>): Observable<<#= viewInterfacePageName #>> {
+        let params: HttpParams  = new HttpParams({encoder: this.<#= AppSettingServicePropName #>});
+        let hasFilter: boolean = false;
+        if (!(typeof filter === 'undefined')) {
+            if (!(filter === null )) {
+
+<#
+        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+
+
+#>
+                if (!(typeof filter.<#= GetTypeScriptPropertyName(prop, Model)#> === 'undefined')) {
+                    if ( Array.isArray(filter.<#= GetTypeScriptPropertyName(prop, Model)#> )) {
+<#          if(prop.IsNullable) { #>
+                        let hasNull: boolean = false;
+<#          } #>
+                        filter.<#= GetTypeScriptPropertyName(prop, Model)#>.forEach(function (value: any) {
+                            if(!(typeof value === 'undefined')) {
+                                if(!(value === null)) {
+                                    params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', value<#= GetJavaScriptToStringMethod(prop) #>);
+                                    hasFilter = true;
+                                } 
+<#          if(prop.IsNullable) { #>
+                                else {
+                                    hasNull = true;
+                                }
+<#          } #>
+                            }
+                        });
+<#          if(prop.IsNullable) { #>
+                        if(hasNull) {
+                            params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', '');
+                        }
+<#          } #>
+                    } // if ( Array.isArray(filter.<#= GetTypeScriptPropertyName(prop, Model)#> ))
+                } // if (!(typeof filter.<#= GetTypeScriptPropertyName(prop, Model)#> === 'undefined'))
+<#
+        } // foreach(ModelViewPropertyOfVwSerializable prop in primKeys) { }
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(!prop.IsUsedByfilter) continue;
+            if (primKeys.Any(p => p == prop)) continue;
+            if(!IsUsedByForeignKey(prop, Model)) continue;
+#>
+                if (!(typeof filter.<#= GetTypeScriptPropertyName(prop, Model)#> === 'undefined')) {
+                    if ( Array.isArray(filter.<#= GetTypeScriptPropertyName(prop, Model)#> )) {
+<#          if(prop.IsNullable) { #>
+                        let hasNull: boolean = false;
+<#          } #>
+                        filter.<#= GetTypeScriptPropertyName(prop, Model)#>.forEach(function (value: any) {
+                            if(!(typeof value === 'undefined')) {
+                                if(!(value === null)) {
+                                    params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', value<#= GetJavaScriptToStringMethod(prop) #>);
+                                    hasFilter = true;
+                                } 
+<#          if(prop.IsNullable) { #>
+                                else {
+                                    hasNull = true;
+                                }
+<#          } #>
+                            }
+                        });
+<#          if(prop.IsNullable) { #>
+                        if(hasNull) {
+                            params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', '');
+                        }
+<#          } #>
+                    } // if ( Array.isArray(filter.<#= GetTypeScriptPropertyName(prop, Model)#> ))
+                } // if (!(typeof filter.<#= GetTypeScriptPropertyName(prop, Model)#> === 'undefined'))
+<#
+        }
+
+        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+#>
+                if (!(typeof  filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> === 'undefined')) {
+                    if (Array.isArray(filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> )) {
+                        filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#>.forEach(function (value: any) {
+                            if(!(typeof value === 'undefined')) {
+                                if(value === null) {
+                                    params = params.append('<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>', '<#= EqualOperator #>');
+                                } 
+                                else {
+                                    params = params.append('<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>', value<#=GetJavaScriptToStringMethod(prop)#>);
+                                }
+                            }
+                        });
+                    } // if (Array.isArray(filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#>))
+                } // if (!(typeof  filter.<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix)#> === 'undefined'))
+<#
+        }
+#>
+
+                if (!(typeof filter.orderby === 'undefined')) {
+                    if ( Array.isArray(filter.orderby)) {
+                        filter.orderby.forEach(function (value: any) {
+                            if (!(typeof value === 'undefined')) {
+                                if(!(value === null)) {
+                                    params = params.append('orderby', value);
+                                    hasFilter = true;
+                                }
+                            }
+                        });
+                    }
+                }
+                if (!(typeof filter.page === 'undefined')) {
+                    if (!(filter.page === null)) {
+                        params = params.append('page', filter.page.toString());
+                        hasFilter = true;
+                    }
+                }
+                if (!(typeof filter.pagesize === 'undefined')) {
+                    if (!(filter.pagesize === null)) {
+                        params = params.append('pagesize', filter.pagesize.toString());
+                        hasFilter = true;
+                    }
+                }
+            } // if (!(filter === null ))
+        } // if (!(typeof filter === 'undefined'))
+        // const options = hasFilter ? { params } : {};
+        // return this.http.get<<#= viewInterfacePageName #>>(this.serviceUrl+'/<#= localRouteManyName #>', options);
+        return this.restService.request<any, <#= viewInterfacePageName #>>(
+            {
+              method: 'GET',
+              url: this.serviceUrl+'/<#= localRouteManyName #>',
+              params: params,
+            },
+            { apiName: this.apiName,...config }
+        );
+    }
+
+<#
+            } // the end of: if (!indIsCorrect) {...} else {}
+        } // the end of: foreach(ModelViewUniqueKeyOfVwSerializable pk uniqueKeys) {}
+    } // if (Model.IsWebApiSelectOneByPrimarykey) { ... }
+#>
+
+<# 
+    if (Model.IsWebApiUpdate) { 
+#>
+    // 
+    // HowTo: item is of type <#= viewInterfaceName #> 
+    //
+    // this.serviceRefInYourCode.<#= UpdateOneMethodName #>(item).subscibe(value =>{
+    //    // handling value of type <#= viewInterfaceName #>
+    // },
+    // error => {
+    //    // handling error 
+    // });
+    // 
+    <#= UpdateOneMethodName #>(item: <#= viewInterfaceName #>, config?: Partial<Rest.Config>): Observable<<#= viewInterfaceName #>> {
+
+        // return this.http.put<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= UpdateOneMethodName #>', item); //, httpOptions);
+        //  .pipe(
+        //    catchError(this.handleError('<#= UpdateOneMethodName #>', item))
+        //  );
+        return this.restService.request<any, <#= viewInterfaceName #>>(
+            {
+              method: 'PUT',
+              url: this.serviceUrl+'/<#= UpdateOneMethodName #>',
+              body: item,
+            },
+            { apiName: this.apiName,...config }
+        );
+    }
+<#
+    } 
+#>
+
+<# 
+    if (Model.IsWebApiAdd) { 
+        List<ModelViewPropertyOfVwSerializable> identProps = GetDatabaseGeneratedProp(Model);
+#>
+    // 
+    // HowTo: item is of type <#= viewInterfaceName #> 
+    //
+    // this.serviceRefInYourCode.<#= AddOneMethodName #>(item).subscibe(value =>{
+    //    // handling value of type <#= viewInterfaceName #>
+    // },
+    // error => {
+    //    // handling error 
+    // });
+    // 
+    <#= AddOneMethodName #>(item: <#= viewInterfaceName #>, config?: Partial<Rest.Config>): Observable<<#= viewInterfaceName #>> {
+<#
+        foreach (ModelViewPropertyOfVwSerializable identProp in identProps) {
+#>
+        if(!(typeof item === 'undefined')) {
+            if(!(item === null)) {
+                if(typeof item.<#= GetTypeScriptPropertyName(identProp, Model) #> === 'undefined') {
+                    item['<#= GetTypeScriptPropertyName(identProp, Model) #>'] = <#= GetDefaultVal(identProp) #>;
+                }
+                if(item.<#= GetTypeScriptPropertyName(identProp, Model) #> === null) {
+                    item['<#= GetTypeScriptPropertyName(identProp, Model) #>'] = <#= GetDefaultVal(identProp) #>;
+                }
+            }
+        }
+<#
+        }
+#>
+        // return this.http.post<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= AddOneMethodName #>', item); //, httpOptions);
+        // .pipe(
+        //      catchError(this.handleError('<#= AddOneMethodName #>', item))
+        // );   
+        return this.restService.request<any, <#= viewInterfaceName #>>(
+            {
+              method: 'POST',
+              url: this.serviceUrl+'/<#= AddOneMethodName #>',
+              body: item,
+            },
+            { apiName: this.apiName,...config }
+        );
+    }
+<#
+    } 
+#>
+
+<# 
+    if (Model.IsWebApiDelete) { 
+        List<ModelViewPropertyOfVwSerializable> primKeys = null;
+        ModelViewUniqueKeyOfVwSerializable locPrimKey = GetModelPrimKeyFromList(uniqueKeys);
+        string indErrrorText = "";
+        bool indIsCorrect = locPrimKey != null;
+        if (!indIsCorrect) {
+            indErrrorText = "Could not find primary key";
+        }
+        if (indIsCorrect) {
+            indIsCorrect = CheckModelIfIndexIsCorrect(Model, locPrimKey, out indErrrorText);
+        }
+        if(!indIsCorrect) {
+#>
+//
+// Could not generate <#= DeleteOneMethodName #>
+// Primary Index Is not correct:
+// <#= indErrrorText #>
+//
+<#
+
+        } else {
+            primKeys = locPrimKey.UniqueKeyProperties;
+
+#>
+    // 
+    // HowTo: item is of type <#= viewInterfaceName #> 
+    //
+    // this.serviceRefInYourCode.<#= DeleteOneMethodName #>(item).subscibe(value =>{
+    //    // handling value of type <#= viewInterfaceName #>
+    // },
+    // error => {
+    //    // handling error 
+    // });
+    // 
+    <#= DeleteOneMethodName #>(<# 
+        {
+            int counter = 0;
+            foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+                if(counter > 0) { #>, <#} #><#= GetTypeScriptPropertyName(prop, Model) #>: <#= GetPropertyTypeScriptTypeName(prop) #>|any <#
+                counter++;
+            }
+        }
+        #>, config?: Partial<Rest.Config>): Observable<<#= viewInterfaceName #>> {
+        let params: HttpParams  = new HttpParams({encoder: this.<#= AppSettingServicePropName #>});
+        let hasFilter: boolean = false;
+<#
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(! (primKeys.Contains(prop))) {
+                continue;
+            }
+#>
+        if (!(typeof <#= GetTypeScriptPropertyName(prop, Model) #> === 'undefined')) {
+            if (!(<#= GetTypeScriptPropertyName(prop, Model) #> === null)) {
+                params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', <#= GetTypeScriptPropertyName(prop, Model) #><#= GetJavaScriptToStringMethod(prop) #>);
+                hasFilter = true;
+            }
+        }
+<#
+    }
+#>
+        // const options = hasFilter ? { params } : {};
+        // return this.http.delete<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= DeleteOneMethodName #>', options); //, httpOptions);
+        // .pipe(
+        //      catchError(this.handleError('<#= DeleteOneMethodName #>', item))
+        // );   
+        return this.restService.request<any, <#= viewInterfaceName #>>(
+            {
+              method: 'DELETE',
+              url: this.serviceUrl+'/<#= DeleteOneMethodName #>',
+              params: params,
+            },
+            { apiName: this.apiName,...config }
+        );
+    }
+<#
+        }
+    } 
+#>
+
+    <#= src2destMethodName #>(src: <#= viewInterfaceName #>, dest: <#= viewInterfaceName #>) {
+        if ((typeof src === 'undefined') || (typeof dest === 'undefined')) return;
+        if ((src === null) || (dest === null)) return;
+<#
+            foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+#>
+        if(typeof src.<#= GetTypeScriptPropertyName(prop, Model) #> === 'undefined') {
+            dest['<#= GetTypeScriptPropertyName(prop, Model) #>'] = null;
+        } else {
+            dest['<#= GetTypeScriptPropertyName(prop, Model) #>'] = src.<#= GetTypeScriptPropertyName(prop, Model) #>;
+        }
+<#                
+            }
+#>        
+    }
+
+    <#= row2FilterRsltMethodName #>(r: <#= viewInterfaceName #>| any): Array<<#= filterResultModelClassName #>> {
+        let rslt: Array<<#= filterResultModelClassName #>> = [];
+        if (typeof r === 'undefined') return rslt;
+        if (r === null) return rslt;
+        for(let i in this._Values) {
+            if (!(typeof r[i] === 'undefined')) {
+                rslt.push({
+                    fltrName: i,
+                    fltrDataType: this._Values[i].dttp,
+                    fltrOperator: 'eq',
+                    fltrValue: r[i]
+                });
+            }
+        }
+        return rslt
+    }
+
+<#                
+  if(false) {
+#>        
+
+    <#= filterRslt2rowMethodName #>(f: Array<<#= filterResultModelClassName #>>|any): <#= viewInterfaceName #>|null {
+        if (typeof f === 'undefined') return null;
+        if (f === null) return null;
+        if (!Array.isArray(f)) return null;
+        let isDef = false;
+        let rslt: <#= viewInterfaceName #>|any ={};
+        f.forEach((i: <#= filterResultModelClassName #>) => {
+            if(!(typeof i.fltrValue === 'undefined')) {
+                if(i.fltrName in this._Values) {
+                    rslt[i.fltrName] = i.fltrValue;
+                    isDef = true;
+                }
+            }
+        });
+        if (isDef) return rslt;
+        return null;
+    }
+
+    <#= row2FilterMethodName #>(r: <#= viewInterfaceName #>|any): <#= viewInterfaceFilterName #> {
+        let rslt: <#= viewInterfaceFilterName #>|any = {};
+        if (typeof r === 'undefined') return rslt;
+        if (r === null) return rslt;
+        for(let i in this._Values) {
+            if (!(typeof r[i] === 'undefined')) {
+                rslt[i] = [r[i]];
+            }
+        }
+        return rslt;
+    }
+    <#= filter2rowMethodName #>(f: <#= viewInterfaceFilterName #>|any): <#= viewInterfaceName #>|null {
+        if (typeof f === 'undefined') return null;
+        if (f === null) return null;
+        let isDef = false;
+        let rslt: <#= viewInterfaceName #>|any ={};
+        for(let i in this._Values) {
+            if(typeof f[i] === 'undefined')
+            if (Array.isArray( f[i] )) {
+                if(f[i].length > 0) {
+                    if (!(typeof f[i][0] === 'undefined')) {
+                        rslt[i] = f[i][0];
+                        isDef = true;
+                    }
+                }
+            }
+        }
+        if (isDef) return rslt;
+        return null;
+    }
+<#                
+  } // if(false) {}
+#>        
+
+}
+

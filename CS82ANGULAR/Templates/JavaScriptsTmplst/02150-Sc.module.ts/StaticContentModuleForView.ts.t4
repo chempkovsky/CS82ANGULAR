@@ -50,10 +50,10 @@ import { <#=  staticContentComponentClassName #> } from '<#= GetFolderNameWithAn
     ],
     exports: [
         <#=  staticContentComponentClassName #>,
-    ],
-    entryComponents: [
-        <#=  staticContentComponentClassName #>
     ]
+//    entryComponents: [
+//        <#=  staticContentComponentClassName #>
+//    ]
 })
 export class <#= staticContentModuleClassName #> { }
 

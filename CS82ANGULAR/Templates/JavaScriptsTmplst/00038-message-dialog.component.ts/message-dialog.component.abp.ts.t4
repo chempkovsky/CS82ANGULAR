@@ -1,0 +1,74 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string messageDialogComponentCssFolder      = "00038-message-dialog.component.css";
+    string messageDialogComponentHtmlFolder     = "00038-message-dialog.component.html";
+    string messageDialogComponentFolder         = "00038-message-dialog.component.ts";
+    string messageDialogDataModelFolder         = "00037-message-dialog.interface.ts";
+
+    string componentSelectorCommonPart          = GetComponentSelectorCommonPart(Model, messageDialogComponentFolder);
+    string messageDialogComponentClassName      = GetComponentClassName(Model, messageDialogComponentFolder);
+
+    string messageDialogDataModelClassName      = GetModelClassNameWithAnglr(AngularJsonFile, Model, messageDialogDataModelFolder, messageDialogComponentFolder);
+
+#>
+
+import { Component, Input } from '@angular/core';
+<# 
+    if(localize) {
+#>
+import { LocalizationService } from '@abp/ng.core';
+<# 
+    }
+#>
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { <#= messageDialogDataModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, messageDialogDataModelFolder, messageDialogComponentFolder)#>';
+
+/* eslint-disable @angular-eslint/no-input-rename */
+
+@Component({
+  selector: 'app-<#= componentSelectorCommonPart #>',
+  templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, messageDialogComponentHtmlFolder, messageDialogComponentFolder)#>.html',
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, messageDialogComponentCssFolder, messageDialogComponentFolder)#>.css']
+})
+export class <#= messageDialogComponentClassName #>  {
+    @Input('data')
+    public data: <#= messageDialogDataModelClassName #>|any; 
+
+    constructor(
+<# 
+    if(localize) {
+#>
+        private L: LocalizationService, 
+<# 
+    }
+#>
+        public dialogRef: NgbActiveModal
+     ) { }
+    onCancel() {
+        this.dialogRef.dismiss();
+    }
+    onOk() {
+        this.dialogRef.close(1);
+    }
+}
+
+
+

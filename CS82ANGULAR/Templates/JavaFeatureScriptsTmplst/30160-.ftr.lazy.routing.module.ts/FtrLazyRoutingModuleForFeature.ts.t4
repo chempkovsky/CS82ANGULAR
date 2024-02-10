@@ -50,9 +50,9 @@ import { <#=  featureRoutingModuleClassName #> } from '<#=  GetFeatureComponentF
         <#=  featureRoutingModuleClassName #>,
     ],
     exports: [
-    ],
-    entryComponents: [
     ]
+//    entryComponents: [
+//    ]
 })
 export class <#= featureLazyRoutingModuleClassName #> { }
 

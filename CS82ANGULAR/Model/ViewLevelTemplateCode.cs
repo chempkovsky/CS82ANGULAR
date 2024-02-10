@@ -17,7 +17,6 @@ namespace CS82ANGULAR.Model
         // ModelViewSerializable GetViewByForeignNameChain(DbContextSerializable context, string ViewName, string foreignKeyNameChain)
         // string GetViewByForeignNameChain(DbContextSerializable context, string ViewName, string foreignKeyNameChain)
         // ModelViewSerializable GetViewByForeignNameChainEx(DbContextSerializable context, string ViewName, string foreignKeyNameChain)
-
         AngularProject GetAngularProjectByRefItem(AngularJson anglJson, CommonStaffSerializable refItem)
         {
             if ((refItem is null) || (anglJson is null)) return null;
@@ -708,11 +707,11 @@ namespace CS82ANGULAR.Model
         string GetCommonServiceClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, DbContextSerializable context, string fileType, string currFolder)
         {
             string result = GetCommonServiceClassName(context, fileType);
-            if (model == null)
+            if ((model == null) || (context == null))
             {
                 return result;
             }
-            if (model.CommonStaffs == null)
+            if ((model.CommonStaffs == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -779,7 +778,7 @@ namespace CS82ANGULAR.Model
             {
                 return result;
             }
-            if (model.CommonStaffs == null)
+            if ((model.CommonStaffs == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -915,7 +914,7 @@ namespace CS82ANGULAR.Model
             {
                 return result;
             }
-            if ((model.CommonStaffs == null) || (context.ModelViews == null))
+            if ((model.CommonStaffs == null) || (context.ModelViews == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -1067,7 +1066,7 @@ namespace CS82ANGULAR.Model
             {
                 return result;
             }
-            if ((model.CommonStaffs == null) || (context.ModelViews == null))
+            if ((model.CommonStaffs == null) || (context.ModelViews == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -1554,6 +1553,96 @@ namespace CS82ANGULAR.Model
             }
             return GetNameByAngularJson(result, anglJson, refItem, curItem);
         }
+
+
+        string GetModuleServiceClassName(ModelViewSerializable model, string fileType)
+        {
+            string result = "";
+            if ((model == null) || string.IsNullOrEmpty(fileType))
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            if (refItem == null)
+            {
+                return result;
+            }
+            if (string.IsNullOrEmpty(refItem.FileName))
+            {
+                return result;
+            }
+            string fn = refItem.FileName.Replace(".module", "Module").Replace(".routing", "Routing").Replace(".service", "Service");
+            StringBuilder sb = new StringBuilder();
+            bool toUpper = true;
+            foreach (char c in fn)
+            {
+                if (c == '-')
+                {
+                    toUpper = true;
+                }
+                else
+                {
+                    if (toUpper)
+                    {
+                        sb.Append(Char.ToUpper(c));
+                        toUpper = false;
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+            }
+            return sb.ToString();
+        }
+        string GetModuleServiceClassNameWithAnglr(AngularJson anglJson, ModelViewSerializable model, string fileType, string currFolder)
+        {
+            string result = GetModuleServiceClassName(model, fileType);
+            if (model == null)
+            {
+                return result;
+            }
+            if (model.CommonStaffs == null)
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                model.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+        string GetModuleServiceClassNameWithAnglrEx(AngularJson anglJson, ModelViewSerializable model, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            string result = GetModuleServiceClassName(model, fileType);
+            if ((model == null) || (currModel == null))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (currModel.CommonStaffs == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem =
+                model.CommonStaffs.Where(c => c.FileType == fileType).FirstOrDefault();
+            CommonStaffSerializable curItem =
+                currModel.CommonStaffs.Where(c => c.FileType == currFolder).FirstOrDefault();
+            if ((refItem == null) || (curItem == null))
+            {
+                return result;
+            }
+            return GetNameByAngularJson(result, anglJson, refItem, curItem);
+        }
+
 
         string GetContextModuleClassName(DbContextSerializable context, string fileType)
         {
@@ -2086,7 +2175,7 @@ namespace CS82ANGULAR.Model
             {
                 return result;
             }
-            if (model.CommonStaffs == null)
+            if ((model.CommonStaffs == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -2161,7 +2250,7 @@ namespace CS82ANGULAR.Model
             {
                 return result;
             }
-            if (model.CommonStaffs == null)
+            if ((model.CommonStaffs == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -2187,7 +2276,7 @@ namespace CS82ANGULAR.Model
             {
                 return result;
             }
-            if (model.CommonStaffs == null)
+            if ((model.CommonStaffs == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -7079,7 +7168,7 @@ namespace CS82ANGULAR.Model
             {
                 return result;
             }
-            if (feature.CommonStaffs == null)
+            if ((feature.CommonStaffs == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -7100,7 +7189,7 @@ namespace CS82ANGULAR.Model
             {
                 return result;
             }
-            if (feature.CommonStaffs == null)
+            if ((feature.CommonStaffs == null) || (context.CommonStaffs == null))
             {
                 return result;
             }
@@ -7568,6 +7657,7 @@ namespace CS82ANGULAR.Model
             return GetNameByAngularJson(result, anglJson, refItem, curItem);
         }
 
+
         string GetDsClearIgnoryFields(ModelViewSerializable RootModel, Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> CurrFk,
                                      List<Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum>> foreignKeyNameChainList)
         {
@@ -7634,7 +7724,7 @@ namespace CS82ANGULAR.Model
             }
             if ((directDetailModel.PrimaryKeyProperties?.Count > 0) && (currFk.ForeignKeyProps?.Count > 0))
             {
-                foreach(ModelViewKeyPropertySerializable pkp in directDetailModel.PrimaryKeyProperties)
+                foreach (ModelViewKeyPropertySerializable pkp in directDetailModel.PrimaryKeyProperties)
                 {
                     for (int i = 0; i < currFk.ForeignKeyProps.Count; i++)
                     {
@@ -7659,9 +7749,7 @@ namespace CS82ANGULAR.Model
             return rslt;
         }
 
-        // ForeignKeyNameChain of the ModelView with intercected Foreign Keys fileds - is a first argument
-        // ForeignKeyNameChain of the ModelView with a primary(unique) key fields which are mapped into intercected Foreign Keys fileds - is a second argument
-        // ModelView with a primary(unique) key fields which are mapped into intercected Foreign Keys fileds - is a third argument
+
         List<Tuple<string, string, ModelViewSerializable>> GetIntersectedForeigKeysMappings(
             string initialForeignKeyNameChain,
             ModelViewSerializable currModel,
@@ -7863,5 +7951,6 @@ namespace CS82ANGULAR.Model
             }
             return rslt;
         }
+
     }
 }

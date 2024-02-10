@@ -1,0 +1,119 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
+<#
+
+    string materialModuleFolder         = "00010-app-material.module.ts";
+    string flexModuleFolder             = "00011-app-flex-layout.module.ts";
+
+    string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
+    string filterModelFolder            = "00021-web-service-filter.interface.ts";
+    string filterDefModelFolder         = "00022-web-service-filter-def.interface.ts";
+    string filterOperatorModelFolder    = "00023-web-service-filter-operator.interface.ts";
+    string filterResultModelFolder      = "00024-web-service-filter-rslt.interface.ts";
+    string uniqFilterModelFolder        = "00042-uniq-service-filter.interface.ts";
+    string uniqFilterDefModelFolder     = "00044-uniq-service-filter-def.interface.ts";
+
+
+    string filterComponentCssFolder     = "00025-web-service-filter.component.css";
+    string filterComponentHtmlFolder    = "00025-web-service-filter.component.html";
+    string filterComponentFolder        = "00025-web-service-filter.component.ts";
+
+    string uniqFilterComponentCssFolder     = "00046-uniq-service-filter.component.css";
+    string uniqFilterComponentHtmlFolder    = "00046-uniq-service-filter.component.html";
+    string uniqFilterComponentFolder        = "00046-uniq-service-filter.component.ts";
+
+
+    string columnSelectorItemInterfaceFolder    = "00032-column-selector-item.interface.ts";
+    string columnSelectorComponentFolder        = "00033-column-selector.component.ts";
+    string columnSelectorDlgComponentFolder     = "00035-column-selector-dlg.component.ts";
+
+    string messageDialogComponentCssFolder      = "00038-message-dialog.component.css";
+    string messageDialogComponentHtmlFolder     = "00038-message-dialog.component.html";
+    string messageDialogComponentFolder         = "00038-message-dialog.component.ts";
+    string messageDialogDataModelFolder         = "00037-message-dialog.interface.ts";
+
+
+    string filterModuleFolder                   = "00050-web-service-filter.module.ts";
+
+    string appModuleClassName   = GetModuleClassName(Model, filterModuleFolder);
+
+    string materialModuleClassName = GetModuleClassNameWithAnglr(AngularJsonFile, Model, materialModuleFolder, filterModuleFolder);
+    string flexModuleClassName = GetModuleClassNameWithAnglr(AngularJsonFile, Model, flexModuleFolder, filterModuleFolder);
+
+    string filterModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterModelFolder, filterModuleFolder);
+    string filterDefModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterDefModelFolder, filterModuleFolder);
+    string filterOperatorModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterOperatorModelFolder, filterModuleFolder);
+    string filterResultModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterResultModelFolder, filterModuleFolder);
+    string uniqFilterModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, uniqFilterModelFolder, filterModuleFolder);
+    string uniqFilterDefModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, uniqFilterDefModelFolder, filterModuleFolder);
+    
+
+    string filterComponentClassName = GetComponentClassNameWithAnglr(AngularJsonFile, Model, filterComponentFolder, filterModuleFolder);
+    string uniqFilterComponentClassName = GetComponentClassNameWithAnglr(AngularJsonFile, Model, uniqFilterComponentFolder, filterModuleFolder);
+    string appSettingServiceClassName   = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, filterModuleFolder);
+    string columnSelectorComponentClassName = GetComponentClassNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentFolder, filterModuleFolder);
+    string columnSelectorDlgComponentClassName = GetComponentClassNameWithAnglr(AngularJsonFile, Model, columnSelectorDlgComponentFolder, filterModuleFolder);
+    string messageDialogComponentClassName      = GetComponentClassNameWithAnglr(AngularJsonFile, Model, messageDialogComponentFolder, filterModuleFolder);
+
+#>
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { CoreModule } from '@abp/ng.core';
+
+import { <#= materialModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, materialModuleFolder, filterModuleFolder)#>';
+import { <#= flexModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, flexModuleFolder, filterModuleFolder)#>';
+
+import { <#= filterComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterComponentFolder, filterModuleFolder)#>';
+import { <#= uniqFilterComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterComponentFolder, filterModuleFolder)#>';
+
+import { <#= columnSelectorComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentFolder, filterModuleFolder)#>';
+import { <#= columnSelectorDlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorDlgComponentFolder, filterModuleFolder)#>';
+import { <#= messageDialogComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, messageDialogComponentFolder, filterModuleFolder)#>';
+
+
+
+@NgModule({
+    declarations: [
+        <#= uniqFilterComponentClassName #>,
+        <#= filterComponentClassName #>,
+        <#= columnSelectorComponentClassName #>,
+        <#= columnSelectorDlgComponentClassName #>,
+        <#= messageDialogComponentClassName #>,
+    ],
+    imports: [
+        CommonModule,
+        CoreModule,
+        <#= materialModuleClassName #>,
+        <#= flexModuleClassName #>,
+    ],
+    exports: [
+        <#= uniqFilterComponentClassName #>,
+        <#= filterComponentClassName #>,
+        <#= columnSelectorComponentClassName #>,
+        <#= columnSelectorDlgComponentClassName #>,
+        <#= messageDialogComponentClassName #>,
+    ]
+//    entryComponents: [
+//        <#= columnSelectorDlgComponentClassName #>,
+//        <#= messageDialogComponentClassName #>,
+//    ]
+})
+export class <#= appModuleClassName #> { }
+
+

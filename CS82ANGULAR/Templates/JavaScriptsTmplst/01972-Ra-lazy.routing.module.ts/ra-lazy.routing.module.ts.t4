@@ -41,9 +41,9 @@ import { <#= raComponentRoutingModuleClassName #> } from '<#= GetFolderNameWithA
         <#= raComponentRoutingModuleClassName #>,
     ],
     exports: [
-    ],
-    entryComponents: [
     ]
+//    entryComponents: [
+//    ]
 })
 export class <#= raComponentLazyRoutingModuleClassName #> { }
 

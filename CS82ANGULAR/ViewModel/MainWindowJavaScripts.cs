@@ -31,7 +31,7 @@ namespace CS82ANGULAR.ViewModel
         public MainWindowJavaScripts(DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory) : base(dte, textTemplating, dialogFactory)
         {
             InvitationViewModel InvitationVM = new InvitationViewModel();
-            InvitationVM.WizardName = "#4 Java Scripts Wizard";
+            InvitationVM.WizardName = "#4 Scripts Wizard (Including Java Scripts)";
             InvitationVM.IsReady.IsReadyEvent += InvitationViewModel_IsReady;
             this.InvitationUC = new UserControlInvitation(InvitationVM);
             this.CurrentUserControl = this.InvitationUC;

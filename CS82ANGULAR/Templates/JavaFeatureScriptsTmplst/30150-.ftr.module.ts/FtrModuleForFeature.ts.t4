@@ -107,9 +107,9 @@ import { <#= GetModuleClassNameForFeatureWithAnglrEx(AngularJsonFile, aModel, al
     ],
     exports: [
         <#=  featureClassName #>,
-    ],
-    entryComponents: [
     ]
+//    entryComponents: [
+//    ]
 })
 export class <#= featureModuleClassName #> { }
 

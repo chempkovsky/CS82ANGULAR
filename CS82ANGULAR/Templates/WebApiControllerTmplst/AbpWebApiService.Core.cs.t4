@@ -1,0 +1,474 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ include file="..\CommonScripts\AbpRepoLevel.t4" #>
+
+#nullable disable
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Volo.Abp;
+
+<#
+
+    string GetAllMethodName             = "getall";
+    string GetWithFilterMethodName      = "getwithfilter";
+    string GetOneMethodName             = "getone";
+    string GetOneByMethodNamePrefix     = "getoneby";
+    string UpdateOneMethodName          = "updateone";
+    string AddOneMethodName             = "addone";
+    string DeleteOneMethodName          = "deleteone";
+    string GetManyByRepPrimMethodNamePrefix = "getmanybyrepprim";
+    string GetManyByRepUnqMethodNamePrefix  = "getmanybyrepunq";
+
+    string OperatorSufix = "Oprtr";
+//    string repoInterfaceNameSpace = GetRepoInterfaceNameSpace(Model);
+    string webApiNameSpace = GetDestinationNameSpace(Model);
+    string rootEntityNameSpace = GetRootEntityNameSpace(Model);
+    string appServiceInterfaceNameSpace = GetAppServiceInterfaceNameSpace(Model);
+//    string dbContextNameSpace = GetDbContextNameSpace(Context);
+//    string domainViewModelNameSpace = GetDomainViewModelNameSpace(Model);
+    string viewModelNameSpace = GetViewModelNameSpace(Model);
+    string webApiServicePrefix = GetWebApiServicePrefix(Model);
+    string webApiRoutePrefix =  GetWebApiRoutePrefix(Model);
+    bool EntHasId = AbpIsEntityWithId(Model);
+    bool EntHasTenantId = AbpHasMultiTenant(Model);
+    string IdDataType = "";
+    string EntityKey = "";
+    if(EntHasId) {
+        IdDataType = GetAbpIdDataType(Model);
+        EntityKey = ", " + IdDataType;
+    }
+
+    List<String> locNavigationPaths = GetNavigationPaths(Model);
+
+    List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
+    {
+        ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
+        if (pk != null) uniqueKeys.Add(pk);
+        
+        GetModelUniqueKeys(Model, uniqueKeys);
+    }
+
+    string moduleName = AbpFirstItemOfNameSpace(webApiNameSpace);
+
+
+#>
+<# if (!string.IsNullOrEmpty(viewModelNameSpace)) {
+ if (!string.Equals(viewModelNameSpace, webApiNameSpace)) {#>
+using <#= viewModelNameSpace #>;
+<# }} #>
+<# if (!string.IsNullOrEmpty(rootEntityNameSpace)) {
+ if (!string.Equals(rootEntityNameSpace, webApiNameSpace)) {#>
+using <#= rootEntityNameSpace #>;
+<# }} #>
+<# if (!string.IsNullOrEmpty(appServiceInterfaceNameSpace)) {
+ if (!string.Equals(appServiceInterfaceNameSpace, webApiNameSpace)) {#>
+using <#= appServiceInterfaceNameSpace #>;
+<# }} #>
+
+/*
+  // == 1 ==
+  // modify "<#= moduleName #>Permissions"-class like seen
+
+  public class <#= moduleName #>Permissions
+  {
+
+    ...
+
+    public static class <#= Model.ViewName #>
+    {
+        
+        public const string Default = GroupName + ".<#= Model.ViewName #>";
+        public const string FullScan = Default + ".FullScan";
+        public const string Create = Default + ".Create";
+        public const string Edit = Default + ".Edit";
+        public const string Delete = Default + ".Delete";
+    }
+
+    ...
+
+  }
+
+  // == 2 ==
+  // modify "<#= moduleName #>PermissionDefinitionProvider"-class like seen
+
+    public class <#= moduleName #>PermissionDefinitionProvider : PermissionDefinitionProvider
+    {
+        ...
+        public override void Define(IPermissionDefinitionContext context)
+        {
+            var mdlGrp = context.AddGroup(<#= moduleName #>Permissions.GroupName, L("Permission:<#= moduleName #>"));
+
+            var perm = mdlGrp.AddPermission(<#= moduleName #>Permissions.<#= Model.ViewName #>.Default, L("Permission:<#= Model.ViewName #>"));
+            perm.AddChild(<#= moduleName #>Permissions.<#= Model.ViewName #>.FullScan, L("Permission:<#= Model.ViewName #>.FullScan"));
+            perm.AddChild(<#= moduleName #>Permissions.<#= Model.ViewName #>.Create, L("Permission:<#= Model.ViewName #>.Create"));
+            perm.AddChild(<#= moduleName #>Permissions.<#= Model.ViewName #>.Edit, L("Permission:<#= Model.ViewName #>.Edit"));
+            perm.AddChild(<#= moduleName #>Permissions.<#= Model.ViewName #>.Delete, L("Permission:<#= Model.ViewName #>.Delete"));
+        }
+
+        ...
+    }
+
+    
+
+
+*/
+
+namespace <#= webApiNameSpace #> {
+
+//
+// Please replace ApplicationService with a name of the ApplicationService of your project
+//
+
+    [Area(<#= moduleName #>RemoteServiceConsts.ModuleName)]
+    [RemoteService(Name = <#= moduleName #>RemoteServiceConsts.RemoteServiceName)]
+    [Authorize(<#= moduleName #>Permissions.<#= Model.ViewName #>.Default)]
+    [Route("<#= webApiRoutePrefix #>")]
+    public class <#= AbpWebApiControllerName(Model) #>: <#= moduleName #>Controller, <#= AbpServiceInterfaceName(Model)  #>
+    {
+
+        private readonly <#= AbpServiceInterfaceName(Model)  #> appService;
+        public <#= AbpWebApiControllerName(Model) #>(<#= AbpServiceInterfaceName(Model)  #> _appService)
+        {
+            appService = _appService;
+        }
+
+<# 
+    if (Model.IsWebApiSelectAll) { 
+#>
+        [HttpGet]
+        [Route("[controller]/<#= GetAllMethodName #>")]
+        [Authorize(<#= moduleName #>Permissions.<#= Model.ViewName #>.FullScan)]
+        public async Task<IEnumerable<<#= Model.ViewName #>>> <#= GetAllMethodName #>()
+        {
+            return await appService.<#= GetAllMethodName #>();
+        } 
+<#
+    }
+#>
+
+
+<# 
+    if (Model.IsWebApiSelectManyWithPagination) { 
+#>
+        [HttpGet]
+        [Route("[controller]/<#= GetWithFilterMethodName #>")]
+        [Authorize(<#= moduleName #>Permissions.<#= Model.ViewName #>.FullScan)]
+        public async Task<<#= Model.PageViewName #>> <#= GetWithFilterMethodName #>(<#
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if (prop.IsUsedByfilter) { 
+#>                
+             [FromQuery] <#= GetNullableType(prop)#>[] <#= GetFilterPropertyName(prop, Model) #>, 
+             [FromQuery] string[] <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>,
+<#
+            }
+        } 
+#>                 
+            [FromQuery] string[] orderby = null, 
+            [FromQuery] int? page =null, 
+            [FromQuery] int? pagesize = null)
+        {
+            return await appService.<#= GetWithFilterMethodName #>(<#
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if (prop.IsUsedByfilter) { 
+#>                
+                <#= GetFilterPropertyName(prop, Model) #>, 
+                <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>,
+<#
+            }
+        } 
+#>                 
+                orderby, 
+                page, 
+                pagesize);
+        } // the end of GetWithFilter()-method
+<#
+    }
+#>
+
+<# 
+    if (Model.IsWebApiSelectOneByPrimarykey) { 
+        foreach(ModelViewUniqueKeyOfVwSerializable pk in uniqueKeys) {
+            List<ModelViewPropertyOfVwSerializable> primKeys = null;
+            string indErrrorText = "";
+            bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, pk, out indErrrorText);
+            string localRouteName = GetOneMethodName;
+            string localRouteManyName = GetManyByRepPrimMethodNamePrefix;
+            if (!pk.IsPrimary) {
+                    
+                localRouteName = GetOneByMethodNamePrefix + pk.UniqueKeyName;
+                localRouteManyName = GetManyByRepUnqMethodNamePrefix + pk.UniqueKeyName;
+            }
+            if (!indIsCorrect) {
+#>
+//
+// Could not generate <#= localRouteName #>
+// Primary/Unique Index Is not correct:
+// <#= indErrrorText #>
+//
+<#
+            } else {
+                primKeys = pk.UniqueKeyProperties;
+#>
+        [HttpGet]
+        [Route("[controller]/<#= localRouteName #>")]
+        public async Task<<#= Model.ViewName #>> <#= localRouteName #>(<#
+        int counter = 0;
+        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+            if(counter > 0) { 
+#>                
+            ,[FromQuery] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model) #>
+<#
+            } else { 
+#>                
+             [FromQuery] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model) #>
+<#
+                counter++;
+            }
+        } #>                
+             )
+        {
+            return await appService.<#= localRouteName #>(<#
+        int counter01 = 0;
+        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+            if(counter01 > 0) { 
+#>                
+              , <#= GetFilterPropertyName(prop, Model) #>
+<#
+            } else { 
+#>                
+                <#= GetFilterPropertyName(prop, Model) #>
+<#
+                counter01++;
+            }
+        } #>                
+             );
+        } // the end of public GetOne()-method
+
+
+        [HttpGet]
+        [Route("[controller]/<#= localRouteManyName #>")]
+        public async Task<<#= Model.PageViewName #>> <#= localRouteManyName #>(
+<#
+        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+#>                
+             [FromQuery] <#= GetNullableType(prop)#>[] <#= GetFilterPropertyName(prop, Model) #>,
+             [FromQuery] string[] <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>,
+<#
+        } 
+      {
+        bool hasForeign = false;
+        bool hasForeignUnderPrim = false;
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(!prop.IsUsedByfilter) continue;
+            if (primKeys.Any(p => p == prop)) {
+                if(IsUsedByForeignKey(prop, Model)) hasForeignUnderPrim = true;
+                continue;
+            }
+            if(!IsUsedByForeignKey(prop, Model)) continue;
+            hasForeign = true;
+#>                
+             [FromQuery] <#= GetNullableType(prop)#>[] <#= GetFilterPropertyName(prop, Model) #>,
+             [FromQuery] string[] <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>,
+<#
+        }
+      }
+#>            
+            [FromQuery] string[] orderby = null, 
+            [FromQuery] int? page =null, 
+            [FromQuery] int? pagesize = null)
+        {
+            return await appService.<#= localRouteManyName #>(
+<#
+        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+#>                
+                <#= GetFilterPropertyName(prop, Model) #>,
+                <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>,
+<#
+        } 
+      {
+        bool hasForeign = false;
+        bool hasForeignUnderPrim = false;
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(!prop.IsUsedByfilter) continue;
+            if (primKeys.Any(p => p == prop)) {
+                if(IsUsedByForeignKey(prop, Model)) hasForeignUnderPrim = true;
+                continue;
+            }
+            if(!IsUsedByForeignKey(prop, Model)) continue;
+            hasForeign = true;
+#>                
+                <#= GetFilterPropertyName(prop, Model) #>,
+                <#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>,
+<#
+        }
+      }
+#>            
+                orderby, 
+                page, 
+                pagesize);
+
+        }
+<#
+            } // the end of: if (!indIsCorrect) {...} else {}
+        } // the end of: foreach(ModelViewUniqueKeyOfVwSerializable pk uniqueKeys) {}
+    } // the end of: if (Model.IsWebApiSelectOneByPrimarykey)
+#>
+
+<# 
+    if (Model.IsWebApiUpdate) { 
+        List<ModelViewPropertyOfVwSerializable> primKeys = null;
+        ModelViewUniqueKeyOfVwSerializable locPrimKey = GetModelPrimKeyFromList(uniqueKeys);
+        string indErrrorText = "";
+        bool indIsCorrect = locPrimKey != null;
+        if (!indIsCorrect) {
+            indErrrorText = "Could not find primary key";
+        }
+        if (indIsCorrect) {
+            indIsCorrect = CheckModelIfIndexIsCorrect(Model, locPrimKey, out indErrrorText);
+        }
+        if(!indIsCorrect) {
+#>
+//
+// Could not generate <#= UpdateOneMethodName #>
+// Primary Index Is not correct:
+// <#= indErrrorText #>
+//
+<#
+
+        } else {
+            primKeys = locPrimKey.UniqueKeyProperties; 
+
+#>
+        [HttpPut]
+        [Route("[controller]/<#= UpdateOneMethodName #>")]
+        [Authorize(<#= moduleName #>Permissions.<#= Model.ViewName #>.Edit)]
+        public async Task<<#= Model.ViewName #>?> <#= UpdateOneMethodName #>([FromBody] <#= Model.ViewName#> viewToUpdate)
+        {
+            return await appService.<#= UpdateOneMethodName #>(viewToUpdate);
+        }
+<#
+        } // the end of: if(indIsCorrect) {} else {}
+    } // the end of: if (Model.IsWebApiAdd)
+
+#>
+
+<# 
+    if (Model.IsWebApiAdd) { 
+        List<ModelViewPropertyOfVwSerializable> primKeys = null;
+        ModelViewUniqueKeyOfVwSerializable locPrimKey = GetModelPrimKeyFromList(uniqueKeys);
+        string indErrrorText = "";
+        bool indIsCorrect = locPrimKey != null;
+        if (!indIsCorrect) {
+            indErrrorText = "Could not find primary key";
+        }
+        if (indIsCorrect) {
+            indIsCorrect = CheckModelIfIndexIsCorrect(Model, locPrimKey, out indErrrorText);
+        }
+        if(!indIsCorrect) {
+#>
+//
+// Could not generate <#= AddOneMethodName #>
+// Primary Index Is not correct:
+// <#= indErrrorText #>
+//
+<#
+
+        } else {
+            primKeys = locPrimKey.UniqueKeyProperties;
+#>
+        [HttpPost]
+        [Route("[controller]/<#= AddOneMethodName #>")]
+        [Authorize(<#= moduleName #>Permissions.<#= Model.ViewName #>.Create)]
+        public async Task<<#= Model.ViewName #>> <#= AddOneMethodName #>([FromBody] <#= Model.ViewName#> viewToAdd)
+        {
+            return await appService.<#= AddOneMethodName #>(viewToAdd);
+        }
+<#
+        } // the end of: if(indIsCorrect) {}
+    } // the end of if (Model.IsWebApiAdd)
+#>
+
+
+<# 
+    if (Model.IsWebApiDelete) { 
+        List<ModelViewPropertyOfVwSerializable> primKeys = null;
+        ModelViewUniqueKeyOfVwSerializable locPrimKey = GetModelPrimKeyFromList(uniqueKeys);
+        string indErrrorText = "";
+        bool indIsCorrect = locPrimKey != null;
+        if (!indIsCorrect) {
+            indErrrorText = "Could not find primary key";
+        }
+        if (indIsCorrect) {
+            indIsCorrect = CheckModelIfIndexIsCorrect(Model, locPrimKey, out indErrrorText);
+        }
+        if(!indIsCorrect) {
+#>
+//
+// Could not generate <#= DeleteOneMethodName #>
+// Primary Index Is not correct:
+// <#= indErrrorText #>
+//
+<#
+
+        } else {
+            primKeys = locPrimKey.UniqueKeyProperties;
+
+#>
+        [HttpDelete]
+        [Route("[controller]/<#= DeleteOneMethodName #>")]
+        [Authorize(<#= moduleName #>Permissions.<#= Model.ViewName #>.Delete)]
+        public async Task<<#= Model.ViewName #>> <#= DeleteOneMethodName #>(<#
+        int counter = 0;
+        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+            if(counter > 0) { 
+#>                
+            ,[FromQuery] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
+<#
+            } else { 
+#>                
+             [FromQuery] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
+<#
+                counter++;
+            } 
+        } #>                
+           )
+        {
+            return await appService.<#= DeleteOneMethodName #>(<#
+        int counter09 = 0;
+        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+            if(counter09 > 0) { 
+#>                
+                ,<#= GetFilterPropertyName(prop, Model)#>
+<#
+            } else { 
+#>                
+                 <#= GetFilterPropertyName(prop, Model)#>
+<#
+                counter09++;
+            } 
+        } #>                
+            );
+        }
+<#
+        } // the end of: if(!indIsCorrect) {} else {}
+    } // the end of if: (Model.IsWebApiDelete)
+#>
+
+    }
+  
+}
+

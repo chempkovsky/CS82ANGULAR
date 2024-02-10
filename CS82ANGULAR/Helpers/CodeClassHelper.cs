@@ -2854,7 +2854,7 @@ namespace CS82ANGULAR.Helpers
             }
             return SelectedModel;
         }
-        public static ModelView DefineModelView(this CodeClass srcClass, CodeClass dbContext, ModelView SelectedModel, string viewSufix = null, string pageViewNameSufix = null)
+        public static ModelView DefineModelView(this CodeClass srcClass, CodeClass dbContext, ModelView SelectedModel, string viewSufix = null, string pageViewNameSufix = null, string domainViewSufix = null, string domainPageViewSufix = null)
         {
             if ((srcClass == null) || (dbContext == null) || (SelectedModel == null)) return null;
             SelectedModel.ClearModelView();
@@ -3097,7 +3097,9 @@ namespace CS82ANGULAR.Helpers
             SelectedModel.RootEntityUniqueProjectName = uniqueProjectName;
             SelectedModel.ViewName = srcClass.Name + viewSufix;
             SelectedModel.PageViewName = srcClass.Name + pageViewNameSufix;
-
+            SelectedModel.DomainViewName = srcClass.Name + domainViewSufix;
+            SelectedModel.DomainPageViewName = srcClass.Name + domainPageViewSufix;
+            
             SelectedModel.PluralTitle = SelectedModel.ViewName + "s";
             SelectedModel.Title = SelectedModel.ViewName;
 
@@ -3163,6 +3165,54 @@ namespace CS82ANGULAR.Helpers
                 }
                 SelectedModel.UniqueKeys.Add(modelViewUniqueKey);
             }
+            string baseClassesStr = "";
+            CodeElements bases = srcClass.Bases;
+            if (bases != null)
+            {
+                if (bases.Count > 0)
+                {
+                    CodeElement baseElement = bases.Item(1);
+                    if (baseElement != null)
+                    {
+                        if (baseElement.Kind == vsCMElement.vsCMElementClass)
+                        {
+                            CodeClass baseClass = baseElement as CodeClass;
+                            if (baseClass != null)
+                            {
+                                baseClassesStr = baseClass.FullName;
+                            }
+                        }
+                    }
+                }
+            }
+            //Volo.Abp.Domain.Entities.AggregateRoot<System.Guid>
+            /*
+                CreationAuditedEntityDto
+                CreationAuditedEntityWithUserDto
+                AuditedEntityDto
+                AuditedEntityWithUserDto
+                FullAuditedEntityDto
+                FullAuditedEntityWithUserDto
+
+                ExtensibleObject implements the IHasExtraProperties (other classes inherits this class).
+                ExtensibleEntityDto
+                ExtensibleCreationAuditedEntityDto
+                ExtensibleCreationAuditedEntityWithUserDto
+                ExtensibleAuditedEntityDto
+                ExtensibleAuditedEntityWithUserDto
+                ExtensibleFullAuditedEntityDto
+                ExtensibleFullAuditedEntityWithUserDto
+
+
+                CreationAuditedEntity<TKey> and CreationAuditedAggregateRoot<TKey> implement the ICreationAuditedObject interface.
+                AuditedEntity<TKey> and AuditedAggregateRoot<TKey> implement the IAuditedObject interface.
+                FullAuditedEntity<TKey> and FullAuditedAggregateRoot<TKey> implement the IFullAuditedObject interface.
+            */
+
+
+            SelectedModel.BaseClass = baseClassesStr;
+
+
             return SelectedModel;
         }
     }

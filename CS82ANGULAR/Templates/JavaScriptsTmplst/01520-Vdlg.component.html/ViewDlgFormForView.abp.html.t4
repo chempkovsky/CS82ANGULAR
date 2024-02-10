@@ -1,0 +1,66 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string HiddenFilterSelector         = "hidden-filter";
+    string HiddenFilterPropName         = "hiddenFilter";
+    string EformModeSelector            = "eform-mode";
+    string EformModePropName            = "eformMode";
+    string FormControlModelSelector     = "eform-control-model";
+    string FormControlModelPropName     = "eformControlModel";
+    string BeforeSubmitSelector         = "before-submit";
+    string BeforeSubmitPropName         = "beforeSubmit";
+    string AfterSubmitSelector          = "after-submit";
+    string AfterSubmitPropName          = "afterSubmit";
+    string OnAfterSubmitMethodName      = "onAfterSubmit";
+
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+    string viewformComponentFolder      = "01500-Vform.component.ts";
+    string viewddlgComponentFolder      = "01520-Vdlg.component.ts";
+
+    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, viewformComponentFolder);
+    string viewddlgComponentClassName = GetComponentClassName(Model, viewddlgComponentFolder);
+#>
+<!-- <h3 mat-dialog-title>{{data.title}}</h3> -->
+<div class="modal-body"> 
+    <app-<#= componentSelectorCommonPart #> 
+        [<#= captionSelector #>]="data.title" 
+        [<#= HiddenFilterSelector #>]="data.<#= HiddenFilterPropName #>"
+        [<#= FormControlModelSelector #>]="data.<#= FormControlModelPropName #>"
+        (<#= AfterSubmitSelector #>)="<#= OnAfterSubmitMethodName #>($event)"
+    ></app-<#= componentSelectorCommonPart #>>
+</div>
+<div class="modal-footer">
+<# 
+    if(localize) {
+#>
+  <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" cdkFocusInitial>{{ { key: 'CmSt::Cancel', defaultValue: 'Cancel' } | abpLocalization }}</button>
+  <button type="button" class="btn btn-outline-secondary" (click)="onOk()">{{ { key: 'CmSt::Ok', defaultValue: 'Ok' } | abpLocalization }}</button>
+<# 
+    } else {
+#>
+  <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" cdkFocusInitial>Cancel</button>
+  <button type="button" class="btn btn-outline-secondary" (click)="onOk()">Ok</button>
+<# 
+    }
+#>
+</div>
+

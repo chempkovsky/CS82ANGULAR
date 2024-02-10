@@ -1,0 +1,62 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "Please use this batch with MONOREPO project",
+    "Create library with a commands:",
+    "",
+    "ng new ang-monorepo --no-create-application",
+    "cd ang-monorepo",
+    "ng add @angular/material",
+    "npm i -s @angular/flex-layout @angular/cdk",
+    "",
+    "ng generate library XXXXX-services",
+    "",
+    "where XXXXX is a name of the selected ViewModel",
+    "",
+    "Please make sure that you selected [src\\lib] folder of the created library !!!",
+    "",
+    "for kendo-UI project instead of the command",
+    "ng add @angular/material",
+    "please use the following commands",
+    "",
+    "ng add @progress/kendo-angular-buttons",
+    "ng add @progress/kendo-angular-layout",
+    "ng add @progress/kendo-angular-icons",
+    "ng add @progress/kendo-angular-inputs",
+    "ng add @progress/kendo-angular-dropdowns",
+    "ng add @progress/kendo-angular-menu",
+    "ng add @progress/kendo-angular-progressbar",
+    "ng add @progress/kendo-angular-dialog",
+    "ng add @progress/kendo-angular-notification",
+    "ng add @progress/kendo-angular-toolbar",
+    "ng add @progress/kendo-angular-tooltip",
+    "ng add @progress/kendo-angular-listview",
+    "ng add @progress/kendo-angular-dateinputs",
+    "ng add @progress/kendo-angular-label",
+    "ng add @progress/kendo-angular-grid"
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01400-.service.ts",
+      "GeneratorSript": "AbpWebServiceForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01400-.service.txt",
+      "GeneratorSript": "WebServiceForView.txt.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01418-Datasource.class.ts",
+      "GeneratorSript": "Datasource.class.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01418-Datasource.class.txt",
+      "GeneratorSript": "Datasource.class.txt.t4"
+    }
+  ]
+
+}

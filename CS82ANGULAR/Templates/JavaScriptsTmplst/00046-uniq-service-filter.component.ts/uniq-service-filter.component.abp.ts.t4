@@ -1,0 +1,641 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string showAddFltItemSelector       = "show-add-flt-item";
+    string showAddFltItemPropName       = "showAddFltItem";
+
+    string AppSettingServicePropName    = "appGlblSettings";
+    string AppearancePropName           = "appearance";
+    string OverflowSelector             = "ovrflw";
+    string OverflowPropName             = "ovrflw";
+
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+
+    string externalFilterSelector               = "external-filter";
+    string externalFilterPropName               = "externalFilter";
+    string externalFilterExPropName             = "externalFilterEx";
+
+    string MaxHeightPropSelector                = "max-height";
+    string MaxHeightPropName                    = "maxHeight";
+    string MaxHeightExPropName                  = "maxHeightEx";
+
+    string showFilterSelector                   = "show-filter";
+    string showFilterPropName                   = "showFilter";
+    string showFilterExPropName                 = "showFilterEx";
+
+    string inputFilterDefsSelector              = "filter-defs";
+    string inputFilterDefsPropName              = "inputFilterDefs";
+    string inputFilterDefsExPropName            = "inputFilterDefsEx";
+
+
+
+    Dictionary<string, string> RegExps = new Dictionary<string, string>() {
+            { "RegExpGuid"       , @"/(?im)^[{(]?[0-9A-F]{8}[-]?(?:[0-9A-F]{4}[-]?){3}[0-9A-F]{12}[)}]?$/" },
+            { "RegExpInteger"    , @"/^[-+]?\d+$/" },
+            { "RegExpFloat"      , @"/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/" },
+            { "RegExpEmail"      , @"/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/" },
+            { "RegExpCurrency"   , @"/(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/" }
+            };
+
+
+    string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
+
+    string uniqFilterModelFolder        = "00042-uniq-service-filter.interface.ts";
+    string uniqFilterDefModelFolder     = "00044-uniq-service-filter-def.interface.ts";
+
+
+    string filterResultModelFolder          = "00024-web-service-filter-rslt.interface.ts";
+
+    string uniqFilterComponentCssFolder     = "00046-uniq-service-filter.component.css";
+    string uniqFilterComponentHtmlFolder    = "00046-uniq-service-filter.component.html";
+    string uniqFilterComponentFolder        = "00046-uniq-service-filter.component.ts";
+
+    string menuItemDataModelFolder      = "00017-menu-item-data.interface.ts";
+    string eventEmitterDataModelFolder  = "00018-event-emitter-data.interface.ts";
+    string eventEmitterPubModelFolder   = "00019-event-emitter-pub.interface.ts";
+
+    string uniqFilterComponentClassName = GetComponentClassName(Model, uniqFilterComponentFolder);
+    string filterComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, uniqFilterComponentFolder);
+                                
+    string uniqFilterModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, uniqFilterModelFolder, uniqFilterComponentFolder);
+    string uniqFilterDefModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, uniqFilterDefModelFolder, uniqFilterComponentFolder);
+    string filterResultModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterResultModelFolder, uniqFilterComponentFolder);
+    string menuItemDataModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, menuItemDataModelFolder, uniqFilterComponentFolder);
+    string eventEmitterDataModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, eventEmitterDataModelFolder, uniqFilterComponentFolder);
+    string eventEmitterPubModelClassName    = GetModelClassNameWithAnglr(AngularJsonFile, Model, eventEmitterPubModelFolder, uniqFilterComponentFolder);
+
+    string appSettingServiceClassName   = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, uniqFilterComponentFolder);
+
+    string OnBackBtnMethodName          = "onBackBtnMd";
+    string OnBackBtnPropName            = "onBackBtn";
+    string OnBackBtnSelector            = "on-back-btn";
+    string showBackBtnPropName          = "showBackBtn";
+    string showBackBtnSelector          = "show-back-btn";
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+    string ShowErrorMethodName          = "showError";
+
+    string tpAheadVarsPropName          = "tpAheadVars";
+    string tpAheadValPropName           = "tpAheadVal";
+    string tpAheadValSelector           = "tp-ahead-val";
+    string tpAheadFncPropName           = "tpAheadFnc";
+    string tpAheadFncSelector           = "tp-ahead-fnc";
+    string tpAheadCptnPropName          = "tpAheadCptn";
+    string tpAheadCptnSelector          = "tp-ahead-cptn";
+    string clearTpAheadVarsMethodName   = "clrTpAheadVars";
+    string tpahValChangedMethodName     = "tpahVlChngs";
+    string patchcontrolsMethodName      = "patchcontrols";
+    string afterObjSelPropName          = "afterObjSel";
+    string afterObjSelSelector          = "after-obj-sel";
+    string notifyAllPropName            = "notifyAll";
+    string notifyAllSelector            = "notify-all";
+
+
+#>
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { FormControl, Validators, ValidatorFn, ValidationErrors } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, Observable, of, OperatorFunction, switchMap } from 'rxjs';
+<# 
+    if(localize) {
+#>
+import { LocalizationService } from '@abp/ng.core';
+<# 
+    }
+#>
+
+
+import { <#= uniqFilterModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterModelFolder, uniqFilterComponentFolder)#>';
+import { <#= uniqFilterDefModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterDefModelFolder, uniqFilterComponentFolder)#>';
+import { <#= filterResultModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterResultModelFolder, uniqFilterComponentFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, uniqFilterComponentFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, menuItemDataModelFolder, uniqFilterComponentFolder)#>';
+import { <#= eventEmitterDataModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, eventEmitterDataModelFolder, uniqFilterComponentFolder)#>';
+import { <#= eventEmitterPubModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, eventEmitterPubModelFolder, uniqFilterComponentFolder)#>';
+
+/* eslint-disable @angular-eslint/no-input-rename */
+/* eslint-disable @angular-eslint/no-output-on-prefix */
+/* eslint-disable @angular-eslint/no-output-rename */
+
+
+@Component({
+  selector: 'app-<#= filterComponentSelectorCommonPart #>',
+  templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterComponentHtmlFolder, uniqFilterComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterComponentCssFolder, uniqFilterComponentFolder) #>.css']
+})
+export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #> {
+    protected isOnInitCalled: boolean = false;
+    
+    constructor(protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
+<# 
+    if(localize) {
+#>
+        private L: LocalizationService, 
+<# 
+    }
+#>
+        private cd: ChangeDetectorRef) { 
+    }
+<# 
+    if(localize) {
+#>
+    RmCurrFltItm: Observable<string> | null = null;
+    ShowDtDlg: Observable<string> | null = null;
+    FltVal: Observable<string> | null = null;
+    Oprtr: Observable<string> | null = null;
+    ClNm: Observable<string> | null = null;
+    ApplFlt: Observable<string> | null = null;
+    RmvAllFltItms: Observable<string> | null = null;
+    AddFltItm: Observable<string> | null = null;
+    NavBckToMstr: Observable<string> | null = null;
+    VlMstLssTn: string | null = null;
+    VlMstGtTn: string | null = null;
+    IncrctFt: string | null = null;
+    IncrctDtFt: string | null = null;
+<# 
+    }
+#>
+
+    ngOnInit(): void {
+        this.onFilterDefsChanged();
+        this.isOnInitCalled = true;
+        this.cd.detectChanges();
+<# 
+    if(localize) {
+#>
+        this.RmCurrFltItm =this.L.get({
+          key: 'CmSt::RmCurrFltItm',
+          defaultValue: "Remove current filter item",
+        });
+        this.ShowDtDlg =this.L.get({
+          key: 'CmSt::ShowDtDlg',
+          defaultValue: "Show date dialog",
+        });
+        this.FltVal =this.L.get({
+          key: 'CmSt::FltVal',
+          defaultValue: "Filter value",
+        });
+        this.Oprtr =this.L.get({
+          key: 'CmSt::Oprtr',
+          defaultValue: "Operator",
+        });
+        this.ClNm =this.L.get({
+          key: 'CmSt::ClNm',
+          defaultValue: "Column name",
+        });
+        this.ApplFlt =this.L.get({
+          key: 'CmSt::ApplFlt',
+          defaultValue: "Apply filter",
+        });
+        this.RmvAllFltItms =this.L.get({
+          key: 'CmSt::RmvAllFltItms',
+          defaultValue: "Remove all filter items",
+        });
+        this.AddFltItm =this.L.get({
+          key: 'CmSt::AddFltItm',
+          defaultValue: "Add filter item",
+        });
+        this.NavBckToMstr =this.L.get({
+          key: 'CmSt::NavBckToMstr',
+          defaultValue: "Navigate back to master",
+        });
+        this.VlMstLssTn = this.L.instant({
+            key: 'CmSt::VlMstLssTn',
+            defaultValue: "The value must be less than"
+        });
+        this.VlMstGtTn = this.L.instant({
+            key: 'CmSt::VlMstGtTn',
+            defaultValue: "The value must be greater than"
+        });
+        this.IncrctFt = this.L.instant({
+            key: 'CmSt::IncrctFt',
+            defaultValue: "Icorrect format"
+        });
+        this.IncrctDtFt = this.L.instant({
+            key: 'CmSt::IncrctDtFt',
+            defaultValue: "Icorrect date format"
+        });
+<# 
+    }
+#>
+    }
+
+    @Input('<#= captionSelector #>') <#= captionPropName #>: string = '';
+    @Input('<#= showBackBtnSelector #>') <#= showBackBtnPropName #>: boolean = false;
+    @Output('<#= OnBackBtnSelector #>') <#= OnBackBtnPropName #> = new EventEmitter<any>();
+    <#= OnBackBtnMethodName #>() {
+        this.<#= OnBackBtnPropName #>.emit(null);
+    }
+
+    public <#= OverflowPropName #>: string | null = null;   
+    public  <#= MaxHeightExPropName #>: number|null = null;
+    protected _<#= MaxHeightPropName #>: number|null = null;
+    @Input('<#= MaxHeightPropSelector #>')
+      get <#= MaxHeightPropName #>(): number|null {
+        return this._<#= MaxHeightPropName #>;
+      }
+      set <#= MaxHeightPropName #>(inp: number|null) {
+        this._<#= MaxHeightPropName #> = inp;
+        if (!(typeof inp === 'undefined')) {
+          if(!(inp === null)) {
+            this.<#= MaxHeightExPropName #> = inp * this.<#= AppSettingServicePropName #>.filterHeightFactor + this.<#= AppSettingServicePropName #>.filterHeightAddition;
+            this.<#= OverflowPropName #> = 'auto';
+            if(this.isOnInitCalled) {
+              this.cd.detectChanges();
+            }
+            return;
+          }
+        }
+        this.<#= MaxHeightExPropName #> = null;
+        this.<#= OverflowPropName #> = null;
+        if(this.isOnInitCalled) {
+            this.cd.detectChanges();
+        }
+      }
+    @Input('<#= showAddFltItemSelector #>') <#= showAddFltItemPropName #>: boolean = true;
+    @Output('<#= onContainerMenuItemClickSelector #>') <#= onContainerMenuItemClickEmitter #> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
+    @Input('<#= containerMenuItemsSelector #>') <#= containerMenuItemsPropName #>: Array<<#= menuItemDataModelClassName #>> = [];
+    <#= onContainerMenuItemClickMethodName #>(v: <#= menuItemDataModelClassName #>)  {
+        let e: <#= eventEmitterDataModelClassName #> = {
+            id: v.id,
+            sender: this,
+            value: null
+        }
+        this.<#= onContainerMenuItemClickEmitter #>.emit(e);
+    }
+
+    public <#= showFilterExPropName #>: boolean = true;
+    protected _<#= showFilterPropName #>: boolean|any = true;
+    @Input('<#= showFilterSelector #>') 
+      get <#= showFilterPropName #>(): boolean {
+        return this._<#= showFilterPropName #>;
+      }
+      set <#= showFilterPropName #>(inshow: boolean|any) {
+        this._<#= showFilterPropName #> = inshow;
+        if (!(typeof inshow === 'undefined')) {
+          if(!(inshow === null)) {
+            this.<#= showFilterExPropName #> = inshow as boolean;
+            if(this.isOnInitCalled) {
+              this.onFilterDefsChanged();
+            }
+          }
+        }
+      }
+
+
+    <#= inputFilterDefsExPropName #>: Array<<#= uniqFilterDefModelClassName #>> = [];
+    protected _<#= inputFilterDefsPropName #>: Array<<#= uniqFilterDefModelClassName #>> = [];
+    @Input('<#= inputFilterDefsSelector #>') 
+        get <#= inputFilterDefsPropName #>(): Array<<#= uniqFilterDefModelClassName #>> {
+          return this._<#= inputFilterDefsPropName #>;
+        }
+        set <#= inputFilterDefsPropName #>(inDef: Array<<#= uniqFilterDefModelClassName #>>) {
+          this._<#= inputFilterDefsPropName #> = inDef
+          if (typeof inDef === 'undefined') {
+            this.<#= inputFilterDefsExPropName #> = [];
+          } else if(!Array.isArray(inDef)) {
+            this.<#= inputFilterDefsExPropName #> = [];
+          } else {
+            this.<#= inputFilterDefsExPropName #> =  inDef;
+          }
+          if(this.isOnInitCalled) {
+            this.onFilterDefsChanged();
+          }
+        }
+
+
+    @Output('on-apply-filter') onApplyFilter = new EventEmitter();
+  
+    webServiceFilterDefs: Array<<#= uniqFilterDefModelClassName #>> = [];
+    webServiceFilters: Array<<#= uniqFilterModelClassName #>> = [];
+
+    onFilterDefsChanged(): void {
+        this.webServiceFilterDefs = [];
+        if(this.<#= showFilterPropName #>) {
+            this.<#= inputFilterDefsExPropName #>.forEach(i => {
+                this.webServiceFilterDefs.push({ fltrName: i.fltrName, fltrCaption: i.fltrCaption, fltrDataType: i.fltrDataType, fltrMaxLen: i.fltrMaxLen, fltrMin: i.fltrMin, fltrMax: i.fltrMax, fltrFlx: i.fltrFlx, fltrMd: i.fltrMd, fltrSm: i.fltrSm, fltrXs: i.fltrXs, fltrSrv: i.fltrSrv });
+            });    
+            let wsfd: Array<<#= uniqFilterModelClassName #>> = [];
+            this.webServiceFilterDefs.forEach(i => {
+                let k: number = this.<#= externalFilterExPropName #>.findIndex((h: <#= filterResultModelClassName #>) => { return h.fltrName === i.fltrName; });
+                let flt: <#= uniqFilterModelClassName #> = {
+                    fltrDataType: i.fltrDataType, 
+                    fltrValue: new FormControl({ value: null, disabled: false }), 
+                    fltrName: i.fltrName, fltrCaption: i.fltrCaption,
+                    fltrMaxLen: i.fltrMaxLen, fltrMin: i.fltrMin, fltrMax: i.fltrMax,
+                    fltrFlx: i.fltrFlx, fltrMd: i.fltrMd, fltrSm: i.fltrSm, fltrXs: i.fltrXs
+                };
+                this.resetVldtrs(flt);
+                if ((k > -1) && (!(typeof this.<#= externalFilterExPropName #>[k].fltrValue === 'undefined'))) flt.fltrValue.reset({ value: this.<#= externalFilterExPropName #>[k].fltrValue, disabled: false });
+                wsfd.push(flt);
+            });
+            this.webServiceFilters = wsfd;
+            let indx: number = 0;
+            this.webServiceFilters.forEach((flt: <#= uniqFilterModelClassName #>) => {
+              this.<#= tpahValChangedMethodName #>(flt.fltrValue, indx);  
+              indx = indx + 1;
+            });
+        } else {
+            this.webServiceFilters = [];
+        }
+        this.cd.detectChanges();
+    }
+
+    resetVldtrs(flt: <#= uniqFilterModelClassName #>) {
+        if (typeof flt === 'undefined') {
+            return;
+        } else if (flt === null)  {
+            return;
+        } 
+
+        let validators: ValidatorFn[] = []; 
+
+        if (!(typeof flt.fltrMaxLen === 'undefined')) {
+            if (!(flt.fltrMaxLen === null)) {
+            validators.push(Validators.maxLength(flt.fltrMaxLen));
+            }
+        }
+        if (!(typeof flt.fltrMax === 'undefined')) {
+            if (!(flt.fltrMax === null)) {
+            validators.push(Validators.max(flt.fltrMax));
+            }
+        }
+        if (!(typeof flt.fltrMin === 'undefined')) {
+            if (!(flt.fltrMin === null)) {
+            validators.push(Validators.min(flt.fltrMin));
+            }
+        }
+        flt.fltrValue.setValidators([]);
+        switch(flt.fltrDataType) {
+            case '':
+                flt.fltrValue.reset({ value: null, disabled: true });
+                break;
+            case 'int16':
+            case 'int32':
+            case 'int64':
+            case 'uint16':
+            case 'uint32':
+            case 'uint64':
+                flt.fltrValue.reset({ value: null, disabled: false });
+                validators.push(Validators.pattern(<#= RegExps["RegExpInteger"] #>));
+                flt.fltrValue.setValidators(validators);
+                break;
+            case 'double':
+            case 'decimal':
+            case 'single':
+                flt.fltrValue.reset({ value: null, disabled: false });
+                validators.push(Validators.pattern(<#= RegExps["RegExpFloat"] #>));
+                flt.fltrValue.setValidators(validators);
+                break;
+            case 'guid':
+                flt.fltrValue.reset({ value: '', disabled: false });
+                //validators.push(Validators.pattern(<#= RegExps["RegExpGuid"] #>));
+                flt.fltrValue.setValidators(validators);
+                break;
+            case 'datetime':
+                flt.fltrValue.reset({ value: null, disabled: false });
+                flt.fltrValue.setValidators(validators);
+                break;
+            default:
+                flt.fltrValue.reset({ value: null, disabled: false });
+                flt.fltrValue.setValidators(validators);
+                break;
+        }
+        flt.fltrValue.updateValueAndValidity(); // must be called after resetting validators
+    }
+
+    removeAllFilters() {
+        let i: number = this.webServiceFilters.length;
+        if (i > 1) {
+          this.webServiceFilters.splice(1, i-1);
+        }
+    }
+
+    getErrorMessage(fc: FormControl): string {
+        let rslt: string = 'Filter item will not be applied.';
+        if (typeof fc === 'undefined') {
+          return rslt;
+        }
+        if (fc === null) {
+          return rslt;
+        }
+        if (fc.errors === null) return rslt;
+        const errs: ValidationErrors = fc.errors as ValidationErrors;
+        Object.keys(errs).forEach(k => {
+          switch(k) {
+            case 'max':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + this.VlMstLssTn + ': ' + errs[k].max;
+<# 
+    } else {
+#>
+              rslt +=' The value must be less than ' + errs[k].max;
+<# 
+    }
+#>
+              break;
+            case 'min':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + this.VlMstGtTn + ': ' + errs[k].max;
+<# 
+    } else {
+#>
+              rslt +=' Value must be greater than ' + errs[k].min;
+<# 
+    }
+#>
+              break;
+            case 'pattern':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + this.IncrctFt + ': ' + errs[k].max;
+<# 
+    } else {
+#>
+              rslt +=' Icorrect format: ' + errs[k].max;
+<# 
+    }
+#>
+              break;
+            case 'matDatepickerMin':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + this.VlMstGtTn + ': ' + errs[k].max;
+<# 
+    } else {
+#>
+              rslt +=' Value must be greater than ' + errs[k].min;
+<# 
+    }
+#>
+              break;
+            case 'matDatepickerMax':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + this.VlMstLssTn + ': ' + errs[k].max;
+<# 
+    } else {
+#>
+              rslt +=' The value must be less than ' + errs[k].max;
+<# 
+    }
+#>
+              break;
+            case 'matDatepickerParse':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + this.IncrctDtFt + '.';
+<# 
+    } else {
+#>
+              rslt +=' Icorrect date format.' ;
+<# 
+    }
+#>
+              break;
+            default:
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + this.IncrctFt + '.';
+<# 
+    } else {
+#>
+              rslt +=' Icorrect format.' ;
+<# 
+    }
+#>
+              rslt +=' Icorrect format.' ;
+              break;
+          }
+        });
+        return rslt;
+    }
+
+    onApplyFilterClicked(): void {
+        let result: Array<<#= filterResultModelClassName #>> = [];
+        let notIgnor: boolean = true;
+        let msg: string = 'The following properties will be ignored: ';
+        let showMsg: boolean = false;
+        this.webServiceFilters.forEach(i => {
+          if (i.fltrValue.enabled) {
+            if(i.fltrValue.valid) {
+                if(notIgnor) {
+                    result.push({fltrName: i.fltrName, fltrDataType: i.fltrDataType, fltrOperator: 'eq', fltrValue: i.fltrValue.value});
+                } else {
+                    msg = msg + i.fltrCaption + '; ';
+                    showMsg = true;
+                }
+            } else notIgnor = false;
+          } else notIgnor = false;
+        });
+        if(showMsg) this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('input', { message: msg });
+        this.onApplyFilter.emit(result);
+    }
+
+    <#= externalFilterExPropName #>: Array<<#= filterResultModelClassName #>> = [];
+    protected _<#= externalFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
+    @Input('<#= externalFilterSelector #>') 
+    get <#= externalFilterPropName #>(): Array<<#= filterResultModelClassName #>> {
+        return this._<#= externalFilterPropName #>;
+    }
+    set <#= externalFilterPropName #>(ef: Array<<#= filterResultModelClassName #>>|any) {
+        this._<#= externalFilterPropName #> = ef;
+        let isNDf = (typeof ef === 'undefined');
+        isNDf = isNDf ? isNDf : (ef === null);
+        isNDf = isNDf ? isNDf : (!Array.isArray(ef));
+        if(isNDf) {
+          if(this.<#= externalFilterExPropName #>.length > 0) {
+            this.<#= externalFilterExPropName #> = [];
+            if(this.isOnInitCalled) {
+              this.onFilterDefsChanged();
+            }
+          }
+        } else {
+          this.<#= externalFilterExPropName #> = [];
+          ef.forEach((fi: <#= filterResultModelClassName #>) => {
+            this.<#= externalFilterExPropName #>.push({fltrName: fi.fltrName, fltrDataType: fi.fltrDataType, fltrOperator: fi.fltrOperator, fltrValue:fi.fltrValue});
+          });
+          if(this.isOnInitCalled) {
+            this.onFilterDefsChanged();
+          }
+      }
+    }
+
+
+<#
+    for(int iii = 0; iii < 7; iii++) {
+#>
+    <#= tpAheadVarsPropName #><#= iii #>: OperatorFunction<string, readonly any[]> = (text$: Observable<string>) =>
+		text$.pipe(
+			debounceTime(200),
+			distinctUntilChanged(),
+			switchMap((value: any) => {
+                if((typeof this.<#= tpAheadFncPropName  #> === 'undefined')||(value.length < 2)) {
+                  return of([]);
+                } 
+                if(this.<#= tpAheadFncPropName  #> === null) {
+                  return of([]);
+                } 
+                return this.<#= tpAheadFncPropName  #>(this.webServiceFilterDefs[<#= iii #>].fltrSrv, this.webServiceFilters, value, <#= iii #>)
+			})
+		);
+    <#= tpAheadCptnPropName #><#= iii #> = (v: any) => {
+        if (typeof this.<#= tpAheadCptnPropName #> === 'undefined') return '';
+        if(this.<#= tpAheadCptnPropName #> === null) return '';
+        return this.<#= tpAheadCptnPropName #>(v, <#= iii #>);
+    }
+<#
+    }
+#>
+
+    @Input('<#= tpAheadValSelector #>') <#= tpAheadValPropName #>!: (v: any, i: number) => any;
+    @Input('<#= tpAheadFncSelector #>') <#= tpAheadFncPropName  #>!: (srv: any, wsfs: Array<<#= uniqFilterModelClassName #>>, value: any, i: number) => Observable<Array<any>>;
+    @Input('<#= tpAheadCptnSelector #>') <#= tpAheadCptnPropName #>!: (v: any, i: number) => string;
+/*
+    <#= clearTpAheadVarsMethodName #>(): void {
+<#
+    for(int iii = 0; iii < 7; iii++) {
+#>
+      this.<#= tpAheadVarsPropName #><#= iii #> = null;
+<#
+    }
+#>
+    }
+*/
+    <#= tpahValChangedMethodName #>(fc: FormControl, indx: number): void {
+        fc.valueChanges.subscribe((value)=>{ this.<#= afterObjSelPropName #>.emit({v: value, i: indx}); });
+    }
+    @Output('<#= afterObjSelSelector #>') <#= afterObjSelPropName #> = new EventEmitter<any>();
+    @Input('<#= notifyAllSelector #>') <#= notifyAllPropName #>: boolean = false;
+
+}
+

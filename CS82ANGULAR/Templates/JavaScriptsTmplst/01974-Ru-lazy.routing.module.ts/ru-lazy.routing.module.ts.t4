@@ -42,9 +42,9 @@ import { <#= ruComponentRoutingModuleClassName #> } from '<#= GetFolderNameWithA
         <#= ruComponentRoutingModuleClassName #>,
     ],
     exports: [
-    ],
-    entryComponents: [
     ]
+//    entryComponents: [
+//    ]
 })
 export class <#= ruComponentLazyRoutingModuleClassName #> { }
 

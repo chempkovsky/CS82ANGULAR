@@ -1,0 +1,28 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "1.",
+    "Please make sure that you have already run the following scripts for the current ViewModel",
+    "                                01100-.interface.ts",
+    "                                01200-Page.interface.ts",
+    "                                01300-Filter.interface.ts",
+    "2.",
+    "Please make sure that you selected src\\app\\services\\your-view-model-name folder",
+    "  where [your-view-model-name] is a name of currently selected ViewModel",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01400-.service.ts",
+      "GeneratorSript": "AbpWebServiceForView.ts.t4"
+    },
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01418-Datasource.class.ts",
+      "GeneratorSript": "Datasource.class.ts.t4"
+    }
+  ]
+
+}

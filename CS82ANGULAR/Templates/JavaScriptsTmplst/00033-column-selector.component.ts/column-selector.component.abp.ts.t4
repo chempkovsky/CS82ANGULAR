@@ -1,0 +1,126 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
+<#
+
+    bool localize = Context.Localize;
+
+    string ShowErrorMethodName          = "showError";
+    string AppSettingServicePropName    = "appGlblSettings";
+
+    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
+    string columnSelectorItemInterfaceFolder    = "00032-column-selector-item.interface.ts";
+    string columnSelectorComponentCssFolder     = "00033-column-selector.component.css";
+    string columnSelectorComponentHtmlFolder    = "00033-column-selector.component.html";
+    string columnSelectorComponentFolder        = "00033-column-selector.component.ts";
+                                    
+    string columnSelectorComponentClassName = GetComponentClassName(Model, columnSelectorComponentFolder);
+    string columnSelectorComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, columnSelectorComponentFolder);
+
+    string columnSelectorItemModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, columnSelectorItemInterfaceFolder, columnSelectorComponentFolder);
+    string appSettingServiceClassName   = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, columnSelectorComponentFolder);
+
+#>
+
+import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
+<# 
+    if(localize) {
+#>
+import { LocalizationService } from '@abp/ng.core';
+<# 
+    }
+#>
+import { <#= columnSelectorItemModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorItemInterfaceFolder, columnSelectorComponentFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, columnSelectorComponentFolder)#>';
+
+@Component({
+  selector: 'app-<#= columnSelectorComponentSelectorCommonPart #>',
+  templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentHtmlFolder, columnSelectorComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentCssFolder, columnSelectorComponentFolder) #>.css']
+})
+export class <#= columnSelectorComponentClassName #> implements OnInit {
+  
+  public colums : Array<<#= columnSelectorItemModelClassName #>> = [];
+  @Input('colums-to-select')
+  get columsToSelect(): Array<IColumnSelectorItem> {
+      return this.colums;
+  }
+  set columsToSelect(inp: Array<IColumnSelectorItem>) {
+    if (!(typeof inp === 'undefined')) {
+      if( Array.isArray(inp)) {
+        this.colums = inp;
+        this.cd.detectChanges();
+      }
+    }
+  }
+
+<# 
+    if(localize) {
+#>
+    ClNmb: string | null = null;
+<# 
+    }
+#>
+
+   constructor(protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
+<# 
+    if(localize) {
+#>
+        private L: LocalizationService, 
+<# 
+    }
+#>
+    private cd: ChangeDetectorRef) { }
+   ngOnInit(): void {
+<# 
+    if(localize) {
+#>
+        this.ClNmb = this.L.instant({
+          key: 'CmSt::ClNmb',
+          defaultValue: "Number of columns",
+        });
+<# 
+    }
+#>
+
+   } 
+   onChanged(v: any // MatCheckboxChange
+   ) {
+       // let i: number = this.colums.findIndex(e => { return e.name === v.source.value; })
+       let i: number = this.colums.findIndex(e => { return e.name === v.value; })
+       if(i > -1) {
+           this.colums[i].checked = v.checked;
+       }
+   }
+   shwoError(s: string) {
+       this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>(
+<# 
+    if(localize) {
+#>
+        this.ClNmb, 
+<# 
+    } else {
+#>
+        'Number of columns', 
+<# 
+    }
+#>
+       { message: s });
+   }
+}
+
+

@@ -329,6 +329,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -359,36 +360,39 @@
 
                     <TextBlock Grid.Row="7"  Grid.Column="0" Text="Generate JsonProperty Attribute" />
                     <CheckBox  Grid.Row="7"  Grid.Column="1" IsChecked="{Binding SelectedModel.GenerateJSonAttribute}"  IsHitTestVisible="False"  VerticalAlignment="Center" HorizontalAlignment="Left"  />
-                    
-                    <TextBlock  Grid.Row="8"  Grid.Column="0" Text="Title"  />
-                    <TextBlock  Grid.Row="8"  Grid.Column="1" Text="{Binding SelectedModel.Title}" />
 
-                    <TextBlock  Grid.Row="9"  Grid.Column="0" Text="Plural Title"  />
-                    <TextBlock  Grid.Row="9"  Grid.Column="1" Text="{Binding SelectedModel.PluralTitle}" />
+                    <TextBlock Grid.Row="8"  Grid.Column="0" Text="Use Only Root Props For Select Method" />
+                    <CheckBox  Grid.Row="8"  Grid.Column="1" IsChecked="{Binding SelectedModel.UseOnlyRootPropsForSelect}"  IsHitTestVisible="False"  VerticalAlignment="Center" HorizontalAlignment="Left"  />
+
+                    <TextBlock  Grid.Row="9"  Grid.Column="0" Text="Title"  />
+                    <TextBlock  Grid.Row="9"  Grid.Column="1" Text="{Binding SelectedModel.Title}" />
 
                     <TextBlock  Grid.Row="10"  Grid.Column="0" Text="Plural Title"  />
                     <TextBlock  Grid.Row="10"  Grid.Column="1" Text="{Binding SelectedModel.PluralTitle}" />
 
-                    <TextBlock Grid.Row="11"  Grid.Column="0" Text="Webapi Route Prefix"  FontWeight="Bold"/>
-                    <TextBox   Grid.Row="11"  Grid.Column="1" Text="{Binding WebApiRoutePrefix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsWebServiceEditable}" Margin="0 0 10 0" />
+                    <TextBlock Grid.Row="11"  Grid.Column="0" Text="Webapi Service Name"  FontWeight="Bold"/>
+                    <TextBox   Grid.Row="11"  Grid.Column="1" Text="{Binding WebApiServiceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsWebServiceEditable}" Margin="0 0 10 0" />
 
-                    <TextBlock Grid.Row="12" Grid.Column="0" Text="Select All" FontWeight="Bold" />
-                    <CheckBox  Grid.Row="12" Grid.Column="1" IsChecked="{Binding IsWebApiSelectAll}" IsHitTestVisible="{Binding IsViewHasProperties}"   />
+                    <TextBlock Grid.Row="12"  Grid.Column="0" Text="Webapi Route Prefix"  FontWeight="Bold"/>
+                    <TextBox   Grid.Row="12"  Grid.Column="1" Text="{Binding WebApiRoutePrefix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsWebServiceEditable}" Margin="0 0 10 0" />
 
-                    <TextBlock Grid.Row="13" Grid.Column="0" Text="Select many with pagination" FontWeight="Bold" />
-                    <CheckBox  Grid.Row="13" Grid.Column="1" IsChecked="{Binding IsWebApiSelectManyWithPagination}" IsHitTestVisible="{Binding IsViewHasProperties}"   />
+                    <TextBlock Grid.Row="13" Grid.Column="0" Text="Select All" FontWeight="Bold" />
+                    <CheckBox  Grid.Row="13" Grid.Column="1" IsChecked="{Binding IsWebApiSelectAll}" IsHitTestVisible="{Binding IsViewHasProperties}"   />
 
-                    <TextBlock Grid.Row="14" Grid.Column="0" Text="Select One By Primary key" FontWeight="Bold" />
-                    <CheckBox  Grid.Row="14" Grid.Column="1" IsChecked="{Binding IsWebApiSelectOneByPrimarykey}" IsHitTestVisible="{Binding IsViewHasRimaryKey}"   />
+                    <TextBlock Grid.Row="14" Grid.Column="0" Text="Select many with pagination" FontWeight="Bold" />
+                    <CheckBox  Grid.Row="14" Grid.Column="1" IsChecked="{Binding IsWebApiSelectManyWithPagination}" IsHitTestVisible="{Binding IsViewHasProperties}"   />
 
-                    <TextBlock Grid.Row="15" Grid.Column="0" Text="Add Item" FontWeight="Bold" />
-                    <CheckBox  Grid.Row="15" Grid.Column="1" IsChecked="{Binding IsWebApiAdd}" IsHitTestVisible="{Binding IsViewHasAllRequiredProperties}"   />
+                    <TextBlock Grid.Row="15" Grid.Column="0" Text="Select One By Primary key" FontWeight="Bold" />
+                    <CheckBox  Grid.Row="15" Grid.Column="1" IsChecked="{Binding IsWebApiSelectOneByPrimarykey}" IsHitTestVisible="{Binding IsViewHasRimaryKey}"   />
 
-                    <TextBlock Grid.Row="16" Grid.Column="0" Text="Update Item" FontWeight="Bold" />
-                    <CheckBox  Grid.Row="16" Grid.Column="1" IsChecked="{Binding IsWebApiUpdate}" IsHitTestVisible="{Binding IsViewHasRimaryKey}"   />
+                    <TextBlock Grid.Row="16" Grid.Column="0" Text="Add Item" FontWeight="Bold" />
+                    <CheckBox  Grid.Row="16" Grid.Column="1" IsChecked="{Binding IsWebApiAdd}" IsHitTestVisible="{Binding IsViewHasAllRequiredProperties}"   />
 
-                    <TextBlock Grid.Row="17" Grid.Column="0" Text="Delete Item" FontWeight="Bold" />
-                    <CheckBox  Grid.Row="17" Grid.Column="1" IsChecked="{Binding IsWebApiDelete}" IsHitTestVisible="{Binding IsViewHasRimaryKey}"   />
+                    <TextBlock Grid.Row="17" Grid.Column="0" Text="Update Item" FontWeight="Bold" />
+                    <CheckBox  Grid.Row="17" Grid.Column="1" IsChecked="{Binding IsWebApiUpdate}" IsHitTestVisible="{Binding IsViewHasRimaryKey}"   />
+
+                    <TextBlock Grid.Row="18" Grid.Column="0" Text="Delete Item" FontWeight="Bold" />
+                    <CheckBox  Grid.Row="18" Grid.Column="1" IsChecked="{Binding IsWebApiDelete}" IsHitTestVisible="{Binding IsViewHasRimaryKey}"   />
 
 
                 </Grid>

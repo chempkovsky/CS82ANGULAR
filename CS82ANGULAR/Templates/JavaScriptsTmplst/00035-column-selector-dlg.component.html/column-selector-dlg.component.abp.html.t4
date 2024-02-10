@@ -1,0 +1,64 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string  columsToSelectSelector =   "colums-to-select";
+
+    string columnSelectorComponentFolder        = "00033-column-selector.component.ts";
+    string componentSelectorCommonPart = GetComponentSelectorCommonPart(Model, columnSelectorComponentFolder);
+
+    string columnSelectorDlgComponentFolder     = "00035-column-selector-dlg.component.ts";
+    string columnSelectorDlgComponentClassName  = GetComponentClassName(Model, columnSelectorDlgComponentFolder);
+#>
+
+<div class="modal-header">
+<# 
+    if(localize) {
+#>
+  <h4 class="modal-title" i18n="Columns To Show@@<#= columnSelectorDlgComponentClassName #>.Columns-To-Show">Columns To Show</h4>
+<# 
+    } else {
+#>
+  <h4 class="modal-title">Columns To Show</h3>
+<# 
+    }
+#>
+</div>
+
+<div class="modal-body">
+    <app-<#= componentSelectorCommonPart #> 
+        [<#= columsToSelectSelector #>]="data"
+    ></app-<#= componentSelectorCommonPart #>>
+</div>
+<div class="modal-footer">
+<# 
+    if(localize) {
+#>
+  <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" cdkFocusInitial>{{ { key: 'CmSt::Cancel', defaultValue: 'Cancel' } | abpLocalization }}</button>
+  <button type="button" class="btn btn-outline-secondary" (click)="onOk()">{{ { key: 'CmSt::Ok', defaultValue: 'Ok' } | abpLocalization }}</button>
+<# 
+    } else {
+#>
+  <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" cdkFocusInitial>Cancel</button>
+  <button type="button" class="btn btn-outline-secondary" (click)="onOk()">Ok</button>
+<# 
+    }
+#>
+</div>
+

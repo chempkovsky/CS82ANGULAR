@@ -216,6 +216,10 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -238,23 +242,35 @@
                     <TextBox Grid.Row="4"  Grid.Column="1" Text="{Binding SelectedModel.PageViewName, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 10 0" />
 
 
-                    <TextBlock Grid.Row="5"  Grid.Column="0" Text="View Project"/>
-                    <TextBlock Grid.Row="5"  Grid.Column="1" Text="{Binding SelectedModel.ViewProject}"  />
+                    <TextBlock Grid.Row="5"  Grid.Column="0" Text="Domain View Name"  FontWeight="Bold"/>
+                    <TextBox Grid.Row="5"  Grid.Column="1" Text="{Binding SelectedModel.DomainViewName, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 10 0" />
 
-                    <TextBlock Grid.Row="6"  Grid.Column="0" Text="View Default Project NameSpace"  />
-                    <TextBlock Grid.Row="6"  Grid.Column="1" Text="{Binding SelectedModel.ViewDefaultProjectNameSpace}" />
+                    <TextBlock Grid.Row="6"  Grid.Column="0" Text="Domain Page View Name"  FontWeight="Bold"/>
+                    <TextBox Grid.Row="6"  Grid.Column="1" Text="{Binding SelectedModel.DomainPageViewName, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 10 0" />
 
-                    <TextBlock Grid.Row="7"  Grid.Column="0" Text="View Project Folder"  />
-                    <TextBlock Grid.Row="7"  Grid.Column="1" Text="{Binding SelectedModel.ViewFolder}" />
+                    <TextBlock Grid.Row="7"  Grid.Column="0" Text="View Project"/>
+                    <TextBlock Grid.Row="7"  Grid.Column="1" Text="{Binding SelectedModel.ViewProject}"  />
 
-                    <TextBlock Grid.Row="8"  Grid.Column="0" Text="Generate JsonProperty Attribute" FontWeight="Bold"/>
-                    <CheckBox  Grid.Row="8"  Grid.Column="1" IsChecked="{Binding SelectedModel.GenerateJSonAttribute}"    VerticalAlignment="Center" HorizontalAlignment="Left"  />
+                    <TextBlock Grid.Row="8"  Grid.Column="0" Text="View Default Project NameSpace"  />
+                    <TextBlock Grid.Row="8"  Grid.Column="1" Text="{Binding SelectedModel.ViewDefaultProjectNameSpace}" />
 
-                    <TextBlock Grid.Row="9"  Grid.Column="0" Text="Title"  FontWeight="Bold"/>
-                    <TextBox   Grid.Row="9"  Grid.Column="1" Text="{Binding SelectedModel.Title, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 10 0"/>
+                    <TextBlock Grid.Row="9"  Grid.Column="0" Text="View Project Folder"  />
+                    <TextBlock Grid.Row="9"  Grid.Column="1" Text="{Binding SelectedModel.ViewFolder}" />
 
-                    <TextBlock Grid.Row="10"  Grid.Column="0" Text="Plural Title"  FontWeight="Bold"/>
-                    <TextBox   Grid.Row="10"  Grid.Column="1" Text="{Binding SelectedModel.PluralTitle, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 10 0"/>
+                    <TextBlock Grid.Row="10"  Grid.Column="0" Text="Generate JsonProperty Attribute" FontWeight="Bold"/>
+                    <CheckBox  Grid.Row="10"  Grid.Column="1" IsChecked="{Binding SelectedModel.GenerateJSonAttribute}"    VerticalAlignment="Center" HorizontalAlignment="Left"  />
+
+                    <TextBlock Grid.Row="11"  Grid.Column="0" Text="Use Only Root Props For Select Method" FontWeight="Bold"/>
+                    <CheckBox  Grid.Row="11"  Grid.Column="1" IsChecked="{Binding SelectedModel.UseOnlyRootPropsForSelect}"    VerticalAlignment="Center" HorizontalAlignment="Left"  />
+
+                    <TextBlock Grid.Row="12"  Grid.Column="0" Text="Title"  FontWeight="Bold"/>
+                    <TextBox   Grid.Row="12"  Grid.Column="1" Text="{Binding SelectedModel.Title, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 10 0"/>
+
+                    <TextBlock Grid.Row="13"  Grid.Column="0" Text="Plural Title"  FontWeight="Bold"/>
+                    <TextBox   Grid.Row="13"  Grid.Column="1" Text="{Binding SelectedModel.PluralTitle, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 10 0"/>
+
+                    <TextBlock Grid.Row="14"  Grid.Column="0" Text="Root Entity Base Classes"  />
+                    <TextBox Grid.Row="14"  Grid.Column="1" Text="{Binding SelectedModel.BaseClass}" HorizontalAlignment="Left" IsReadOnly="True" Margin="0 0 10 0"/>
 
                 </Grid>
                 <Grid Grid.Row="0" Visibility="{Binding KeyPropertyVisibility}" >

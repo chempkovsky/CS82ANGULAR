@@ -63,10 +63,10 @@ import { <#=  searchDlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(
     exports: [
         <#=  searchComponentClassName #>,
         <#=  searchDlgComponentClassName #>
-    ],
-    entryComponents: [
-        <#=  searchDlgComponentClassName #>
     ]
+//    entryComponents: [
+//        <#=  searchDlgComponentClassName #>
+//    ]
 })
 export class <#= searchModuleClassName #> { }
 

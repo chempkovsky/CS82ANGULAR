@@ -257,9 +257,9 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
 <#
     }
 #>
-    ],
-    entryComponents: [
     ]
+//    entryComponents: [
+//    ]
 })
 export class <#= rdFormModuleClassName #> { }
 

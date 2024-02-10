@@ -1,0 +1,638 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string showAddFltItemSelector       = "show-add-flt-item";
+    string showAddFltItemPropName       = "showAddFltItem";
+
+    string AppSettingServicePropName    = "appGlblSettings";
+    string AppearancePropName           = "appearance";
+    string OverflowSelector             = "ovrflw";
+    string OverflowPropName             = "ovrflw";
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+
+    string externalFilterSelector               = "external-filter";
+    string externalFilterPropName               = "externalFilter";
+    string externalFilterExPropName             = "externalFilterEx";
+
+    string HiddenFilterSelector                 = "hidden-filter";
+    string HiddenFilterPropName                 = "hiddenFilter";
+    string HiddenFilterExPropName               = "hiddenFilterEx";
+
+    string MaxHeightPropSelector                = "max-height";
+    string MaxHeightPropName                    = "maxHeight";
+    string MaxHeightExPropName                  = "maxHeightEx";
+
+    string showFilterSelector                   = "show-filter";
+    string showFilterPropName                   = "showFilter";
+    string showFilterExPropName                 = "showFilterEx";
+
+    string inputFilterDefsSelector              = "filter-defs";
+    string inputFilterDefsPropName              = "inputFilterDefs";
+    string inputFilterDefsExPropName            = "inputFilterDefsEx";
+
+
+    Dictionary<string, string> RegExps = new Dictionary<string, string>() {
+            { "RegExpGuid"       , @"/(?im)^[{(]?[0-9A-F]{8}[-]?(?:[0-9A-F]{4}[-]?){3}[0-9A-F]{12}[)}]?$/" },
+            { "RegExpInteger"    , @"/^[-+]?\d+$/" },
+            { "RegExpFloat"      , @"/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/" },
+            { "RegExpEmail"      , @"/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/" },
+            { "RegExpCurrency"   , @"/(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/" }
+            };
+
+
+    string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
+    string filterModelFolder = "00021-web-service-filter.interface.ts";
+    string filterDefModelFolder = "00022-web-service-filter-def.interface.ts";
+    string filterOperatorModelFolder = "00023-web-service-filter-operator.interface.ts";
+    string filterResultModelFolder = "00024-web-service-filter-rslt.interface.ts";
+    string filterComponentCssFolder = "00025-web-service-filter.component.css";
+    string filterComponentHtmlFolder = "00025-web-service-filter.component.html";
+    string filterComponentFolder = "00025-web-service-filter.component.ts";
+    string menuItemDataModelFolder = "00017-menu-item-data.interface.ts";
+    string eventEmitterDataModelFolder = "00018-event-emitter-data.interface.ts";
+    string eventEmitterPubModelFolder = "00019-event-emitter-pub.interface.ts";
+
+
+    string filterComponentClassName = GetComponentClassName(Model, filterComponentFolder);
+    string filterComponentSelectorCommonPart = GetComponentSelectorCommonPart(Model, filterComponentFolder);
+                                
+    string filterModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterModelFolder, filterComponentFolder);
+    string filterDefModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterDefModelFolder, filterComponentFolder);
+    string filterOperatorModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterOperatorModelFolder, filterComponentFolder);
+    string filterResultModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, filterResultModelFolder, filterComponentFolder);
+    string menuItemDataModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, menuItemDataModelFolder, filterComponentFolder);
+    string eventEmitterDataModelClassName = GetModelClassNameWithAnglr(AngularJsonFile, Model, eventEmitterDataModelFolder, filterComponentFolder);
+    string eventEmitterPubModelClassName    = GetModelClassNameWithAnglr(AngularJsonFile, Model, eventEmitterPubModelFolder, filterComponentFolder);
+
+    string appSettingServiceClassName   = GetServiceClassNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, filterComponentFolder);
+
+    string OnBackBtnMethodName          = "onBackBtnMd";
+    string OnBackBtnPropName            = "onBackBtn";
+    string OnBackBtnSelector            = "on-back-btn";
+    string showBackBtnPropName          = "showBackBtn";
+    string showBackBtnSelector          = "show-back-btn";
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+
+#>
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { FormControl, Validators, ValidatorFn, ValidationErrors } from '@angular/forms';
+<# 
+    if(localize) {
+#>
+import { LocalizationService } from '@abp/ng.core';
+<# 
+    }
+#>
+import { Observable } from 'rxjs';
+
+import { <#= filterModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterModelFolder, filterComponentFolder)#>';
+import { <#= filterDefModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterDefModelFolder, filterComponentFolder)#>';
+import { <#= filterOperatorModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterOperatorModelFolder, filterComponentFolder)#>';
+import { <#= filterResultModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterResultModelFolder, filterComponentFolder)#>';
+import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, filterComponentFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, menuItemDataModelFolder, filterComponentFolder)#>';
+import { <#= eventEmitterDataModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, eventEmitterDataModelFolder, filterComponentFolder)#>';
+import { <#= eventEmitterPubModelClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, eventEmitterPubModelFolder, filterComponentFolder)#>';
+
+/* eslint-disable @angular-eslint/no-input-rename */
+/* eslint-disable @angular-eslint/no-output-on-prefix */
+/* eslint-disable @angular-eslint/no-output-rename */
+
+
+@Component({
+  selector: 'app-<#= filterComponentSelectorCommonPart #>',
+  templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterComponentHtmlFolder, filterComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterComponentCssFolder, filterComponentFolder) #>.css']
+})
+export class <#= filterComponentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #> {
+    protected isOnInitCalled: boolean = false;
+
+    
+
+    constructor(protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
+<# 
+    if(localize) {
+#>
+        private L: LocalizationService, 
+<# 
+    }
+#>
+        private cd: ChangeDetectorRef) { 
+    }
+
+<# 
+    if(localize) {
+#>
+    RmCurrFltItm: Observable<string> | null = null;
+    ShowDtDlg: Observable<string> | null = null;
+    FltVal: Observable<string> | null = null;
+    Oprtr: Observable<string> | null = null;
+    ClNm: Observable<string> | null = null;
+    ApplFlt: Observable<string> | null = null;
+    RmvAllFltItms: Observable<string> | null = null;
+    AddFltItm: Observable<string> | null = null;
+    NavBckToMstr: Observable<string> | null = null;
+    VlMstLssTn: string | null = null;
+    VlMstGtTn: string | null = null;
+    IncrctFt: string | null = null;
+    IncrctDtFt: string | null = null;
+<# 
+    }
+#>
+
+    ngOnInit(): void {
+        this.webServiceOperators = [
+            {oName: 'eq', oCaption: '=='},
+            {oName: 'gt', oCaption: '>='},
+            {oName: 'lt', oCaption: '=<'},
+            {oName: 'ne', oCaption: '<>'},
+            {oName: 'lk', oCaption: 'Like'}
+        ];
+        this.onFilterDefsChanged();
+        this.isOnInitCalled = true;
+        this.cd.detectChanges();
+
+<# 
+    if(localize) {
+#>
+        this.RmCurrFltItm =this.L.get({
+          key: 'CmSt::RmCurrFltItm',
+          defaultValue: "Remove current filter item",
+        });
+        this.ShowDtDlg =this.L.get({
+          key: 'CmSt::ShowDtDlg',
+          defaultValue: "Show date dialog",
+        });
+        this.FltVal =this.L.get({
+          key: 'CmSt::FltVal',
+          defaultValue: "Filter value",
+        });
+        this.Oprtr =this.L.get({
+          key: 'CmSt::Oprtr',
+          defaultValue: "Operator",
+        });
+        this.ClNm =this.L.get({
+          key: 'CmSt::ClNm',
+          defaultValue: "Column name",
+        });
+        this.ApplFlt =this.L.get({
+          key: 'CmSt::ApplFlt',
+          defaultValue: "Apply filter",
+        });
+        this.RmvAllFltItms =this.L.get({
+          key: 'CmSt::RmvAllFltItms',
+          defaultValue: "Remove all filter items",
+        });
+        this.AddFltItm =this.L.get({
+          key: 'CmSt::AddFltItm',
+          defaultValue: "Add filter item",
+        });
+        this.NavBckToMstr =this.L.get({
+          key: 'CmSt::NavBckToMstr',
+          defaultValue: "Navigate back to master",
+        });
+        this.VlMstLssTn = this.L.instant({
+            key: 'CmSt::VlMstLssTn',
+            defaultValue: "The value must be less than"
+        });
+        this.VlMstGtTn = this.L.instant({
+            key: 'CmSt::VlMstGtTn',
+            defaultValue: "The value must be greater than"
+        });
+        this.IncrctFt = this.L.instant({
+            key: 'CmSt::IncrctFt',
+            defaultValue: "Icorrect format"
+        });
+        this.IncrctDtFt = this.L.instant({
+            key: 'CmSt::IncrctDtFt',
+            defaultValue: "Icorrect date format"
+        });
+<# 
+    }
+#>
+    }
+
+    @Input('<#= captionSelector #>') <#= captionPropName #>: string = '';
+    @Input('<#= showBackBtnSelector #>') <#= showBackBtnPropName #>: boolean = false;
+    @Output('<#= OnBackBtnSelector #>') <#= OnBackBtnPropName #> = new EventEmitter<any>();
+    <#= OnBackBtnMethodName #>() {
+        this.<#= OnBackBtnPropName #>.emit(null);
+    }
+
+    public <#= OverflowPropName #>: string | null = null;   
+    public  <#= MaxHeightExPropName #>: number|null = null;
+    protected _<#= MaxHeightPropName #>: number|null = null;
+    @Input('<#= MaxHeightPropSelector #>')
+      get <#= MaxHeightPropName #>(): number|null {
+        return this._<#= MaxHeightPropName #>;
+      }
+      set <#= MaxHeightPropName #>(inp: number|null) {
+        this._<#= MaxHeightPropName #> = inp;
+        if (!(typeof inp === 'undefined')) {
+          if(!(inp === null)) {
+            this.<#= MaxHeightExPropName #> = inp * this.<#= AppSettingServicePropName #>.filterHeightFactor + this.<#= AppSettingServicePropName #>.filterHeightAddition;
+            this.<#= OverflowPropName #> = 'auto';
+            if(this.isOnInitCalled) {
+              this.cd.detectChanges();
+            }
+            return;
+          }
+        }
+        this.<#= MaxHeightExPropName #> = null;
+        this.<#= OverflowPropName #> = null;
+        if(this.isOnInitCalled) {
+            this.cd.detectChanges();
+        }
+      }
+    @Input('<#= showAddFltItemSelector #>') <#= showAddFltItemPropName #>: boolean = true;
+    @Output('<#= onContainerMenuItemClickSelector #>') <#= onContainerMenuItemClickEmitter #> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
+    @Input('<#= containerMenuItemsSelector #>') <#= containerMenuItemsPropName #>: Array<<#= menuItemDataModelClassName #>> = [];
+    <#= onContainerMenuItemClickMethodName #>(v: <#= menuItemDataModelClassName #>)  {
+        let e: <#= eventEmitterDataModelClassName #> = {
+            id: v.id,
+            sender: this,
+            value: null
+        }
+        this.<#= onContainerMenuItemClickEmitter #>.emit(e);
+    }
+
+    public <#= showFilterExPropName #>: boolean = true;
+    protected _<#= showFilterPropName #>: boolean|any = true;
+    @Input('<#= showFilterSelector #>') 
+      get <#= showFilterPropName #>(): boolean {
+        return this._<#= showFilterPropName #>;
+      }
+      set <#= showFilterPropName #>(inshow: boolean|any) {
+        this._<#= showFilterPropName #> = inshow;
+        if (!(typeof inshow === 'undefined')) {
+          if(!(inshow === null)) {
+            this.<#= showFilterExPropName #> = inshow as boolean;
+            if(this.isOnInitCalled) {
+              this.onFilterDefsChanged();
+            }
+          }
+        }
+      }
+
+    <#= HiddenFilterExPropName #>: Array<<#= filterResultModelClassName #>> = [];
+    protected _<#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
+    @Input('<#= HiddenFilterSelector #>') 
+        get <#= HiddenFilterPropName #>(): Array<<#= filterResultModelClassName #>>|any {
+          return this._<#= HiddenFilterPropName #>;
+        }
+        set <#= HiddenFilterPropName #>(inDef: Array<<#= filterResultModelClassName #>>|any) {
+          this._<#= HiddenFilterPropName #> = inDef;
+          if (typeof inDef === 'undefined') {
+            this.<#= HiddenFilterExPropName #> = [];
+          } else if(!Array.isArray(inDef)) {
+            this.<#= HiddenFilterExPropName #> = [];
+          } else {
+            this.<#= HiddenFilterExPropName #> = inDef as Array<<#= filterResultModelClassName #>>;
+          }
+          if(this.isOnInitCalled) {
+            this.onFilterDefsChanged();
+          }
+        } 
+
+    <#= inputFilterDefsExPropName #>: Array<<#= filterDefModelClassName #>> = [];
+    protected _<#= inputFilterDefsPropName #>: Array<<#= filterDefModelClassName #>> = [];
+    @Input('<#= inputFilterDefsSelector #>') 
+        get <#= inputFilterDefsPropName #>(): Array<<#= filterDefModelClassName #>> {
+          return this._<#= inputFilterDefsPropName #>;
+        }
+        set <#= inputFilterDefsPropName #>(inDef: Array<<#= filterDefModelClassName #>>) {
+          this._<#= inputFilterDefsPropName #> = inDef;
+          if (typeof inDef === 'undefined') {
+            this.<#= inputFilterDefsExPropName #> = [];
+          } else if(!Array.isArray(inDef)) {
+            this.<#= inputFilterDefsExPropName #> = [];
+          } else {
+            this.<#= inputFilterDefsExPropName #> =  inDef;
+          }
+          if(this.isOnInitCalled) {
+            this.onFilterDefsChanged();
+          }
+        }
+
+
+    @Output('on-apply-filter') onApplyFilter = new EventEmitter();
+  
+    webServiceFilterDefs: Array<<#= filterDefModelClassName #>> = [];
+    webServiceOperators: Array<<#= filterOperatorModelClassName #>> = [];
+    webServiceFilters: Array<<#= filterModelClassName #>> = [];
+
+
+    onFilterDefsChanged(): void {
+        this.webServiceFilterDefs = [{fltrName: '', fltrCaption: '--No filter--',  fltrDataType: '', fltrMaxLen: null, fltrMin: null, fltrMax: null }];
+        this.<#= inputFilterDefsExPropName #>.forEach(i => {
+            if(this.<#= HiddenFilterExPropName #>.findIndex((h: { fltrName: string; }) => { return (h.fltrName === i.fltrName); }) < 0) {
+            this.webServiceFilterDefs.push({ fltrName: i.fltrName, fltrCaption: i.fltrCaption, fltrDataType: i.fltrDataType, fltrMaxLen: i.fltrMaxLen, fltrMin: i.fltrMin, fltrMax: i.fltrMax });
+            }
+        });    
+        if(this.<#= showFilterPropName #>) {
+            this.webServiceFilters = [];
+            this.<#= externalFilterExPropName #>.forEach((fi: IWebServiceFilterRslt) => {
+                let i: number = this.<#= inputFilterDefsExPropName #>.findIndex((h: { fltrName: string; }) => { return (h.fltrName === fi.fltrName); });
+                if(i > -1) {
+                  let fDf: IWebServiceFilterDef = this.<#= inputFilterDefsExPropName #>[i];
+                  this.webServiceFilters.push({ fltrName: new FormControl(fDf.fltrName), fltrDataType: fDf.fltrDataType, 
+                      fltrOperator: new FormControl(fi.fltrOperator), fltrValue: new FormControl({ value: fi.fltrValue, disabled: false }), 
+                      fltrMaxLen: fDf.fltrMaxLen, fltrMin: fDf.fltrMin, fltrMax: fDf.fltrMax });
+                }
+            });
+            if(this.webServiceFilters.length < 1) {
+                const fltDef: <#= filterDefModelClassName #> = this.webServiceFilterDefs[0];
+                const fltOp: <#= filterOperatorModelClassName #> = this.webServiceOperators[0];
+                this.webServiceFilters = [
+                    { fltrName: new FormControl(fltDef.fltrName), fltrDataType: fltDef.fltrDataType, 
+                    fltrOperator: new FormControl(fltOp.oName), fltrValue: new FormControl({ value: null, disabled: true }), 
+                    fltrMaxLen: fltDef.fltrMaxLen, fltrMin: fltDef.fltrMin, fltrMax: fltDef.fltrMax }
+                ];
+            }
+        } else {
+            this.webServiceFilters = [];
+        }
+    }
+
+    addFilter() {
+        const fltDef: <#= filterDefModelClassName #> = this.webServiceFilterDefs[0];
+        const fltOp: <#= filterOperatorModelClassName #> = this.webServiceOperators[0];
+
+        let item: <#= filterModelClassName #> = { fltrName: new FormControl(fltDef.fltrName), fltrDataType: fltDef.fltrDataType, fltrOperator: new FormControl(fltOp.oName), 
+          fltrValue: new FormControl({ value: null, disabled: true }), fltrMaxLen: fltDef.fltrMaxLen, fltrMin: fltDef.fltrMin, fltrMax: fltDef.fltrMax };
+        this.webServiceFilters.push(item);
+    }
+
+    onSelectionChanged(event: any, // MatSelectChange, 
+        flt: <#= filterModelClassName #>) {
+        if ((typeof flt === 'undefined') || (typeof event === 'undefined')) return;
+        if (typeof event.value === 'undefined')  return;
+        if ((flt === null) || (event.value === null))  return;
+
+        let itm: <#= filterDefModelClassName #> | any = this.webServiceFilterDefs.find((e,i,a) => {
+            return (e.fltrName === event.value);
+        });
+        if(typeof itm === 'undefined') {
+            itm = this.webServiceFilterDefs[0];
+        } else if (itm === null) {
+            itm = this.webServiceFilterDefs[0];
+        } 
+
+        if (!(typeof itm === 'undefined')) {
+            if(!(itm === null)) {
+            flt.fltrDataType = itm.fltrDataType;
+            flt.fltrMaxLen = itm.fltrMaxLen;
+            flt.fltrMax = itm.fltrMax;
+            flt.fltrMin = itm.fltrMin;
+            let validators: ValidatorFn[] = []; 
+
+            if (!(typeof itm.fltrMaxLen === 'undefined')) {
+                if (!(itm.fltrMaxLen === null)) {
+                validators.push(Validators.maxLength(itm.fltrMaxLen));
+                }
+            }
+            if (!(typeof itm.fltrMax === 'undefined')) {
+                if (!(itm.fltrMax === null)) {
+                validators.push(Validators.max(itm.fltrMax));
+                }
+            }
+            if (!(typeof itm.fltrMin === 'undefined')) {
+                if (!(itm.fltrMin === null)) {
+                validators.push(Validators.min(itm.fltrMin));
+                }
+            }
+            flt.fltrValue.setValidators([]);
+            switch(itm.fltrDataType) {
+                case '':
+                    flt.fltrValue.reset({ value: null, disabled: true });
+                    break;
+                case 'int16':
+                case 'int32':
+                case 'int64':
+                case 'uint16':
+                case 'uint32':
+                case 'uint64':
+                    flt.fltrValue.reset({ value: null, disabled: false });
+                    validators.push(Validators.pattern(<#= RegExps["RegExpInteger"] #>));
+                    flt.fltrValue.setValidators(validators);
+                    break;
+                case 'double':
+                case 'decimal':
+                case 'single':
+                    flt.fltrValue.reset({ value: null, disabled: false });
+                    validators.push(Validators.pattern(<#= RegExps["RegExpFloat"] #>));
+                    flt.fltrValue.setValidators(validators);
+                    break;
+                case 'guid':
+                    flt.fltrValue.reset({ value: '', disabled: false });
+                    //validators.push(Validators.pattern(<#= RegExps["RegExpGuid"] #>));
+                    flt.fltrValue.setValidators(validators);
+                    break;
+                case 'datetime':
+                    flt.fltrValue.reset({ value: null, disabled: false });
+                    flt.fltrValue.setValidators(validators);
+                    break;
+                default:
+                    flt.fltrValue.reset({ value: null, disabled: false });
+                    flt.fltrValue.setValidators(validators);
+                    break;
+            }
+            flt.fltrValue.updateValueAndValidity(); // must be called after resetting validators
+
+            }
+        }
+    }
+
+    removeFltr(wsfdDef: <#= filterModelClassName #>) {
+        if(typeof wsfdDef === 'undefined') return;
+        if (this.webServiceFilters.length < 2) return;
+        const i = this.webServiceFilters.indexOf(wsfdDef);
+        if (i >= 0) {
+          this.webServiceFilters.splice(i, 1);
+        }
+    }
+
+    removeAllFilters() {
+        let i: number = this.webServiceFilters.length;
+        if (i > 1) {
+          this.webServiceFilters.splice(1, i-1);
+        }
+    }
+
+    getErrorMessage(fc: FormControl): string {
+        let rslt: string = 'Filter item will not be applied.';
+        if (typeof fc === 'undefined') {
+          return rslt;
+        }
+        if (fc === null) {
+          return rslt;
+        }
+        if (fc.errors === null) return rslt;
+        const errs: ValidationErrors = fc.errors as ValidationErrors;
+        Object.keys(errs).forEach(k => {
+          switch(k) {
+            case 'max':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + this.VlMstLssTn + ': ' + errs[k].max;
+<# 
+    } else {
+#>
+              rslt +=' The value must be less than ' + errs[k].max;
+<# 
+    }
+#>
+              break;
+            case 'min':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + this.VlMstGtTn + ': ' + errs[k].max;
+<# 
+    } else {
+#>
+              rslt +=' Value must be greater than ' + errs[k].min;
+<# 
+    }
+#>
+              break;
+            case 'pattern':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + this.IncrctFt + ': ' + errs[k].max;
+<# 
+    } else {
+#>
+              rslt +=' Icorrect format: ' + errs[k].max;
+<# 
+    }
+#>
+              break;
+            case 'matDatepickerMin':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + this.VlMstGtTn + ': ' + errs[k].max;
+<# 
+    } else {
+#>
+              rslt +=' Value must be greater than ' + errs[k].min;
+<# 
+    }
+#>
+              break;
+            case 'matDatepickerMax':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + this.VlMstLssTn + ': ' + errs[k].max;
+<# 
+    } else {
+#>
+              rslt +=' The value must be less than ' + errs[k].max;
+<# 
+    }
+#>
+              break;
+            case 'matDatepickerParse':
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + this.IncrctDtFt + '.';
+<# 
+    } else {
+#>
+              rslt +=' Icorrect date format.' ;
+<# 
+    }
+#>
+              break;
+            default:
+<# 
+    if(localize) {
+#>
+              rslt += ' ' + this.IncrctFt + '.';
+<# 
+    } else {
+#>
+              rslt +=' Icorrect format.' ;
+<# 
+    }
+#>
+              break;
+          }
+        });
+        return rslt;
+    }
+
+    onApplyFilterClicked(): void {
+        let result: Array<<#= filterResultModelClassName #>> = [];
+        this.<#= HiddenFilterExPropName #>.forEach((i: IWebServiceFilterRslt) => {
+          result.push(i);
+        });
+        this.webServiceFilters.forEach(i => {
+          if (i.fltrValue.enabled) {
+            if(i.fltrValue.valid) {
+              result.push({fltrName: i.fltrName.value, fltrDataType: i.fltrDataType, fltrOperator: i.fltrOperator.value, fltrValue: i.fltrValue.value});
+            }
+          }
+        });
+        this.onApplyFilter.emit(result);
+    }
+
+    <#= externalFilterExPropName #>: Array<<#= filterResultModelClassName #>> = [];
+    protected _<#= externalFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
+    @Input('<#= externalFilterSelector #>') 
+    get <#= externalFilterPropName #>(): Array<<#= filterResultModelClassName #>> {
+        return this._externalFilter;
+    }
+    set <#= externalFilterPropName #>(ef: Array<<#= filterResultModelClassName #>>|any) {
+        this._externalFilter = ef;
+        let isNDf = (typeof ef === 'undefined');
+        isNDf = isNDf ? isNDf : (ef === null);
+        isNDf = isNDf ? isNDf : (!Array.isArray(ef));
+        if(isNDf) {
+          if(this.<#= externalFilterExPropName #>.length > 0) {
+            this.<#= externalFilterExPropName #> = [];
+            if(this.isOnInitCalled) {
+              this.onFilterDefsChanged();
+            }
+          }
+        } else {
+          this.<#= externalFilterExPropName #> = [];
+          ef.forEach((fi: <#= filterResultModelClassName #>) => {
+            this.<#= externalFilterExPropName #>.push({fltrName: fi.fltrName, fltrDataType: fi.fltrDataType, fltrOperator: fi.fltrOperator, fltrValue:fi.fltrValue});
+          });
+          if(this.isOnInitCalled) {
+            this.onFilterDefsChanged();
+          }
+      }
+    }
+
+}
+

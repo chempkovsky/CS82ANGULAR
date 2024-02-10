@@ -102,10 +102,10 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
     exports: [
         <#=  uformComponentClassName #>,
         <#=  uformDlgComponentClassName #>
-    ],
-    entryComponents: [
-        <#=  uformDlgComponentClassName #>
     ]
+//    entryComponents: [
+//        <#=  uformDlgComponentClassName #>
+//    ]
 })
 export class <#= uformModuleClassName #> { }
 

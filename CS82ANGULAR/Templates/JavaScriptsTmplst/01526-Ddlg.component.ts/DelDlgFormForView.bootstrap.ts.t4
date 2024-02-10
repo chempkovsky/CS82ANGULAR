@@ -43,6 +43,10 @@ import { <#= viewInterfaceDDlgClassName #> } from '<#= GetFolderNameWithAnglr(An
 import { <#= delformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, delformComponentFolder, deldlgComponentFolder) #>';
 import { <#= viewInterfaceName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, deldlgComponentFolder) #>';
 
+/* eslint-disable @angular-eslint/no-output-on-prefix */
+/* eslint-disable @angular-eslint/no-output-rename */
+/* eslint-disable @angular-eslint/no-input-rename */
+
 
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',

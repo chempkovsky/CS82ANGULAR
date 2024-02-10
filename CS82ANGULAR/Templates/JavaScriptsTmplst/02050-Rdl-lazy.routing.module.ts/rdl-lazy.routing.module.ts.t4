@@ -45,9 +45,9 @@ import { <#= rdlComponentRoutingModuleClassName #> } from '<#= GetFolderNameWith
         <#= rdlComponentRoutingModuleClassName #>,
     ],
     exports: [
-    ],
-    entryComponents: [
     ]
+//    entryComponents: [
+//    ]
 })
 export class <#= rdlComponentLazyRoutingModuleClassName #> { }
 

@@ -1,0 +1,129 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ include file="..\CommonScripts\AbpRepoLevel.t4" #>
+
+<#
+    bool EntHasId = AbpIsEntityWithId(Model);
+    bool EntWithOutId = AbpIsAbpEntityWithOutId(Model);
+    bool EntIsCreationAuditedRoot = AbpIsCreationAuditedRoot(Model);
+    bool EntIsModificationAuditedObject = AbpIsModificationAuditedObject(Model);
+    bool EntIsAuditedObject = AbpIsAuditedObject(Model);
+    bool EntIsDeletionAuditedObject = AbpIsDeletionAuditedObject(Model);
+    bool EntIsFullAuditedObject = AbpIsFullAuditedObject(Model);
+    bool EntHasEntityVersion = AbpHasEntityVersion(Model);
+    bool EntHasMultiTenant = AbpHasMultiTenant(Model);
+    bool EntHasConcurrencyStamp = AbpHasConcurrencyStamp(Model);
+    bool EntHasExtraProperties = AbpHasExtraProperties(Model);
+    string InheritedFrom = "";
+
+    if(EntHasExtraProperties) {
+        InheritedFrom = "Extensible";
+    }
+    if (EntIsFullAuditedObject) {
+        InheritedFrom += "FullAuditedEntityDto";
+    } else if(EntIsAuditedObject) {
+        InheritedFrom += "AuditedEntityDto";
+    } else if (EntIsCreationAuditedRoot) {
+        InheritedFrom += "CreationAuditedEntityDto";
+    } else {
+        InheritedFrom += "EntityDto";
+    }
+    if (EntHasId) {
+        InheritedFrom += "<" + GetAbpIdDataType(Model) + ">";
+    }
+    if (EntHasConcurrencyStamp) {
+        InheritedFrom += ", IHasConcurrencyStamp";
+    }
+    if (EntHasMultiTenant) {
+        InheritedFrom += ", IMultiTenant";
+    }
+    if (EntHasEntityVersion) {
+        InheritedFrom += ", IHasEntityVersion";
+    }
+    
+#>
+
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Linq.Expressions;
+<# if(Model.GenerateJSonAttribute) { #>
+using System.Text.Json.Serialization;
+<# } #>
+
+// 
+// using Volo.Abp.Application.Dtos;
+//
+<# if (EntHasConcurrencyStamp) { #>
+using Volo.Abp.Domain.Entities;
+<# } #>
+<# if (EntHasMultiTenant) { #>
+using Volo.Abp.MultiTenancy;
+<# } #>
+<# if (EntHasEntityVersion) { #>
+using Volo.Abp.Auditing;
+<# } #>
+
+
+namespace <#= GetModelNameSpace(Model) #> {
+    public class <#= Model.DomainViewName #> // : <#= InheritedFrom  #> 
+    {
+<#
+        foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(Model.UseOnlyRootPropsForSelect) {
+                if(!string.IsNullOrEmpty(prop.ForeignKeyName)) continue;
+                if(!string.IsNullOrEmpty(prop.ForeignKeyNameChain)) continue;
+            }
+/*
+            if (string.IsNullOrEmpty(prop.ForeignKeyName) && string.IsNullOrEmpty(prop.ForeignKeyNameChain)) {
+                if(("DeletionTime".Equals(prop.ViewPropertyName) ||
+                "DeleterId".Equals(prop.ViewPropertyName) ||
+                "IsDeleted".Equals(prop.ViewPropertyName)) && EntIsFullAuditedObject) {
+                    continue;
+                }
+                if(("LastModificationTime".Equals(prop.ViewPropertyName) ||
+                "LastModifierId".Equals(prop.ViewPropertyName)) && EntIsAuditedObject) {
+                    continue;
+                }
+                if(("CreatorId".Equals(prop.ViewPropertyName) ||
+                "CreationTime".Equals(prop.ViewPropertyName)) && EntIsCreationAuditedRoot) {
+                    continue;
+                }
+                if ("ExtraProperties".Equals(prop.ViewPropertyName) && EntHasExtraProperties) {
+                    continue;
+                }
+                if ("Id".Equals(prop.ViewPropertyName) && EntHasId) {
+                    continue;
+                }
+            }
+*/
+            if((!prop.IsNullable) && IsStringPropertyTypeName(prop)) {
+#>
+        public <#= GetPropertyTypeName(prop) #>  <#= GetTypeScriptPropertyName(prop, Model) #> { get; set; } = null!;
+
+<# 
+            } else {
+#>
+        public <#= GetPropertyTypeName(prop) #>  <#= GetTypeScriptPropertyName(prop, Model) #> { get; set; }
+
+<# 
+            }
+       } 
+#>
+    }
+}
+

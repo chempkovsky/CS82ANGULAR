@@ -112,8 +112,8 @@ const appInitializerFn = (appConfig: <#= appConfigServiceClassName #>) => {
     <#= flexModuleClassName #>,
     HttpClientModule,
   ],
-  entryComponents: [
-  ],
+//  entryComponents: [
+//  ],
   exports: [
   ],
   providers: [

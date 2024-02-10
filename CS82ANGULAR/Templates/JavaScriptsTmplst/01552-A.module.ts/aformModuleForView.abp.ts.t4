@@ -1,0 +1,117 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+
+    string aformModuleFolder            = "01552-A.module.ts";
+    string aformModuleClassName         = GetModuleClassName(Model, aformModuleFolder);
+
+    string materialModuleFolder         = "00010-app-material.module.ts";
+    string materialModuleClassName      = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, materialModuleFolder, aformModuleFolder);
+    
+    string flexModuleFolder             = "00011-app-flex-layout.module.ts";
+    string flexModuleClassName          = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, flexModuleFolder, aformModuleFolder);
+
+    string filterModuleFolder           = "00050-web-service-filter.module.ts";
+    string filterModuleClassName        = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, filterModuleFolder, aformModuleFolder);
+
+    string formatterModuleFolder        = "00070-app-formatter.module.ts";
+    string formatterModuleClassName     = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, formatterModuleFolder, aformModuleFolder);
+
+    string searchModuleFolder           = "01450-S.module.ts";
+    string searchModuleClassName        = GetModuleClassNameWithAnglr(AngularJsonFile, Model, searchModuleFolder, aformModuleFolder);
+
+    string aformComponentFolder         = "01502-Aform.component.ts";
+    string aformComponentClassName      = GetComponentClassNameWithAnglr(AngularJsonFile, Model, aformComponentFolder, aformModuleFolder);
+
+    string adlgComponentFolder          = "01522-Adlg.component.ts";
+    string aformDlgComponentClassName   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, adlgComponentFolder, aformModuleFolder);
+    string GetMethodPrefix              = "get";
+
+    
+    List<string> masterViewNames = new List<string>();
+    masterViewNames = GetSearchDialogViewsList(Model, Context, masterViewNames);
+#>
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { CoreModule } from '@abp/ng.core';
+
+import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  flexModuleFolder, aformModuleFolder) #>';
+import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  materialModuleFolder, aformModuleFolder) #>';
+import { <#=  formatterModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  formatterModuleFolder, aformModuleFolder) #>';
+
+import { <#=  aformComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, aformComponentFolder, aformModuleFolder) #>';
+import { <#=  aformDlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, adlgComponentFolder, aformModuleFolder) #>';
+
+
+<#
+    foreach(string viewName in masterViewNames) {
+        ModelViewSerializable masterView = GetViewByName(Context, viewName);
+        if (masterView == null) {
+#>
+//
+//Error: could not find view by its name <#= viewName #>
+//
+<#
+            continue;
+        }
+#>
+import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, aformModuleFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, aformModuleFolder, Context, masterView.ViewName, searchModuleFolder) #>';
+<#
+    }
+#>
+
+@NgModule({
+    declarations: [
+        <#=  aformComponentClassName #>,
+        <#=  aformDlgComponentClassName #>
+    ],
+    imports: [
+        CommonModule,
+        CoreModule,
+        <#= materialModuleClassName #>,
+        <#= flexModuleClassName #>,
+        <#= formatterModuleClassName #>,
+<#
+    foreach(string viewName in masterViewNames) {
+        ModelViewSerializable masterView = GetViewByName(Context, viewName);
+        if (masterView == null) {
+            continue;
+        }
+#>
+        <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, aformModuleFolder) #>,
+<#
+    }
+#>
+
+    ],
+    exports: [
+        <#=  aformComponentClassName #>,
+        <#=  aformDlgComponentClassName #>
+    ]
+//    entryComponents: [
+//        <#=  aformDlgComponentClassName #>
+//    ]
+})
+export class <#= aformModuleClassName #> { 
+    static <#= GetMethodPrefix #><#=  aformDlgComponentClassName #>(): typeof <#=  aformDlgComponentClassName #> {
+        return <#=  aformDlgComponentClassName #>;
+    }
+}
+
+

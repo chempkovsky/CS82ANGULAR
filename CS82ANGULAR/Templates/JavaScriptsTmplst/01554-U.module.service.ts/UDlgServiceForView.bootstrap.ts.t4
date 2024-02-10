@@ -1,0 +1,58 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+
+    string updModuleServiceFolder               = "01554-U.module.service.ts";
+    string updModuleServiceClassName            = GetModuleServiceClassName(Model, updModuleServiceFolder);
+
+    string updModuleFolder                      = "01554-U.module.ts";
+    string updModuleClassName                   = GetModuleClassNameWithAnglr(AngularJsonFile, Model, updModuleFolder, updModuleServiceFolder);
+
+    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName           = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, updModuleServiceFolder);
+
+
+    string updComponentFolder                   = "01524-Udlg.component.ts";
+    string updDlgComponentClassName             = GetComponentClassNameWithAnglr(AngularJsonFile, Model, updComponentFolder, updModuleServiceFolder);
+    string GetMethodPrefix                      = "get";
+    string AppSettingServicePropName            = "appGlblSettings";
+
+    string updInterfaceDlgFolder                = "01514-Udlg.interface.ts";
+    string updInterfaceDlgClassName             = GetInterfaceDlgNameWithAnglr(AngularJsonFile, Model, updInterfaceDlgFolder, updModuleServiceFolder);
+
+#>
+
+import { Injectable } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, updModuleServiceFolder)#>';
+import { <#= updInterfaceDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, updInterfaceDlgFolder, updModuleServiceFolder)#>';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class <#= updModuleServiceClassName #> {
+  constructor(private dialog: NgbModal, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {}
+  async open(data: <#= updInterfaceDlgClassName #>): Promise<any> {
+    let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
+    const  <#= updModuleClassName #> = (await import('<#= GetFolderNameWithAnglr(AngularJsonFile, Model, updModuleFolder, updModuleServiceFolder) #>')).<#= updModuleClassName #>;
+    let dialogRef = this.dialog.open(<#= updModuleClassName #>.<#= GetMethodPrefix #><#=  updDlgComponentClassName #>(), {size: w}); 
+    dialogRef.componentInstance.data = data;
+    return dialogRef.result;
+  }  
+}
+

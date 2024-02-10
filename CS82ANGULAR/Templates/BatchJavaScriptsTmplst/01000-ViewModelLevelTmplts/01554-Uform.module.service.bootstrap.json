@@ -1,0 +1,21 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "1.",
+    "Please make sure that you have already run the following scripts for the current ViewModel",
+    "                                01554-U.module.service.ts",
+    "2.",
+    "Please make sure that you selected src\\app\\services\\your-view-model-name folder",
+    "  where [your-view-model-name] is a name of currently selected ViewModel",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01554-U.module.service.ts",
+      "GeneratorSript": "UDlgServiceForView.bootstrap.ts.t4"
+    }
+  ]
+
+}

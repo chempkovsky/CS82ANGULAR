@@ -1,0 +1,244 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="html" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ContextLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string AppearancePropName           = "appearance";
+    string OverflowSelector             = "ovrflw";
+    string OverflowPropName             = "ovrflw";
+    string containerMenuItemsPropName           = "contMenuItems";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string showAddFltItemSelector       = "show-add-flt-item";
+    string showAddFltItemPropName       = "showAddFltItem";
+
+    string OnBackBtnMethodName          = "onBackBtnMd";
+    string OnBackBtnPropName            = "onBackBtn";
+    string showBackBtnPropName          = "showBackBtn";
+    string showBackBtnSelector          = "show-back-btn";
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+    string showFilterExPropName         = "showFilterEx";
+    string MaxHeightExPropName          = "maxHeightEx";
+
+    string filterComponentFolder = "00025-web-service-filter.component.ts";
+    string filterComponentClassName = GetComponentClassName(Model, filterComponentFolder);
+
+#>
+
+  <div>
+     <div fxLayout="row" fxLayoutAlign="flex-end space-around"> 
+        <label fxFlex fxLayoutAlign="flex-start space-around">{{<#= captionPropName #>}}</label>
+        <i class="fas fa-arrow-circle-left text-primary mr-5" type="button" data-toggle="tooltip" (click)="<#= OnBackBtnMethodName #>()" *ngIf="<#= showBackBtnPropName #>" 
+<# 
+    if(localize) {
+#>
+        title="{{NavBckToMstr|async}}"></i>
+<# 
+    } else {
+#>
+        title="Navigate back to master"></i>
+<# 
+    }
+#>
+        <span fxFlex="3%"></span>  
+        <i class="fas plus-square text-primary ml-1" type="button" data-toggle="tooltip" (click)="addFilter()" *ngIf="showFilter && <#= showAddFltItemPropName #>" 
+<# 
+    if(localize) {
+#>
+            title="{{AddFltItm|async}}"></i> 
+<# 
+    } else {
+#>
+            title="Add filter item"></i> 
+<# 
+    }
+#>
+        <span fxFlex="1%"></span>   
+        <i class="fas minus-square text-danger ml-1 " type="button" data-toggle="tooltip" (click)="removeAllFilters()" *ngIf="showFilter && <#= showAddFltItemPropName #>"
+<# 
+    if(localize) {
+#>
+            title="{{RmvAllFltItms|async}}"></i>
+<# 
+    } else {
+#>
+            title="Remove all filter items"></i>
+<# 
+    }
+#>
+        <span fxFlex="1%"></span>  
+        <i class="fa fa-refresh text-primary ml-1 mr-3" type="button" data-toggle="tooltip" (click)="onApplyFilterClicked()"
+<# 
+    if(localize) {
+#>
+         title="{{ApplFlt|async}}"></i>
+<# 
+    } else {
+#>
+         title="Apply filter"></i>
+<# 
+    }
+#>
+        <span fxFlex="2%"></span>     
+        <ng-template ngFor let-item [ngForOf]="<#= containerMenuItemsPropName #>">
+            <span fxFlex="1%"></span>  
+            <i class="{{'fa ' + item.iconName + ' ml-1 text-'+ item.iconColor}}" type="button" data-toggle="tooltip" title="{{item.caption}}"
+                (click)="<#= onContainerMenuItemClickMethodName #>(item)"></i>
+        </ng-template>            
+        <span fxFlex="1%"></span>
+     </div> 
+
+    <div *ngIf="<#= showFilterExPropName #>" [style.maxHeight.em]="<#= MaxHeightExPropName #>" [style.overflow]="<#= OverflowPropName #>"> 
+        <div 
+            fxLayout
+            fxLayout.xs="column"
+            fxLayoutAlign="left"
+            fxLayoutGap="1px"
+            fxLayoutGap.xs="0px" *ngFor="let flt of webServiceFilters;" >
+            <span fxFlex="39%" fxFlex.xs="99%">
+                <span fxFlex="1%"></span>        
+                <div class="form-group"  fxFlex="99%">
+<# 
+    if(localize) {
+#>
+                    <small>{{ClNm|async}}</small>
+<# 
+    } else {
+#>
+                    <small>Column name</small>
+<# 
+    }
+#>
+                    <select class="form-control" [formControl]="flt.fltrName" (change)="onSelectionChanged($event.target, flt)">
+                        <option *ngFor="let fltDef of webServiceFilterDefs;" [value]="fltDef.fltrName">{{fltDef.fltrCaption}}</option>
+                    </select>
+                </div>
+            </span>
+
+            <div fxFlex="59%" fxFlex.xs="99%" fxLayout="row">
+                <span fxFlex="1%"></span>
+                <div class="form-group"  fxFlex="20%">
+<# 
+    if(localize) {
+#>
+                    <small>{{Oprtr|async}}</small>
+<# 
+    } else {
+#>
+                    <small>Operator</small>
+<# 
+    }
+#>
+                    <select class="form-control" [formControl]="flt.fltrOperator">
+                        <option *ngFor="let oprtr of webServiceOperators;" [value]="oprtr.oName">{{oprtr.oCaption}}</option>
+                    </select>
+                </div>
+
+                <span fxFlex="1%"></span>                
+                    
+                <div class="form-group" *ngIf="flt.fltrDataType !== 'datetime'"  fxFlex="72%">
+<# 
+    if(localize) {
+#>
+                    <small>{{FltVal|async}}</small>
+<# 
+    } else {
+#>
+                    <small>Filter value</small>
+<# 
+    }
+#>
+                    <div class="input-group">
+                        <input  class="form-control" placeholder="Placeholder" [formControl]="flt.fltrValue" [maxlength]="flt.fltrMaxLen">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary " type="button"   (click)="removeFltr(flt)" data-toggle="tooltip" 
+<# 
+    if(localize) {
+#>
+                                title="{{RmCurrFltItm|async}}">
+<# 
+    } else {
+#>
+                                title="Remove current filter item">
+<# 
+    }
+#>
+                                <i class="fa fa-trash md-18 text-danger" ></i>
+                            </button>
+                        </div>
+                        <small class="text-danger" *ngIf="flt.fltrValue.invalid">{{getErrorMessage(flt.fltrValue)}}</small>
+                        <small class="text-muted" *ngIf="flt.fltrMaxLen">{{flt.fltrValue.value?.length || 0}}/{{flt.fltrMaxLen}}</small>
+                    </div>
+                </div>
+
+                <div class="form-group" *ngIf="flt.fltrDataType === 'datetime'"  fxFlex="72%">
+<# 
+    if(localize) {
+#>
+                    <small>{{FltVal|async}}</small>
+<# 
+    } else {
+#>
+                    <small>Filter value</small>
+<# 
+    }
+#>
+                    <div class="input-group">
+                        <input class="form-control" ngbDatepicker #d="ngbDatepicker" container="body"
+                        (click)="d.toggle()" [formControl]="flt.fltrValue" [min]="flt.fltrMin" [max]="flt.fltrMax">
+
+                        <div class="input-group-append" >
+                            <button class="btn btn-outline-secondary " type="button"   (click)="d.toggle()" data-toggle="tooltip" 
+<# 
+    if(localize) {
+#>
+                                title="{{ShowDtDlg|async}}">
+<# 
+    } else {
+#>
+                                title="Show date dialog">
+<# 
+    }
+#>
+                                <i class="fa fa-calendar md-18 text-primary"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary " type="button"   (click)="removeFltr(flt)" data-toggle="tooltip" 
+<# 
+    if(localize) {
+#>
+                                title="{{RmCurrFltItm|async}}">
+<# 
+    } else {
+#>
+                                title="Remove current filter item">
+<# 
+    }
+#>
+                                <i class="fa fa-trash md-18 text-danger"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <small class="text-danger" *ngIf="flt.fltrValue.invalid">{{getErrorMessage(flt.fltrValue)}}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

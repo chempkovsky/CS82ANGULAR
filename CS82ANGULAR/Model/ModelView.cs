@@ -7,6 +7,7 @@ namespace CS82ANGULAR.Model
     {
         #region Fields
         protected string _ViewName = "";
+        protected string _DomainViewName = "";
         protected string _RootEntityClassName = "";
         protected string _RootEntityFullClassName = "";
         protected string _RootEntityUniqueProjectName = "";
@@ -14,12 +15,32 @@ namespace CS82ANGULAR.Model
         protected string _DefaultProjectNameSpace = "";
         protected string _DestinationFolder = "";
         protected bool _GenerateJSonAttribute;
+        protected bool _UseOnlyRootPropsForSelect;
         protected string _RootEntityDbContextPropertyName;
         protected string _PageViewName;
+        protected string _DomainPageViewName;
         protected string _PluralTitle = "";
         protected string _Title = "";
+        protected string _BaseClass = "";
 
         #endregion
+
+        public string BaseClass
+        {
+            get
+            {
+                return _BaseClass;
+            }
+            set
+            {
+                if (_BaseClass != value)
+                {
+                    _BaseClass = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public string Title
         {
             get
@@ -81,6 +102,36 @@ namespace CS82ANGULAR.Model
                 }
             }
         }
+        public string DomainViewName
+        {
+            get
+            {
+                return _DomainViewName;
+            }
+            set
+            {
+                if (_DomainViewName != value)
+                {
+                    _DomainViewName = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public string DomainPageViewName
+        {
+            get
+            {
+                return _DomainPageViewName;
+            }
+            set
+            {
+                if (_DomainPageViewName != value)
+                {
+                    _DomainPageViewName = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         public string RootEntityDbContextPropertyName
         {
             get
@@ -96,8 +147,6 @@ namespace CS82ANGULAR.Model
                 }
             }
         }
-
-
         public string RootEntityClassName
         {
             get
@@ -203,6 +252,21 @@ namespace CS82ANGULAR.Model
                 }
             }
         }
+        public bool UseOnlyRootPropsForSelect
+        {
+            get
+            {
+                return _UseOnlyRootPropsForSelect;
+            }
+            set
+            {
+                if (_UseOnlyRootPropsForSelect != value)
+                {
+                    _UseOnlyRootPropsForSelect = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         public ObservableCollection<ModelViewProperty> ScalarProperties { get; set; }
         public ObservableCollection<ModelViewForeignKey> ForeignKeys { get; set; }
         public ObservableCollection<ModelViewKeyProperty> PrimaryKeyProperties { get; set; }
@@ -210,7 +274,8 @@ namespace CS82ANGULAR.Model
         public ObservableCollection<ModelViewUIFormProperty> UIFormProperties { get; set; }
         public ObservableCollection<ModelViewUIListProperty> UIListProperties { get; set; }
         public ObservableCollection<ModelViewUniqueKey> UniqueKeys { get; set; }
-
+        public ObservableCollection<GeneratedDto> GeneratedDtos { get; set; }
+        public ObservableCollection<GeneratedService> GeneratedServices { get; set; }
     }
 
 }

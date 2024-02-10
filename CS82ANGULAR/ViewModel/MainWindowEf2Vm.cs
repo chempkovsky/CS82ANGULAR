@@ -11,6 +11,8 @@ using System.Windows;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio;
+using CS82ANGULAR.Model;
+using Microsoft.VisualStudio.Package;
 
 namespace CS82ANGULAR.ViewModel
 {
@@ -29,6 +31,7 @@ namespace CS82ANGULAR.ViewModel
         DbContextSerializable CurrentDbContext = null;
 
         UserControlSelectExisting SelectExistingUC = null;
+        GenTypeItem gti = null;
         #endregion
 
 
@@ -37,6 +40,10 @@ namespace CS82ANGULAR.ViewModel
 
         public MainWindowEf2Vm(DTE2 dte, ITextTemplating textTemplating, IVsThreadedWaitDialogFactory dialogFactory) : base(dte, textTemplating, dialogFactory)
         {
+            GenTypeItems.Add(new GenTypeItem() { GtDisplayName = "Domain Dto", GtType = "Domain", GtItmPath = "ViewModelDomainTmplst", GtLstPath = "ViewPageModelDomainTmplst" });
+            GenTypeItems.Add(new GenTypeItem() { GtDisplayName = "WebApi Dto", GtType = "WebApi", GtItmPath = "ViewModelTmplst", GtLstPath = "ViewPageModelTmplst" });
+            GenTypeComboSelectedItem = GenTypeItems[1];
+
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             InvitationViewModel InvitationVM = new InvitationViewModel();
             InvitationVM.WizardName = "#2 View Wizard";
@@ -59,12 +66,16 @@ namespace CS82ANGULAR.ViewModel
                     CurrentUiStepId = 0;
                     PrevBtnEnabled = false;
                     NextBtnEnabled = true;
+                    GenTypeComboVisibility = Visibility.Collapsed;
+                    GenTypeComboEnabled = false;
                     break;
                 case 2:
                     CurrentUiStepId = 1;
                     PrevBtnEnabled = true;
                     NextBtnEnabled = false;
                     SaveBtnEnabled = false;
+                    GenTypeComboVisibility = Visibility.Collapsed;
+                    GenTypeComboEnabled = false;
                     (SelectDbContextUC.DataContext as SelectDbContextViewModel).CheckIsReady();
                     this.CurrentUserControl = SelectDbContextUC;
                     this.OnPropertyChanged("CurrentUserControl");
@@ -77,6 +88,8 @@ namespace CS82ANGULAR.ViewModel
                     PrevBtnEnabled = true;
                     NextBtnEnabled = true;
                     SaveBtnEnabled = false;
+                    GenTypeComboVisibility = Visibility.Collapsed;
+                    GenTypeComboEnabled = false;
                     (SelectSourceEntityUC.DataContext as SelectEntityForGivenDbContextViewModel).CheckIsReady();
                     this.CurrentUserControl = SelectSourceEntityUC;
                     this.OnPropertyChanged("CurrentUserControl");
@@ -87,6 +100,8 @@ namespace CS82ANGULAR.ViewModel
                     PrevBtnEnabled = true;
                     NextBtnEnabled = true;
                     SaveBtnEnabled = false;
+                    GenTypeComboVisibility = Visibility.Collapsed;
+                    GenTypeComboEnabled = false;
                     (SelectExistingUC.DataContext as SelectExistingViewModel).CheckIsReady();
                     this.CurrentUserControl = SelectExistingUC;
                     this.OnPropertyChanged("CurrentUserControl");
@@ -97,6 +112,8 @@ namespace CS82ANGULAR.ViewModel
                     PrevBtnEnabled = true;
                     NextBtnEnabled = true;
                     SaveBtnEnabled = false;
+                    GenTypeComboVisibility = Visibility.Visible;
+                    GenTypeComboEnabled = true;
                     this.CurrentUserControl = CreateViewUC;
                     this.OnPropertyChanged("CurrentUserControl");
                     break;
@@ -108,6 +125,8 @@ namespace CS82ANGULAR.ViewModel
                     NextBtnEnabled = true;
                     SaveBtnEnabled = false;
                     this.CurrentUserControl = T4EditorUC;
+                    GenTypeComboVisibility = Visibility.Visible;
+                    GenTypeComboEnabled = false;
                     this.OnPropertyChanged("CurrentUserControl");
                     break;
 
@@ -117,6 +136,8 @@ namespace CS82ANGULAR.ViewModel
                     NextBtnEnabled = true;
                     SaveBtnEnabled = false;
                     this.CurrentUserControl = GenerateUC;
+                    GenTypeComboVisibility = Visibility.Visible;
+                    GenTypeComboEnabled = false;
                     this.OnPropertyChanged("CurrentUserControl");
                     break;
                 case 8:
@@ -125,6 +146,8 @@ namespace CS82ANGULAR.ViewModel
                     NextBtnEnabled = true;
                     SaveBtnEnabled = false;
                     (T4EditorPageUC.DataContext as T4EditorViewModel).CheckIsReady();
+                    GenTypeComboVisibility = Visibility.Visible;
+                    GenTypeComboEnabled = false;
                     this.CurrentUserControl = T4EditorPageUC;
                     this.OnPropertyChanged("CurrentUserControl");
                     break;
@@ -144,6 +167,8 @@ namespace CS82ANGULAR.ViewModel
                     PrevBtnEnabled = true;
                     NextBtnEnabled = false;
                     SaveBtnEnabled = false;
+                    GenTypeComboVisibility = Visibility.Collapsed;
+                    GenTypeComboEnabled = false;
                     if (SelectDbContextUC == null)
                     {
                         SelectDbContextViewModel dataContext = new SelectDbContextViewModel(Dte);
@@ -168,6 +193,8 @@ namespace CS82ANGULAR.ViewModel
                     PrevBtnEnabled = true;
                     NextBtnEnabled = false;
                     SaveBtnEnabled = false;
+                    GenTypeComboVisibility = Visibility.Collapsed;
+                    GenTypeComboEnabled = false;
                     if (SelectSourceEntityUC == null)
                     {
                         SelectEntityForGivenDbContextViewModel dataContext = new SelectEntityForGivenDbContextViewModel(Dte);
@@ -189,6 +216,8 @@ namespace CS82ANGULAR.ViewModel
                     PrevBtnEnabled = true;
                     NextBtnEnabled = false;
                     SaveBtnEnabled = false;
+                    GenTypeComboVisibility = Visibility.Collapsed;
+                    GenTypeComboEnabled = false;
                     if (SelectExistingUC == null)
                     {
                         SelectExistingViewModel dataContext = new SelectExistingViewModel(Dte);
@@ -213,6 +242,8 @@ namespace CS82ANGULAR.ViewModel
                     PrevBtnEnabled = true;
                     NextBtnEnabled = true;
                     SaveBtnEnabled = false;
+                    GenTypeComboVisibility = Visibility.Visible;
+                    GenTypeComboEnabled = true;
                     if (CreateViewUC == null)
                     {
                         CreateViewViewModel dataContext = new CreateViewViewModel(Dte);
@@ -251,6 +282,8 @@ namespace CS82ANGULAR.ViewModel
                     }
 
                     CurrentUiStepId = 5;
+                    GenTypeComboVisibility = Visibility.Visible;
+                    GenTypeComboEnabled = false;
                     PrevBtnEnabled = true;
                     NextBtnEnabled = true;
                     SaveBtnEnabled = false;
@@ -262,6 +295,8 @@ namespace CS82ANGULAR.ViewModel
                         dataContext.IsReady.IsReadyEvent += T4EditorViewModel_IsReady;
                         T4EditorUC = new UserControlT4Editor(dataContext);
                     }
+                    gti = (GenTypeComboSelectedItem as GenTypeItem);
+                    (T4EditorUC.DataContext as T4EditorViewModel).T4TemplateFolder = Path.Combine(TemplatePathHelper.GetTemplatePath(), gti.GtItmPath); 
                     (T4EditorUC.DataContext as T4EditorViewModel).CheckIsReady();
                     this.CurrentUserControl = T4EditorUC;
                     this.OnPropertyChanged("CurrentUserControl");
@@ -269,6 +304,8 @@ namespace CS82ANGULAR.ViewModel
                     break;
                 case 5:
                     CurrentUiStepId = 6;
+                    GenTypeComboVisibility = Visibility.Visible;
+                    GenTypeComboEnabled = false;
                     PrevBtnEnabled = true;
                     NextBtnEnabled = false;
                     IVsThreadedWaitDialog2 aDialog = null;
@@ -321,6 +358,8 @@ namespace CS82ANGULAR.ViewModel
                     break;
                 case 6:
                     CurrentUiStepId = 7;
+                    GenTypeComboVisibility = Visibility.Visible;
+                    GenTypeComboEnabled = false;
                     PrevBtnEnabled = true;
                     NextBtnEnabled = true;
                     SaveBtnEnabled = false;
@@ -332,12 +371,16 @@ namespace CS82ANGULAR.ViewModel
                         dataContext.IsReady.IsReadyEvent += T4EditorViewModel_IsReady;
                         T4EditorPageUC = new UserControlT4Editor(dataContext);
                     }
+                    gti = (GenTypeComboSelectedItem as GenTypeItem);
+                    (T4EditorPageUC.DataContext as T4EditorViewModel).T4TemplateFolder = Path.Combine(TemplatePathHelper.GetTemplatePath(), gti.GtLstPath);
                     (T4EditorPageUC.DataContext as T4EditorViewModel).CheckIsReady();
                     this.CurrentUserControl = T4EditorPageUC;
                     this.OnPropertyChanged("CurrentUserControl");
                     break;
                 case 7:
                     CurrentUiStepId = 8;
+                    GenTypeComboVisibility = Visibility.Visible;
+                    GenTypeComboEnabled = false;
                     PrevBtnEnabled = true;
                     NextBtnEnabled = true;
                     IVsThreadedWaitDialog2 aaDialog = null;
@@ -386,6 +429,8 @@ namespace CS82ANGULAR.ViewModel
                     break;
                 case 8:
                     CurrentUiStepId = 1;
+                    GenTypeComboVisibility = Visibility.Collapsed;
+                    GenTypeComboEnabled = false;
                     NextBtnCommandAction(param);
                     break;
                 default:
@@ -396,16 +441,63 @@ namespace CS82ANGULAR.ViewModel
         #endregion
 
         #region SaveBtnCommand
+        string GetModelNameSpace(string ViewDefaultProjectNameSpace, string ViewFolder)
+        {
+            string result = ViewFolder;
+            if (string.IsNullOrEmpty(result))
+            {
+                result = "";
+            }
+            else
+            {
+                result = "." + result.Replace("\\", ".");
+            }
+            return ViewDefaultProjectNameSpace + result;
+        }
+
         public override void SaveBtnCommandAction(Object param)
         {
             ModelViewSerializable modelViewSerializable = new ModelViewSerializable();
             (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ModelViewAssingTo(modelViewSerializable);
+
+            if(modelViewSerializable.GeneratedDtos == null)
+            {
+                modelViewSerializable.GeneratedDtos = new List<GeneratedDtoSerializable> { };
+            }
+            GenTypeItem si = (this.GenTypeComboSelectedItem as GenTypeItem);
+            string GtType = "WebApi";
+            if (si != null) {
+                GtType = si.GtType;
+            }
+
+            GeneratedDtoSerializable gds = modelViewSerializable.GeneratedDtos.FirstOrDefault(d => d.ViewType == GtType);
+            if(gds == null)
+            {
+                gds = new GeneratedDtoSerializable();
+                modelViewSerializable.GeneratedDtos.Add(gds);
+            }
+            gds.ViewDefaultProjectNameSpace = GetModelNameSpace(modelViewSerializable.ViewDefaultProjectNameSpace, modelViewSerializable.ViewFolder);
+            gds.ViewProject = modelViewSerializable.ViewProject;
+            if (GtType == "WebApi")
+            {
+                gds.ViewClassName = modelViewSerializable.ViewName;
+                gds.PageViewClassName = modelViewSerializable.PageViewName;
+            } else
+            {
+                gds.ViewClassName = modelViewSerializable.DomainViewName;
+                gds.PageViewClassName = modelViewSerializable.DomainPageViewName;
+            }
+            gds.ViewType = GtType;
+
             ModelViewSerializable existedModelViewSerializable =
                 CurrentDbContext.ModelViews.FirstOrDefault(mv => mv.ViewName == modelViewSerializable.ViewName);
             if (existedModelViewSerializable != null)
             {
                 existedModelViewSerializable.PageViewName = modelViewSerializable.PageViewName;
+                existedModelViewSerializable.DomainViewName = modelViewSerializable.DomainViewName;
+                existedModelViewSerializable.DomainPageViewName = modelViewSerializable.DomainPageViewName;
                 existedModelViewSerializable.Title = modelViewSerializable.Title;
+                existedModelViewSerializable.BaseClass = modelViewSerializable.BaseClass;
                 existedModelViewSerializable.PluralTitle = modelViewSerializable.PluralTitle;
                 existedModelViewSerializable.RootEntityClassName = modelViewSerializable.RootEntityClassName;
                 existedModelViewSerializable.RootEntityFullClassName = modelViewSerializable.RootEntityFullClassName;
@@ -415,6 +507,10 @@ namespace CS82ANGULAR.ViewModel
                 existedModelViewSerializable.ViewDefaultProjectNameSpace = modelViewSerializable.ViewDefaultProjectNameSpace;
                 existedModelViewSerializable.ViewFolder = modelViewSerializable.ViewFolder;
                 existedModelViewSerializable.GenerateJSonAttribute = modelViewSerializable.GenerateJSonAttribute;
+                existedModelViewSerializable.UseOnlyRootPropsForSelect = modelViewSerializable.UseOnlyRootPropsForSelect;
+
+
+
                 if ((existedModelViewSerializable.ScalarProperties != null) && (modelViewSerializable.ScalarProperties != null))
                 {
                     foreach (ModelViewPropertyOfVwSerializable srcProp in existedModelViewSerializable.ScalarProperties)
@@ -446,6 +542,7 @@ namespace CS82ANGULAR.ViewModel
                 existedModelViewSerializable.UIFormProperties = modelViewSerializable.UIFormProperties;
                 existedModelViewSerializable.UIListProperties = modelViewSerializable.UIListProperties;
                 existedModelViewSerializable.UniqueKeys = modelViewSerializable.UniqueKeys;
+                existedModelViewSerializable.GeneratedDtos = modelViewSerializable.GeneratedDtos;
             }
             else
             {
@@ -486,7 +583,8 @@ namespace CS82ANGULAR.ViewModel
                         SolutionDirectory,
                         Path.GetDirectoryName((CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewProject),
                         (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewFolder,
-                        (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewName
+                        // (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewName
+                        gds.ViewClassName
                         + (GenerateUC.DataContext as GenerateViewModel).FileExtension);
                         File.WriteAllText(FlNm, (GenerateUC.DataContext as GenerateViewModel).GenerateText);
                         DestinationProject.ProjectItems.AddFromFile(FlNm);
@@ -497,7 +595,8 @@ namespace CS82ANGULAR.ViewModel
                         SolutionDirectory,
                         Path.GetDirectoryName((CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewProject),
                         (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.ViewFolder,
-                        (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.PageViewName
+                        // (CreateViewUC.DataContext as CreateViewViewModel).SelectedModel.PageViewName
+                        gds.PageViewClassName
                         //+ "." 
                         + (GeneratePageUC.DataContext as GenerateViewPageModel).FileExtension);
                         File.WriteAllText(FlNm, (GeneratePageUC.DataContext as GenerateViewPageModel).GenerateText);
