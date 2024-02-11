@@ -39,18 +39,19 @@
 
 import { Injectable } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, searchModuleServiceFolder)#>';
+// import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, searchModuleServiceFolder)#>';
 import { <#= searchInterfaceDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, searchInterfaceDlgFolder, searchModuleServiceFolder)#>';
 
 @Injectable({
   providedIn: 'root',
 })
 export class <#= searchModuleServiceClassName #> {
-  constructor(private dialog: NgbModal, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {}
+  constructor(private dialog: NgbModal // , protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>
+  ) {}
   async open(data: <#= searchInterfaceDlgClassName #>): Promise<any> {
-    let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
+    // let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
     const  <#= searchModuleClassName #> = (await import('<#= GetFolderNameWithAnglr(AngularJsonFile, Model, searchModuleFolder, searchModuleServiceFolder) #>')).<#= searchModuleClassName #>;
-    let dialogRef = this.dialog.open(<#= searchModuleClassName #>.<#= GetMethodPrefix #><#=  searchDlgComponentClassName #>(), {size: w}); 
+    let dialogRef = this.dialog.open(<#= searchModuleClassName #>.<#= GetMethodPrefix #><#=  searchDlgComponentClassName #>(), {size: 'xl'}); 
     dialogRef.componentInstance.data = data;
     return dialogRef.result;
   }  

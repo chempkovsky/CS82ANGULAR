@@ -1,0 +1,106 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+
+    string lformModuleFolder            = "01650-L.module.ts";
+    string lformModuleClassName         = GetModuleClassName(Model, lformModuleFolder);
+
+    string materialModuleFolder         = "00010-app-material.module.ts";
+    string materialModuleClassName      = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, materialModuleFolder, lformModuleFolder);
+
+    string flexModuleFolder             = "00011-app-flex-layout.module.ts";
+    string flexModuleClassName          = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, flexModuleFolder, lformModuleFolder);
+
+    string filterModuleFolder           = "00050-web-service-filter.module.ts";
+    string filterModuleClassName        = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, filterModuleFolder, lformModuleFolder);
+
+    string formatterModuleFolder        = "00070-app-formatter.module.ts";
+    string formatterModuleClassName     = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, formatterModuleFolder, lformModuleFolder);
+
+
+    string searchModuleFolder           = "01450-S.module.ts";
+    string searchModuleClassName        = GetModuleClassNameWithAnglr(AngularJsonFile, Model, searchModuleFolder, lformModuleFolder);
+
+    string vformModuleFolder            = "01550-V.module.ts";
+    string vformModuleClassName         = GetModuleClassNameWithAnglr(AngularJsonFile, Model, vformModuleFolder, lformModuleFolder);
+
+    string aformModuleFolder            = "01552-A.module.ts";
+    string aformModuleClassName         = GetModuleClassNameWithAnglr(AngularJsonFile, Model, aformModuleFolder, lformModuleFolder);
+
+    string uformModuleFolder            = "01554-U.module.ts";
+    string uformModuleClassName         = GetModuleClassNameWithAnglr(AngularJsonFile, Model, uformModuleFolder, lformModuleFolder);
+
+    string dformModuleFolder            = "01556-D.module.ts";
+    string dformModuleClassName         = GetModuleClassNameWithAnglr(AngularJsonFile, Model, dformModuleFolder, lformModuleFolder);
+
+    string lformComponentFolder         = "01600-Lform.component.ts";
+    string lformComponentClassName      = GetComponentClassNameWithAnglr(AngularJsonFile, Model, lformComponentFolder, lformModuleFolder);
+
+    string ldlgComponentFolder          = "01620-Ldlg.component.ts";
+    string lformDlgComponentClassName   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, ldlgComponentFolder, lformModuleFolder);
+    string GetMethodPrefix              = "get";
+    
+#>
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { CoreModule } from '@abp/ng.core';
+
+import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  flexModuleFolder, lformModuleFolder) #>';
+import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  materialModuleFolder, lformModuleFolder) #>';
+import { <#=  formatterModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  formatterModuleFolder, lformModuleFolder) #>';
+
+import { <#=  searchModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, searchModuleFolder, lformModuleFolder) #>';
+import { <#=  vformModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, vformModuleFolder, lformModuleFolder) #>';
+import { <#=  aformModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, aformModuleFolder, lformModuleFolder) #>';
+import { <#=  uformModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uformModuleFolder, lformModuleFolder) #>';
+import { <#=  dformModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, dformModuleFolder, lformModuleFolder) #>';
+
+import { <#=  lformComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, lformComponentFolder, lformModuleFolder) #>';
+import { <#=  lformDlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, ldlgComponentFolder, lformModuleFolder) #>';
+
+
+@NgModule({
+    declarations: [
+        <#=  lformComponentClassName #>,
+        <#=  lformDlgComponentClassName #>
+    ],
+    imports: [
+        CommonModule,
+        CoreModule,
+        <#= materialModuleClassName #>,
+        <#= flexModuleClassName #>,
+        <#=  searchModuleClassName #>,
+
+        <#=  vformModuleClassName #>,
+        <#=  aformModuleClassName #>,
+        <#=  uformModuleClassName #>,
+        <#=  dformModuleClassName #>,
+    ],
+    exports: [
+        <#=  lformComponentClassName #>,
+        <#=  lformDlgComponentClassName #>
+    ]
+})
+export class <#= lformModuleClassName #> {
+    static <#= GetMethodPrefix #><#=  lformDlgComponentClassName #>(): typeof <#=  lformDlgComponentClassName #> {
+        return <#=  lformDlgComponentClassName #>;
+    }
+}
+
+

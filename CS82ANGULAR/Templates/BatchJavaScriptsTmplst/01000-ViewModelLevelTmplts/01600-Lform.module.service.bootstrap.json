@@ -1,0 +1,21 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "1.",
+    "Please make sure that you have already run the following scripts for the current ViewModel",
+    "                                01600-Lform.module.ts",
+    "2.",
+    "Please make sure that you selected src\\app\\services\\your-view-model-name folder",
+    "  where [your-view-model-name] is a name of currently selected ViewModel",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "",
+      "GeneratorType": "01650-L.module.service.ts",
+      "GeneratorSript": "LDlgServiceForView.bootstrap.ts.t4"
+    }
+  ]
+
+}

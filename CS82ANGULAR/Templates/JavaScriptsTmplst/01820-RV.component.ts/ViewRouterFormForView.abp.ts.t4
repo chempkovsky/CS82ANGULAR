@@ -1,0 +1,546 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string HiddenFilterPrefix           = "hf";
+    string IdPrefix                     = "id";
+    string VPrefix                      = "View";
+    string APrefix                      = "Add";
+    string UPrefix                      = "Upd";
+    string DPrefix                      = "Del";
+
+    string NavPrefix                    = "np";
+    string OutletNmPropName             = "outletNm";
+    string IsDetailPropName             = "isdtl";
+    string routeShowFilterPropName      = "sf";
+    string DepthParamName               = "depth"; 
+    string routeDepthParamName          = "dp"; 
+    string routeOutletParent            = "oltp";
+    string routeOutletNmPropName        = "oltn";
+
+    string HiddenFilterAsFltRsltSuffix  = "HiddenFilterAsFltRslt";
+    string ActionParamName              = "mode";  
+    string ItemParamName                = "item";  
+
+    string AppearancePropName           = "appearance";
+    string OutletNamePrefix             = "oltnm";
+    string OutletParent                 = "oltParent";
+
+    string SelectedDetailPropName       = "selectedDetail";
+    string DetailViewsPropName          = "detailViews";
+    string OnDetailChangedMethodName    = "onDetailChanged";
+    string ToDetailMethodName           = "toDetail";
+    string RootDataSource               = "rootDataSource";
+    string HiddenFilterByRowSuffix      = "HiddenFilterByRow";
+    string Values2InterfaceMethodName   = "values2Interface";
+
+
+
+    string HiddenFilterSelector         = "hidden-filter";
+    string HiddenFilterPropName         = "hiddenFilter";
+
+    string ShowErrorMethodName          = "showError";
+    string OnAfterSubmitMethodName      = "onAfterSubmit";
+    
+
+    string FormControlModelPropName     = "eformControlModel";
+    string FormControlNewModelPropName  = "eformNewControlModel";
+    string AppSettingServicePropName    = "appGlblSettings";
+    string formRootService              = "frmRootSrv";
+    string TitlePropName                = "title";
+    string ShowDetailsPropName          = "showDetails";
+    string NavBackToMasterPropName      = "NavBackToMaster";
+
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+    string frasesPropName                       = "frases";
+
+    string rvCssFolder                          = "01820-RV.component.css";
+    string rvHtmlFolder                         = "01820-RV.component.html";
+    string rvComponentFolder                    = "01820-RV.component.ts";
+    string componentClassName                   = GetComponentClassName(Model, rvComponentFolder);
+    string componentSelectorCommonPart          = GetComponentSelectorCommonPart(Model, rvComponentFolder);
+
+
+    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName           = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, rvComponentFolder);
+
+    string eventEmitterDataModelFolder          = "00018-event-emitter-data.interface.ts";
+    string eventEmitterDataModelClassName       = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterDataModelFolder, rvComponentFolder);
+
+    string menuItemDataModelFolder              = "00017-menu-item-data.interface.ts";
+    string menuItemDataModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, menuItemDataModelFolder, rvComponentFolder);
+
+    string eventEmitterPubModelFolder           = "00019-event-emitter-pub.interface.ts";
+    string eventEmitterPubModelClassName        = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, rvComponentFolder);
+
+    string filterResultModelFolder              = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, filterResultModelFolder, rvComponentFolder);
+
+    string viewInterfaceFolder                  = "01100-.interface.ts";
+    string viewInterfaceName                    = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, rvComponentFolder);
+
+    string viewServiceFolder                    = "01400-.service.ts";
+    string serviceClassName                     = GetServiceClassNameWithAnglr(AngularJsonFile, Model, viewServiceFolder, rvComponentFolder);
+
+    string vformComponentFolder                 = "01500-Vform.component.ts";
+    string vformComponentClassName              = GetComponentClassNameWithAnglr(AngularJsonFile, Model, vformComponentFolder, rvComponentFolder);
+
+    string OutletNameValue = OutletNamePrefix + Model.ViewName;
+
+    List<ModelViewPropertyOfVwSerializable> primKeys= GetModelPrimaryKeyProps(Model);
+    List<string> detailViewNames = GetDetailViews(Model, Context, null);
+    List<string> detailViewNamesToExclude = new List<string>(); 
+
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
+        GetSearchResources(Model, Context);
+    string DlgSrvPrefix                         = "dlgSrv";
+    string apiName                              = AbpFirstItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
+
+#>
+
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, Inject, AfterViewInit } from '@angular/core';
+import { ActivatedRoute, Router, ParamMap, UrlSegment, ActivatedRouteSnapshot } from '@angular/router';
+<# 
+    if(localize) {
+#>
+import { LocalizationService } from '@abp/ng.core';
+<# 
+    }
+#>
+
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, rvComponentFolder)#>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterResultModelFolder, rvComponentFolder) #>';
+import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  eventEmitterDataModelFolder, rvComponentFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  menuItemDataModelFolder, rvComponentFolder)#>';
+import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, rvComponentFolder)#>';
+
+import { <#= viewInterfaceName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, rvComponentFolder) #>';
+import { <#= serviceClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewServiceFolder, rvComponentFolder) #>';
+import { <#= vformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, vformComponentFolder, rvComponentFolder) #>';
+
+@Component({
+  selector: 'app-<#= componentSelectorCommonPart #>',
+  templateUrl: '<#= GetFolderName(Model, rvHtmlFolder, rvComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderName(Model, rvCssFolder, rvComponentFolder) #>.css']
+})
+
+export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eventEmitterPubModelClassName #> {
+<# 
+    if(localize) {
+#>
+    <#= frasesPropName #>: {[key:string]: string}  = {};
+<# 
+    } else {
+#>
+    <#= frasesPropName #>: {[key:string]: string}  = {
+        '<#= TitlePropName #>': 'View <#= Model.Title #>',
+        '<#= NavBackToMasterPropName #>': 'Navigate back to master',
+        'Hide-details': 'Hide details',
+<#
+    {
+        foreach(string detailVwnm in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailVwnm)) continue;
+            ModelViewSerializable detailView = GetViewByName(Context, detailVwnm);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+#>
+        '<#= viewToNavigate.ViewName +"__"+ detailView.ViewName #>': '<#= viewToNavigate.PluralTitle #>(<#= detailView.Title #>)',
+<#
+                        continue;
+                    }
+                }
+#>
+        '<#= detailView.ViewName + foreignKey.NavigationName #>': '<#= detailView.PluralTitle + "(" + foreignKey.NavigationName + ")" #>',
+<#
+            }
+            
+        }
+    }
+#>
+    }
+<# 
+    }
+#>
+
+
+    public <#= ShowDetailsPropName #>: boolean = false;
+<# 
+    if(localize) {
+#>
+    <#= TitlePropName #>: string|any = '';
+<# 
+    } else {
+#>
+    <#= TitlePropName #>: string|any = this.<#= frasesPropName #>['<#= TitlePropName #>'];
+<# 
+    } 
+#>
+    <#= NavPrefix #>: string|any = '';
+    <#= OutletNmPropName #> : string = 'primary';
+    <#= OutletParent #>: string = '';
+    @Output('<#= onContainerMenuItemClickSelector #>') <#= onContainerMenuItemClickEmitter #> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
+    @Input('<#= containerMenuItemsSelector #>') <#= containerMenuItemsPropName #>: Array<<#= menuItemDataModelClassName #>> = [];
+    <#= onContainerMenuItemClickMethodName #>(v: <#= eventEmitterDataModelClassName #>)  {
+        this.<#= onContainerMenuItemClickEmitter #>.emit(v);
+    }
+    <#= HiddenFilterPrefix #>: string = '<#= HiddenFilterPrefix + "1" #>';
+    <#= IdPrefix #>: string = '<#= IdPrefix + "1" #>';
+    <#= DepthParamName #>: number = 1;
+    <#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
+    <#= FormControlModelPropName #>: <#= viewInterfaceName #> | null = null;
+    constructor(protected route: ActivatedRoute, protected router: Router, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
+<# 
+    if(localize) {
+#>
+        private L: LocalizationService, 
+<# 
+    }
+#>
+
+        protected <#= formRootService #>: <#= serviceClassName #>) { 
+<# 
+    if(localize) {
+#>
+        this.<#= frasesPropName #> = {
+            '<#= TitlePropName #>': this.L.instant({
+                key: '<#= apiName #>::<#= Model.ViewName #>:ViewTitle',
+                defaultValue: "View <#= Model.Title #>"
+            }), 
+            '<#= NavBackToMasterPropName #>': this.L.instant({
+                key: '<#= apiName #>::<#= Model.ViewName #>:NabBckMstr',
+                defaultValue: "Navigate back to master"
+            }), 
+            'Hide-details': this.L.instant({
+                key: '<#= apiName #>::<#= Model.ViewName #>:HideDtls',
+                defaultValue: "Hide details"
+            }), 
+<#
+    {
+        foreach(string detailVwnm in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailVwnm)) continue;
+            ModelViewSerializable detailView = GetViewByName(Context, detailVwnm);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+#>
+            '<#= viewToNavigate.ViewName +"__"+ detailView.ViewName #>': this.L.instant({
+                key: '<#= apiName #>::<#= Model.ViewName #>:<#= viewToNavigate.PluralTitle #>:<#= detailView.Title #>',
+                defaultValue: "<#= viewToNavigate.PluralTitle #>(<#= detailView.Title #>)"
+            }), 
+<#
+                        continue;
+                    }
+                }
+#>
+            '<#= detailView.ViewName + foreignKey.NavigationName #>': this.L.instant({
+                key: '<#= apiName #>::<#= Model.ViewName #>:<#= detailView.PluralTitle #>:<#= foreignKey.NavigationName #>',
+                defaultValue: "<#= detailView.PluralTitle + "(" + foreignKey.NavigationName + ")" #>"
+            }), 
+<#
+            }
+        }
+    }
+#>
+        };
+        this.<#= TitlePropName #>any = this.<#= frasesPropName #>['<#= TitlePropName #>'];
+        this.<#= DetailViewsPropName #> = [
+<#
+    {
+        foreach(string detailVwnm in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailVwnm)) continue;
+            ModelViewSerializable detailView = GetViewByName(Context, detailVwnm);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+#>
+            {caption: this.<#= frasesPropName #>['<#= viewToNavigate.ViewName +"__"+ detailView.ViewName #>'], vw: '<#= viewToNavigate.ViewName #>', nv: '<#= foreignKey.NavigationName #>', addon: '<#= detailView.ViewName #>'},
+<#
+                        continue;
+                    }
+                }
+#>
+            {caption:this.<#= frasesPropName #>['<#= detailView.ViewName + foreignKey.NavigationName #>'], vw: '<#= detailVwnm #>', nv: '<#= foreignKey.NavigationName #>', addon: '<#= detailVwnm #>'},
+<#
+            }
+        }
+    }
+#>
+        ];
+<# 
+    }
+#>
+    }
+    <#= IsDetailPropName #>: boolean = false;
+    ngOnInit() {
+        if (!(typeof this.route.snapshot.data === 'undefined')) {
+            if (!(this.route.snapshot.data === null)) {
+                if (!(typeof this.route.snapshot.data['<#= TitlePropName #>'] === 'undefined')) {
+                    this.<#= TitlePropName #> = this.route.snapshot.data['<#= TitlePropName #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= routeDepthParamName #>'] === 'undefined')) {
+                    this.<#= DepthParamName #> = this.route.snapshot.data['<#= routeDepthParamName #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= HiddenFilterPrefix #>'] === 'undefined')) {
+                    this.<#= HiddenFilterPrefix #> = this.route.snapshot.data['<#= HiddenFilterPrefix #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= IdPrefix #>'] === 'undefined')) {
+                    this.<#= IdPrefix #> = this.route.snapshot.data['<#= IdPrefix #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= NavPrefix #>'] === 'undefined')) {
+                    this.<#= NavPrefix #> = this.route.snapshot.data['<#= NavPrefix #>'];
+                }
+/*
+                if (!(typeof this.route.snapshot.data['<#= routeOutletNmPropName #>'] === 'undefined')) {
+                    this.<#= OutletNmPropName #> = this.route.snapshot.data['<#= routeOutletNmPropName #>'];
+                }
+*/
+                if (!(typeof this.route.snapshot.data['<#= IsDetailPropName #>'] === 'undefined')) {
+                    this.<#= IsDetailPropName #> = this.route.snapshot.data['<#= IsDetailPropName #>'];
+                }
+/*
+                if (!(typeof this.route.snapshot.data['<#= routeOutletParent #>'] === 'undefined')) {
+                    this.<#= OutletParent #> = this.route.snapshot.data['<#= routeOutletParent #>'];
+                }
+*/
+            }
+        }
+        if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+            this.<#= HiddenFilterPropName #> = this.<#= formRootService #>.get<#= HiddenFilterAsFltRsltSuffix #>(JSON.parse(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]));
+        }
+        if (!(typeof this.route.snapshot.params[this.<#= IdPrefix #>] === 'undefined')) {
+            this.<#= FormControlModelPropName #> =  JSON.parse(this.route.snapshot.params[this.<#= IdPrefix #>]);
+        }
+        this.<#= ShowDetailsPropName #> = !this.<#= IsDetailPropName #>;
+        this.<#= SelectedDetailPropName #> = this.<#= DetailViewsPropName #>[0];
+    }
+    <#= OnAfterSubmitMethodName #>(newVal: <#= viewInterfaceName #>) {
+        this.router.navigate(['../../../'], {relativeTo: this.route});
+/*
+        if(this.<#= OutletNmPropName #> === 'primary') {
+            this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route}).then(
+                ()=> {
+                    this.router.navigate(['../../../'], {relativeTo: this.route});
+                }
+            );
+        } else {
+            let qp: string[] = [];
+            qp.push(this.<#= OutletParent #>);
+
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>])
+            } else {
+                qp.push(JSON.stringify({}));
+            }
+
+            this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route.parent!.parent}).then(
+                ()=> {
+                    
+                    this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: qp }}], {relativeTo: this.route.parent!.parent})
+                }
+            );
+        }
+*/
+    }
+
+    onCancel() {
+        this.router.navigate(['../../../'], {relativeTo: this.route});
+/*
+        if(this.<#= OutletNmPropName #> === 'primary') {
+            this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route}).then(
+                ()=> {
+                    this.router.navigate(['../../../'], {relativeTo: this.route});
+                }
+            );
+        } else {
+            let qp: string[] = [];
+            qp.push(this.<#= OutletParent #>);
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>])
+            } else {
+                qp.push(JSON.stringify({}));
+            }
+            this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route.parent!.parent}).then(
+                ()=> {
+                    this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: qp }}], {relativeTo: this.route.parent!.parent})
+                }
+            );
+        }
+*/
+    }
+    onOk() {
+        if (typeof this.childForm === 'undefined') return;
+        if (this.childForm === null) return;
+        this.childForm.doSubmit();
+    }
+
+    @ViewChild(<#= vformComponentClassName #>) childForm!: <#= vformComponentClassName #>;
+
+
+    public <#= SelectedDetailPropName #>: {caption: string, vw: string|null, nv: string|null, addon: string|null}|null = null;
+
+<# 
+    if(localize) {
+#>
+    public <#= DetailViewsPropName #>: Array<{caption: string, vw: string|null, nv: string|null, addon: string|null}> = [];
+<# 
+    } else {
+#>
+    public <#= DetailViewsPropName #>: Array<{caption: string, vw: string|null, nv: string|null, addon: string|null}> = [
+        {caption:this.<#= frasesPropName #>['Hide-details'], vw:null, nv:null, addon: null},
+<#
+    {
+        foreach(string detailVwnm in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailVwnm)) continue;
+            ModelViewSerializable detailView = GetViewByName(Context, detailVwnm);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+#>
+        {caption: this.<#= frasesPropName #>['<#= viewToNavigate.ViewName +"__"+ detailView.ViewName #>'], vw: '<#= viewToNavigate.ViewName #>', nv: '<#= foreignKey.NavigationName #>', addon: '<#= detailView.ViewName #>'},
+<#
+                        continue;
+                    }
+                }
+#>
+        {caption:this.<#= frasesPropName #>['<#= detailView.ViewName + foreignKey.NavigationName #>'], vw: '<#= detailVwnm #>', nv: '<#= foreignKey.NavigationName #>', addon: '<#= detailVwnm #>'},
+<#
+            }
+            
+        }
+    }
+#>
+    ];
+<#
+    }
+#>
+    public ngAfterViewInit() {
+        
+    }
+
+    public <#= OnDetailChangedMethodName #>(e: any) {
+        if(this.<#= ShowDetailsPropName #>) {
+            this.<#= ToDetailMethodName #>();
+        }
+    }
+    public <#= ToDetailMethodName #>() {
+        let isNtDef: boolean = this.<#= SelectedDetailPropName #> === null;
+        isNtDef = isNtDef ? isNtDef : ((this.<#= SelectedDetailPropName #>!.vw === null) || (this.<#= SelectedDetailPropName #>!.nv === null))
+/*
+        if(isNtDef) {
+            this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route});
+        } else {
+            this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(
+                () => {
+                    let qp: string[] = [];
+                    qp.push( '<#= OutletNameValue +"2" #>' + this.<#= SelectedDetailPropName #>!.vw );
+                    qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>( this.childForm.<#= RootDataSource #>.<#= Values2InterfaceMethodName #>(), this.<#= SelectedDetailPropName #>!.nv)));
+                    this.router.navigate([{ outlets: { '<#=  OutletNameValue #>' : qp } }], {relativeTo: this.route});
+                }
+            );
+        }
+*/
+        if(isNtDef) {
+            this.router.navigate(['./'], {relativeTo: this.route});
+        } else {
+            let qp: string[] = [];
+            qp.push( '<#= OutletNameValue +"2" #>' + this.<#= SelectedDetailPropName #>!.vw );
+            qp.push(JSON.stringify(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>( this.childForm.<#= RootDataSource #>.<#= Values2InterfaceMethodName #>(), this.<#= SelectedDetailPropName #>!.nv)));
+            this.router.navigate(qp, {relativeTo: this.route});
+        }
+
+    }
+}
+
+

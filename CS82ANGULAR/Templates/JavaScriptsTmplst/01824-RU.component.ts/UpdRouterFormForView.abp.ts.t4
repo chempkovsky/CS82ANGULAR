@@ -1,0 +1,308 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string HiddenFilterPrefix           = "hf";
+    string IdPrefix                     = "id";
+    string VPrefix                      = "View";
+    string APrefix                      = "Add";
+    string UPrefix                      = "Upd";
+    string DPrefix                      = "Del";
+
+    string NavPrefix                    = "np";
+    string OutletNmPropName             = "outletNm";
+    string OutletParent                 = "oltParent";
+    string IsDetailPropName             = "isdtl";
+    string routeShowFilterPropName      = "sf";
+    string routeDepthParamName          = "dp"; 
+    string routeOutletParent            = "oltp";
+    string routeOutletNmPropName        = "oltn";
+
+
+    string HiddenFilterAsFltRsltSuffix  = "HiddenFilterAsFltRslt";
+    string DepthParamName               = "depth"; 
+    string ActionParamName              = "mode";  
+    string ItemParamName                = "item";  
+
+    string HiddenFilterSelector         = "hidden-filter";
+    string HiddenFilterPropName         = "hiddenFilter";
+
+    string ShowErrorMethodName          = "showError";
+    string OnAfterSubmitMethodName      = "onAfterSubmit";
+
+    string FormControlModelPropName     = "eformControlModel";
+    string FormControlNewModelPropName  = "eformNewControlModel";
+    string AppSettingServicePropName    = "appGlblSettings";
+    string formRootService              = "frmRootSrv";
+    string TitlePropName                = "title";
+
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+    string frasesPropName                       = "frases";
+
+    string ruCssFolder                          = "01824-RU.component.css";
+    string ruHtmlFolder                         = "01824-RU.component.html";
+    string ruComponentFolder                    = "01824-RU.component.ts";
+    string componentClassName                   = GetComponentClassName(Model, ruComponentFolder);
+    string componentSelectorCommonPart          = GetComponentSelectorCommonPart(Model, ruComponentFolder);
+
+    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName           = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, ruComponentFolder);
+
+    string eventEmitterDataModelFolder          = "00018-event-emitter-data.interface.ts";
+    string eventEmitterDataModelClassName       = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterDataModelFolder, ruComponentFolder);
+
+    string menuItemDataModelFolder              = "00017-menu-item-data.interface.ts";
+    string menuItemDataModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, menuItemDataModelFolder, ruComponentFolder);
+
+    string eventEmitterPubModelFolder           = "00019-event-emitter-pub.interface.ts";
+    string eventEmitterPubModelClassName        = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, ruComponentFolder);
+
+    string filterResultModelFolder              = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, filterResultModelFolder, ruComponentFolder);
+
+    string viewInterfaceFolder                  = "01100-.interface.ts";
+    string viewInterfaceName                    = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, ruComponentFolder);
+
+    string viewServiceFolder                    = "01400-.service.ts";
+    string serviceClassName                     = GetServiceClassNameWithAnglr(AngularJsonFile, Model, viewServiceFolder, ruComponentFolder);
+
+    string uformComponentFolder                 = "01504-Uform.component.ts";
+    string uformComponentClassName              = GetComponentClassNameWithAnglr(AngularJsonFile, Model, uformComponentFolder, ruComponentFolder);
+
+    string DlgSrvPrefix                         = "dlgSrv";
+    string apiName                              = AbpFirstItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
+
+    List<ModelViewPropertyOfVwSerializable> primKeys  = GetModelPrimaryKeyProps(Model);
+#>
+
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, Inject } from '@angular/core';
+import { ActivatedRoute, Router, ParamMap, UrlSegment, ActivatedRouteSnapshot } from '@angular/router';
+<# 
+    if(localize) {
+#>
+import { LocalizationService } from '@abp/ng.core';
+<# 
+    }
+#>
+
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, ruComponentFolder)#>';
+import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  filterResultModelFolder, ruComponentFolder) #>';
+import { <#= eventEmitterDataModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  eventEmitterDataModelFolder, ruComponentFolder)#>';
+import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  menuItemDataModelFolder, ruComponentFolder)#>';
+import { <#= eventEmitterPubModelClassName #> } from '<#= GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, ruComponentFolder)#>';
+
+import { <#= viewInterfaceName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, ruComponentFolder) #>';
+import { <#= serviceClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewServiceFolder, ruComponentFolder) #>';
+import { <#= uformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, uformComponentFolder, ruComponentFolder) #>';
+
+@Component({
+  selector: 'app-<#= componentSelectorCommonPart #>',
+  templateUrl: '<#= GetFolderName(Model, ruHtmlFolder, ruComponentFolder) #>.html',
+  styleUrls: ['<#= GetFolderName(Model, ruCssFolder, ruComponentFolder) #>.css']
+})
+
+export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #> {
+<# 
+    if(localize) {
+#>
+    <#= frasesPropName #>: {[key:string]: string}  = {
+        '<#= TitlePropName #>': $localize`:Update <#= Model.Title #>@@<#= componentClassName #>.<#= "Update" + Model.ViewName #>:Update <#= Model.Title #>`,
+    };
+<# 
+    } else {
+#>
+    <#= frasesPropName #>: {[key:string]: string}  = {
+        '<#= TitlePropName #>': 'Update <#= Model.Title #>',
+    };
+<# 
+    } 
+#>
+
+<# 
+    if(localize) {
+#>
+    <#= TitlePropName #>: string|any = '';
+<# 
+    } else {
+#>
+    <#= TitlePropName #>: string|any = this.<#= frasesPropName #>['<#= TitlePropName #>'];
+<# 
+    } 
+#>
+
+    <#= NavPrefix #>: string|any = '';
+    <#= OutletNmPropName #> : string = 'primary';
+    <#= OutletParent #>: string = '';
+
+    @Output('<#= onContainerMenuItemClickSelector #>') <#= onContainerMenuItemClickEmitter #> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
+    @Input('<#= containerMenuItemsSelector #>') <#= containerMenuItemsPropName #>: Array<<#= menuItemDataModelClassName #>> = [];
+    <#= onContainerMenuItemClickMethodName #>(v: <#= eventEmitterDataModelClassName #>)  {
+        this.<#= onContainerMenuItemClickEmitter #>.emit(v);
+    }
+    <#= HiddenFilterPrefix #>: string = '<#= HiddenFilterPrefix + "1" #>';
+    <#= IdPrefix #>: string = '<#= IdPrefix + "1" #>';
+    <#= DepthParamName #>: number = 1;
+    @ViewChild(<#= uformComponentClassName #>) childForm: <#= uformComponentClassName #> | any;
+    <#= HiddenFilterPropName #>: Array<<#= filterResultModelClassName #>> = [];
+    <#= FormControlModelPropName #>: <#= viewInterfaceName #> | null = null;
+    constructor(protected route: ActivatedRoute, protected router: Router, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
+<# 
+    if(localize) {
+#>
+        private L: LocalizationService, 
+<# 
+    }
+#>
+        protected <#= formRootService #>: <#= serviceClassName #>) { 
+<# 
+    if(localize) {
+#>
+        this.<#= frasesPropName #> = {
+            '<#= TitlePropName #>': this.L.instant({
+                key: '<#= apiName #>::<#= Model.ViewName #>:UpdateTitle',
+                defaultValue: "Update <#= Model.Title #>"
+            }) 
+        };
+        this.<#= TitlePropName #>any = this.<#= frasesPropName #>['<#= TitlePropName #>'];
+<# 
+    }
+#>
+    }
+    <#= IsDetailPropName #>: boolean = false;
+    ngOnInit() {
+        if (!(typeof this.route.snapshot.data === 'undefined')) {
+            if (!(this.route.snapshot.data === null)) {
+                if (!(typeof this.route.snapshot.data['<#= TitlePropName #>'] === 'undefined')) {
+                    this.<#= TitlePropName #> = this.route.snapshot.data['<#= TitlePropName #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= routeDepthParamName #>'] === 'undefined')) {
+                    this.<#= DepthParamName #> = this.route.snapshot.data['<#= routeDepthParamName #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= HiddenFilterPrefix #>'] === 'undefined')) {
+                    this.<#= HiddenFilterPrefix #> = this.route.snapshot.data['<#= HiddenFilterPrefix #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= IdPrefix #>'] === 'undefined')) {
+                    this.<#= IdPrefix #> = this.route.snapshot.data['<#= IdPrefix #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= NavPrefix #>'] === 'undefined')) {
+                    this.<#= NavPrefix #> = this.route.snapshot.data['<#= NavPrefix #>'];
+                }
+/*
+                if (!(typeof this.route.snapshot.data['<#= routeOutletNmPropName #>'] === 'undefined')) {
+                    this.<#= OutletNmPropName #> = this.route.snapshot.data['<#= routeOutletNmPropName #>'];
+                }
+*/
+                if (!(typeof this.route.snapshot.data['<#= IsDetailPropName #>'] === 'undefined')) {
+                    this.<#= IsDetailPropName #> = this.route.snapshot.data['<#= IsDetailPropName #>'];
+                }
+/*
+                if (!(typeof this.route.snapshot.data['<#= routeOutletParent #>'] === 'undefined')) {
+                    this.<#= OutletParent #> = this.route.snapshot.data['<#= routeOutletParent #>'];
+                }
+*/
+            }
+        }
+        if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+            this.<#= HiddenFilterPropName #> = this.<#= formRootService #>.get<#= HiddenFilterAsFltRsltSuffix #>(JSON.parse(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]));
+        }
+        if (!(typeof this.route.snapshot.params[this.<#= IdPrefix #>] === 'undefined')) {
+            this.<#= FormControlModelPropName #> =  JSON.parse(this.route.snapshot.params[this.<#= IdPrefix #>]);
+        }
+    }
+    <#= OnAfterSubmitMethodName #>(newVal: <#= viewInterfaceName #>) {
+<#
+        if(primKeys != null) {
+#>      
+        let flt: any = {};
+<#
+            foreach(ModelViewPropertyOfVwSerializable primKey in primKeys) { 
+#>      
+        flt['<#= GetTypeScriptPropertyName(primKey, Model) #>'] = newVal.<#= GetTypeScriptPropertyName(primKey, Model) #>;
+<#
+            }
+#>      
+        let qp: any = {
+            <#= ActionParamName #>: '<#= UPrefix #>',
+            <#= ItemParamName  #>:  JSON.stringify(flt)
+        };
+<#
+
+        } else {
+#>
+        let qp: any = {
+            <#= ActionParamName #>: '<#= UPrefix #>',
+            <#= ItemParamName  #>:  JSON.stringify(newVal)
+        };
+<#
+        }
+#>
+        this.router.navigate(['../../../'], {queryParams: qp, relativeTo: this.route});
+/*
+        if(this.<#= OutletNmPropName #> === 'primary') {
+            this.router.navigate(['../../../'], {queryParams: qp, relativeTo: this.route});
+        } else {
+            let qp0: string[] = [];
+            qp0.push(this.<#= OutletParent #>);
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                qp0.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>])
+            } else {
+                qp0.push(JSON.stringify({}));
+            }
+            this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route.parent!.parent}).then(
+                ()=> {
+                    this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: qp0 }}], {queryParams: qp, relativeTo: this.route.parent!.parent})
+                }
+            );
+        }
+*/
+    }
+
+    onCancel() {
+        this.router.navigate(['../../../'], {relativeTo: this.route});
+/*
+        if(this.<#= OutletNmPropName #> === 'primary') {
+            this.router.navigate(['../../../'], {relativeTo: this.route});
+        } else {
+            let qp: string[] = [];
+            qp.push(this.<#= OutletParent #>);
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>])
+            } else {
+                qp.push(JSON.stringify({}));
+            }
+            this.router.navigate([{outlets: { [this.<#= OutletNmPropName #>]: null}}], {relativeTo: this.route.parent!.parent}).then(
+                ()=> {
+                    this.router.navigate([{ outlets: { [this.<#= OutletNmPropName #>]: qp }}], {relativeTo: this.route.parent!.parent})
+                }
+            );
+        }
+*/
+    }
+    onOk() {
+        if (typeof this.childForm === 'undefined') return;
+        if (this.childForm === null) return;
+        this.childForm.doSubmit();
+    }
+}
+
+

@@ -1,0 +1,59 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+
+    string LModuleServiceFolder                 = "01650-L.module.service.ts";
+    string LModuleServiceClassName              = GetModuleServiceClassName(Model, LModuleServiceFolder);
+
+    string LModuleFolder                        = "01650-L.module.ts";
+    string LModuleClassName                     = GetModuleClassNameWithAnglr(AngularJsonFile, Model, LModuleFolder, LModuleServiceFolder);
+
+    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName           = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, LModuleServiceFolder);
+
+
+    string LComponentFolder                     = "01620-Ldlg.component.ts";
+    string LDlgComponentClassName               = GetComponentClassNameWithAnglr(AngularJsonFile, Model, LComponentFolder, LModuleServiceFolder);
+    string GetMethodPrefix                      = "get";
+    string AppSettingServicePropName            = "appGlblSettings";
+
+    string viewInterfaceDlgFolder               = "01430-Dlg.interface.ts";
+    string viewInterfaceDlgClassName            = GetInterfaceDlgNameWithAnglr(AngularJsonFile, Model, viewInterfaceDlgFolder, LModuleServiceFolder);
+
+#>
+
+import { Injectable } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+// import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, LModuleServiceFolder)#>';
+import { <#= viewInterfaceDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceDlgFolder, LModuleServiceFolder)#>';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class <#= LModuleServiceClassName #> {
+  constructor(private dialog: NgbModal //, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>
+    ) {}
+  async open(data: <#= viewInterfaceDlgClassName #>): Promise<any> {
+    // let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
+    const  <#= LModuleClassName #> = (await import('<#= GetFolderNameWithAnglr(AngularJsonFile, Model, LModuleFolder, LModuleServiceFolder) #>')).<#= LModuleClassName #>;
+    let dialogRef = this.dialog.open(<#= LModuleClassName #>.<#= GetMethodPrefix #><#=  LDlgComponentClassName #>(), {size: 'xl'}); 
+    dialogRef.componentInstance.data = data;
+    return dialogRef.result;
+  }  
+}
+
