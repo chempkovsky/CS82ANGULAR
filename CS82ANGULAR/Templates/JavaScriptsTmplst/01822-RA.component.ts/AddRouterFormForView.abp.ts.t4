@@ -129,7 +129,10 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     if(localize) {
 #>
     <#= frasesPropName #>: {[key:string]: string}  = {
-        '<#= TitlePropName #>': $localize`:Add <#= Model.Title #>@@<#= componentClassName #>.<#= "Add" + Model.ViewName #>:Add <#= Model.Title #>`,
+        '<#= TitlePropName #>': this.L.instant({
+            key: '<#= apiName #>::<#= Model.ViewName #>:AddTitle',
+            defaultValue: "Add <#= Model.Title #>"
+        }) 
     };
 <# 
     } else {
@@ -141,18 +144,7 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     } 
 #>
 
-<# 
-    if(localize) {
-#>
-    <#= TitlePropName #>: string|any = '';
-<# 
-    } else {
-#>
     <#= TitlePropName #>: string|any = this.<#= frasesPropName #>['<#= TitlePropName #>'];
-<# 
-    } 
-#>
-
     <#= NavPrefix #>: string|any = '';
     <#= OutletNmPropName #> : string = 'primary';
     <#= OutletParent #>: string = '';
@@ -176,27 +168,24 @@ export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubMod
     }
 #>
         protected <#= formRootService #>: <#= serviceClassName #>) { 
-<# 
-    if(localize) {
-#>
-        this.<#= frasesPropName #>: {[key:string]: string}  = {
-            '<#= TitlePropName #>': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:AddTitle',
-                defaultValue: "Add <#= Model.Title #>"
-            }) 
-        };
-        this.<#= TitlePropName #>any = this.<#= frasesPropName #>['<#= TitlePropName #>'];
-<# 
-    }
-#>
     }
     <#= IsDetailPropName #>: boolean = false;
     ngOnInit() {
         if (!(typeof this.route.snapshot.data === 'undefined')) {
             if (!(this.route.snapshot.data === null)) {
+<# 
+    if(localize) {
+#>
+                this.<#= TitlePropName #> = this.<#= frasesPropName #>['<#= TitlePropName #>'];
+<# 
+    } else {
+#>
                 if (!(typeof this.route.snapshot.data['<#= TitlePropName #>'] === 'undefined')) {
                     this.<#= TitlePropName #> = this.route.snapshot.data['<#= TitlePropName #>'];
                 }
+<# 
+    }
+#>
                 if (!(typeof this.route.snapshot.data['<#= routeDepthParamName #>'] === 'undefined')) {
                     this.<#= DepthParamName #> = this.route.snapshot.data['<#= routeDepthParamName #>'];
                 }

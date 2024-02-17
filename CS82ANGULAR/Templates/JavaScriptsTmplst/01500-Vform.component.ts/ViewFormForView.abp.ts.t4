@@ -336,15 +336,47 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     if(localize) {
 #>
     <#= frasesPropName #>: {[key:string]: string}  = {
+<#
+        for(int i = 0; i < Model.UIFormProperties.Count; i++) {
+            ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable = Model.UIFormProperties[i];
+#>
+        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label':  this.L.instant({
+            key: '<#= apiName #>::<#= Model.ViewName #>:<#= modelViewUIFormPropertySerializable.ViewPropertyName #>Label',
+            defaultValue: "<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>"
+        }), 
+        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint': this.L.instant({
+            key: '<#= apiName #>::<#= Model.ViewName #>:<#= modelViewUIFormPropertySerializable.ViewPropertyName #>Hint',
+            defaultValue: "<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#>"
+        }),  
+        '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder': this.L.instant({
+            key: '<#= apiName #>::<#= Model.ViewName #>:<#= modelViewUIFormPropertySerializable.ViewPropertyName #>Placeholder',
+            defaultValue: "<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>"
+        }),  
+<#
+        }
+#>
+        'Not-all-props': $localize`: this.L.instant({
+            key: '<#= apiName #>::<#= Model.ViewName #>:NAllPrpsAreSet',
+            defaultValue: "Not all properties are set"
+        }),
+        '<#= captionPropName #>': this.L.instant({
+            key: '<#= apiName #>::<#= Model.ViewName #>:ReviewTitle',
+            defaultValue: "Review <#= Model.Title #>"
+        }),
+        '<#= TitlePropName #>': this.L.instant({
+            key: '<#= apiName #>::<#= Model.ViewName #>:SelTitleCaptionVal',
+            defaultValue: "<#= TitleCaptionVal #>"
+        }),
+        'Not-all-masters': this.L.instant({
+            key: '<#= apiName #>::<#= Model.ViewName #>:NtAllMstSet',
+            defaultValue: "Not all masters have been set"
+        }) 
+
     };
 <# 
     } else {
 #>
     <#= frasesPropName #>: {[key:string]: string}  = {
-        'Not-all-props': 'Not all properties are set',
-        '<#= captionPropName #>': 'Review <#= Model.Title #>',
-        '<#= TitlePropName #>': '<#= TitleCaptionVal #>',
-        'Not-all-masters': 'Not all masters have been set',
 <#
         for(int i = 0; i < Model.UIFormProperties.Count; i++) {
             ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable = Model.UIFormProperties[i];
@@ -355,6 +387,10 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#
         }
 #>
+        'Not-all-props': 'Not all properties are set',
+        '<#= captionPropName #>': 'Review <#= Model.Title #>',
+        '<#= TitlePropName #>': '<#= TitleCaptionVal #>',
+        'Not-all-masters': 'Not all masters have been set'
     };
 <# 
     }
@@ -410,18 +446,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         return this.<#= AppSettingServicePropName #>.getValidationErrorMessage(fc);
     } 
     // start: variable declaration section
-<# 
-    if(localize) {
-#>
-    @Input('<#= captionSelector #>') <#= captionPropName #>: string|any = '';
-<# 
-    } else {
-#>
     @Input('<#= captionSelector #>') <#= captionPropName #>: string|any = this.<#= frasesPropName #>['<#= captionPropName #>'];
-<# 
-    }
-#>
-
 
     @Output('<#= onContainerMenuItemClickSelector #>') <#= onContainerMenuItemClickEmitter #> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
     @Input('<#= containerMenuItemsSelector #>') <#= containerMenuItemsPropName #>: Array<<#= menuItemDataModelClassName #>> = [];
@@ -537,50 +562,6 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 
         protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #> ) {
 
-<# 
-    if(localize) {
-#>
-        this.<#= frasesPropName #> = {
-<#
-        for(int i = 0; i < Model.UIFormProperties.Count; i++) {
-            ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable = Model.UIFormProperties[i];
-#>
-            '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label':  this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:<#= modelViewUIFormPropertySerializable.ViewPropertyName #>Label',
-                defaultValue: "<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>"
-            }), 
-            '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-hint': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:<#= modelViewUIFormPropertySerializable.ViewPropertyName #>Hint',
-                defaultValue: "<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayHintProperty)#>"
-            }),  
-            '<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:<#= modelViewUIFormPropertySerializable.ViewPropertyName #>Placeholder',
-                defaultValue: "<#= GetDisplayAttributeValueString(modelViewUIFormPropertySerializable, Model, DisplayLabelProperty)#>"
-            }),  
-<#
-        }
-#>
-            'Not-all-props': $localize`: this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:NAllPrpsAreSet',
-                defaultValue: "Not all properties are set"
-            }),
-            '<#= captionPropName #>': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:ReviewTitle',
-                defaultValue: "Review <#= Model.Title #>"
-            }),
-            '<#= TitlePropName #>': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:SelTitleCaptionVal',
-                defaultValue: "<#= TitleCaptionVal #>"
-            }),
-            'Not-all-masters': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:NtAllMstSet',
-                defaultValue: "Not all masters have been set"
-            }) 
-        };
-        this.<#= captionPropName #>: string|any = this.<#= frasesPropName #>['<#= captionPropName #>'];
-<# 
-    } 
-#>
         this.<#= RootDataSource #> = new <#= GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, Model.ViewName, viewDatasourceClassFolder, Model, viewformComponentFolder) #> (this.<#= formServicePrefix + Model.ViewName #>,
             this.<#= AppSettingServicePropName #>, null, null, [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, "") #>],'',[]);
         this.<#= RootDataSource #>.set<#= IsNewSuffix #>(false);

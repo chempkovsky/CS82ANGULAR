@@ -151,7 +151,64 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 <# 
     if(localize) {
 #>
-    <#= frasesPropName #>: {[key:string]: string}  = {};
+    <#= frasesPropName #>: {[key:string]: string}  = {
+        '<#= TitlePropName #>': this.L.instant({
+            key: '<#= apiName #>::<#= Model.ViewName #>:ViewTitle',
+            defaultValue: "View <#= Model.Title #>"
+        }), 
+        '<#= NavBackToMasterPropName #>': this.L.instant({
+            key: '<#= apiName #>::<#= Model.ViewName #>:NabBckMstr',
+            defaultValue: "Navigate back to master"
+        }), 
+        'Hide-details': this.L.instant({
+            key: '<#= apiName #>::<#= Model.ViewName #>:HideDtls',
+            defaultValue: "Hide details"
+        }), 
+<#
+    {
+        foreach(string detailVwnm in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailVwnm)) continue;
+            ModelViewSerializable detailView = GetViewByName(Context, detailVwnm);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+#>
+        '<#= viewToNavigate.ViewName +"__"+ detailView.ViewName #>': this.L.instant({
+            key: '<#= apiName #>::<#= Model.ViewName #>:<#= viewToNavigate.PluralTitle #>:<#= detailView.Title #>',
+            defaultValue: "<#= viewToNavigate.PluralTitle #>(<#= detailView.Title #>)"
+        }), 
+<#
+                        continue;
+                    }
+                }
+#>
+        '<#= detailView.ViewName + foreignKey.NavigationName #>': this.L.instant({
+            key: '<#= apiName #>::<#= Model.ViewName #>:<#= detailView.PluralTitle #>:<#= foreignKey.NavigationName #>',
+            defaultValue: "<#= detailView.PluralTitle + "(" + foreignKey.NavigationName + ")" #>"
+        }), 
+<#
+            }
+        }
+    }
+#>
+    };
 <# 
     } else {
 #>
@@ -205,17 +262,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 
 
     public <#= ShowDetailsPropName #>: boolean = false;
-<# 
-    if(localize) {
-#>
-    <#= TitlePropName #>: string|any = '';
-<# 
-    } else {
-#>
     <#= TitlePropName #>: string|any = this.<#= frasesPropName #>['<#= TitlePropName #>'];
-<# 
-    } 
-#>
     <#= NavPrefix #>: string|any = '';
     <#= OutletNmPropName #> : string = 'primary';
     <#= OutletParent #>: string = '';
@@ -239,119 +286,24 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 #>
 
         protected <#= formRootService #>: <#= serviceClassName #>) { 
-<# 
-    if(localize) {
-#>
-        this.<#= frasesPropName #> = {
-            '<#= TitlePropName #>': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:ViewTitle',
-                defaultValue: "View <#= Model.Title #>"
-            }), 
-            '<#= NavBackToMasterPropName #>': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:NabBckMstr',
-                defaultValue: "Navigate back to master"
-            }), 
-            'Hide-details': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:HideDtls',
-                defaultValue: "Hide details"
-            }), 
-<#
-    {
-        foreach(string detailVwnm in detailViewNames) {
-            if(detailViewNamesToExclude.Any(s => s == detailVwnm)) continue;
-            ModelViewSerializable detailView = GetViewByName(Context, detailVwnm);
-            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
-            bool isM2m = false;
-            if(IsTableMatchesIndex(detailView)) {
-                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
-                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
-                        isM2m = true;
-                    }
-                }
-            }
-            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
-                if(isM2m) {
-                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
-                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
-                    if (tmpSearchSchema != null) {
-                        int  cnt = 0;
-                        if(tmpSearchSchema.Item5 == null) continue;
-                        if(tmpSearchSchema.Item5.Count != 1) continue;
-                        if(tmpSearchSchema.Item4 != null) continue;
-                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
-                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
-#>
-            '<#= viewToNavigate.ViewName +"__"+ detailView.ViewName #>': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:<#= viewToNavigate.PluralTitle #>:<#= detailView.Title #>',
-                defaultValue: "<#= viewToNavigate.PluralTitle #>(<#= detailView.Title #>)"
-            }), 
-<#
-                        continue;
-                    }
-                }
-#>
-            '<#= detailView.ViewName + foreignKey.NavigationName #>': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:<#= detailView.PluralTitle #>:<#= foreignKey.NavigationName #>',
-                defaultValue: "<#= detailView.PluralTitle + "(" + foreignKey.NavigationName + ")" #>"
-            }), 
-<#
-            }
-        }
-    }
-#>
-        };
-        this.<#= TitlePropName #>any = this.<#= frasesPropName #>['<#= TitlePropName #>'];
-        this.<#= DetailViewsPropName #> = [
-<#
-    {
-        foreach(string detailVwnm in detailViewNames) {
-            if(detailViewNamesToExclude.Any(s => s == detailVwnm)) continue;
-            ModelViewSerializable detailView = GetViewByName(Context, detailVwnm);
-            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
-            bool isM2m = false;
-            if(IsTableMatchesIndex(detailView)) {
-                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
-                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
-                        isM2m = true;
-                    }
-                }
-            }
-            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
-                if(isM2m) {
-                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
-                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
-                    if (tmpSearchSchema != null) {
-                        int  cnt = 0;
-                        if(tmpSearchSchema.Item5 == null) continue;
-                        if(tmpSearchSchema.Item5.Count != 1) continue;
-                        if(tmpSearchSchema.Item4 != null) continue;
-                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
-                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
-#>
-            {caption: this.<#= frasesPropName #>['<#= viewToNavigate.ViewName +"__"+ detailView.ViewName #>'], vw: '<#= viewToNavigate.ViewName #>', nv: '<#= foreignKey.NavigationName #>', addon: '<#= detailView.ViewName #>'},
-<#
-                        continue;
-                    }
-                }
-#>
-            {caption:this.<#= frasesPropName #>['<#= detailView.ViewName + foreignKey.NavigationName #>'], vw: '<#= detailVwnm #>', nv: '<#= foreignKey.NavigationName #>', addon: '<#= detailVwnm #>'},
-<#
-            }
-        }
-    }
-#>
-        ];
-<# 
-    }
-#>
     }
     <#= IsDetailPropName #>: boolean = false;
     ngOnInit() {
         if (!(typeof this.route.snapshot.data === 'undefined')) {
             if (!(this.route.snapshot.data === null)) {
+<# 
+    if(localize) {
+#>
+                this.<#= TitlePropName #> = this.<#= frasesPropName #>['<#= TitlePropName #>'];
+<# 
+    } else {
+#>
                 if (!(typeof this.route.snapshot.data['<#= TitlePropName #>'] === 'undefined')) {
                     this.<#= TitlePropName #> = this.route.snapshot.data['<#= TitlePropName #>'];
                 }
+<# 
+    }
+#>
                 if (!(typeof this.route.snapshot.data['<#= routeDepthParamName #>'] === 'undefined')) {
                     this.<#= DepthParamName #> = this.route.snapshot.data['<#= routeDepthParamName #>'];
                 }
@@ -453,13 +405,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 
     public <#= SelectedDetailPropName #>: {caption: string, vw: string|null, nv: string|null, addon: string|null}|null = null;
 
-<# 
-    if(localize) {
-#>
-    public <#= DetailViewsPropName #>: Array<{caption: string, vw: string|null, nv: string|null, addon: string|null}> = [];
-<# 
-    } else {
-#>
     public <#= DetailViewsPropName #>: Array<{caption: string, vw: string|null, nv: string|null, addon: string|null}> = [
         {caption:this.<#= frasesPropName #>['Hide-details'], vw:null, nv:null, addon: null},
 <#
@@ -502,13 +447,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     }
 #>
     ];
-<#
-    }
-#>
-    public ngAfterViewInit() {
-        
-    }
-
+    public ngAfterViewInit() {}
     public <#= OnDetailChangedMethodName #>(e: any) {
         if(this.<#= ShowDetailsPropName #>) {
             this.<#= ToDetailMethodName #>();

@@ -361,7 +361,10 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
 <# 
     if(localize) {
 #>
-    @Input('<#= captionSelector #>') <#= captionPropName #>: string = '';
+    @Input('<#= captionSelector #>') <#= captionPropName #>: string = this.L.instant({
+                    key: '<#= apiName #>::<#= Model.ViewName #>:PluralTitle',
+                    defaultValue: "<#= Model.PluralTitle #>"
+            });
 <# 
     } else {
 #>
@@ -373,7 +376,17 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
 
     <#= columnCaptionsPropName + Model.ViewName #>: {[key:string]: string}  = {
 <# 
-    if(!localize) {
+    if(localize) {
+        foreach(ModelViewPropertyOfVwSerializable dispSclProp in Model.ScalarProperties) {
+#>
+        '<#= GetTypeScriptPropertyName(dispSclProp, Model) #>': this.L.instant({
+                    key: '<#= apiName #>::<#= Model.ViewName #>:<#= dispSclProp.ViewPropertyName #>',
+                    defaultValue: "<#=  GetDisplayAttributeValueString(dispSclProp, Model, DisplayLabelProperty) #>"
+                }),
+
+<#
+        }
+    } else {
         foreach(ModelViewPropertyOfVwSerializable dispSclProp in Model.ScalarProperties) {
 #>
         '<#= GetTypeScriptPropertyName(dispSclProp, Model) #>': '<#=  GetDisplayAttributeValueString(dispSclProp, Model, DisplayLabelProperty) #>',
@@ -396,6 +409,10 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
                     ModelViewPropertyOfVwSerializable dispSclProp = GetFirstPropOfFirstUniqueKey(searchModel);
 #>
     <#= columnCaptionsPropName + searchModel.ViewName #>: {[key:string]: string}  = {
+        '<#= GetTypeScriptPropertyName(dispSclProp, searchModel) #>': this.L.instant({
+            key: '<#= apiName #>::<#= searchModel.ViewName #>:<#= dispSclProp.ViewPropertyName #>',
+            defaultValue: "<#=  GetDisplayAttributeValueString(dispSclProp, searchModel, DisplayLabelProperty) #>"
+        })
     };
 <#
                 }
@@ -420,7 +437,10 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
 <# 
         if(localize) {
 #>
-        'fullscann': '',
+        'fullscann': this.L.instant({
+            key: '<#= apiName #>::<#= Model.ViewName #>:FullScan',
+            defaultValue: 'full scan'
+        }),
 <# 
         } else {
 #>
@@ -447,7 +467,15 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
                     if(!uniqueKeys[i].IsPrimary) {
                         caption = uniqueKeys[i].UniqueKeyName;
                     }
-                    if(!localize) {
+                    if(localize) {
+#>
+        '<#= scannByMode + caption #>': this.L.instant({
+                    key: '<#= apiName #>::<#= Model.ViewName #>:ScanBy<#= caption #>',
+                    defaultValue: "filter by <#= caption #>"
+                    }),
+
+<# 
+                    } else {
 #>
         '<#= scannByMode + caption #>': 'filter by <#= caption #>',
 <# 
@@ -458,7 +486,15 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
         if(searchSchemas!= null) {
             foreach(var sch in searchSchemas) {
                 ModelViewSerializable m2mModel = sch.Item1;
-                if(!localize) {
+                if(localize) {
+#>
+        '<#= m2mModel.ViewName #>': this.L.instant({
+                    key: '<#= apiName #>::<#= m2mModel.ViewName #>:ScanByTitle',
+                    defaultValue: "filter by <#= m2mModel.Title #>"
+                    }),
+
+<# 
+                } else {
 #>
         '<#= m2mModel.ViewName #>': 'filter by <#= m2mModel.Title #>',
 <# 
@@ -471,7 +507,10 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
 <# 
         if(localize) {
 #>
-    FltNtAppl: string = '';
+    FltNtAppl: string = this.L.instant({
+            key: '<#= apiName #>::<#= Model.ViewName #>:FltNtAppl',
+            defaultValue: 'Could not apply filter as not all attributes are set'
+        });
 <# 
         } else {
 #>
@@ -479,140 +518,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
 <# 
         }
 #>
-    
-
-    constructor(public  <#= formRootService #>: <#= serviceClassName #>, public <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
-<# 
-    if(localize) {
-#>
-        private L: LocalizationService, 
-<# 
-    }
-#>
-
-<#
-        if(searchSchemas!= null) {
-            List<ModelViewSerializable> smds = new List<ModelViewSerializable>();
-            foreach(var sch in searchSchemas) {
-                ModelViewSerializable m2mModel = sch.Item1;
-#>
-                public  <#= formServicePrefix + m2mModel.ViewName #>: <#= GetServiceClassNameWithAnglrEx(AngularJsonFile, m2mModel, viewServiceFolder, Model, sformComponentFolder) #>,
-<#
-                foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
-                    ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
-                    if(smds.Any(p => p == searchModel)) continue;
-                    smds.Add(searchModel);
-#>
-                public  <#= formServicePrefix + searchModel.ViewName #>: <#= GetServiceClassNameWithAnglrEx(AngularJsonFile, searchModel, viewServiceFolder, Model, sformComponentFolder) #>,
-<#
-                }
-            }
-        } // if(searchSchemas!= null) {...}
-#>    
-            protected dialog: NgbModal,
-            private cd: ChangeDetectorRef) {
-
-<# 
-        if(localize) {
-#>
-            this.<#= columnCaptionsPropName + Model.ViewName #> = {
-<#
-            foreach(ModelViewPropertyOfVwSerializable dispSclProp in Model.ScalarProperties) {
-#>
-                '<#= GetTypeScriptPropertyName(dispSclProp, Model) #>': this.L.instant({
-                    key: '<#= apiName #>::<#= Model.ViewName #>:<#= dispSclProp.ViewPropertyName #>',
-                    defaultValue: "<#=  GetDisplayAttributeValueString(dispSclProp, Model, DisplayLabelProperty) #>"
-                }),
-<#
-            }
-#>
-            };
-
-            this.<#= captionPropName #> = this.L.instant({
-                    key: '<#= apiName #>::<#= Model.ViewName #>:PluralTitle',
-                    defaultValue: "<#= Model.PluralTitle #>"
-            });
-
-<#
-    if(searchSchemas != null) {
-        List<ModelViewSerializable> smds = new List<ModelViewSerializable>();
-        foreach(var sch in searchSchemas) {
-                foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
-                    ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
-                    if(smds.Any(p => p == searchModel)) continue;
-                    smds.Add(searchModel);
-                    ModelViewPropertyOfVwSerializable dispSclProp = GetFirstPropOfFirstUniqueKey(searchModel);
-#>
-            this.<#= columnCaptionsPropName + searchModel.ViewName #> = {
-                '<#= GetTypeScriptPropertyName(dispSclProp, searchModel) #>': this.L.instant({
-                    key: '<#= apiName #>::<#= searchModel.ViewName #>:<#= dispSclProp.ViewPropertyName #>',
-                    defaultValue: "<#=  GetDisplayAttributeValueString(dispSclProp, searchModel, DisplayLabelProperty) #>"
-                }),
-            };
-<#
-                }
-        } // foreach(var sch in searchSchemas) {...}
-    } // if(searchSchemas != null) {...}
-#>
-            this.<#= menuCaptionsPropName #> = {
-                'fullscann': this.L.instant({
-                    key: '<#= apiName #>::<#= Model.ViewName #>:FullScan',
-                    defaultValue: 'full scan'
-                }),
-<# 
-        if (Model.IsWebApiSelectOneByPrimarykey) {
-            for(int i = 0; i < uniqueKeys.Count; i++) { 
-                string indErrrorText = "";
-                bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
-                if (!indIsCorrect) {
-#>
-
-//
-// Could not generate fragment of code
-// Primary/Unique Index Is not correct:
-// <#= indErrrorText #>
-//
-
-<#
-                } else {
-            
-                    string caption = "Primary";
-                    if(!uniqueKeys[i].IsPrimary) {
-                        caption = uniqueKeys[i].UniqueKeyName;
-                    }
-#>
-                '<#= scannByMode + caption #>': this.L.instant({
-                    key: '<#= apiName #>::<#= Model.ViewName #>:ScanBy<#= caption #>',
-                    defaultValue: "filter by <#= caption #>"
-                    }),
-<# 
-                }
-            }
-        }
-        if(searchSchemas!= null) {
-            foreach(var sch in searchSchemas) {
-                ModelViewSerializable m2mModel = sch.Item1;
-#>
-                '<#= m2mModel.ViewName #>': this.L.instant({
-                    key: '<#= apiName #>::<#= m2mModel.ViewName #>:ScanByTitle',
-                    defaultValue: "filter by <#= m2mModel.Title #>"
-                    }),
-<# 
-            }
-        }
-#>
-            };
-
-            this.FltNtAppl = this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:FltNtAppl',
-                defaultValue: 'Could not apply filter as not all attributes are set'
-            });
-<#
-        } // the end of if(localize) { ... }
-#>
-            this.cnFllscn = (<#= AppSettingServicePropName #>.getViewModelMask('<#= Model.ViewName #>') & 16) === 16;
-            this.redefTableIndexMenuItemsData();
-    }
 
     <#= showMultiSelectedRowExPropName #>: boolean = true;
     protected _<#= showMultiSelectedRowPropName #>: boolean|null = true;
@@ -1238,6 +1143,37 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
     @Output('<#= applyFilterSelector #>') <#= applyFilterPropName #>: EventEmitter<<#= componentClassName #>|null> = new EventEmitter<<#= componentClassName #>|null>();
 
     cnFllscn: boolean = false;
+
+    constructor(public  <#= formRootService #>: <#= serviceClassName #>, public <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
+<# 
+        if(localize) {
+#>
+                private L: LocalizationService, 
+<# 
+        }
+        if(searchSchemas!= null) {
+            List<ModelViewSerializable> smds = new List<ModelViewSerializable>();
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+#>
+                public  <#= formServicePrefix + m2mModel.ViewName #>: <#= GetServiceClassNameWithAnglrEx(AngularJsonFile, m2mModel, viewServiceFolder, Model, sformComponentFolder) #>,
+<#
+                foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                    ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                    if(smds.Any(p => p == searchModel)) continue;
+                    smds.Add(searchModel);
+#>
+                public  <#= formServicePrefix + searchModel.ViewName #>: <#= GetServiceClassNameWithAnglrEx(AngularJsonFile, searchModel, viewServiceFolder, Model, sformComponentFolder) #>,
+<#
+                }
+            }
+        } // if(searchSchemas!= null) {...}
+#>    
+            protected dialog: NgbModal,
+            private cd: ChangeDetectorRef) {
+            this.cnFllscn = (<#= AppSettingServicePropName #>.getViewModelMask('<#= Model.ViewName #>') & 16) === 16;
+            this.redefTableIndexMenuItemsData();
+    }
 
     onHiddenFilter() {
         if(this.curIndexMenuItemsData) {

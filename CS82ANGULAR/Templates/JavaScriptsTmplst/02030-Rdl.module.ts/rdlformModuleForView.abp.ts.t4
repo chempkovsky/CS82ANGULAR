@@ -1,0 +1,191 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+    string rdlFormModuleFolder          = "02030-Rdl.module.ts";
+    string rdlFormModuleClassName       = GetModuleClassName(Model, rdlFormModuleFolder);
+
+
+    string materialModuleFolder         = "00010-app-material.module.ts";
+    string materialModuleClassName      = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, materialModuleFolder, rdlFormModuleFolder);
+
+    string flexModuleFolder             = "00011-app-flex-layout.module.ts";
+    string flexModuleClassName          = GetContextModuleClassNameWithAnglr(AngularJsonFile, Model, Context, flexModuleFolder, rdlFormModuleFolder);
+
+    string searchModuleFolder           = "01450-S.module.ts";
+    string searchModuleClassName        = GetModuleClassNameWithAnglr(AngularJsonFile, Model, searchModuleFolder, rdlFormModuleFolder);
+
+    string viewformModuleFolder         = "01550-V.module.ts";
+    string viewformModuleClassName      = GetModuleClassNameWithAnglr(AngularJsonFile, Model, viewformModuleFolder, rdlFormModuleFolder);
+
+    string addformModuleFolder          = "01552-A.module.ts";
+    string addformModuleClassName       = GetModuleClassNameWithAnglr(AngularJsonFile, Model, addformModuleFolder, rdlFormModuleFolder);
+
+    string updformModuleFolder          = "01554-U.module.ts";
+    string updformModuleClassName       = GetModuleClassNameWithAnglr(AngularJsonFile, Model, updformModuleFolder, rdlFormModuleFolder);
+
+    string delformModuleFolder          = "01556-D.module.ts";
+    string delformModuleClassName       = GetModuleClassNameWithAnglr(AngularJsonFile, Model, delformModuleFolder, rdlFormModuleFolder);
+
+    string rdlistComponentFolder        = "02020-Rdlist.component.ts";
+    string rdlComponentClassName        = GetComponentClassNameWithAnglr(AngularJsonFile, Model, rdlistComponentFolder, rdlFormModuleFolder);
+
+    
+    List<string> masterViewNames = new List<string>();
+    masterViewNames = GetSearchDialogViewsList(Model, Context, masterViewNames);
+
+#>
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { CoreModule } from '@abp/ng.core';
+import { RouterModule } from '@angular/router';
+
+import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  flexModuleFolder, rdlFormModuleFolder) #>';
+import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  materialModuleFolder, rdlFormModuleFolder) #>';
+
+<#
+    if(!string.IsNullOrEmpty(rdlComponentClassName)) {
+#>
+import { <#=  searchModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, searchModuleFolder, rdlFormModuleFolder) #>';
+import { <#=  rdlComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, rdlistComponentFolder, rdlFormModuleFolder) #>';
+
+<#
+    }
+    if(!string.IsNullOrEmpty(viewformModuleClassName)) {
+#>
+import { <#=  viewformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewformModuleFolder, rdlFormModuleFolder) #>';
+<#
+    }
+    if(!string.IsNullOrEmpty(addformModuleClassName)) {
+#>
+import { <#=  addformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, addformModuleFolder, rdlFormModuleFolder) #>';
+<#
+    }
+    if(!string.IsNullOrEmpty(updformModuleClassName)) {
+#>
+import { <#=  updformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, updformModuleFolder, rdlFormModuleFolder) #>';
+<#
+    }
+    if(!string.IsNullOrEmpty(delformModuleClassName)) {
+#>
+import { <#=  delformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, delformModuleFolder, rdlFormModuleFolder) #>';
+<#
+    }
+#>
+
+
+<#
+    foreach(string viewName in masterViewNames) {
+        ModelViewSerializable masterView = GetViewByName(Context, viewName);
+        if (masterView == null) {
+#>
+//
+//Error: could not find view by its name <#= viewName #>
+//
+<#
+            continue;
+        }
+#>
+import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, rdlFormModuleFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, rdlFormModuleFolder, Context, masterView.ViewName, searchModuleFolder) #>';
+<#
+    }
+#>
+
+
+
+@NgModule({
+    declarations: [
+<#
+    if(!string.IsNullOrEmpty(rdlComponentClassName)) {
+#>
+        <#=  rdlComponentClassName #>,
+<#
+    }
+#>
+
+    ],
+    imports: [
+        CommonModule,
+        CoreModule,
+        RouterModule,
+        // BrowserModule,
+        <#= materialModuleClassName #>,
+        <#= flexModuleClassName #>,
+
+<#
+    if(!string.IsNullOrEmpty(rdlComponentClassName)) {
+#>
+        <#=  searchModuleClassName #>,
+<#
+    }
+#>
+
+
+
+<#
+    if(!string.IsNullOrEmpty(viewformModuleClassName)) {
+#>
+        <#=  viewformModuleClassName #>,
+<#
+    }
+    if(!string.IsNullOrEmpty(addformModuleClassName)) {
+#>
+        <#=  addformModuleClassName #>,
+<#
+    }
+    if(!string.IsNullOrEmpty(updformModuleClassName)) {
+#>
+        <#=  updformModuleClassName #>,
+<#
+    }
+    if(!string.IsNullOrEmpty(delformModuleClassName)) {
+#>
+        <#=  delformModuleClassName #>,
+<#
+    }
+#>
+
+
+<#
+    foreach(string viewName in masterViewNames) {
+        ModelViewSerializable masterView = GetViewByName(Context, viewName);
+        if (masterView == null) {
+            continue;
+        }
+#>
+        <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, rdlFormModuleFolder) #>,
+<#
+    }
+#>
+
+    ],
+    exports: [
+<#
+    if(!string.IsNullOrEmpty(rdlComponentClassName)) {
+#>
+        <#=  rdlComponentClassName #>,
+<#
+    }
+#>
+    ]
+//    entryComponents: [
+//    ]
+})
+export class <#= rdlFormModuleClassName #> { }
+
+

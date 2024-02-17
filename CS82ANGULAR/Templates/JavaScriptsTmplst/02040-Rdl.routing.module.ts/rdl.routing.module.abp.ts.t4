@@ -1,0 +1,218 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string rdlComponentLazyRoutingModuleFolder      = "02040-Rdl.routing.module.ts";
+    string rdlComponentLazyRoutingModuleClassName   = GetModuleClassName(Model, rdlComponentLazyRoutingModuleFolder);
+
+
+    string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName               = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, rdlComponentLazyRoutingModuleFolder);
+
+    string rdlComponentFolder                       = "02020-Rdlist.component.ts";
+    string rdlComponentClassName                    = GetComponentClassNameWithAnglr(AngularJsonFile, Model, rdlComponentFolder, rdlComponentLazyRoutingModuleFolder);
+
+    string rdlLazyModuleFolder                      = "02050-Rdl-lazy.routing.module.ts";
+
+
+    string OutletNmPropName             = "outletNm";
+    string HiddenFilterPrefix           = "hf";
+    string IdPrefix                     = "id";
+    string VPrefix                      = "View";
+    string APrefix                      = "Add";
+    string UPrefix                      = "Upd";
+    string DPrefix                      = "Del";
+    string DepthParamName               = "depth"; 
+    string uidParamName                 = "uid"; 
+    string OutletNamePrefix             = "oltnm";
+    string DlgLstDetailPrefix           = "DLDT";
+    string OutletParent                 = "oltParent";
+    string IsDetailPropName             = "isdtl";
+    string routeOutletNmPropName        = "oltn";
+
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string FilterMaxHeightPropSelector  = "filter-max-height";
+    string FilterMaxHeightPropName      = "filterMaxHeight";
+    string ShowFilterPropName           = "showFilter";
+    string TitlePropName                = "title";
+    string NavPrefix                    = "np";
+    string DlOutletNamePrefix           = "dloltnm";
+    string routeDepthParamName          = "dp"; 
+    string routeMaxHeightPropName       = "mh";
+    string routeFilterMaxHeightPropName = "fh";
+    string routeOutletParent            = "oltp";
+
+    string routeShowFilterPropName          = "sf";
+    string routeDataViewNamePropName        = "vn";
+    string routeDataViewActionPropName      = "va";
+    string routeDataShowMultiSelectPropName = "ms";
+    string rdllzFrases                      = "rdllz" + Model.ViewName;
+
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
+
+    string OutletNameValue = DlOutletNamePrefix + Model.ViewName;
+    // Model, url, depth
+    List<Tuple<ModelViewSerializable, string, int>> nodes = new List<Tuple<ModelViewSerializable, string, int>>();
+    List<string> viewNames = GetDetailViews(Model, Context, null);
+    List<string> detailViewNames = new List<string>();
+    foreach(string viewName in viewNames) {
+        ModelViewSerializable detailView = GetViewByName(Context, viewName);
+        string newPath = OutletNameValue + "2" + viewName + "/:" + HiddenFilterPrefix + "102";
+        List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+        detailViewNames.Clear();
+        bool isM2m = false;
+        if(IsTableMatchesIndex(detailView)) {
+            if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                    isM2m = true;
+                }
+            }
+        }
+        foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+            if(isM2m) {
+                // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                if (tmpSearchSchema != null) {
+                    int  cnt = 0;
+                    if(tmpSearchSchema.Item5 == null) continue;
+                    if(tmpSearchSchema.Item5.Count != 1) continue;
+                    if(tmpSearchSchema.Item4 != null) continue;
+                    if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                    ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                    string newPathEx = OutletNameValue + "2" + viewToNavigate.ViewName + "/:" + HiddenFilterPrefix + "102";
+                    if (!detailViewNames.Any(v => v == viewToNavigate.ViewName)) {
+                        nodes.Add(new Tuple<ModelViewSerializable, string, int>(viewToNavigate, newPathEx, 2));
+                        detailViewNames.Add(viewToNavigate.ViewName);
+                    }
+                    continue;
+                }
+            }
+            if (!detailViewNames.Any(v => v == detailView.ViewName)) {
+                nodes.Add(new Tuple<ModelViewSerializable, string, int>(detailView, newPath, 2));
+                detailViewNames.Add(detailView.ViewName);
+            }
+        }
+    }
+
+#>
+
+
+
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { <#= appSettingServiceClassName + "Activator" #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, rdlComponentLazyRoutingModuleFolder)#>';
+import { <#= rdlComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, rdlComponentFolder, rdlComponentLazyRoutingModuleFolder) #>';
+
+
+const <#= rdllzFrases #>: {[key:string]: string} = {
+<#
+{
+    List<string> frviewNames = new List<string>();
+    if(localize) {
+        for(int k = nodes.Count-1; k > -1; k--) {
+            Tuple<ModelViewSerializable, string, int> node = nodes[k];
+            ModelViewSerializable aModel = node.Item1;
+            if(frviewNames.Any(p => p == aModel.ViewName)) continue;
+            frviewNames.Add(aModel.ViewName);
+#>
+//        '<#= "List" + aModel.ViewName #>': $localize`:<#= aModel.PluralTitle #>@@<#= rdllzFrases #>.<#= aModel.ViewName #>:<#= aModel.PluralTitle#>`,
+<#
+        }
+    } else {
+        for(int k = nodes.Count-1; k > -1; k--) {
+            Tuple<ModelViewSerializable, string, int> node = nodes[k];
+            ModelViewSerializable aModel = node.Item1;
+            if(frviewNames.Any(p => p == aModel.ViewName)) continue;
+            frviewNames.Add(aModel.ViewName);
+#>
+        '<#= "List" + aModel.ViewName #>': '<#= aModel.PluralTitle #>',
+<#
+        }
+    }
+}
+#>
+} 
+
+const routes: Routes = [
+ {
+    path: '',
+    component: <#= rdlComponentClassName #>,
+    canActivate: [<#= appSettingServiceClassName + "Activator" #>],
+    children: [
+<#
+{
+    for(int k = nodes.Count-1; k > -1; k--) {
+        Tuple<ModelViewSerializable, string, int> node = nodes[k];
+        ModelViewSerializable aModel = node.Item1;
+        int CurrDepth = node.Item3 + 1;
+        string rdlLazyModuleImport = null;
+        if (aModel.CommonStaffs.Any(c => c.FileType == rdlLazyModuleFolder)) {
+            rdlLazyModuleImport = GenerateLoadChildrenImportWithAnglr(AngularJsonFile, aModel, rdlLazyModuleFolder, Model, rdlComponentLazyRoutingModuleFolder);
+        }
+#>
+
+//
+// Info: Root Master View  [<#= Model.ViewName #>] 
+// Info: Detail View  [<#= aModel.ViewName #>] 
+//
+<#
+
+        if(aModel.IsWebApiSelectManyWithPagination) {
+            if(!string.IsNullOrEmpty(rdlLazyModuleImport) && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rdlLazyModuleFolder)))) {
+#>
+    { 
+//        outlet: '<#=  OutletNameValue #>',
+        path: '<#= node.Item2 #>', 
+        <#= rdlLazyModuleImport #>,
+        data: { <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, /* <#= routeOutletNmPropName #>: '<#=  OutletNameValue #>', */ <#= NavPrefix #>: '', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, <# if(!localize) { #> <#= TitlePropName #>: <#= rdllzFrases #>['<#= "List" + aModel.ViewName #>'], <# } #> <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
+        canActivate: [<#= appSettingServiceClassName + "Activator" #>],
+    },
+
+<#
+            } else { // if(!string.IsNullOrEmpty(fileNm_rdl) && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rdlLazyModuleFolder)))) {}
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the component [<#= rdlLazyModuleFolder #>] has not been generated yet
+//
+<#
+            } // if(!string.IsNullOrEmpty(fileNm_rdl) && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rdlLazyModuleFolder)))) {} else {}
+        } else { // if(aModel.IsWebApiSelectManyWithPagination) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] SelectManyWithPagination is set to false
+//
+<#
+        } // if(aModel.IsWebApiSelectManyWithPagination) { } else { ... }
+    } // for(int k = nodes.Count-1; k > -1; k--) {
+}
+#>
+
+    ]
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class <#= rdlComponentLazyRoutingModuleClassName #> { }
+
+

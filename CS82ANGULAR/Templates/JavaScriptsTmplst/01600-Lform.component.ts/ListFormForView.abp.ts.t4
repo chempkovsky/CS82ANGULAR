@@ -296,7 +296,39 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     if(localize) {
 #>
     <#= frasesPropName #>: {[key:string]: string}  = {
-    }
+        '<#= captionPropName #>': this.L.instant({
+                key: '<#= apiName #>::<#= Model.ViewName #>:PluralTitle',
+                defaultValue: "<#= Model.PluralTitle #>"
+            }), 
+        '<#= ActionParamUpdateMode #>': this.L.instant({
+                key: '<#= apiName #>::<#= Model.ViewName #>:Edit',
+                defaultValue: "Modify Item"
+            }), 
+        '<#= ActionParamDeleteMode #>': this.L.instant({
+                key: '<#= apiName #>::<#= Model.ViewName #>:Delete',
+                defaultValue: "Delete Item"
+            }), 
+        '<#= ActionParamViewMode #>': this.L.instant({
+                key: '<#= apiName #>::<#= Model.ViewName #>:View',
+                defaultValue: "View Item"
+            }), 
+        '<#= ActionParamAddMode #>': this.L.instant({
+                key: '<#= apiName #>::<#= Model.ViewName #>:Add',
+                defaultValue: "Add Item"
+            }), 
+        '<#= ActionParamDeleteSelMode #>': this.L.instant({
+                key: '<#= apiName #>::<#= Model.ViewName #>:DelSel',
+                defaultValue: "Delete Selected"
+            }), 
+        '<#= permissionPropName #>': this.L.instant({
+                key: '<#= apiName #>::<#= Model.ViewName #>:Permission',
+                defaultValue: "Permission"
+            }), 
+        '<#= accessDeniedPropName #>': this.L.instant({
+                key: '<#= apiName #>::<#= Model.ViewName #>:AccDen',
+                defaultValue: "Access denied"
+            }) 
+    };
 <# 
     } else {
 #>
@@ -309,7 +341,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         '<#= ActionParamDeleteSelMode #>': 'Delete Selected',
         '<#= permissionPropName #>': 'Permission',
         '<#= accessDeniedPropName #>': 'Access denied',
-    }
+    };
 <#
    }
 #>
@@ -320,19 +352,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     <#= onMultiSelectedRowPropName #>(e: Array<<#= viewInterfaceName #>>): void {
         this.<#= multiSelectedRowPropName #>.emit(e);
     }
-
-<# 
-    if(localize) {
-#>
-    @Input('<#= captionSelector #>') <#= captionPropName #>: string = '';
-<# 
-    } else {
-#>
     @Input('<#= captionSelector #>') <#= captionPropName #>: string = this.<#= frasesPropName #>['<#= captionPropName #>'];
-<# 
-    }
-#>
-
     @Input('<#= FilterMaxHeightPropSelector #>')  <#= FilterMaxHeightPropName #>: number | any = null;
     @Input('<#= MaxHeightPropSelector #>') <#= MaxHeightPropName #>: number | any = null;
 
@@ -485,28 +505,15 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 #>
         }
 
-<# 
-    if(localize) {
-#>
-    rowMenuItemsData = [];
-    tableMenuItemsData = [];
-<# 
-    } else {
-#>
-    rowMenuItemsData = [
-          {id: '<#= ActionParamUpdateMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'], iconName: 'fa-edit', iconColor: 'primary', enabled: true},
-          {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'fa-trash', iconColor: 'warn', enabled: true},
-          {id: '<#= ActionParamViewMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'fa-eye', iconColor: 'primary', enabled: true},
+    rowMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
+            {id: '<#= ActionParamUpdateMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'], iconName: 'fa-edit', iconColor: 'primary', enabled: true},
+            {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'fa-trash', iconColor: 'warn', enabled: true},
+            {id: '<#= ActionParamViewMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'fa-eye', iconColor: 'primary', enabled: true},
         ];
-    tableMenuItemsData = [
+    tableMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
         {id: '<#= ActionParamAddMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'], iconName: 'fa-plus', iconColor: 'primary', enabled: true},
         {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'], iconName: 'fa-trash', iconColor: 'warn', enabled: true},
-      ];
-<# 
-    }
-#>
-
-
+        ];
     constructor(private  <#= formRootService #>: <#= serviceClassName #>, 
 <#
     if(Model.IsWebApiSelectOneByPrimarykey) {
@@ -539,66 +546,6 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
     }
 #>
         protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, public dialog: NgbModal, private cd: ChangeDetectorRef) {
-
-<# 
-    if(localize) {
-#>
-    this.<#= frasesPropName #> = {
-        '<#= captionPropName #>':
-:           this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:PluralTitle',
-                defaultValue: "<#= Model.PluralTitle #>"
-            }), 
-        '<#= ActionParamUpdateMode #>': 
-:           this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:Edit',
-                defaultValue: "Modify Item"
-            }), 
-        '<#= ActionParamDeleteMode #>':
-:           this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:Delete',
-                defaultValue: "Delete Item"
-            }), 
-        '<#= ActionParamViewMode #>': $localize`:View Item@@<#= componentClassName #>.<#= ActionParamViewMode #>:View Item`,
-:           this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:View',
-                defaultValue: "View Item"
-            }), 
-        '<#= ActionParamAddMode #>': $localize`:Add Item@@<#= componentClassName #>.<#= ActionParamAddMode #>:Add Item`,
-:           this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:Add',
-                defaultValue: "Add Item"
-            }), 
-        '<#= ActionParamDeleteSelMode #>': $localize`:Delete Selected@@<#= componentClassName #>.<#= ActionParamDeleteSelMode #>:Delete Selected`,
-:           this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:DelSel',
-                defaultValue: "Delete Selected"
-            }), 
-        '<#= permissionPropName #>': $localize`:Permission@@<#= componentClassName #>.<#= permissionPropName #>:Permission`,
-:           this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:Permission',
-                defaultValue: "Permission"
-            }), 
-        '<#= accessDeniedPropName #>': $localize`:Access denied@@<#= componentClassName #>.<#= accessDeniedPropName #>:Access denied`,
-:           this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:AccDen',
-                defaultValue: "Access denied"
-            }) 
-    }
-    this.<#= captionPropName #>: string = this.<#= frasesPropName #>['<#= captionPropName #>'];
-
-    this.rowMenuItemsData = [
-          {id: '<#= ActionParamUpdateMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'], iconName: 'fa-edit', iconColor: 'primary', enabled: true},
-          {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'fa-trash', iconColor: 'warn', enabled: true},
-          {id: '<#= ActionParamViewMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'fa-eye', iconColor: 'primary', enabled: true},
-        ];
-    this.tableMenuItemsData = [
-        {id: '<#= ActionParamAddMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'], iconName: 'fa-plus', iconColor: 'primary', enabled: true},
-        {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'], iconName: 'fa-trash', iconColor: 'warn', enabled: true},
-      ];
-<# 
-    }
-#>
     }
     permMask: number = 0;
     ngOnInit() {
