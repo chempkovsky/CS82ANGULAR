@@ -32,7 +32,7 @@
 // set _IsDefined
 
     Dictionary<string, string> RegExps = new Dictionary<string, string>() {
-            { "RegExpGuid"       , @"/^\{?[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89ABab][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}\}?$/" },
+            { "RegExpGuid"       , @"/^[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$/" },
             { "RegExpInteger"    , @"/^[-+]?\d+$/" },
             { "RegExpFloat"      , @"/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/" },
             { "RegExpEmail"      , @"/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/" },
