@@ -1,0 +1,256 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string HiddenFilterPrefix           = "hf";
+    string IdPrefix                     = "id";
+    string ItemParamName                = "item";  
+    string VPrefix                      = "View";
+    string APrefix                      = "Add";
+    string UPrefix                      = "Upd";
+    string DPrefix                      = "Del";
+    string DepthParamName               = "depth"; 
+    string HiddenFilterAsFltRsltSuffix  = "HiddenFilterAsFltRslt";
+    string HiddenFilterByRowSuffix      = "HiddenFilterByRow";
+    string uidParamName                 = "uid"; 
+    string routeFilterMaxHeightPropName = "fh";
+
+    string NavPrefix                    = "np";
+    string OutletNmPropName             = "outletNm";
+    string IsDetailPropName             = "isdtl";
+    string routeShowFilterPropName      = "sf";
+    string routeDepthParamName          = "dp"; 
+    string routeMaxHeightPropName       = "mh";
+    string routeOutletNmPropName        = "oltn";
+
+    string getStorageItemMethodName     = "getStorageItem";
+    string setStorageItemMethodName     = "setStorageItem";
+    string getStorageLengthMethodName   = "getStorageLength";
+    string removeStorageItemMethodName  = "removeStorageItem";
+    string getStorageKeyMethodName      = "getStorageKey";
+    string clearStorageMethodName       = "getStorageKey";
+
+    string GetOneMethodName             = "getone";
+    string DeleteOneMethodName          = "deleteone";
+
+
+    string ActionParamName              = "mode";  
+    string ActionParamAddMode           = "add";
+    string ActionParamUpdateMode        = "update";
+    string ActionParamDeleteMode        = "delete";
+    string ActionParamDeleteSelMode     = "deletesel";
+    string ActionParamNavM2mNotAllwd    = "nvm2mntallwd";
+    string ActionParamViewMode          = "view";
+    string ViewNameParamName            = "view";
+    string NavigationParamName          = "nav";
+    string NavigationAddOnName          = "addon";
+    string permissionPropName           = "permission";
+    string accessDeniedPropName         = "accessdenied";
+
+    // WebApi service's method names
+
+    string CanAddSelector           = "can-add";
+    string CanAddPropName           = "canAdd";
+    string CanUpdSelector           = "can-update";
+    string CanUpdPropName           = "canUpdate";
+    string CanDelSelector           = "can-delete";
+    string CanDelPropName           = "canDelete";
+    string HiddenFilterSelector     = "hidden-filter";
+    string HiddenFilterPropName     = "hiddenFilter";
+    string ShowFilterSelector       = "show-filter";
+    string ShowFilterPropName       = "showFilter";
+    string applyFilterSelector      = "apply-filter";
+    string applyFilterPropName      = "applyFilter";
+    string ShowErrorMethodName      = "showError";
+
+
+    string AppSettingServicePropName    = "appGlblSettings";
+    string formRootService              = "frmRootSrv";
+    string formServicePrefix            = "frmSrv";
+
+    
+    string RowCommandsSelector          = "row-commands";
+    string RowCommandsPropName          = "rowCommands";
+    string TableCommandsSelector        = "table-commands";
+    string TableCommandsPropName        = "tableCommands";
+
+    string OnRowCommandSelector         = "on-row-command";
+    string OnRowCommandPropName         = "onRowCommand";
+    string OnTableCommandSelector       = "on-table-command";
+    string OnTableCommandPropName       = "onTableCommand";
+
+    string externalFilterSelector               = "external-filter";
+    string externalFilterPropName               = "externalFilter";
+    string beforeSquerySelector                 = "before-squery";
+    string beforeSqueryPropName                 = "beforeSquery";
+    string OnBeforeSqueryMethodName             = "onBeforeSquery";
+
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string FilterMaxHeightPropSelector  = "filter-max-height";
+    string FilterMaxHeightPropName      = "filterMaxHeight";
+    string frasesPropName               = "frases";
+
+    string rlistCssFolder                       = "01920-Rlist.component.css";
+    string rlistHtmlFolder                      = "01920-Rlist.component.html";
+    string rlistComponentFolder                 = "01920-Rlist.component.ts";
+    string componentClassName                   = GetComponentClassName(Model, rlistComponentFolder);
+    string componentSelectorCommonPart          = GetComponentSelectorCommonPart(Model, rlistComponentFolder);
+
+    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName           = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, rlistComponentFolder);
+
+    string eventEmitterDataModelFolder          = "00018-event-emitter-data.interface.ts";
+    string eventEmitterDataModelClassName       = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterDataModelFolder, rlistComponentFolder);
+
+    string menuItemDataModelFolder              = "00017-menu-item-data.interface.ts";
+    string menuItemDataModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, menuItemDataModelFolder, rlistComponentFolder);
+
+    string eventEmitterPubModelFolder           = "00019-event-emitter-pub.interface.ts";
+    string eventEmitterPubModelClassName        = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, rlistComponentFolder);
+
+    string filterResultModelFolder              = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, filterResultModelFolder, rlistComponentFolder);
+
+    string itemHeightDataModelFolder            = "00016-item-height-data.interface.ts";
+    string itemHeightDataModelClassName         = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, itemHeightDataModelFolder, rlistComponentFolder);
+
+    string messageDialogInterfaceFolder         = "00037-message-dialog.interface.ts";
+    string messageDialogInterfaceName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, messageDialogInterfaceFolder, rlistComponentFolder);
+
+    string messageDialogComponentFolder         = "00038-message-dialog.component.ts";
+    string messageDialogComponentClassName      = GetContextComponentClassNameWithAnglr(AngularJsonFile, Model, Context, messageDialogComponentFolder, rlistComponentFolder);
+
+    string viewInterfaceFolder                  = "01100-.interface.ts";
+    string viewInterfaceName                    = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, rlistComponentFolder);
+
+    string viewServiceFolder                    = "01400-.service.ts";
+    string serviceClassName                     = GetServiceClassNameWithAnglr(AngularJsonFile, Model, viewServiceFolder, rlistComponentFolder);
+
+    string sformComponentFolder                 = "01420-Sform.component.ts";
+    string searchComponentClassName             = GetComponentClassNameWithAnglr(AngularJsonFile, Model, sformComponentFolder, rlistComponentFolder);
+
+
+
+
+    string ActionColumnDefProperty      = "menuAction";
+    string SelectColumnDefProperty      = "selectAction";
+    string DisplayedColumnsProperty     = "displayedColumns";
+    string MatPaginatorPageSize         = "10";
+    string MatPaginatorPageSizeOptions  = "[10, 25, 50, 100]";
+
+
+
+    List<ModelViewPropertyOfVwSerializable> primKeys= GetModelPrimaryKeyProps(Model);
+    List<string> detailViewNames =  GetDetailViews(Model, Context, null);
+    List<string> detailViewNamesToExclude = new List<string>();
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
+        GetSearchResources(Model, Context);
+
+    string OnBackBtnMethodName          = "onBackBtnMd";
+    string OnBackBtnPropName            = "onBackBtn";
+    string OnBackBtnSelector            = "on-back-btn";
+    string showBackBtnPropName          = "showBackBtn";
+    string showBackBtnSelector          = "show-back-btn";
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+    string currentRowPropName           = "currentRow";
+    string OnSelectRowMethodName        = "onSelectRow";
+    string showMultiSelectPropName      = "showMultiSelect";
+    string showMultiSelectedRowSelector = "show-multi-selected-row";
+    string showMultiSelectedRowPropName = "showMultiSelectedRow";
+    string multiSelectedRowSelector     = "multi-selected-row";
+    string multiSelectedRowPropName     = "multiSelectedRow";
+    string onMultiSelectedRowPropName   = "onMultiSelectedRow";
+    string currentMultiRowPropName      = "currentMultiRow";
+    string LOutletNamePrefix            = "loltnm"; //
+    string OnDetailChangedMethodName    = "onDetailChanged";
+    string ToDetailMethodName           = "toDetail";
+    string SelectedDetailPropName       = "selectedDetail";
+    string DetailViewsPropName          = "detailViews";
+    string ShowDetailsPropName          = "showDetails";
+    string AppearancePropName           = "appearance";
+    string selectedRowSelector          = "selected-row";
+    string selectedRowPropName          = "selectedRow";
+
+    string OutletNameValue = LOutletNamePrefix + Model.ViewName;
+
+    string DlgSrvPrefix                 = "dlgSrv";
+    string apiName                      = AbpFirstItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
+
+#>
+
+        "<#= apiName #>::<#= Model.ViewName #>:HideDtls": "Hide details",
+        "<#= apiName #>::<#= Model.ViewName #>:<#= ActionParamNavM2mNotAllwd #>": "Navigating to detail form is not allowed in One-to-Many mode",
+        "<#= apiName #>::<#= Model.ViewName #>:PluralTitle": "<#= Model.PluralTitle #>",
+        "<#= apiName #>::<#= Model.ViewName #>:Edit": "Modify Item",
+        "<#= apiName #>::<#= Model.ViewName #>:Delete": "Delete Item",
+        "<#= apiName #>::<#= Model.ViewName #>:View": "View Item",
+        "<#= apiName #>::<#= Model.ViewName #>:Add": "Add Item",
+        "<#= apiName #>::<#= Model.ViewName #>:DelSel": "Delete Selected",
+        "<#= apiName #>::<#= Model.ViewName #>:Permission": "Permission",
+        "<#= apiName #>::<#= Model.ViewName #>:AccDen": "Access denied",
+<#
+        foreach(string detailViewName in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;
+            ModelViewSerializable detailView = GetViewByName(Context, detailViewName);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            if (foreignKeys == null) continue;
+            if (foreignKeys.Count < 1) continue;
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+#>
+        "<#= apiName #>::<#= Model.ViewName #>:<#= viewToNavigate.PluralTitle #>:<#= detailView.Title #>": "<#= viewToNavigate.PluralTitle #>(<#= detailView.Title #>)",
+<#
+                        continue;
+                    }
+                }
+#>
+        "<#= apiName #>::<#= Model.ViewName #>:<#= detailView.PluralTitle #>:<#= foreignKey.NavigationName #>": "<#= detailView.PluralTitle + "(" + foreignKey.NavigationName + ")" #>"
+<#
+            }
+        }
+#>

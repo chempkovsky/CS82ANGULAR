@@ -141,6 +141,11 @@ import { <#= viewInterfaceName #> } from '<#=  GetFolderNameWithAnglr(AngularJso
 import { <#= serviceClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewServiceFolder, rvComponentFolder) #>';
 import { <#= vformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, vformComponentFolder, rvComponentFolder) #>';
 
+/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
+/* eslint-disable @angular-eslint/no-input-rename */
+/* eslint-disable @angular-eslint/no-output-rename */
+/* eslint-disable @angular-eslint/no-output-on-prefix */
+
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, rvHtmlFolder, rvComponentFolder) #>.html',

@@ -259,7 +259,7 @@
 <#
                                         } else {
 #>
-                        <input class="form-control" <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #>  placeholder="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
+                        <input class="form-control" <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #>  [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>">
 <#
                                         }
                                     }

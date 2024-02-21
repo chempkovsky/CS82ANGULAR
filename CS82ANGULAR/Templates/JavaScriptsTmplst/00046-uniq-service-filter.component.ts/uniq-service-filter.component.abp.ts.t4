@@ -51,7 +51,7 @@
 
 
     Dictionary<string, string> RegExps = new Dictionary<string, string>() {
-            { "RegExpGuid"       , @"/(?im)^[{(]?[0-9A-F]{8}[-]?(?:[0-9A-F]{4}[-]?){3}[0-9A-F]{12}[)}]?$/" },
+            { "RegExpGuid"       , @"/^\{?[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89ABab][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}\}?$/" },
             { "RegExpInteger"    , @"/^[-+]?\d+$/" },
             { "RegExpFloat"      , @"/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/" },
             { "RegExpEmail"      , @"/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/" },
@@ -545,11 +545,25 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
         let notIgnor: boolean = true;
         let msg: string = 'The following properties will be ignored: ';
         let showMsg: boolean = false;
-        this.webServiceFilters.forEach(i => {
+        this.webServiceFilters.forEach((i,ind) => {
           if (i.fltrValue.enabled) {
             if(i.fltrValue.valid) {
                 if(notIgnor) {
-                    result.push({fltrName: i.fltrName, fltrDataType: i.fltrDataType, fltrOperator: 'eq', fltrValue: i.fltrValue.value});
+                    let l_val: any = null;
+                    if(typeof i.fltrValue.value === 'object') {
+                        if(this.<#= tpAheadValPropName #>) {
+                            l_val = this.<#= tpAheadValPropName #>(i.fltrValue.value, ind);
+                        }
+                    } else {
+                        l_val = i.fltrValue.value;
+                    }
+                    if (l_val) {
+                        result.push({fltrName: i.fltrName, fltrDataType: i.fltrDataType, fltrOperator: 'eq', fltrValue: l_val});
+                    } else {
+                        notIgnor = false;
+                        msg = msg + i.fltrCaption + '; ';
+                        showMsg = true;
+                    }
                 } else {
                     msg = msg + i.fltrCaption + '; ';
                     showMsg = true;

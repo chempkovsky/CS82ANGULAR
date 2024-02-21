@@ -1624,6 +1624,20 @@
             }
             return GetNameByAngularJson(result, anglJson, refItem, curItem);
         }
+        string GetModuleServiceClassNameExWithAnglrEx(AngularJson anglJson, DbContextSerializable context, string viewName, string fileType, ModelViewSerializable currModel, string currFolder)
+        {
+            ModelViewSerializable model = null;
+            if (context == null)
+            {
+                return GetModuleServiceClassNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+            }
+            if (context.ModelViews == null)
+            {
+                return GetModuleServiceClassNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+            }
+            model = context.ModelViews.Where(v => v.ViewName == viewName).FirstOrDefault();
+            return GetModuleServiceClassNameWithAnglrEx(anglJson, model, fileType, currModel, currFolder);
+        }
 
         string GetContextModuleClassName(DbContextSerializable context, string fileType)
         {

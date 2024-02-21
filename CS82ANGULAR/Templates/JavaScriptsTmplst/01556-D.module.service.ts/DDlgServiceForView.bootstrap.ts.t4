@@ -32,22 +32,22 @@
     string GetMethodPrefix                      = "get";
     string AppSettingServicePropName            = "appGlblSettings";
 
-    string delInterfaceDlgFolder                = "01516-Ddlg.interface.ts";
-    string delInterfaceDlgClassName             = GetInterfaceDlgNameWithAnglr(AngularJsonFile, Model, delInterfaceDlgFolder, delModuleServiceFolder);
+    string viewInterfaceDDlgFolder              = "01516-Ddlg.interface.ts";
+    string viewInterfaceDDlgClassName           = GetInterfaceDDlgNameWithAnglr(AngularJsonFile, Model,  viewInterfaceDDlgFolder, delModuleServiceFolder);
 
 #>
 
 import { Injectable } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, delModuleServiceFolder)#>';
-import { <#= delInterfaceDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, delInterfaceDlgFolder, delModuleServiceFolder)#>';
+import { <#= viewInterfaceDDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceDDlgFolder, delModuleServiceFolder)#>';
 
 @Injectable({
   providedIn: 'root',
 })
 export class <#= delModuleServiceClassName #> {
   constructor(private dialog: NgbModal, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {}
-  async open(data: <#= delInterfaceDlgClassName #>): Promise<any> {
+  async open(data: <#= viewInterfaceDDlgClassName #>): Promise<any> {
     let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
     const  <#= delModuleClassName #> = (await import('<#= GetFolderNameWithAnglr(AngularJsonFile, Model, delModuleFolder, delModuleServiceFolder) #>')).<#= delModuleClassName #>;
     let dialogRef = this.dialog.open(<#= delModuleClassName #>.<#= GetMethodPrefix #><#=  delDlgComponentClassName #>(), {size: w}); 

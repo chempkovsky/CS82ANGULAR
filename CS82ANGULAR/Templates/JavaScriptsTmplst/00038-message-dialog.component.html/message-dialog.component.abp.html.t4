@@ -27,7 +27,7 @@
     <h3 mat-dialog-title>{{data.title}}</h3>
 </div>
 <div class="modal-body">
-    <i class="{{'material-icons ml-1 text-'+ data.iconcolor}}">{{data.iconname}}</i>
+    <i class="{{'fa ' + data.iconname + ' ml-1 text-'+ data.iconcolor}}"></i>
     <span>&nbsp;&nbsp;</span>
     <span>&nbsp;&nbsp;</span>
     <label>{{data.message}}</label>

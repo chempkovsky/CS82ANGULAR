@@ -52,6 +52,7 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { CoreModule } from '@abp/ng.core';
 
 import { <#=  flexModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  flexModuleFolder, dformModuleFolder) #>';
 import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  materialModuleFolder, dformModuleFolder) #>';
@@ -84,6 +85,7 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
     ],
     imports: [
         CommonModule,
+        CoreModule,
         <#= materialModuleClassName #>,
         <#= flexModuleClassName #>,
         <#= formatterModuleClassName #>,

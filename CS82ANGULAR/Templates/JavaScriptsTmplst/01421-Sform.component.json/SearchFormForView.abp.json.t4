@@ -1,0 +1,361 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="json" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string OperatorSufix        = "Oprtr";
+    string EqualOperator        = "eq";
+    string LikeOperator         = "lk";
+
+    // WebApi service's method names
+
+    string showAddFltItemSelector       = "show-add-flt-item";
+    string showAddFltItemPropName       = "showAddFltItem";
+
+    string GetAllMethodName         = "getall";
+    string GetWithFilterMethodName  = "getwithfilter";
+    string GetOneMethodName         = "getone";
+    string UpdateOneMethodName      = "updateone";
+    string AddOneMethodName         = "addone";
+    string DeleteOneMethodName      = "deleteone";
+    string GetManyByRepPrimMethodNamePrefix     = "getmanybyrepprim";
+    string GetManyByRepUnqMethodNamePrefix      = "getmanybyrepunq";
+    string src2destMethodName       = "src2dest";
+
+    string searchShowFilterPropName     = "searchShowFilter";
+    string searchShowAddFltItemPropName = "searchShowAddFltItem";
+    string searchOnSelectRowMethodName  = "srchOnSlctRw";
+    string searchDoSelectRowMethodName  = "srchDoSlctRw";
+    string searchSelectRowPropName      = "srchSlctRw";
+    string searchMaxHeightPropName      = "searchMaxHeight";
+    string searchFilterMaxHeightPropName= "searchFilterMaxHeight";
+    string scannByMode                  = "scannBy";
+    string currentSortColumnPropName    = "currentSortColumn";
+
+
+    string DisplayLabelProperty     = "Name";
+    string DisplayHintProperty      = "Prompt";
+
+    string CanAddSelector           = "can-add";
+    string CanAddPropName           = "canAdd";
+    string CanUpdSelector           = "can-update";
+    string CanUpdPropName           = "canUpdate";
+    string CanDelSelector           = "can-delete";
+    string CanDelPropName           = "canDelete";
+    string ShowFilterSelector       = "show-filter";
+    string ShowFilterPropName       = "showFilter";
+
+    string externalFilterSelector       = "external-filter";
+    string externalFilterPropName       = "externalFilter";
+    string externalFilterExPropName     = "externalFilterEx";
+    string externalFilterRsltPropName   = "externalFilterRslt";
+    string beforeSquerySelector         = "before-squery";
+    string beforeSqueryPropName         = "beforeSquery";
+    string onBeforeSqueryPropName       = "onBeforeSquery";
+    string OnSelectRowMethodName        = "onSelectRow";
+    string HiddenFilterAsFltRsltSuffix  = "HiddenFilterAsFltRslt";
+    string HiddenFilterByRowSuffix      = "HiddenFilterByRow";
+    string clearDatasourceMethodName    = "clrDs";
+    string row2FilterRsltMethodName     = "row2FilterRslt";
+    string filterRslt2rowMethodName     = "filterRslt2row";
+
+
+    string RowCommandsSelector      = "row-commands";
+    string RowCommandsPropName      = "rowCommands";
+
+    string OnRowCommandSelector     = "on-row-command";
+    string OnRowCommandPropName     = "onRowCommand";
+    string OnTableCommandSelector   = "on-table-command";
+    string OnTableCommandPropName   = "onTableCommand";
+
+    string OverflowSelector             = "ovrflw";
+    string OverflowPropName             = "ovrflw";
+
+
+    Dictionary<string, string> RegExps = new Dictionary<string, string>() {
+            { "RegExpGuid"       , @"/^\{?[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89ABab][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}\}?$/" },
+            { "RegExpInteger"    , @"/^[-+]?\d+$/" },
+            { "RegExpFloat"      , @"/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/" },
+            { "RegExpEmail"      , @"/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/" },
+            { "RegExpCurrency"   , @"/(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/" }
+            };
+
+    string ComboSufix               = "CmbCntrl";
+    string ButtonSufix              = "BttnItm";
+    string TypeaheadSufix           = "TphdCntrl";
+
+    string TypeaheadAddDisplaySufix = "AddDsplFn";
+    string TypeaheadUpdDisplaySufix = "UpdDsplFn";
+    string TypeaheadDelDisplaySufix = "DelDsplFn";
+
+    string SearchClickSufix         = "SrchClck";
+
+    string formServicePrefix        = "frmSrv";
+    string formRootService          = "frmRootSrv";
+
+    string MainFormGroupName        = "mainFormGroup";
+
+    string EformModeSelector        = "eform-mode";
+    string EformModePropName        = "eformMode";
+
+    string selectedRowSelector        = "selected-row";
+    string selectedRowPropName        = "selectedRow";
+
+    string multiSelectedRowSelector   = "multi-selected-row";
+    string multiSelectedRowPropName   = "multiSelectedRow";
+
+    string showMultiSelectedRowSelector   = "show-multi-selected-row";
+    string showMultiSelectedRowPropName   = "showMultiSelectedRow";
+    string showMultiSelectedRowExPropName = "showMultiSelectedRowEx";
+
+    string TableCommandsSelector    = "table-commands";
+    string TableCommandsPropName    = "tableCommands";
+    string TableCommandsExPropName  = "tableCommandsEx";
+
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string MaxHeightExPropName          = "maxHeightEx";
+
+    string HiddenFilterSelector     = "hidden-filter";
+    string HiddenFilterPropName     = "hiddenFilter";
+    string HiddenFilterExPropName   = "hiddenFilterEx";
+
+    string FilterMaxHeightPropSelector  = "filter-max-height";
+    string FilterMaxHeightPropName      = "filterMaxHeight";
+
+    string applyFilterSelector        = "apply-filter";
+    string applyFilterPropName        = "applyFilter";
+
+    string currentRowPropName        = "currentRow";
+    string currentMultiRowPropName   = "currentMultiRow";
+
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+    
+    string FormControlModelSelector     = "eform-control-model";
+    string FormControlModelPropName     = "eformControlModel";
+    string FormControlNewModelPropName  = "eformNewControlModel";
+    
+    string AppSettingServicePropName    = "appGlblSettings";
+    string ShowErrorMethodName          = "showError";
+
+
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+
+    string tpAheadVarsPropName          = "tpAheadVars";
+    string tpAheadValPropName           = "tpAheadVal";
+    string tpAheadValSelector           = "tp-ahead-val";
+    string tpAheadFncPropName           = "tpAheadFnc";
+    string tpAheadFncSelector           = "tp-ahead-fnc";
+    string tpAheadSrvPropName           = "tpAheadSrv";
+    string tpAheadSrvSelector           = "tp-ahead-srv";
+    string tpAheadCptnPropName          = "tpAheadCptn";
+    string tpAheadCptnSelector          = "tp-ahead-cptn";
+    string clearTpAheadVarsMethodName   = "clrTpAheadVars";
+    string tpahValChangedMethodName     = "tpahVlChngs";
+    string patchcontrolsMethodName      = "patchcontrols";
+    string afterObjSelPropName          = "afterObjSel";
+    string afterObjSelSelector          = "after-obj-sel";
+    string columnCaptionsPropName       = "clmnCptns";
+    string menuCaptionsPropName         = "menuCptns";
+
+    List<string> FKViewsDict =  GetFKViewsList(Model, Context, new List<string>());
+    if (! FKViewsDict.Contains(Model.ViewName) ) {
+        FKViewsDict.Add(Model.ViewName);
+    }
+
+    string sformCssFolder                           = "01420-Sform.component.css";
+    string sformHtmlFolder                          = "01420-Sform.component.html";
+    string sformComponentFolder                     = "01420-Sform.component.ts";
+    string componentSelectorCommonPart              = GetComponentSelectorCommonPart(Model, sformComponentFolder);
+    string componentClassName                       = GetComponentClassName(Model, sformComponentFolder);
+
+    string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName               = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, sformComponentFolder);
+
+    string filterResultModelFolder                  = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName               = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, filterResultModelFolder, sformComponentFolder);
+    
+    string menuItemDataModelFolder                  = "00017-menu-item-data.interface.ts";
+    string menuItemDataModelClassName               = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, menuItemDataModelFolder, sformComponentFolder);
+
+    string eventEmitterDataModelFolder              = "00018-event-emitter-data.interface.ts";
+    string eventEmitterDataModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterDataModelFolder, sformComponentFolder);
+
+    string eventEmitterPubModelFolder               = "00019-event-emitter-pub.interface.ts";
+    string eventEmitterPubModelClassName            = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, sformComponentFolder);
+
+    string itemHeightDataModelFolder                = "00016-item-height-data.interface.ts";
+    string itemHeightDataModelClassName             = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, itemHeightDataModelFolder, sformComponentFolder);
+    
+    string columnSelectorItemInterfaceFolder        = "00032-column-selector-item.interface.ts";
+    string columnSelectorItemModelClassName         = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, columnSelectorItemInterfaceFolder, sformComponentFolder);
+
+    string columnSelectorDlgComponentFolder         = "00035-column-selector-dlg.component.ts";
+    string componentSelectorDlgComponentClassName   = GetContextComponentClassNameWithAnglr(AngularJsonFile, Model, Context, columnSelectorDlgComponentFolder, sformComponentFolder);
+
+    string uniqFilterModelFolder                    = "00042-uniq-service-filter.interface.ts";
+    string uniqFilterModelClassName                 = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, uniqFilterModelFolder, sformComponentFolder);
+
+    string uniqFilterDefModelFolder                 = "00044-uniq-service-filter-def.interface.ts";
+    string uniqFilterDefModelClassName              = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, uniqFilterDefModelFolder, sformComponentFolder);
+
+
+    string sortheadDirectiveFolder                  = "00082-sorthead.directive.ts";
+    string sortheadDirectiveEventName               = GetDirectiveEventNameWithAnglr(AngularJsonFile, Model, Context, sortheadDirectiveFolder, sformComponentFolder);
+    string sortheadDirectiveClassName               = GetDirectiveClassNameWithAnglr(AngularJsonFile, Model, Context, sortheadDirectiveFolder, sformComponentFolder);
+    string sortheadDirectiveSelectorName            = GetDirectiveSelectorNameWithAnglr(AngularJsonFile, Model, Context, sortheadDirectiveFolder, sformComponentFolder);
+
+    string viewInterfaceFolder                      = "01100-.interface.ts";
+    string viewInterfaceName                        = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, sformComponentFolder);
+
+    string viewInterfacePageFolder                  = "01200-Page.interface.ts";
+    string viewInterfacePageName                    = GetInterfacePageNameWithAnglr(AngularJsonFile, Model, viewInterfacePageFolder, sformComponentFolder);
+
+    string viewInterfaceFltFolder                   = "01300-Filter.interface.ts";
+    string viewInterfaceFilterName                  = GetInterfaceFilterNameWithAnglr(AngularJsonFile, Model, viewInterfaceFltFolder, sformComponentFolder);
+
+    string viewServiceFolder                        = "01400-.service.ts";
+    string serviceClassName                         = GetServiceClassNameWithAnglr(AngularJsonFile, Model, viewServiceFolder, sformComponentFolder);
+
+    string apiName                                  = AbpFirstItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
+
+    string ActionColumnDefProperty      = "menuAction";
+    string SelectColumnDefProperty      = "selectAction";
+    string SelectMultColumnDefProperty  = "selectMultAction";
+    string multSelectionProperty        = "multSelection";
+
+    string DisplayedColumnsProperty     = "displayedColumns";
+    string MatPaginatorPageSize         = "10";
+    string MatPaginatorPageSizeOptions  = "[10, 25, 50, 100]";
+
+    string OnBackBtnMethodName          = "onBackBtnMd";
+    string OnBackBtnPropName            = "onBackBtn";
+    string OnBackBtnSelector            = "on-back-btn";
+    string showBackBtnPropName          = "showBackBtn";
+    string showBackBtnSelector          = "show-back-btn";
+    
+    List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = GetModelUniqueKeys(Model, new List<ModelViewUniqueKeyOfVwSerializable>());
+    ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
+    if(pk!= null) uniqueKeys.Add(pk);
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
+        GetSearchResources(Model, Context);
+    {
+        string viewNm = Model.ViewName;
+        if(searchSchemas!= null) {
+            List<ModelViewSerializable> mdls = new List<ModelViewSerializable>();
+            List<ModelViewSerializable> smdls = new List<ModelViewSerializable>();
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+                List<KeyValuePair<ModelViewForeignKeySerializable,int>> crLst = null;
+                for(int crItm = 0; crItm < 3; crItm++) {
+                    if(crItm > 0) continue;
+                    switch(crItm) {
+                        case 0:  crLst = sch.Item3;
+                            break;
+                        case 1:  crLst = sch.Item4;
+                            break;
+                        default: crLst = sch.Item5;
+                            break;
+                    }
+                    if(crLst != null) {
+                        foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in crLst) {
+                            ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                            if(smdls.Any(p => p == searchModel)) continue;
+                            smdls.Add(searchModel);
+                        }
+                    }
+                }
+                if(!mdls.Any(p => p == m2mModel)) {
+                    mdls.Add(m2mModel);
+                }
+            } // foreach(var sch in searchSchemas) {...}
+        } // if(searchSchemas!= null) {...}
+    }
+#>
+//
+// Do not save this file. But copy the content and paste into abp translation file.eng
+//
+
+    "<#= apiName #>::<#= Model.ViewName #>:PluralTitle": "<#= Model.PluralTitle #>",
+<# 
+    foreach(ModelViewPropertyOfVwSerializable dispSclProp in Model.ScalarProperties) {
+#>
+        
+    "<#= apiName #>::<#= Model.ViewName #>:<#= dispSclProp.ViewPropertyName #>": "<#=  GetDisplayAttributeValueString(dispSclProp, Model, DisplayLabelProperty) #>",
+<#
+    }
+    if(searchSchemas != null) {
+        List<ModelViewSerializable> smds = new List<ModelViewSerializable>();
+        foreach(var sch in searchSchemas) {
+            foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {
+                ModelViewSerializable searchModel = GetViewByName(Context, kvp.Key.ViewName);
+                if(smds.Any(p => p == searchModel)) continue;
+                smds.Add(searchModel);
+                ModelViewPropertyOfVwSerializable dispSclProp = GetFirstPropOfFirstUniqueKey(searchModel);
+#>
+    "<#= apiName #>::<#= searchModel.ViewName #>:<#= dispSclProp.ViewPropertyName #>": "<#=  GetDisplayAttributeValueString(dispSclProp, searchModel, DisplayLabelProperty) #>",
+<#
+            }
+        } // foreach(var sch in searchSchemas) {...}
+    } // if(searchSchemas != null) {...}
+#>
+    "<#= apiName #>::<#= Model.ViewName #>:FullScan": "full scan",
+<# 
+        if (Model.IsWebApiSelectOneByPrimarykey) {
+            for(int i = 0; i < uniqueKeys.Count; i++) { 
+                string indErrrorText = "";
+                bool indIsCorrect = CheckModelIfIndexIsCorrect(Model, uniqueKeys[i], out indErrrorText);
+                if (!indIsCorrect) {
+#>
+//
+// Could not generate fragment of code
+// Primary/Unique Index Is not correct:
+// <#= indErrrorText #>
+//
+<#
+                } else {
+            
+                    string caption = "Primary";
+                    if(!uniqueKeys[i].IsPrimary) {
+                        caption = uniqueKeys[i].UniqueKeyName;
+                    }
+#>
+    "<#= apiName #>::<#= Model.ViewName #>:ScanBy<#= caption #>": "filter by <#= caption #>",
+<# 
+                }
+            }
+        }
+        if(searchSchemas!= null) {
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+#>
+    "<#= apiName #>::<#= m2mModel.ViewName #>:ScanByTitle: "filter by <#= m2mModel.Title #>",
+<# 
+            }
+        }
+#>
+    "<#= apiName #>::<#= Model.ViewName #>:FltNtAppl": "Could not apply filter as not all attributes are set",
+
+

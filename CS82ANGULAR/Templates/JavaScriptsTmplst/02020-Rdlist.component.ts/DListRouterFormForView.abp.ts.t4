@@ -315,6 +315,12 @@ import { <#=  dModSrvClassName #> } from '<#= GetFolderNameWithAnglr(AngularJson
     }
 #>
 
+/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
+/* eslint-disable @angular-eslint/no-input-rename */
+/* eslint-disable @angular-eslint/no-output-rename */
+/* eslint-disable @angular-eslint/no-output-on-prefix */
+
+
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, rdlistHtmlFolder, rdlistComponentFolder)#>.html',
@@ -514,12 +520,12 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         }
     rowMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
          {id: '<#= ActionParamUpdateMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'], iconName: 'fa-edit', iconColor: 'primary', enabled: true},
-         {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'fa-trash', iconColor: 'warn', enabled: true},
+         {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'fa-trash', iconColor: 'warning', enabled: true},
          {id: '<#= ActionParamViewMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'fa-eye', iconColor: 'primary', enabled: true},
       ];
     tableMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
          {id: '<#= ActionParamAddMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'], iconName: 'fa-plus', iconColor: 'primary', enabled: true},
-         {id: '<#= ActionParamDeleteSelMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'], iconName: 'fa-trash', iconColor: 'warn', enabled: true},
+         {id: '<#= ActionParamDeleteSelMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'], iconName: 'fa-trash', iconColor: 'warning', enabled: true},
       ];
     constructor(protected route: ActivatedRoute, protected router: Router, protected  <#= formRootService #>: <#= serviceClassName #>, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
 <#
@@ -537,22 +543,22 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#
     if(Model.IsWebApiSelectOneByPrimarykey) {
 #>
-        v<#= DlgSrvPrefix #>: <#=  vModSrvClassName #>,
+        protected v<#= DlgSrvPrefix #>: <#=  vModSrvClassName #>,
 <#
     }
     if(Model.IsWebApiAdd) {
 #>
-        a<#= DlgSrvPrefix #>: <#=  aModSrvClassName #>,
+        protected a<#= DlgSrvPrefix #>: <#=  aModSrvClassName #>,
 <#
     }
     if(Model.IsWebApiUpdate) {
 #>
-        u<#= DlgSrvPrefix #>: <#=  uModSrvClassName #>,
+        protected u<#= DlgSrvPrefix #>: <#=  uModSrvClassName #>,
 <#
     }
     if(Model.IsWebApiDelete) {
 #>
-        d<#= DlgSrvPrefix #>: <#=  dModSrvClassName #>,
+        protected d<#= DlgSrvPrefix #>: <#=  dModSrvClassName #>,
 <#
     }
 #>
@@ -905,7 +911,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 //        dialogRef.componentInstance.data = locdata;
 //        dialogRef.result.then((rslt) => {
 //        });
-        v<#= DlgSrvPrefix #>.open(locdata)
+        this.v<#= DlgSrvPrefix #>.open(locdata)
         .then((rslt) => {})
         .catch(c => {});
 
@@ -952,7 +958,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 //                }
 //            }
 //        });
-        a<#= DlgSrvPrefix #>.open(locdata)
+        this.a<#= DlgSrvPrefix #>.open(locdata)
         .then((rslt) => {
             if (!(typeof rslt === 'undefined')) {
                 if (!(rslt === null)) {
@@ -1008,7 +1014,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 //                }
 //            }
 //        });
-        u<#= DlgSrvPrefix #>.open(locdata).then((rslt) => {
+        this.u<#= DlgSrvPrefix #>.open(locdata).then((rslt) => {
             if (!(typeof rslt === 'undefined')) {
                 if (!(rslt === null)) {
                     if (!((typeof rslt.<#= FormControlModelPropName #> === 'undefined') || (typeof rslt.<#= FormControlNewModelPropName #> === 'undefined'))) {
@@ -1067,7 +1073,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 //                }
 //            }
 //        });
-        d<#= DlgSrvPrefix #>.open(locdata).then((rslt) => {
+        this.d<#= DlgSrvPrefix #>.open(locdata).then((rslt) => {
             if (!(typeof rslt === 'undefined')) {
                 if (!(rslt === null)) {
                     if (!((typeof rslt.<#= FormControlModelPropName #> === 'undefined') || (typeof rslt.<#= FormControlNewModelPropName #> === 'undefined'))) {
@@ -1112,7 +1118,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             title: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'],
             message: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'] + ' ?',
             iconname: 'fa-warning',
-            iconcolor: 'warn'
+            iconcolor: 'warning'
         };
         let dialogRef = this.dialog.open(<#=  messageDialogComponentClassName #>);
         dialogRef.componentInstance.data = locdata;

@@ -1,0 +1,102 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="json" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string HiddenFilterPrefix           = "hf";
+    string IdPrefix                     = "id";
+    string VPrefix                      = "View";
+    string APrefix                      = "Add";
+    string UPrefix                      = "Upd";
+    string DPrefix                      = "Del";
+
+    string NavPrefix                    = "np";
+    string OutletNmPropName             = "outletNm";
+    string OutletParent                 = "oltParent";
+    string IsDetailPropName             = "isdtl";
+    string routeShowFilterPropName      = "sf";
+    string routeDepthParamName          = "dp"; 
+    string DepthParamName               = "depth"; 
+    string routeOutletParent            = "oltp";
+    string routeOutletNmPropName        = "oltn";
+
+    string HiddenFilterAsFltRsltSuffix  = "HiddenFilterAsFltRslt";
+    string ItemParamName                = "item";  
+    string ActionParamName              = "mode";  
+    string formRootService              = "frmRootSrv";
+    string TitlePropName                = "title";
+
+
+    string HiddenFilterSelector         = "hidden-filter";
+    string HiddenFilterPropName         = "hiddenFilter";
+
+    string ShowErrorMethodName          = "showError";
+    string OnAfterSubmitMethodName      = "onAfterSubmit";
+    
+
+    string FormControlModelPropName     = "eformControlModel";
+    string FormControlNewModelPropName  = "eformNewControlModel";
+    string AppSettingServicePropName    = "appGlblSettings";
+
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+    string frasesPropName                       = "frases";
+
+
+    string raCssFolder                          = "01822-RA.component.css";
+    string raHtmlFolder                         = "01822-RA.component.html";
+    string raComponentFolder                    = "01822-RA.component.ts";
+    string componentClassName                   = GetComponentClassName(Model, raComponentFolder);
+    string componentSelectorCommonPart          = GetComponentSelectorCommonPart(Model, raComponentFolder);
+
+    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName           = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, raComponentFolder);
+
+    string eventEmitterDataModelFolder          = "00018-event-emitter-data.interface.ts";
+    string eventEmitterDataModelClassName       = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterDataModelFolder, raComponentFolder);
+
+    string menuItemDataModelFolder              = "00017-menu-item-data.interface.ts";
+    string menuItemDataModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, menuItemDataModelFolder, raComponentFolder);
+
+    string eventEmitterPubModelFolder           = "00019-event-emitter-pub.interface.ts";
+    string eventEmitterPubModelClassName        = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, raComponentFolder);
+
+    string filterResultModelFolder              = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, filterResultModelFolder, raComponentFolder);
+
+    string viewInterfaceFolder                  = "01100-.interface.ts";
+    string viewInterfaceName                    = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, raComponentFolder);
+
+    string viewServiceFolder                    = "01400-.service.ts";
+    string serviceClassName                     = GetServiceClassNameWithAnglr(AngularJsonFile, Model, viewServiceFolder, raComponentFolder);
+
+    string aformComponentFolder                 = "01502-Aform.component.ts";
+    string aformComponentClassName              = GetComponentClassNameWithAnglr(AngularJsonFile, Model, aformComponentFolder, raComponentFolder);
+
+    string DlgSrvPrefix                         = "dlgSrv";
+    string apiName                              = AbpFirstItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
+
+    List<ModelViewPropertyOfVwSerializable> primKeys= GetModelPrimaryKeyProps(Model);
+#>
+
+
+    "<#= apiName #>::<#= Model.ViewName #>:AddTitle": "Add <#= Model.Title #>"
+

@@ -246,6 +246,11 @@ import { <#=  GetServiceClassNameExWithAnglrEx(AngularJsonFile, Context, m2mMode
         }
 #>
 
+/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
+/* eslint-disable @angular-eslint/no-input-rename */
+/* eslint-disable @angular-eslint/no-output-rename */
+/* eslint-disable @angular-eslint/no-output-on-prefix */
+
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, rlistHtmlFolder, rlistComponentFolder)#>.html',
@@ -443,14 +448,14 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             }
         }
 
-    this.rowMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
-            {id: '<#= ActionParamUpdateMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'], iconName: 'edit', iconColor: 'primary', enabled: true},
-            {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'delete_forever', iconColor: 'warn', enabled: true},
-            {id: '<#= ActionParamViewMode #>',   caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'preview', iconColor: 'primary', enabled: true},
+    rowMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
+            {id: '<#= ActionParamUpdateMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'], iconName: 'fa-edit', iconColor: 'primary', enabled: true},
+            {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'fa-trash', iconColor: 'warning', enabled: true},
+            {id: '<#= ActionParamViewMode #>',   caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'fa-eye', iconColor: 'primary', enabled: true},
         ];
-    this.tableMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
-            {id: '<#= ActionParamAddMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'], iconName: 'create', iconColor: 'primary', enabled: true},
-            {id: '<#= ActionParamDeleteSelMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'], iconName: 'delete_forever', iconColor: 'warn', enabled: true},
+    tableMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
+            {id: '<#= ActionParamAddMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'], iconName: 'fa-plus', iconColor: 'primary', enabled: true},
+            {id: '<#= ActionParamDeleteSelMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'], iconName: 'fa-trash', iconColor: 'warning', enabled: true},
         ];
 
     constructor(protected route: ActivatedRoute, protected router: Router, protected  <#= formRootService #>: <#= serviceClassName #>, 
@@ -627,7 +632,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             msk = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= viewToNavigate.ViewName #>');
             if((msk & 1) === 1) {
                 this.rowMenuItemsData.push(
-                 { id: '<#= id #>', caption: this.<#= frasesPropName #>['<#= viewToNavigate.ViewName +"__"+ detailView.ViewName #>'], iconName: 'arrow_forward', iconColor: 'primary', enabled: true, 
+                 { id: '<#= id #>', caption: this.<#= frasesPropName #>['<#= viewToNavigate.ViewName +"__"+ detailView.ViewName #>'], iconName: 'fa-arrow-circle-right', iconColor: 'primary', enabled: true, 
                     data: {
                         <#= ViewNameParamName #>: '<#= viewToNavigate.ViewName #>',
                         <#= NavigationParamName #>: '<#= foreignKey.NavigationName #>',
@@ -646,7 +651,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             msk = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= detailViewName #>');
             if((msk & 1) === 1) {
                 this.rowMenuItemsData.push(
-                 { id: '<#= id #>', caption: this.<#= frasesPropName #>['<#=detailView.ViewName + foreignKey.NavigationName #>'], iconName: 'arrow_forward', iconColor: 'primary', enabled: true, 
+                 { id: '<#= id #>', caption: this.<#= frasesPropName #>['<#=detailView.ViewName + foreignKey.NavigationName #>'], iconName: 'fa-arrow-circle-right', iconColor: 'primary', enabled: true, 
                     data: {
                         <#= ViewNameParamName #>: '<#= detailViewName #>',
                         <#= NavigationParamName #>: '<#= foreignKey.NavigationName #>',
@@ -768,8 +773,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         let locdata: <#=  messageDialogInterfaceName #> = {
             title: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'],
             message: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'] + ' ?',
-            iconname: 'warning',
-            iconcolor: 'warn'
+            iconname: 'fa-warning',
+            iconcolor: 'warning'
         };
         let dialogRef = this.dialog.open(<#=  messageDialogComponentClassName #>);
 //        , {

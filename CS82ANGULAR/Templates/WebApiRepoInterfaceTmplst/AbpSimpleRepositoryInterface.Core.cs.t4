@@ -1,0 +1,85 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ include file="..\CommonScripts\AbpRepoLevel.t4" #>
+
+#nullable disable
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Volo.Abp.Domain.Repositories;
+
+
+
+<#
+
+    string GetAllMethodName             = "getall";
+    string GetWithFilterMethodName      = "getwithfilter";
+    string GetOneMethodName             = "getone";
+    string GetOneByMethodNamePrefix     = "getoneby";
+    string UpdateOneMethodName          = "updateone";
+    string AddOneMethodName             = "addone";
+    string DeleteOneMethodName          = "deleteone";
+    string GetManyByRepPrimMethodNamePrefix = "getmanybyrepprim";
+    string GetManyByRepUnqMethodNamePrefix  = "getmanybyrepunq";
+
+    string OperatorSufix = "Oprtr";
+    string repoInterfaceNameSpace = GetDestinationNameSpace(Model);
+    string rootEntityNameSpace = GetRootEntityNameSpace(Model);
+    string dbContextNameSpace = GetDbContextNameSpace(Context);
+    string domainViewModelNameSpace = GetDomainViewModelNameSpace(Model);
+    string webApiServicePrefix = GetWebApiServicePrefix(Model);
+    string webApiRoutePrefix =  GetWebApiRoutePrefix(Model);
+    bool EntHasId = AbpIsEntityWithId(Model);
+    bool EntHasTenantId = AbpHasMultiTenant(Model);
+    string EntityKey = "";
+    if(EntHasId) {
+        EntityKey = ", " +  GetAbpIdDataType(Model);
+    }
+
+    List<String> locNavigationPaths = GetNavigationPaths(Model);
+
+    List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
+    {
+        ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
+        if (pk != null) uniqueKeys.Add(pk);
+        
+        GetModelUniqueKeys(Model, uniqueKeys);
+    }
+
+
+#>
+<# if (!string.IsNullOrEmpty(domainViewModelNameSpace)) {
+ if (!string.Equals(domainViewModelNameSpace, repoInterfaceNameSpace)) {#>
+using <#= domainViewModelNameSpace #>;
+<# }} #>
+<# if (!string.IsNullOrEmpty(rootEntityNameSpace)) {
+ if (!string.Equals(rootEntityNameSpace, repoInterfaceNameSpace)) {#>
+using <#= rootEntityNameSpace #>;
+<# }} #>
+
+/*
+    Repository Interface must be defined in the
+    "XXX.Domain.csproj"-project
+*/
+
+namespace <#= repoInterfaceNameSpace #> {
+
+    public interface <#= AbpRepositoryInterfaceName(Model) #>: IRepository<<#= Model.RootEntityClassName #><#= EntityKey #>>
+    {
+
+
+    }
+}
+

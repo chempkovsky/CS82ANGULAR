@@ -1,0 +1,166 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="json" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string HiddenFilterPrefix           = "hf";
+    string IdPrefix                     = "id";
+    string VPrefix                      = "View";
+    string APrefix                      = "Add";
+    string UPrefix                      = "Upd";
+    string DPrefix                      = "Del";
+
+    string NavPrefix                    = "np";
+    string OutletNmPropName             = "outletNm";
+    string IsDetailPropName             = "isdtl";
+    string routeShowFilterPropName      = "sf";
+    string DepthParamName               = "depth"; 
+    string routeDepthParamName          = "dp"; 
+    string routeOutletParent            = "oltp";
+    string routeOutletNmPropName        = "oltn";
+
+    string HiddenFilterAsFltRsltSuffix  = "HiddenFilterAsFltRslt";
+    string ActionParamName              = "mode";  
+    string ItemParamName                = "item";  
+
+    string AppearancePropName           = "appearance";
+    string OutletNamePrefix             = "oltnm";
+    string OutletParent                 = "oltParent";
+
+    string SelectedDetailPropName       = "selectedDetail";
+    string DetailViewsPropName          = "detailViews";
+    string OnDetailChangedMethodName    = "onDetailChanged";
+    string ToDetailMethodName           = "toDetail";
+    string RootDataSource               = "rootDataSource";
+    string HiddenFilterByRowSuffix      = "HiddenFilterByRow";
+    string Values2InterfaceMethodName   = "values2Interface";
+
+
+
+    string HiddenFilterSelector         = "hidden-filter";
+    string HiddenFilterPropName         = "hiddenFilter";
+
+    string ShowErrorMethodName          = "showError";
+    string OnAfterSubmitMethodName      = "onAfterSubmit";
+    
+
+    string FormControlModelPropName     = "eformControlModel";
+    string FormControlNewModelPropName  = "eformNewControlModel";
+    string AppSettingServicePropName    = "appGlblSettings";
+    string formRootService              = "frmRootSrv";
+    string TitlePropName                = "title";
+    string ShowDetailsPropName          = "showDetails";
+    string NavBackToMasterPropName      = "NavBackToMaster";
+
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+    string frasesPropName                       = "frases";
+
+    string rvCssFolder                          = "01820-RV.component.css";
+    string rvHtmlFolder                         = "01820-RV.component.html";
+    string rvComponentFolder                    = "01820-RV.component.ts";
+    string componentClassName                   = GetComponentClassName(Model, rvComponentFolder);
+    string componentSelectorCommonPart          = GetComponentSelectorCommonPart(Model, rvComponentFolder);
+
+
+    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName           = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, rvComponentFolder);
+
+    string eventEmitterDataModelFolder          = "00018-event-emitter-data.interface.ts";
+    string eventEmitterDataModelClassName       = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterDataModelFolder, rvComponentFolder);
+
+    string menuItemDataModelFolder              = "00017-menu-item-data.interface.ts";
+    string menuItemDataModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, menuItemDataModelFolder, rvComponentFolder);
+
+    string eventEmitterPubModelFolder           = "00019-event-emitter-pub.interface.ts";
+    string eventEmitterPubModelClassName        = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, rvComponentFolder);
+
+    string filterResultModelFolder              = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, filterResultModelFolder, rvComponentFolder);
+
+    string viewInterfaceFolder                  = "01100-.interface.ts";
+    string viewInterfaceName                    = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, rvComponentFolder);
+
+    string viewServiceFolder                    = "01400-.service.ts";
+    string serviceClassName                     = GetServiceClassNameWithAnglr(AngularJsonFile, Model, viewServiceFolder, rvComponentFolder);
+
+    string vformComponentFolder                 = "01500-Vform.component.ts";
+    string vformComponentClassName              = GetComponentClassNameWithAnglr(AngularJsonFile, Model, vformComponentFolder, rvComponentFolder);
+
+    string OutletNameValue = OutletNamePrefix + Model.ViewName;
+
+    List<ModelViewPropertyOfVwSerializable> primKeys= GetModelPrimaryKeyProps(Model);
+    List<string> detailViewNames = GetDetailViews(Model, Context, null);
+    List<string> detailViewNamesToExclude = new List<string>(); 
+
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
+    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+    List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
+        GetSearchResources(Model, Context);
+    string DlgSrvPrefix                         = "dlgSrv";
+    string apiName                              = AbpFirstItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
+
+#>
+
+
+        '<#= TitlePropName #>': this.L.instant({
+        "<#= apiName #>::<#= Model.ViewName #>:ViewTitle": "View <#= Model.Title #>",
+        "<#= apiName #>::<#= Model.ViewName #>:NabBckMstr": "Navigate back to master",
+        "<#= apiName #>::<#= Model.ViewName #>:HideDtls": "Hide details",
+<#
+    {
+        foreach(string detailVwnm in detailViewNames) {
+            if(detailViewNamesToExclude.Any(s => s == detailVwnm)) continue;
+            ModelViewSerializable detailView = GetViewByName(Context, detailVwnm);
+            List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(Model, detailView, null);
+            bool isM2m = false;
+            if(IsTableMatchesIndex(detailView)) {
+                if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                    if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                        isM2m = true;
+                    }
+                }
+            }
+            foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                if(isM2m) {
+                    // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                    tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                    if (tmpSearchSchema != null) {
+                        int  cnt = 0;
+                        if(tmpSearchSchema.Item5 == null) continue;
+                        if(tmpSearchSchema.Item5.Count != 1) continue;
+                        if(tmpSearchSchema.Item4 != null) continue;
+                        if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                        ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+#>
+        "<#= apiName #>::<#= Model.ViewName #>:<#= viewToNavigate.PluralTitle #>:<#= detailView.Title #>": "<#= viewToNavigate.PluralTitle #>(<#= detailView.Title #>)",
+<#
+                        continue;
+                    }
+                }
+#>
+        "<#= apiName #>::<#= Model.ViewName #>:<#= detailView.PluralTitle #>:<#= foreignKey.NavigationName #>": "<#= detailView.PluralTitle + "(" + foreignKey.NavigationName + ")" #>"
+<#
+            }
+        }
+    }
+#>

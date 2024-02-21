@@ -35,6 +35,10 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { <#= viewInterfaceName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, ldlgComponentFolder) #>';
 import { <#= viewInterfaceDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceDlgFolder, ldlgComponentFolder) #>';
 
+/* eslint-disable @angular-eslint/no-output-on-prefix */
+/* eslint-disable @angular-eslint/no-output-rename */
+/* eslint-disable @angular-eslint/no-input-rename */
+
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, ldlgHtmlFolder, ldlgComponentFolder)#>.html',

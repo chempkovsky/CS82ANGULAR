@@ -85,7 +85,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/internal/Observable';
-import { RestService, Rest } from '@abp/ng.core';
+// import { RestService, Rest } from '@abp/ng.core';
 import { <#= viewInterfaceName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, viewServiceFolder) #>';
 import { <#= viewInterfacePageName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfacePageFolder, viewServiceFolder) #>';
 import { <#= viewInterfaceFilterName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFltFolder, viewServiceFolder) #>';
@@ -100,7 +100,8 @@ import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderNameWithA
 export class <#= serviceClassName #> {
     apiName: string = '<#= apiName #>';
     serviceUrl: string;  
-    constructor(private restService: RestService, private http: HttpClient, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {
+    constructor( //  private restService: RestService, 
+       private http: HttpClient, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {
        this.serviceUrl = this.<#= AppSettingServicePropName #>.getWebApiPrefix('<#= Model.ViewName #>') + '<#= GetWebApiServicePrefix(Model) #>';  
     }
     protected _<#= ValuesSuffix #>: {[key: string]: {org: string, fk: string, fkchain: string, isinprimkey: boolean, isinunqkey: boolean, required: boolean, dbgenerated: boolean, dttp: string}} = {
@@ -460,20 +461,21 @@ export class <#= serviceClassName #> {
     //    // handling error 
     // });
     // 
-    <#= GetAllMethodName #>(config?: Partial<Rest.Config>): Observable<<#= viewInterfaceName #>[]> {
-        // return this.http.get<<#= viewInterfaceName #>[]>(this.serviceUrl+'/<#= GetAllMethodName #>');
-
+    <#= GetAllMethodName #>() // config?: Partial<Rest.Config>)
+        : Observable<<#= viewInterfaceName #>[]> {
+        return this.http.get<<#= viewInterfaceName #>[]>(this.serviceUrl+'/<#= GetAllMethodName #>');
         //    .pipe(
         //        catchError(this.handleError('<#= GetAllMethodName #>', []))
         //    );
 
-        return this.restService.request<any, <#= viewInterfaceName #>[]>(
-            {
-              method: 'GET',
-              url: this.serviceUrl+'/<#= GetAllMethodName #>',
-            },
-            { apiName: this.apiName,...config }
-        );
+        // IT DOES NOT WORK   
+        //return this.restService.request<any, <#= viewInterfaceName #>[]>(
+        //    {
+        //      method: 'GET',
+        //      url: this.serviceUrl+'/<#= GetAllMethodName #>',
+        //    },
+        //    { apiName: this.apiName,...config }
+        //);
     }
 
 <#
@@ -494,7 +496,8 @@ export class <#= serviceClassName #> {
     //    // handling error 
     // });
     // 
-    <#= GetWithFilterMethodName #>(filter: <#= viewInterfaceFilterName #>, config?: Partial<Rest.Config>): Observable<<#= viewInterfacePageName #>> {
+    <#= GetWithFilterMethodName #>(filter: <#= viewInterfaceFilterName #>) //, config?: Partial<Rest.Config>)
+        : Observable<<#= viewInterfacePageName #>> {
         let params: HttpParams  = new HttpParams({encoder: this.<#= AppSettingServicePropName #>});
         let hasFilter: boolean = false;
         if (!(typeof filter === 'undefined')) {
@@ -585,20 +588,21 @@ export class <#= serviceClassName #> {
                 }
             } // if (!(filter === null ))
         } // if (!(typeof filter === 'undefined'))
-        // const options = hasFilter ? { params } : {};
-        // return this.http.get<<#= viewInterfacePageName #>>(this.serviceUrl+'/<#= GetWithFilterMethodName #>', options);
+        const options = hasFilter ? { params } : {};
+        return this.http.get<<#= viewInterfacePageName #>>(this.serviceUrl+'/<#= GetWithFilterMethodName #>', options);
           //    .pipe(
           //        catchError(this.handleError('<#= GetWithFilterMethodName #>', []))
           //    );
 
-        return this.restService.request<any, <#= viewInterfacePageName #>>(
-            {
-              method: 'GET',
-              url: this.serviceUrl+'/<#= GetWithFilterMethodName #>',
-              params: params,
-            },
-            { apiName: this.apiName,...config }
-        );
+        // IT DOES NOT WORK   
+        //return this.restService.request<any, <#= viewInterfacePageName #>>(
+        //    {
+        //      method: 'GET',
+        //      url: this.serviceUrl+'/<#= GetWithFilterMethodName #>',
+        //      params: params,
+        //    },
+        //    { apiName: this.apiName,...config }
+        //);
     }
 <#
     }
@@ -659,7 +663,7 @@ export class <#= serviceClassName #> {
                     }
                 }
 #>
-                , config?: Partial<Rest.Config>
+               // , config?: Partial<Rest.Config>
         ): Observable<<#= viewInterfaceName #>> {
         let params: HttpParams  = new HttpParams({encoder: this.<#= AppSettingServicePropName #>});
         let hasFilter: boolean = false;
@@ -678,22 +682,25 @@ export class <#= serviceClassName #> {
 <#
                 }
 #>
-        // const options = hasFilter ? { params } : {};
-        // return this.http.get<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= localRouteName #>', options);
+        const options = hasFilter ? { params } : {};
+        return this.http.get<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= localRouteName #>', options);
           // .pipe(
           //   catchError(this.handleError('<#= localRouteName #>', []))
           // );
-        return this.restService.request<any, <#= viewInterfaceName #>>(
-            {
-              method: 'GET',
-              url: this.serviceUrl+'/<#= localRouteName #>',
-              params: params,
-            },
-            { apiName: this.apiName,...config }
-        );
+
+        // IT DOES NOT WORK   
+        //return this.restService.request<any, <#= viewInterfaceName #>>(
+        //    {
+        //      method: 'GET',
+        //      url: this.serviceUrl+'/<#= localRouteName #>',
+        //      params: params,
+        //    },
+        //    { apiName: this.apiName,...config }
+        //);
     }
 
-    <#= localRouteManyName #>(filter: <#= viewInterfaceFilterName #>, config?: Partial<Rest.Config>): Observable<<#= viewInterfacePageName #>> {
+    <#= localRouteManyName #>(filter: <#= viewInterfaceFilterName #>) // , config?: Partial<Rest.Config>)
+     : Observable<<#= viewInterfacePageName #>> {
         let params: HttpParams  = new HttpParams({encoder: this.<#= AppSettingServicePropName #>});
         let hasFilter: boolean = false;
         if (!(typeof filter === 'undefined')) {
@@ -810,16 +817,18 @@ export class <#= serviceClassName #> {
                 }
             } // if (!(filter === null ))
         } // if (!(typeof filter === 'undefined'))
-        // const options = hasFilter ? { params } : {};
-        // return this.http.get<<#= viewInterfacePageName #>>(this.serviceUrl+'/<#= localRouteManyName #>', options);
-        return this.restService.request<any, <#= viewInterfacePageName #>>(
-            {
-              method: 'GET',
-              url: this.serviceUrl+'/<#= localRouteManyName #>',
-              params: params,
-            },
-            { apiName: this.apiName,...config }
-        );
+        const options = hasFilter ? { params } : {};
+        return this.http.get<<#= viewInterfacePageName #>>(this.serviceUrl+'/<#= localRouteManyName #>', options);
+
+        // IT DOES NOT WORK   
+        //return this.restService.request<any, <#= viewInterfacePageName #>>(
+        //    {
+        //      method: 'GET',
+        //      url: this.serviceUrl+'/<#= localRouteManyName #>',
+        //      params: params,
+        //    },
+        //    { apiName: this.apiName,...config }
+        //);
     }
 
 <#
@@ -841,20 +850,22 @@ export class <#= serviceClassName #> {
     //    // handling error 
     // });
     // 
-    <#= UpdateOneMethodName #>(item: <#= viewInterfaceName #>, config?: Partial<Rest.Config>): Observable<<#= viewInterfaceName #>> {
-
-        // return this.http.put<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= UpdateOneMethodName #>', item); //, httpOptions);
+    <#= UpdateOneMethodName #>(item: <#= viewInterfaceName #>) // , config?: Partial<Rest.Config>)
+        : Observable<<#= viewInterfaceName #>> {
+        return this.http.put<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= UpdateOneMethodName #>', item); //, httpOptions);
         //  .pipe(
         //    catchError(this.handleError('<#= UpdateOneMethodName #>', item))
         //  );
-        return this.restService.request<any, <#= viewInterfaceName #>>(
-            {
-              method: 'PUT',
-              url: this.serviceUrl+'/<#= UpdateOneMethodName #>',
-              body: item,
-            },
-            { apiName: this.apiName,...config }
-        );
+
+        // IT DOES NOT WORK   
+        //return this.restService.request<any, <#= viewInterfaceName #>>(
+        //    {
+        //      method: 'PUT',
+        //      url: this.serviceUrl+'/<#= UpdateOneMethodName #>',
+        //      body: item,
+        //    },
+        //    { apiName: this.apiName,...config }
+        //);
     }
 <#
     } 
@@ -874,7 +885,8 @@ export class <#= serviceClassName #> {
     //    // handling error 
     // });
     // 
-    <#= AddOneMethodName #>(item: <#= viewInterfaceName #>, config?: Partial<Rest.Config>): Observable<<#= viewInterfaceName #>> {
+    <#= AddOneMethodName #>(item: <#= viewInterfaceName #>) // , config?: Partial<Rest.Config>)
+        : Observable<<#= viewInterfaceName #>> {
 <#
         foreach (ModelViewPropertyOfVwSerializable identProp in identProps) {
 #>
@@ -891,18 +903,20 @@ export class <#= serviceClassName #> {
 <#
         }
 #>
-        // return this.http.post<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= AddOneMethodName #>', item); //, httpOptions);
+        return this.http.post<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= AddOneMethodName #>', item); //, httpOptions);
         // .pipe(
         //      catchError(this.handleError('<#= AddOneMethodName #>', item))
-        // );   
-        return this.restService.request<any, <#= viewInterfaceName #>>(
-            {
-              method: 'POST',
-              url: this.serviceUrl+'/<#= AddOneMethodName #>',
-              body: item,
-            },
-            { apiName: this.apiName,...config }
-        );
+        // );
+        
+        // IT DOES NOT WORK   
+        //return this.restService.request<any, <#= viewInterfaceName #>>(
+        //    {
+        //      method: 'POST',
+        //      url: this.serviceUrl+'/<#= AddOneMethodName #>',
+        //      body: item,
+        //    },
+        //    { apiName: this.apiName,...config }
+        //);
     }
 <#
     } 
@@ -950,8 +964,8 @@ export class <#= serviceClassName #> {
                 if(counter > 0) { #>, <#} #><#= GetTypeScriptPropertyName(prop, Model) #>: <#= GetPropertyTypeScriptTypeName(prop) #>|any <#
                 counter++;
             }
-        }
-        #>, config?: Partial<Rest.Config>): Observable<<#= viewInterfaceName #>> {
+        }#> //, config?: Partial<Rest.Config>
+        ): Observable<<#= viewInterfaceName #>> {
         let params: HttpParams  = new HttpParams({encoder: this.<#= AppSettingServicePropName #>});
         let hasFilter: boolean = false;
 <#
@@ -969,19 +983,21 @@ export class <#= serviceClassName #> {
 <#
     }
 #>
-        // const options = hasFilter ? { params } : {};
-        // return this.http.delete<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= DeleteOneMethodName #>', options); //, httpOptions);
-        // .pipe(
-        //      catchError(this.handleError('<#= DeleteOneMethodName #>', item))
-        // );   
-        return this.restService.request<any, <#= viewInterfaceName #>>(
-            {
-              method: 'DELETE',
-              url: this.serviceUrl+'/<#= DeleteOneMethodName #>',
-              params: params,
-            },
-            { apiName: this.apiName,...config }
-        );
+        const options = hasFilter ? { params } : {};
+        return this.http.delete<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= DeleteOneMethodName #>', options); //, httpOptions);
+        //.pipe(
+        //     catchError(this.handleError('<#= DeleteOneMethodName #>', item))
+        //);   
+
+        // IT DOES NOT WORK   
+        //return this.restService.request<any, <#= viewInterfaceName #>>(
+        //    {
+        //      method: 'DELETE',
+        //      url: this.serviceUrl+'/<#= DeleteOneMethodName #>',
+        //      params: params,
+        //    },
+        //    { apiName: this.apiName,...config }
+        //);
     }
 <#
         }

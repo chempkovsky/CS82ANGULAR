@@ -44,7 +44,7 @@
   <div>
      <div fxLayout="row" fxLayoutAlign="flex-end space-around"> 
         <label fxFlex fxLayoutAlign="flex-start space-around">{{<#= captionPropName #>}}</label>
-        <i class="fas fa-arrow-circle-left text-primary mr-5" type="button" data-toggle="tooltip" (click)="<#= OnBackBtnMethodName #>()" *ngIf="<#= showBackBtnPropName #>" 
+        <i class="fa fa-arrow-circle-left text-primary mr-5" type="button" data-toggle="tooltip" (click)="<#= OnBackBtnMethodName #>()" *ngIf="<#= showBackBtnPropName #>" 
 <# 
     if(localize) {
 #>
@@ -57,7 +57,7 @@
     }
 #>
         <span fxFlex="3%"></span>  
-        <i class="fas plus-square text-primary ml-1" type="button" data-toggle="tooltip" (click)="addFilter()" *ngIf="showFilter && <#= showAddFltItemPropName #>" 
+        <i class="fa fa-search-plus text-primary ml-1" type="button" data-toggle="tooltip" (click)="addFilter()" *ngIf="showFilter && <#= showAddFltItemPropName #>" 
 <# 
     if(localize) {
 #>
@@ -70,7 +70,7 @@
     }
 #>
         <span fxFlex="1%"></span>   
-        <i class="fas minus-square text-danger ml-1 " type="button" data-toggle="tooltip" (click)="removeAllFilters()" *ngIf="showFilter && <#= showAddFltItemPropName #>"
+        <i class="fa fa-search-minus text-danger ml-1 " type="button" data-toggle="tooltip" (click)="removeAllFilters()" *ngIf="showFilter && <#= showAddFltItemPropName #>"
 <# 
     if(localize) {
 #>

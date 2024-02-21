@@ -36,7 +36,7 @@ using LinqKit.Core;
     string GetManyByRepUnqMethodNamePrefix  = "getmanybyrepunq";
 
     string OperatorSufix = "Oprtr";
-//    string repoInterfaceNameSpace = GetRepoInterfaceNameSpace(Model);
+    string repoInterfaceNameSpace = GetRepoInterfaceNameSpace(Model);
     string appServiceNameSpace = GetDestinationNameSpace(Model);
     string rootEntityNameSpace = GetRootEntityNameSpace(Model);
     string appServiceInterfaceNameSpace = GetAppServiceInterfaceNameSpace(Model);
@@ -80,6 +80,12 @@ using <#= rootEntityNameSpace #>;
  if (!string.Equals(appServiceInterfaceNameSpace, appServiceNameSpace)) {#>
 using <#= appServiceInterfaceNameSpace #>;
 <# }} #>
+<# if (!string.IsNullOrEmpty(repoInterfaceNameSpace)) {
+ if (!string.Equals(repoInterfaceNameSpace, appServiceNameSpace)) {#>
+using <#= repoInterfaceNameSpace #>;
+<# }} #>
+
+
 
 /*
   // == 1 ==
@@ -140,9 +146,12 @@ namespace <#= appServiceNameSpace #> {
         private int defaultPageSize = 50;
         private int minPageSize = 5;
         private int maxPageSize = 150;
-        private IRepository<<#= Model.RootEntityClassName #><#= EntityKey #>> repo;
+        // private IRepository<<#= Model.RootEntityClassName #><#= EntityKey #>> repo;
+        // public <#= AbpServiceName(Model) #>(IRepository<<#= Model.RootEntityClassName #><#= EntityKey #>> _repo) { repo = _repo; }
 
-        public <#= AbpServiceName(Model) #>(IRepository<<#= Model.RootEntityClassName #><#= EntityKey #>> _repo)
+        private <#= AbpRepositoryInterfaceName(Model) #> repo;
+
+        public <#= AbpServiceName(Model) #>(<#= AbpRepositoryInterfaceName(Model) #> _repo)
         {
             repo = _repo;
         }
@@ -813,6 +822,7 @@ namespace <#= appServiceNameSpace #> {
         }
 #>
                 await repo.UpdateAsync(resultEntity);
+                await UnitOfWorkManager.Current.SaveChangesAsync();
                 var appQrEx =   (await repo.GetQueryableAsync()) // .<#= Model.RootEntityDbContextPropertyName #>
 <#
         for(int pkId= 0; pkId < primKeys.Count; pkId++) {
@@ -918,6 +928,7 @@ namespace <#= appServiceNameSpace #> {
         }
 #>
                 await repo.InsertAsync(entityToAdd);
+                await UnitOfWorkManager.Current.SaveChangesAsync();
                 var appQr =   (await repo.GetQueryableAsync())
 <#
         for(int pkId= 0; pkId < primKeys.Count; pkId++) {
@@ -1045,6 +1056,7 @@ namespace <#= appServiceNameSpace #> {
                     return result;
                 }
                 await repo.DeleteAsync(entityToDelete);
+                await UnitOfWorkManager.Current.SaveChangesAsync();
                 return result;
             } // using(repo.EnableTracking()) { ... }
         }

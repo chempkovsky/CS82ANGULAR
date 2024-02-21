@@ -32,22 +32,23 @@
     string GetMethodPrefix                      = "get";
     string AppSettingServicePropName            = "appGlblSettings";
 
-    string viewInterfaceDlgFolder               = "01510-Vdlg.interface.ts";
-    string viewInterfaceDlgClassName            = GetInterfaceDlgNameWithAnglr(AngularJsonFile, Model, viewInterfaceDlgFolder, viewModuleServiceFolder);
+    string viewInterfaceVDlgFolder              = "01510-Vdlg.interface.ts";
+    string viewInterfaceVDlgClassName           = GetInterfaceVDlgNameWithAnglr(AngularJsonFile, Model,  viewInterfaceVDlgFolder, viewModuleServiceFolder);
+
 
 #>
 
 import { Injectable } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, viewModuleServiceFolder)#>';
-import { <#= viewInterfaceDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceDlgFolder, viewModuleServiceFolder)#>';
+import { <#= viewInterfaceVDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceVDlgFolder, viewModuleServiceFolder)#>';
 
 @Injectable({
   providedIn: 'root',
 })
 export class <#= viewModuleServiceClassName #> {
   constructor(private dialog: NgbModal, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {}
-  async open(data: <#= viewInterfaceDlgClassName #>): Promise<any> {
+  async open(data: <#= viewInterfaceVDlgClassName #>): Promise<any> {
     let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
     const  <#= viewModuleClassName #> = (await import('<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewModuleFolder, viewModuleServiceFolder) #>')).<#= viewModuleClassName #>;
     let dialogRef = this.dialog.open(<#= viewModuleClassName #>.<#= GetMethodPrefix #><#=  viewDlgComponentClassName #>(), {size: w}); 

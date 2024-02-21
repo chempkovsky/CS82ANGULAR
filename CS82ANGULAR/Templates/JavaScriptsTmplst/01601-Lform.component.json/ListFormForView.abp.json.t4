@@ -1,0 +1,235 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="json" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+    bool localize = Context.Localize;
+
+    string OperatorSufix        = "Oprtr";
+    string EqualOperator        = "eq";
+
+    string ActionParamViewMode          = "view";
+    string ActionParamAddMode           = "add";
+    string ActionParamUpdateMode        = "update";
+    string ActionParamDeleteMode        = "delete";
+
+    // WebApi service's method names
+
+    string GetAllMethodName         = "getall";
+    string GetWithFilterMethodName  = "getwithfilter";
+    string GetOneMethodName         = "getone";
+    string UpdateOneMethodName      = "updateone";
+    string AddOneMethodName         = "addone";
+    string DeleteOneMethodName      = "deleteone";
+    string src2destMethodName       = "src2dest";
+
+
+    string DisplayLabelProperty     = "Name";
+    string DisplayHintProperty      = "Prompt";
+
+    string showAddFltItemSelector   = "show-add-flt-item";
+    string showAddFltItemPropName   = "showAddFltItem";
+    string CanAddSelector           = "can-add";
+    string CanAddPropName           = "canAdd";
+    string CanUpdSelector           = "can-update";
+    string CanUpdPropName           = "canUpdate";
+    string CanDelSelector           = "can-delete";
+    string CanDelPropName           = "canDelete";
+    string CanViewSelector          = "can-view";
+    string CanViewPropName          = "canView";
+    string HiddenFilterSelector     = "hidden-filter";
+    string HiddenFilterPropName     = "hiddenFilter";
+    string ShowFilterSelector       = "show-filter";
+    string ShowFilterPropName       = "showFilter";
+    string frasesPropName           = "frases";
+    string ActionParamDeleteSelMode = "deletesel";
+
+
+    Dictionary<string, string> RegExps = new Dictionary<string, string>() {
+            { "RegExpGuid"       , @"/^\{?[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89ABab][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}\}?$/" },
+            { "RegExpInteger"    , @"/^[-+]?\d+$/" },
+            { "RegExpFloat"      , @"/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/" },
+            { "RegExpEmail"      , @"/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/" },
+            { "RegExpCurrency"   , @"/(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/" }
+            };
+
+    string ComboSufix               = "CmbCntrl";
+    string ButtonSufix              = "BttnItm";
+    string TypeaheadSufix           = "TphdCntrl";
+
+    string TypeaheadAddDisplaySufix = "AddDsplFn";
+    string TypeaheadUpdDisplaySufix = "UpdDsplFn";
+    string TypeaheadDelDisplaySufix = "DelDsplFn";
+
+    string SearchClickSufix         = "SrchClck";
+
+    string formServicePrefix        = "frmSrv";
+    string formRootService          = "frmRootSrv";
+
+    string MainFormGroupName        = "mainFormGroup";
+
+    string EformModeSelector        = "eform-mode";
+    string EformModePropName        = "eformMode";
+
+    string selectedRowSelector        = "selected-row";
+    string selectedRowPropName        = "selectedRow";
+
+    string currentRowPropName        = "currentRow";
+    string OnSelectRowMethodName     = "onSelectRow";
+
+    
+    string FormControlModelSelector     = "eform-control-model";
+    string FormControlModelPropName     = "eformControlModel";
+    string FormControlNewModelPropName  = "eformNewControlModel";
+    
+
+    string RowCommandsSelector      = "row-commands";
+    string RowCommandsPropName      = "rowCommands";
+    string TableCommandsSelector    = "table-commands";
+    string TableCommandsPropName    = "tableCommands";
+
+    string OnRowCommandSelector         = "on-row-command";
+    string OnRowCommandPropName         = "onRowCommand";
+    string OnTableCommandSelector       = "on-table-command";
+    string OnTableCommandPropName       = "onTableCommand";
+
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string FilterMaxHeightPropSelector  = "filter-max-height";
+    string FilterMaxHeightPropName      = "filterMaxHeight";
+
+    string containerMenuItemsPropName           = "contMenuItems";
+    string containerMenuItemsSelector           = "cont-menu-items";
+    string onContainerMenuItemClickMethodName   = "onContMenuItemClicked";
+    string onContainerMenuItemClickSelector     = "on-cont-menu-item-click";
+    string onContainerMenuItemClickEmitter      = "onContMenuItemEmitter";
+
+    List<string> FKViewsDict =  GetFKViewsList(Model, Context, new List<string>());
+    if (! FKViewsDict.Contains(Model.ViewName) ) {
+        FKViewsDict.Add(Model.ViewName);
+    }
+
+    string lformCssFolder                           = "01600-Lform.component.css";
+    string lformHtmlFolder                          = "01600-Lform.component.html";
+    string lformComponentFolder                     = "01600-Lform.component.ts";
+    string componentClassName                       = GetComponentClassName(Model, lformComponentFolder);
+    string componentSelectorCommonPart              = GetComponentSelectorCommonPart(Model, lformComponentFolder);
+
+
+    string appSettingServiceFolder                  = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName               = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, lformComponentFolder);
+
+    string eventEmitterDataModelFolder              = "00018-event-emitter-data.interface.ts";
+    string eventEmitterDataModelClassName           = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterDataModelFolder, lformComponentFolder);
+
+    string menuItemDataModelFolder                  = "00017-menu-item-data.interface.ts";
+    string menuItemDataModelClassName               = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, menuItemDataModelFolder, lformComponentFolder);
+
+    string eventEmitterPubModelFolder               = "00019-event-emitter-pub.interface.ts";
+    string eventEmitterPubModelClassName            = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, eventEmitterPubModelFolder, lformComponentFolder);
+
+    string itemHeightDataModelFolder                = "00016-item-height-data.interface.ts";
+    string itemHeightDataModelClassName             = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, itemHeightDataModelFolder, lformComponentFolder);
+    
+    string filterResultModelFolder                  = "00024-web-service-filter-rslt.interface.ts";
+    string filterResultModelClassName               = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, filterResultModelFolder, lformComponentFolder);
+
+    string messageDialogInterfaceFolder             = "00037-message-dialog.interface.ts";
+    string messageDialogInterfaceName               = GetModelClassNameWithAnglr(AngularJsonFile, Model, Context, messageDialogInterfaceFolder, lformComponentFolder);
+
+    string messageDialogComponentFolder             = "00038-message-dialog.component.ts";
+    string messageDialogComponentClassName          = GetContextComponentClassNameWithAnglr(AngularJsonFile, Model, Context, messageDialogComponentFolder, lformComponentFolder);
+
+    string viewInterfaceFolder                      = "01100-.interface.ts";
+    string viewInterfaceName                        = GetInterfaceNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, lformComponentFolder);
+
+    string viewInterfacePageFolder                  = "01200-Page.interface.ts";
+    string viewInterfacePageName                    = GetInterfacePageNameWithAnglr(AngularJsonFile, Model, viewInterfacePageFolder, lformComponentFolder);
+
+    string viewInterfaceFltFolder                   = "01300-Filter.interface.ts";
+    string viewInterfaceFilterName                  = GetInterfaceFilterNameWithAnglr(AngularJsonFile, Model, viewInterfaceFltFolder, lformComponentFolder);
+
+    string viewServiceFolder                        = "01400-.service.ts";
+    string serviceClassName                         = GetServiceClassNameWithAnglr(AngularJsonFile, Model, viewServiceFolder, lformComponentFolder);
+
+    string sformComponentFolder                     = "01420-Sform.component.ts";
+    string searchComponentClassName                 = GetComponentClassNameWithAnglr(AngularJsonFile, Model, sformComponentFolder, lformComponentFolder);
+
+    string viewInterfaceVDlgFolder                  = "01510-Vdlg.interface.ts";
+    string viewInterfaceVDlgClassName               = GetInterfaceVDlgNameWithAnglr(AngularJsonFile, Model,  viewInterfaceVDlgFolder, lformComponentFolder);
+
+    string vdlgComponentFolder                      = "01520-Vdlg.component.ts";
+    string vdlgComponentClassName                   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, vdlgComponentFolder, lformComponentFolder);
+    string vModSrvFolder                            = "01550-V.module.service.ts";
+    string vModSrvClassName                         = GetModuleServiceClassNameWithAnglr(AngularJsonFile, Model, vModSrvFolder, lformComponentFolder);
+
+    string viewInterfaceADlgFolder                  = "01512-Adlg.interface.ts";
+    string viewInterfaceADlgClassName               = GetInterfaceADlgNameWithAnglr(AngularJsonFile, Model,  viewInterfaceADlgFolder, lformComponentFolder);
+
+    string adlgComponentFolder                      = "01522-Adlg.component.ts";
+    string adlgComponentClassName                   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, adlgComponentFolder, lformComponentFolder); 
+    string aModSrvFolder                            = "01552-A.module.service.ts";
+    string aModSrvClassName                         = GetModuleServiceClassNameWithAnglr(AngularJsonFile, Model, aModSrvFolder, lformComponentFolder);
+
+    string viewInterfaceUDlgFolder                  = "01514-Udlg.interface.ts";
+    string viewInterfaceUDlgClassName               = GetInterfaceUDlgNameWithAnglr(AngularJsonFile, Model,  viewInterfaceUDlgFolder, lformComponentFolder);
+
+    string udlgComponentFolder                      = "01524-Udlg.component.ts";
+    string udlgComponentClassName                   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, udlgComponentFolder, lformComponentFolder); 
+    string uModSrvFolder                            = "01554-U.module.service.ts";
+    string uModSrvClassName                         = GetModuleServiceClassNameWithAnglr(AngularJsonFile, Model, uModSrvFolder, lformComponentFolder);
+
+    string viewInterfaceDDlgFolder                  = "01516-Ddlg.interface.ts";
+    string viewInterfaceDDlgClassName               = GetInterfaceDDlgNameWithAnglr(AngularJsonFile, Model,  viewInterfaceDDlgFolder, lformComponentFolder);
+
+    string ddlgComponentFolder                      = "01526-Ddlg.component.ts";
+    string ddlgComponentClassName                   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, ddlgComponentFolder, lformComponentFolder); 
+    string dModSrvFolder                            = "01556-D.module.service.ts";
+    string dModSrvClassName                         = GetModuleServiceClassNameWithAnglr(AngularJsonFile, Model, dModSrvFolder, lformComponentFolder);
+
+
+    string captionPropName              = "caption";
+    string captionSelector              = "caption";
+
+    string showMultiSelectedRowSelector = "show-multi-selected-row";
+    string showMultiSelectedRowPropName = "showMultiSelectedRow";
+    string multiSelectedRowSelector     = "multi-selected-row";
+    string multiSelectedRowPropName     = "multiSelectedRow";
+    string onMultiSelectedRowPropName   = "onMultiSelectedRow";
+    string currentMultiRowPropName      = "currentMultiRow";
+    string permissionPropName           = "permission";
+    string accessDeniedPropName         = "accessdenied";
+
+    string ActionColumnDefProperty      = "menuAction";
+    string SelectColumnDefProperty      = "selectAction";
+    string DisplayedColumnsProperty     = "displayedColumns";
+    string MatPaginatorPageSize         = "10";
+    string MatPaginatorPageSizeOptions  = "[10, 25, 50, 100]";
+
+    string AppSettingServicePropName    = "appGlblSettings";
+    string DlgSrvPrefix                 = "dlgSrv";
+    string apiName                      = AbpFirstItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
+
+#>
+
+        "<#= apiName #>::<#= Model.ViewName #>:PluralTitle": "<#= Model.PluralTitle #>",
+        "<#= apiName #>::<#= Model.ViewName #>:Edit": "Modify Item",
+        "<#= apiName #>::<#= Model.ViewName #>:Delete": "Delete Item",
+        "<#= apiName #>::<#= Model.ViewName #>:View": "View Item",
+        "<#= apiName #>::<#= Model.ViewName #>:Add": "Add Item",
+        "<#= apiName #>::<#= Model.ViewName #>:DelSel": "Delete Selected",
+        "<#= apiName #>::<#= Model.ViewName #>:Permission": "Permission",
+        "<#= apiName #>::<#= Model.ViewName #>:AccDen": "Access denied",

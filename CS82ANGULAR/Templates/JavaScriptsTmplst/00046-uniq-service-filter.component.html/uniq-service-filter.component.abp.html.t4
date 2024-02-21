@@ -52,7 +52,7 @@
 
      <div fxLayout="row" fxLayoutAlign="flex-end space-around"> 
         <label fxFlex fxLayoutAlign="flex-start space-around">{{<#= captionPropName #>}}</label>
-        <i class="fas fa-arrow-circle-left text-primary mr-5" type="button" data-toggle="tooltip" (click)="<#= OnBackBtnMethodName #>()" *ngIf="<#= showBackBtnPropName #>" 
+        <i class="fa fa-arrow-circle-left text-primary mr-5" type="button" data-toggle="tooltip" (click)="<#= OnBackBtnMethodName #>()" *ngIf="<#= showBackBtnPropName #>" 
 <# 
     if(localize) {
 #>
@@ -65,11 +65,11 @@
     }
 #>
         <span fxFlex="3%"></span>  
-        <i class="fas plus-square text-primary ml-1 mr-3" type="button" data-toggle="tooltip" (click)="onApplyFilterClicked()"
+        <i class="fa fa-refresh text-primary ml-1 mr-3" type="button" data-toggle="tooltip" (click)="onApplyFilterClicked()"
 <# 
     if(localize) {
 #>
-         title="{{AddFltItm|async}}"></i>
+         title="{{ApplFlt|async}}"></i>
 <# 
     } else {
 #>
