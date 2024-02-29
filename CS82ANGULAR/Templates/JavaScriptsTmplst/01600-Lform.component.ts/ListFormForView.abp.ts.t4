@@ -218,6 +218,7 @@
     string DisplayedColumnsProperty     = "displayedColumns";
     string MatPaginatorPageSize         = "10";
     string MatPaginatorPageSizeOptions  = "[10, 25, 50, 100]";
+    string PermissionServicePropName    = "pmssnSrvs";
 
     string AppSettingServicePropName    = "appGlblSettings";
     string DlgSrvPrefix                 = "dlgSrv";
@@ -228,6 +229,7 @@ import { Component, OnInit, Input, Output, EventEmitter, ViewChild, AfterViewIni
 import { FormControl, Validators, ValidatorFn } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { firstValueFrom } from 'rxjs';
+import { PermissionService } from '@abp/ng.core';
 <# 
     if(localize) {
 #>
@@ -519,7 +521,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         {id: '<#= ActionParamAddMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'], iconName: 'fa-plus', iconColor: 'primary', enabled: true},
         {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteSelMode #>'], iconName: 'fa-trash', iconColor: 'warning', enabled: true},
         ];
-    constructor(private  <#= formRootService #>: <#= serviceClassName #>, 
+    constructor(private  <#= formRootService #>: <#= serviceClassName #>, private <#= PermissionServicePropName #>: PermissionService,
 <#
     if(Model.IsWebApiSelectOneByPrimarykey) {
 #>
@@ -552,9 +554,9 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 #>
         protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, public dialog: NgbModal, private cd: ChangeDetectorRef) {
     }
-    permMask: number = 0;
+    // permMask: number = 0;
     ngOnInit() {
-        this.permMask = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= Model.ViewName #>');
+        // this.permMask = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= Model.ViewName #>');
     
         this.onRowMenuItemsData();
         this.onTableMenuItemsData();
@@ -568,8 +570,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
           {id: '<#= ActionParamViewMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'fa-eye', iconColor: 'primary', enabled: true },
         ];
         tmp = tmp.concat(this._<#= RowCommandsPropName #>);
-        tmp[0].enabled = this._<#= CanUpdPropName #> && ((this.permMask & 4) === 4)  <# if (!Model.IsWebApiUpdate) { #> && false <# } #>;
-        tmp[1].enabled = this._<#= CanDelPropName #> && ((this.permMask & 2) === 2) <# if (!Model.IsWebApiDelete) { #> && false <# } #>;
+        tmp[0].enabled = this._<#= CanUpdPropName #> && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>.u')  <# if (!Model.IsWebApiUpdate) { #> && false <# } #>;
+        tmp[1].enabled = this._<#= CanDelPropName #> && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>.d') <# if (!Model.IsWebApiDelete) { #> && false <# } #>;
         tmp[2].enabled = this._<#= CanViewPropName #> <# if (!Model.IsWebApiSelectOneByPrimarykey) { #> && false <# } #>;
         this.rowMenuItemsData = tmp;
     }
@@ -579,8 +581,8 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'fa-trash', iconColor: 'warning', enabled: true},
         ];
         tmp = tmp.concat(this._<#= TableCommandsPropName #>);
-        tmp[0].enabled = this._<#= CanAddPropName #> && ((this.permMask & 8) === 8) <# if (!Model.IsWebApiAdd) { #> && false <# } #>;
-        tmp[1].enabled = this._<#= CanDelPropName #> && ((this.permMask & 2) === 2) <# if (!Model.IsWebApiDelete) { #> && false <# } #>;
+        tmp[0].enabled = this._<#= CanAddPropName #> && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>.a') <# if (!Model.IsWebApiAdd) { #> && false <# } #>;
+        tmp[1].enabled = this._<#= CanDelPropName #> && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>.d') <# if (!Model.IsWebApiDelete) { #> && false <# } #>;
         this.tableMenuItemsData = tmp;
     }
     

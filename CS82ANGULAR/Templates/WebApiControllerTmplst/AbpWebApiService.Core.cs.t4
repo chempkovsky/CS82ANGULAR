@@ -92,10 +92,10 @@ using <#= appServiceInterfaceNameSpace #>;
     {
         
         public const string Default = GroupName + ".<#= Model.ViewName #>";
-        public const string FullScan = Default + ".FullScan";
-        public const string Create = Default + ".Create";
-        public const string Edit = Default + ".Edit";
-        public const string Delete = Default + ".Delete";
+        public const string FullScan = Default + ".f";
+        public const string Create = Default + ".a";
+        public const string Edit = Default + ".u";
+        public const string Delete = Default + ".d";
     }
 
     ...
@@ -112,11 +112,11 @@ using <#= appServiceInterfaceNameSpace #>;
         {
             var mdlGrp = context.AddGroup(<#= moduleName #>Permissions.GroupName, L("Permission:<#= moduleName #>"));
 
-            var perm = mdlGrp.AddPermission(<#= moduleName #>Permissions.<#= Model.ViewName #>.Default, L("Permission:<#= Model.ViewName #>"));
-            perm.AddChild(<#= moduleName #>Permissions.<#= Model.ViewName #>.FullScan, L("Permission:<#= Model.ViewName #>.FullScan"));
-            perm.AddChild(<#= moduleName #>Permissions.<#= Model.ViewName #>.Create, L("Permission:<#= Model.ViewName #>.Create"));
-            perm.AddChild(<#= moduleName #>Permissions.<#= Model.ViewName #>.Edit, L("Permission:<#= Model.ViewName #>.Edit"));
-            perm.AddChild(<#= moduleName #>Permissions.<#= Model.ViewName #>.Delete, L("Permission:<#= Model.ViewName #>.Delete"));
+            var perm = mdlGrp.AddPermission(<#= moduleName #>Permissions.<#= Model.ViewName #>.Default, L("Psn:<#= Model.ViewName #>"));
+            perm.AddChild(<#= moduleName #>Permissions.<#= Model.ViewName #>.FullScan, L("Psn:<#= Model.ViewName #>.f"));
+            perm.AddChild(<#= moduleName #>Permissions.<#= Model.ViewName #>.Create, L("Psn:<#= Model.ViewName #>.a"));
+            perm.AddChild(<#= moduleName #>Permissions.<#= Model.ViewName #>.Edit, L("Psn:<#= Model.ViewName #>.u"));
+            perm.AddChild(<#= moduleName #>Permissions.<#= Model.ViewName #>.Delete, L("Psn:<#= Model.ViewName #>.d"));
         }
 
         ...

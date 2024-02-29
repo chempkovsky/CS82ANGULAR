@@ -7950,5 +7950,10 @@
             }
             return rslt;
         }
+        string AbpFirstItemOfDestinationNameSpace(ModelViewSerializable model) {
+            if (model == null) return "";
+            return AbpFirstItemOfNameSpace(GetDestinationNameSpace(model));
+        }
+        
 
 #>

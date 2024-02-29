@@ -254,6 +254,7 @@
     string OnBackBtnSelector            = "on-back-btn";
     string showBackBtnPropName          = "showBackBtn";
     string showBackBtnSelector          = "show-back-btn";
+    string PermissionServicePropName    = "pmssnSrvs";
     
     List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = GetModelUniqueKeys(Model, new List<ModelViewUniqueKeyOfVwSerializable>());
     ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
@@ -264,6 +265,7 @@
 
 #>
 import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, ChangeDetectorRef, QueryList, ViewChildren} from '@angular/core';
+import { PermissionService } from '@abp/ng.core';
 <# 
     if(localize) {
 #>
@@ -1144,7 +1146,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
 
     cnFllscn: boolean = false;
 
-    constructor(public  <#= formRootService #>: <#= serviceClassName #>, public <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, 
+    constructor(public  <#= formRootService #>: <#= serviceClassName #>, public <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>, private <#= PermissionServicePropName #>: PermissionService,
 <# 
         if(localize) {
 #>
@@ -1171,7 +1173,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
 #>    
             protected dialog: NgbModal,
             private cd: ChangeDetectorRef) {
-            this.cnFllscn = (<#= AppSettingServicePropName #>.getViewModelMask('<#= Model.ViewName #>') & 16) === 16;
+            this.cnFllscn = this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>.f')
             this.redefTableIndexMenuItemsData();
     }
 

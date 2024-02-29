@@ -59,15 +59,18 @@ import { LocalizationService } from '@abp/ng.core';
 <# 
     }
 #>
-import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot, CanActivateChild, Route } from '@angular/router';
+// import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot, CanActivateChild, Route } from '@angular/router';
+import { Router, ActivatedRouteSnapshot, RouterStateSnapshot, Route } from '@angular/router';
 import { <#= appConfigServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appConfigServiceFolder, appSettingServiceFolder) #>';
 import { HttpParameterCodec } from '@angular/common/http';
+import { LocalizationService, PermissionService } from '@abp/ng.core';
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class <#= appSettingServiceClassName #> implements CanActivate, CanActivateChild, HttpParameterCodec {
+export class <#= appSettingServiceClassName #> implements // CanActivate, CanActivateChild, 
+    HttpParameterCodec {
 //
 // begin HttpParameterCodec: https://github.com/angular/angular/issues/20376
 //
@@ -105,21 +108,67 @@ export class <#= appSettingServiceClassName #> implements CanActivate, CanActiva
 <# 
     if(localize) {
 #>
-    ErrorTxt: string | null = null;
-    ErrorTp: string | null = null;
-    SttsTxt: string | null = null;
-    SttsText: string | null = null;
-    ErrorCd: string | null = null;
-    ErrorDscr: string | null = null;
-    ValidError: string | null = null;
-    ReqMxLn: string | null = null;
-    ReqMinLn: string | null = null;
-    ReqFld: string | null = null;
-    VlMstLssTn: string | null = null;
-    VlMstGtTn: string | null = null;
-    IncrctFt: string | null = null;
-    IncrctDtFt: string | null = null;
-    AccDen: string | null = null;
+        ErrorTxt: string | null = this.L.instant({
+            key: 'CmSt::ErrorTxt',
+            defaultValue: "Error :"
+        });
+        ErrorTp: string | null = this.L.instant({
+            key: 'CmSt::ErrorTp',
+            defaultValue: "Error of type"
+        });
+        SttsTxt: string | null = this.L.instant({
+            key: 'CmSt::SttsTxt',
+            defaultValue: "status:"
+        });
+        SttsText: string | null = this.L.instant({
+            key: 'CmSt::SttsText',
+            defaultValue: "Status Text:"
+        });
+        ErrorCd: string | null = this.L.instant({
+            key: 'CmSt::ErrorCd',
+            defaultValue: "error code:"
+        });
+        ErrorDscr: string | null = this.L.instant({
+            key: 'CmSt::ErrorDscr',
+            defaultValue: "error descr:"
+        });
+        ValidError: string | null = this.L.instant({
+            key: 'CmSt::ValidError',
+            defaultValue: "Validation Error."
+        });
+        ReqMxLn: string | null = this.L.instant({
+            key: 'CmSt::ReqMxLn',
+            defaultValue: "Required max length"
+        });
+        ReqMinLn: string | null = this.L.instant({
+            key: 'CmSt::ReqMinLn',
+            defaultValue: "Required min length"
+        });
+        ReqFld: string | null = this.L.instant({
+            key: 'CmSt::ReqFld',
+            defaultValue: "Required field"
+        });
+        VlMstLssTn: string | null = this.L.instant({
+            key: 'CmSt::VlMstLssTn',
+            defaultValue: "The value must be less than"
+        });
+        VlMstGtTn = this.L.instant({
+            key: 'CmSt::VlMstGtTn',
+            defaultValue: "The value must be greater than"
+        });
+        IncrctFt: string | null = this.L.instant({
+            key: 'CmSt::IncrctFt',
+            defaultValue: "Icorrect format"
+        });
+        IncrctDtFt: string | null = this.L.instant({
+            key: 'CmSt::IncrctDtFt',
+            defaultValue: "Icorrect date format"
+        });
+        AccDen: string | null = this.L.instant({
+            key: 'CmSt::AccDen',
+            defaultValue: "Access denied"
+        });
+
 <# 
     }
 #>
@@ -730,7 +779,7 @@ deprecated
 @Injectable({
   providedIn: 'root'
 })
-export class <#= appSettingServiceClassName + "Activator" #> implements CanActivate {
+export class <#= appSettingServiceClassName + "Activator" #> { // implements CanActivate {
     constructor(protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {}
     
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
@@ -738,3 +787,8 @@ export class <#= appSettingServiceClassName + "Activator" #> implements CanActiv
     }
 }
 
+export function <#= appSettingServiceClassName + "CanActivateFn" #>(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+  if(typeof route.data['pm'] === 'undefined') return false;
+  if(route.data['pm'] === null) return false;
+  return inject(PermissionService).getGrantedPolicy(route.data['pm']);
+}

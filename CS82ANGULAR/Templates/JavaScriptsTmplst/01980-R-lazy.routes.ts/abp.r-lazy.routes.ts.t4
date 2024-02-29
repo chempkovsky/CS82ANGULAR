@@ -1,0 +1,359 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+    
+    string rLazyRoutesFolder            = "01980-R-lazy.routes.ts";
+    string appSettingServiceFolder      = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName   = GetCommonServiceClassName(Context, appSettingServiceFolder);
+
+    CommonStaffSerializable refItem     = null;
+    if(!(Model.CommonStaffs == null)) {
+        refItem = Model.CommonStaffs.Where(c => c.FileType == rLazyRoutesFolder).FirstOrDefault();
+    }
+    AngularProject currAngularPrj = GetAngularProjectByRefItem(AngularJsonFile, refItem);
+    if(currAngularPrj is null) {
+        throw new Exception("Critical error: Couldn't find Angular Project to generate code!");
+    }
+    if(currAngularPrj.ProjectType != "application") {
+        throw new Exception("Critical error: The folder you choose to generate the code must belong to an application-type project.");
+    }
+
+    string HiddenFilterPrefix           = "hf";
+    string IdPrefix                     = "id";
+    string DepthParamName               = "depth"; 
+    string uidParamName                 = "uid"; 
+
+    string VPrefix                      = "View";
+    string APrefix                      = "Add";
+    string UPrefix                      = "Upd";
+    string DPrefix                      = "Del";
+
+    string MaxHeightPropSelector        = "max-height";
+    string MaxHeightPropName            = "maxHeight";
+    string FilterMaxHeightPropSelector  = "filter-max-height";
+    string FilterMaxHeightPropName      = "filterMaxHeight";
+    string ShowFilterPropName           = "showFilter";
+    string TitlePropName                = "title";
+
+
+    string routeDataViewNamePropName        = "vn";
+    string routeDataViewActionPropName      = "va";
+    string routeDataShowMultiSelectPropName = "ms";
+    string routeShowFilterPropName          = "sf";
+    string routeMaxHeightPropName           = "mh";
+    string routeFilterMaxHeightPropName     = "fh";
+    string routeDepthParamName              = "dp"; 
+    string routePermission                  = "pm";
+
+
+                                           
+    string rvLazyModuleFolder           = "01970-Rv-lazy.routing.module.ts";
+    string raLazyModuleFolder           = "01972-Ra-lazy.routing.module.ts";
+    string ruLazyModuleFolder           = "01974-Ru-lazy.routing.module.ts";
+    string rdLazyModuleFolder           = "01976-Rd-lazy.routing.module.ts";
+    string rlLazyModuleFolder           = "01978-Rl-lazy.routing.module.ts";
+
+    Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
+    List<Tuple<ModelViewSerializable, string, int>> nodes = new List<Tuple<ModelViewSerializable, string, int>>();
+    List<string> allViewNames= new List<string>();
+    // Model, url, depth
+    nodes.Add(new Tuple<ModelViewSerializable, string, int>( Model, Model.ViewName, 1));
+    List<string> detailViewNames = new List<string>();
+    allViewNames.Add(Model.ViewName);
+
+    {
+        int currId= 0;
+        while(currId < nodes.Count) {
+            Tuple<ModelViewSerializable, string, int> masterNode = nodes[currId];
+            ModelViewSerializable masterView = masterNode.Item1;
+            List<ModelViewPropertyOfVwSerializable> masterPrincipals = GetModelPrimaryKeyProps(masterView);
+            string CurrPath = masterNode.Item2;
+            int CurrDepth = masterNode.Item3 + 1;
+            List<string> viewNames = GetDetailViews(masterView, Context, null);
+            foreach(string viewName in viewNames) {
+                ModelViewSerializable detailView = GetViewByName(Context, viewName);
+                if(nodes.Count(p => p.Item1 == detailView) > 2) {
+                    continue;
+                }
+                string newPath = CurrPath + "/" + viewName;
+                if (CurrDepth > 1) {
+                    newPath = newPath +"/:" + HiddenFilterPrefix + CurrDepth.ToString();
+                }
+                List<ModelViewForeignKeySerializable> foreignKeys = GetDetailViewForeignKeys(masterView, detailView, null);
+                detailViewNames.Clear();
+                bool isM2m = false;
+                if(IsTableMatchesIndex(detailView)) {
+                    if(AllPrimKeyPropsAreForeignKeysProps(detailView)) {
+                        if(ForeignKeysOrderedInsidePrimKey(detailView)) {
+                            isM2m = true;
+                        }
+                    }
+                }
+                foreach(ModelViewForeignKeySerializable foreignKey in foreignKeys) {
+                    if(isM2m) {
+                        // m2mMdl, m2mFk, searchFks, otherFks, externalFks
+                        tmpSearchSchema = DetailViewAsM2mMdl(detailView, Context);
+                        if (tmpSearchSchema != null) {
+                            int  cnt = 0;
+                            if(tmpSearchSchema.Item5 == null) continue;
+                            if(tmpSearchSchema.Item5.Count != 1) continue;
+                            if(tmpSearchSchema.Item4 != null) continue;
+                            if(tmpSearchSchema.Item5[0].Key != foreignKey) continue;
+                            ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
+                            string newPathEx = CurrPath + "/" + viewToNavigate.ViewName;
+                            if (CurrDepth > 1) {
+                                newPathEx = newPathEx +"/:" + HiddenFilterPrefix + CurrDepth.ToString();
+                            }
+                            if (!detailViewNames.Any(v => v == viewToNavigate.ViewName)) {
+                                nodes.Add(new Tuple<ModelViewSerializable, string, int>(viewToNavigate, newPathEx, CurrDepth));
+                                detailViewNames.Add(viewToNavigate.ViewName);
+                            }
+                            continue;
+                        }
+                    }
+                    if (!detailViewNames.Any(v => v == detailView.ViewName)) {
+                        nodes.Add(new Tuple<ModelViewSerializable, string, int>(detailView, newPath, CurrDepth));
+                        detailViewNames.Add(detailView.ViewName);
+                    }
+                }
+            }
+            currId++;
+        }
+    }
+
+#>
+
+<# {
+        Tuple<ModelViewSerializable, string, int> node = nodes[0];
+#>
+//
+// How to use:
+//  1.
+//  <li [ngbNavItem] > <a ngbNavLink [routerLink]="['<#= node.Item2 #>']" routerLinkActive="active">List of <#= Model.PluralTitle #></a>/li>                  
+//  2.
+//  <a mat-list-item [routerLink]="['<#= node.Item2 #>']" routerLinkActive="active">List of <#= Model.PluralTitle #></a>
+//  3.
+//  mainMenuItems: Array<{id?: number | string, parentId?: number | string, text?: string, icon?: string, disabled?: boolean, selected?: boolean, separator?: boolean, path?: string}> = [
+//      { text: "Home", icon: "k-i-home", selected: false, path: "/home" },
+//      ...
+//      { text: "List of <#= Model.PluralTitle #>", icon: "k-i-grid", selected: false, path: '<#= node.Item2 #>' },
+//      ...
+//  // never leave separator as the last element of an array
+//  //      { separator: true },
+//  ]
+//
+<#
+    }
+#>
+//
+// 2. Do not save this file.
+//
+// Copy generated paths and insert into "const routes: Routes = [...] "-array
+// const routes: Routes = [
+//  ...
+/*
+
+<#
+    for(int k = nodes.Count-1; k > -1; k--) {
+        Tuple<ModelViewSerializable, string, int> node = nodes[k];
+        ModelViewSerializable aModel = node.Item1;
+        int CurrDepth = node.Item3 + 1;
+        List<ModelViewPropertyOfVwSerializable> aModelPrincipals = GetModelPrimaryKeyProps(aModel);
+
+        string rlLazyModuleImport = null;
+        if(aModel.CommonStaffs.Any(c => c.FileType == rlLazyModuleFolder)) {
+            rlLazyModuleImport = GenerateLoadChildrenImportWithAnglrEx(AngularJsonFile, aModel, rlLazyModuleFolder, currAngularPrj);
+        }
+
+        string rvLazyModuleImport = null;
+        if(aModel.CommonStaffs.Any(c => c.FileType == rvLazyModuleFolder)) {
+            rvLazyModuleImport = GenerateLoadChildrenImportWithAnglrEx(AngularJsonFile, aModel, rvLazyModuleFolder, currAngularPrj);
+        }
+
+        string raLazyModuleImport = null;
+        if(aModel.CommonStaffs.Any(c => c.FileType == raLazyModuleFolder)) {
+            raLazyModuleImport = GenerateLoadChildrenImportWithAnglrEx(AngularJsonFile, aModel, raLazyModuleFolder, currAngularPrj);
+        }
+
+        string ruLazyModuleImport = null;
+        if(aModel.CommonStaffs.Any(c => c.FileType == ruLazyModuleFolder)) {
+            ruLazyModuleImport = GenerateLoadChildrenImportWithAnglrEx(AngularJsonFile, aModel, ruLazyModuleFolder, currAngularPrj);
+        }
+
+        string rdLazyModuleImport = null;
+        if(aModel.CommonStaffs.Any(c => c.FileType == rdLazyModuleFolder)) {
+            rdLazyModuleImport = GenerateLoadChildrenImportWithAnglrEx(AngularJsonFile, aModel, rdLazyModuleFolder, currAngularPrj);
+        }
+        
+#>
+
+//
+// Info: Root Master View  [<#= Model.ViewName #>] 
+// Info: Detail View  [<#= aModel.ViewName #>] 
+//
+<#
+
+        if(aModel.IsWebApiSelectManyWithPagination) {
+            if(!string.IsNullOrEmpty(rlLazyModuleImport)  && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rlLazyModuleFolder)))) {
+
+
+
+                if(aModel.IsWebApiSelectOneByPrimarykey) {
+                    if(!string.IsNullOrEmpty(rvLazyModuleImport) && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rvLazyModuleFolder)))) {
+#>
+    { path: '<#= node.Item2 + "/" + VPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', canActivate:[<#= appSettingServiceClassName + "CanActivateFn" #>],
+        <#= rvLazyModuleImport #>,
+        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'v', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'View <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>', <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
+
+<#
+                    } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the component [<#= rvLazyModuleFolder #>] has not been generated yet
+//
+<#
+                    } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
+                } else { // if(aModel.IsWebApiSelectOneByPrimarykey) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] SelectOneByPrimarykey is set to false
+//
+<#
+                } // if(aModel.IsWebApiSelectOneByPrimarykey) { ... } else { ... }
+
+
+
+
+                if(aModel.IsWebApiAdd) {
+                    if(!string.IsNullOrEmpty(raLazyModuleImport)  && (!string.IsNullOrEmpty( GetModuleClassName(aModel, raLazyModuleFolder)))) {
+#>
+    { path: '<#= node.Item2 + "/" + APrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() #>', canActivate:[<#= appSettingServiceClassName + "CanActivateFn" #>],
+        <#= raLazyModuleImport #>,
+        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>.a', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'a', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'Add <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
+
+<#
+                    } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= raLazyModuleFolder #>] has not been generated yet
+//
+<#
+                    } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
+                } else { // if(aModel.IsWebApiAdd) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] WebApiAdd is set to false
+//
+<#
+                } // if(aModel.IsWebApiAdd) { ... } else { ... }
+
+
+
+
+                if(aModel.IsWebApiUpdate) {
+                    if(!string.IsNullOrEmpty(ruLazyModuleImport)  && (!string.IsNullOrEmpty( GetModuleClassName(aModel, ruLazyModuleFolder)))) {
+#>
+    { path: '<#= node.Item2 + "/" + UPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', canActivate:[<#= appSettingServiceClassName + "CanActivateFn" #>],
+        <#= ruLazyModuleImport #>,
+        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>.u', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'u', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'Update <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
+
+<#
+                    } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= ruLazyModuleFolder #>] has not been generated yet
+//
+<#
+                    } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
+                } else { // if(aModel.IsWebApiUpdate) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] WebApiUpdate is set to false
+//
+<#
+                } // if(aModel.IsWebApiUpdate) { ... } else { ... }
+
+
+
+
+                if(aModel.IsWebApiDelete) {
+                    if(!string.IsNullOrEmpty(rdLazyModuleImport)  && (!string.IsNullOrEmpty( GetModuleClassName(aModel, rdLazyModuleFolder)))) {
+#>
+    { path: '<#= node.Item2 + "/" + DPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', canActivate:[<#= appSettingServiceClassName + "CanActivateFn" #>],
+        <#= rdLazyModuleImport #>,
+        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>.d', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'd', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'Delete <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
+
+<#
+                    } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= rdLazyModuleFolder #>] has not been generated yet
+//
+<#
+                    } // if(!string.IsNullOrEmpty(fileNm_rv)) { ... } else { ... }
+                } else { // if(aModel.IsWebApiDelete) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] WebApiDelete is set to false
+//
+<#
+                } // if(aModel.IsWebApiDelete) { ... } else { ... }
+
+
+                if(node.Item3 > 1) {
+#>
+    { path: '<#= node.Item2 #>', canActivate:[<#= appSettingServiceClassName + "CanActivateFn" #>], 
+        <#= rlLazyModuleImport #>,
+        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true,  <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, /*  <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + node.Item3.ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+
+<#
+
+                } else {
+#>
+    { path: '<#= node.Item2 #>', canActivate:[<#= appSettingServiceClassName + "CanActivateFn" #>], 
+        <#= rlLazyModuleImport #>,
+        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true,  <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, /* <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+
+<#
+                } // if(node.Item3 > 1) { ... } else { ... }
+
+
+
+            } else {
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] the componen [<#= rlLazyModuleFolder #>] has not been generated yet
+//
+<#
+            }
+        } else { // if(aModel.IsWebApiSelectManyWithPagination) { ... } ...
+#>
+//
+//warning: for the View   [<#= aModel.ViewName #>] SelectManyWithPagination is set to false
+//
+<#
+        } // if(aModel.IsWebApiSelectManyWithPagination) { } else { ... }
+    }
+#>
+*/
+//
+//    ...
+//];
+//
+
+
