@@ -162,11 +162,11 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             defaultValue: "View <#= Model.Title #>"
         }), 
         '<#= NavBackToMasterPropName #>': this.L.instant({
-            key: '<#= apiName #>::<#= Model.ViewName #>:NabBckMstr',
+            key: 'CmSt::NabBckMstr',
             defaultValue: "Navigate back to master"
         }), 
         'Hide-details': this.L.instant({
-            key: '<#= apiName #>::<#= Model.ViewName #>:HideDtls',
+            key: 'CmSt::HideDtls',
             defaultValue: "Hide details"
         }), 
 <#

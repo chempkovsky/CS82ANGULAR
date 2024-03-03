@@ -9,10 +9,12 @@ using EnvDTE80;
 using Microsoft.VisualStudio.TextTemplating;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 
@@ -630,6 +632,7 @@ namespace CS82ANGULAR.ViewModel
             textTemplatingSessionHost.Session["DeleteBehavior"] = SelectedOnDeleteAction;
 
 
+            textTemplating.BeginErrorSession();
             string result = textTemplating.ProcessTemplate(tempatePath, T4TempateText, tpCallback);
             if (tpCallback.ProcessingErrors != null)
             {
@@ -641,9 +644,42 @@ namespace CS82ANGULAR.ViewModel
                         GenerateError = GenerateError + tpError.ToString() + "\n";
                     }
                     MessageBox.Show(GenerateError, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    textTemplating.EndErrorSession();
                     return null;
                 }
             }
+            {
+                string GenerateError = "";
+                Microsoft.VisualStudio.TextTemplating.Engine eng =
+                    (textTemplating as ITextTemplatingComponents).Engine as Microsoft.VisualStudio.TextTemplating.Engine;
+                Type t = eng.GetType();
+                FieldInfo fld = t.GetField("errors", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public);
+                if (fld != null)
+                {
+                    CompilerErrorCollection errs = (CompilerErrorCollection)fld.GetValue(eng);
+                    if (errs != null)
+                    {
+                        if (errs.HasErrors)
+                        {
+                            GenerateError += "Error: \n";
+                        }
+                        foreach (CompilerError err in errs)
+                        {
+                            if (!err.IsWarning)
+                            {
+                                GenerateError += err.ToString() + "\n";
+                            }
+                        }
+                    }
+                }
+                if (!string.IsNullOrEmpty(GenerateError))
+                {
+                    MessageBox.Show(GenerateError, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    textTemplating.EndErrorSession();
+                    return null;
+                }
+            }
+            textTemplating.EndErrorSession();
             return result;
         }
         public void DoRefresh()

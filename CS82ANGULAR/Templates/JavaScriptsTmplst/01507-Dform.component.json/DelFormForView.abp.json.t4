@@ -287,7 +287,8 @@
 <#
     }
 #>
-        "<#= apiName #>::<#= Model.ViewName #>:NAllPrpsAreSet": "Not all properties are set"
         "<#= apiName #>::<#= Model.ViewName #>:DeleteTitle": "Delete <#= Model.Title #>"
-        "<#= apiName #>::<#= Model.ViewName #>:SelTitleCaptionVal": "<#= TitleCaptionVal #>"
-        "<#= apiName #>::<#= Model.ViewName #>:NtAllMstSet": "Not all masters have been set"
+
+        "CmSt::NAllPrpsAreSet": "Not all properties are set",
+        "CmSt::SItm": "Select Item",
+        "CmSt::NtAllMstSet": "Not all masters have been set"

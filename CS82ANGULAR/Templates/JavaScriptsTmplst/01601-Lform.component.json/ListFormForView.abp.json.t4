@@ -226,10 +226,10 @@
 #>
 
         "<#= apiName #>::<#= Model.ViewName #>:PluralTitle": "<#= Model.PluralTitle #>",
-        "<#= apiName #>::<#= Model.ViewName #>:Edit": "Modify Item",
-        "<#= apiName #>::<#= Model.ViewName #>:Delete": "Delete Item",
-        "<#= apiName #>::<#= Model.ViewName #>:View": "View Item",
-        "<#= apiName #>::<#= Model.ViewName #>:Add": "Add Item",
-        "<#= apiName #>::<#= Model.ViewName #>:DelSel": "Delete Selected",
-        "<#= apiName #>::<#= Model.ViewName #>:Permission": "Permission",
-        "<#= apiName #>::<#= Model.ViewName #>:AccDen": "Access denied",
+        "CmSt::EItm": "Modify Item",
+        "CmSt::DItm": "Delete Item",
+        "CmSt::VItm": "View Item",
+        "CmSt::AItm": "Add Item",
+        "CmSt::DSel": "Delete Selected",
+        "CmSt::Prmssn": "Permission",
+        "CmSt::AccDen": "Access denied",

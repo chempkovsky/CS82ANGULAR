@@ -308,31 +308,31 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 defaultValue: "<#= Model.PluralTitle #>"
             }), 
         '<#= ActionParamUpdateMode #>': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:Edit',
+                key: 'CmSt::EItm',
                 defaultValue: "Modify Item"
             }), 
         '<#= ActionParamDeleteMode #>': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:Delete',
+                key: 'CmSt::DItm',
                 defaultValue: "Delete Item"
             }), 
         '<#= ActionParamViewMode #>': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:View',
+                key: 'CmSt::VItm',
                 defaultValue: "View Item"
             }), 
         '<#= ActionParamAddMode #>': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:Add',
+                key: 'CmSt::AItm',
                 defaultValue: "Add Item"
             }), 
         '<#= ActionParamDeleteSelMode #>': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:DelSel',
+                key: 'CmSt::DSel',
                 defaultValue: "Delete Selected"
             }), 
         '<#= permissionPropName #>': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:Permission',
+                key: 'CmSt::Prmssn',
                 defaultValue: "Permission"
             }), 
         '<#= accessDeniedPropName #>': this.L.instant({
-                key: '<#= apiName #>::<#= Model.ViewName #>:AccDen',
+                key: 'CmSt::AccDen',
                 defaultValue: "Access denied"
             }) 
     };

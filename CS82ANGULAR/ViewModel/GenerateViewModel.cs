@@ -9,6 +9,8 @@ using Microsoft.VisualStudio.TextTemplating;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
 using System;
 using System.Threading.Tasks;
+using System.CodeDom.Compiler;
+using System.Reflection;
 
 namespace CS82ANGULAR.ViewModel
 {
@@ -43,6 +45,7 @@ namespace CS82ANGULAR.ViewModel
 //            textTemplatingSessionHost.Session["AngularJsonFile"] = AngularJsonHelper.GetAngularJson();
             textTemplatingSessionHost.Session["Model"] = GeneratedModelView;
             textTemplatingSessionHost.Session["AngularJsonFile"] = AngularJsonHelper.GetAngularJson();
+            textTemplating.BeginErrorSession();
             if (string.IsNullOrEmpty(GenText))
             {
                 this.GenerateText = textTemplating.ProcessTemplate(T4TempatePath, File.ReadAllText(T4TempatePath), tpCallback);
@@ -59,6 +62,32 @@ namespace CS82ANGULAR.ViewModel
                     this.GenerateError = tpError.ToString() + "\n";
                 }
             }
+            if (string.IsNullOrEmpty(this.GenerateError))
+            {
+                Microsoft.VisualStudio.TextTemplating.Engine eng =
+                    (textTemplating as ITextTemplatingComponents).Engine as Microsoft.VisualStudio.TextTemplating.Engine;
+                Type t = eng.GetType();
+                FieldInfo fld = t.GetField("errors", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public);
+                if (fld != null)
+                {
+                    CompilerErrorCollection errs = (CompilerErrorCollection)fld.GetValue(eng);
+                    if (errs != null)
+                    {
+                        if (errs.HasErrors)
+                        {
+                            this.GenerateError += "Compiler errors found\n";
+                        }
+                        foreach (CompilerError err in errs)
+                        {
+                            if (!err.IsWarning)
+                            {
+                                this.GenerateError += err.ToString() + "\n";
+                            }
+                        }
+                    }
+                }
+            }
+            textTemplating.EndErrorSession();
             if (string.IsNullOrEmpty(this.GenerateError))
             {
                 if (string.Compare(this.FileExtension, ".jsonefm2txt", true) == 0)

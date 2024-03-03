@@ -15,6 +15,8 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System;
 using CS82ANGULAR.Model.Serializable.Angular;
+using System.CodeDom.Compiler;
+using System.Reflection;
 
 namespace CS82ANGULAR.Helpers.BatchProcess
 {
@@ -65,6 +67,7 @@ namespace CS82ANGULAR.Helpers.BatchProcess
             textTemplatingSessionHost.Session["Model"] = model;
             textTemplatingSessionHost.Session["Context"] = SerializableDbContext;
             textTemplatingSessionHost.Session["DefaultProjectNameSpace"] = string.IsNullOrEmpty(defaultProjectNameSpace) ? "" : defaultProjectNameSpace;
+            textTemplating.BeginErrorSession();
             result.GenerateText = textTemplating.ProcessTemplate(T4TempatePath, File.ReadAllText(result.T4TempatePath), tpCallback);
             result.FileExtension = tpCallback.FileExtension;
             if (tpCallback.ProcessingErrors != null)
@@ -72,8 +75,35 @@ namespace CS82ANGULAR.Helpers.BatchProcess
                 foreach (TPError tpError in tpCallback.ProcessingErrors)
                 {
                     result.GenerateError += tpError.ToString() + "\n";
+                    
                 }
             }
+            if (string.IsNullOrEmpty(result.GenerateError))
+            {
+                Microsoft.VisualStudio.TextTemplating.Engine eng =
+                    (textTemplating as ITextTemplatingComponents).Engine as Microsoft.VisualStudio.TextTemplating.Engine;
+                Type t = eng.GetType();
+                FieldInfo fld = t.GetField("errors", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public);
+                if (fld != null)
+                {
+                    CompilerErrorCollection errs = (CompilerErrorCollection)fld.GetValue(eng);
+                    if (errs != null)
+                    {
+                        if (errs.HasErrors)
+                        {
+                            result.GenerateError += "Compiler errors found\n";
+                        }
+                        foreach (CompilerError err in errs)
+                        {
+                            if (!err.IsWarning)
+                            {
+                                result.GenerateError += err.ToString() + "\n";
+                            }
+                        }
+                    }
+                }
+            }
+            textTemplating.EndErrorSession();
             if (string.IsNullOrEmpty(result.GenerateError))
             {
                 if (string.Compare(result.FileExtension, ".jsonefm2txt", true) == 0)

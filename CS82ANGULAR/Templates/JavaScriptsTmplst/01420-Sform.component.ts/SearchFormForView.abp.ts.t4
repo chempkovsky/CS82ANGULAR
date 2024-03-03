@@ -440,7 +440,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
         if(localize) {
 #>
         'fullscann': this.L.instant({
-            key: '<#= apiName #>::<#= Model.ViewName #>:FullScan',
+            key: 'CmSt::FullScan',
             defaultValue: 'full scan'
         }),
 <# 
@@ -510,7 +510,7 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
         if(localize) {
 #>
     FltNtAppl: string = this.L.instant({
-            key: '<#= apiName #>::<#= Model.ViewName #>:FltNtAppl',
+            key: 'CmSt::FltNtAppl',
             defaultValue: 'Could not apply filter as not all attributes are set'
         });
 <# 

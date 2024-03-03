@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.TextTemplating;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
 using System;
 using System.Runtime.InteropServices;
@@ -51,13 +52,9 @@ namespace CS82ANGULAR
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
 
-            ITextTemplating textTemplating = null;
-            EnvDTE80.DTE2 dte2 = null;
-            IVsThreadedWaitDialogFactory dialogFactory = null;
-
-            dte2 = await GetServiceAsync(typeof(SDTE)) as EnvDTE80.DTE2;
-            textTemplating = await GetServiceAsync(typeof(STextTemplating)) as ITextTemplating;
-            dialogFactory = await GetServiceAsync(typeof(SVsThreadedWaitDialogFactory)) as IVsThreadedWaitDialogFactory;
+            EnvDTE80.DTE2 dte2 = await GetServiceAsync(typeof(SDTE)) as EnvDTE80.DTE2;
+            ITextTemplating textTemplating = await GetServiceAsync(typeof(STextTemplating)) as ITextTemplating;
+            IVsThreadedWaitDialogFactory dialogFactory = await GetServiceAsync(typeof(SVsThreadedWaitDialogFactory)) as IVsThreadedWaitDialogFactory;
 
 
             await CS82ANGULAR.Commands.CrtDbContextCommand.InitializeAsync(this, dte2, textTemplating, dialogFactory);

@@ -321,7 +321,7 @@
         } // foreach(var sch in searchSchemas) {...}
     } // if(searchSchemas != null) {...}
 #>
-    "<#= apiName #>::<#= Model.ViewName #>:FullScan": "full scan",
+    "CmSt::FullScan": "full scan",
 <# 
         if (Model.IsWebApiSelectOneByPrimarykey) {
             for(int i = 0; i < uniqueKeys.Count; i++) { 
@@ -356,6 +356,6 @@
             }
         }
 #>
-    "<#= apiName #>::<#= Model.ViewName #>:FltNtAppl": "Could not apply filter as not all attributes are set",
+    "CmSt::FltNtAppl": "Could not apply filter as not all attributes are set",
 
 

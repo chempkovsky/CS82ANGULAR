@@ -399,7 +399,7 @@ namespace CS82ANGULAR.Model
         }
         ModelViewPropertyOfVwSerializable GetModelScalarPropByKeyProp(ModelViewSerializable model, ModelViewKeyPropertySerializable pk)
         {
-            ModelViewPropertyOfVwSerializable rslt = null;
+           // ModelViewPropertyOfVwSerializable rslt = null;
             if ((model == null) || (pk == null)) return null;
             if (model.ScalarProperties == null) return null;
             ModelViewPropertyOfVwSerializable scProp =

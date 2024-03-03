@@ -7,6 +7,9 @@ using Microsoft.VisualStudio.TextTemplating.VSHost;
 using CS82ANGULAR.Helpers;
 using System;
 using System.Threading.Tasks;
+using System.Reflection;
+using System.CodeDom.Compiler;
+using System.Management.Instrumentation;
 
 namespace CS82ANGULAR.ViewModel
 {
@@ -22,7 +25,6 @@ namespace CS82ANGULAR.ViewModel
 
         public async Task DoGenerateViewModelAsync(DTE2 Dte, ITextTemplating textTemplating, string T4TempatePath, DbContextSerializable SerializableDbContext, ModelViewSerializable model, string defaultProjectNameSpace = null)
         {
-
             this.GenerateText = "";
             this.GenerateError = "";
             IsReady.DoNotify(this, false);
@@ -44,14 +46,17 @@ namespace CS82ANGULAR.ViewModel
                 IsReady.DoNotify(this, string.IsNullOrEmpty(this.GenerateError));
                 return;
             }
+
             ITextTemplatingSessionHost textTemplatingSessionHost = (ITextTemplatingSessionHost)textTemplating;
             textTemplatingSessionHost.Session = textTemplatingSessionHost.CreateSession();
             TPCallback tpCallback = new TPCallback();
+            
             textTemplatingSessionHost.Session["AngularJsonFile"] = AngularJsonHelper.GetAngularJson();
             textTemplatingSessionHost.Session["Model"] = GeneratedModelView;
             textTemplatingSessionHost.Session["Context"] = SerializableDbContext;
             textTemplatingSessionHost.Session["DefaultProjectNameSpace"] = string.IsNullOrEmpty(defaultProjectNameSpace) ? "" : defaultProjectNameSpace;
-
+            
+            textTemplating.BeginErrorSession();
             if (string.IsNullOrEmpty(GenText))
             {
                 this.GenerateText = textTemplating.ProcessTemplate(T4TempatePath, File.ReadAllText(T4TempatePath), tpCallback);
@@ -70,13 +75,38 @@ namespace CS82ANGULAR.ViewModel
             }
             if (string.IsNullOrEmpty(this.GenerateError))
             {
+                Microsoft.VisualStudio.TextTemplating.Engine eng =
+                    (textTemplating as ITextTemplatingComponents).Engine as Microsoft.VisualStudio.TextTemplating.Engine;
+                Type t = eng.GetType();
+                FieldInfo fld = t.GetField("errors", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public);
+                if(fld != null)
+                {
+                    CompilerErrorCollection errs = (CompilerErrorCollection)fld.GetValue(eng);
+                    if (errs != null)
+                    {
+                        if (errs.HasErrors)
+                        {
+                            this.GenerateError +=  "Compiler errors found\n";
+                        }
+                        foreach(CompilerError err in errs)
+                        {
+                            if (!err.IsWarning)
+                            {
+                                this.GenerateError += err.ToString() + "\n";
+                            }
+                        }
+                    }
+                }
+            }
+            textTemplating.EndErrorSession();
+            if (string.IsNullOrEmpty(this.GenerateError))
+            {
                 if (string.Compare(this.FileExtension, ".jsonefm2txt", true) == 0)
                 {
                     this.FileExtension = ".txt";
                     this.GenerateText = await ExportFileModifier.ExecuteJsonScriptEFMAsync(AngularJsonHelper.GetAngularJson(), model, this.GenerateText);
                 }
             }
-
             IsReady.DoNotify(this, string.IsNullOrEmpty(this.GenerateError));
         }
         public async Task DoGenerateFeatureAsync(DTE2 Dte, ITextTemplating textTemplating, string T4TempatePath, DbContextSerializable SerializableDbContext, FeatureContextSerializable SerializableFeatureContext, FeatureSerializable feature, AllowedFileTypesSerializable AllowedFileTypes, string defaultProjectNameSpace = null)
@@ -114,6 +144,7 @@ namespace CS82ANGULAR.ViewModel
             textTemplatingSessionHost.Session["Context"] = SerializableDbContext;
             textTemplatingSessionHost.Session["DefaultProjectNameSpace"] = string.IsNullOrEmpty(defaultProjectNameSpace) ? "" : defaultProjectNameSpace;
 
+            textTemplating.BeginErrorSession();
             if (string.IsNullOrEmpty(GenText))
             {
                 this.GenerateText = textTemplating.ProcessTemplate(T4TempatePath, File.ReadAllText(T4TempatePath), tpCallback);
@@ -130,6 +161,32 @@ namespace CS82ANGULAR.ViewModel
                     this.GenerateError += tpError.ToString() + "\n";
                 }
             }
+            if (string.IsNullOrEmpty(this.GenerateError))
+            {
+                Microsoft.VisualStudio.TextTemplating.Engine eng =
+                    (textTemplating as ITextTemplatingComponents).Engine as Microsoft.VisualStudio.TextTemplating.Engine;
+                Type t = eng.GetType();
+                FieldInfo fld = t.GetField("errors", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public);
+                if (fld != null)
+                {
+                    CompilerErrorCollection errs = (CompilerErrorCollection)fld.GetValue(eng);
+                    if (errs != null)
+                    {
+                        if (errs.HasErrors)
+                        {
+                            this.GenerateError += "Compiler errors found\n";
+                        }
+                        foreach (CompilerError err in errs)
+                        {
+                            if (!err.IsWarning)
+                            {
+                                this.GenerateError += err.ToString() + "\n";
+                            }
+                        }
+                    }
+                }
+            }
+            textTemplating.EndErrorSession();
             if (string.IsNullOrEmpty(this.GenerateError))
             {
                 if (string.Compare(this.FileExtension, ".jsonefm2txt", true) == 0)

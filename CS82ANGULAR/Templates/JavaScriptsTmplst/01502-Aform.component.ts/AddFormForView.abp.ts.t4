@@ -351,7 +351,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         }
 #>
         'Not-all-props': this.L.instant({
-            key: '<#= apiName #>::<#= Model.ViewName #>:NAllPrpsAreSet',
+            key: 'CmSt::NAllPrpsAreSet',
             defaultValue: "Not all properties are set"
         }),
         '<#= captionPropName #>': this.L.instant({
@@ -359,11 +359,11 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             defaultValue: "Add <#= Model.Title #>"
         }),
         '<#= TitlePropName #>': this.L.instant({
-            key: '<#= apiName #>::<#= Model.ViewName #>:SelTitleCaptionVal',
-            defaultValue: "<#= TitleCaptionVal #>"
+            key: 'CmSt::SItm',
+            defaultValue: "Select Item"
         }),
         'Not-all-masters': this.L.instant({
-            key: '<#= apiName #>::<#= Model.ViewName #>:NtAllMstSet',
+            key: 'CmSt::NtAllMstSet',
             defaultValue: "Not all masters have been set"
         }) 
     };

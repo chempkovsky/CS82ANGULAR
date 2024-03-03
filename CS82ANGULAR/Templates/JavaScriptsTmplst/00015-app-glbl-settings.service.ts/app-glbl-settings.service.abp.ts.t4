@@ -50,7 +50,7 @@
 
 #>
 
-import { Injectable, Component, TemplateRef } from '@angular/core';
+import { Injectable, Component, TemplateRef, inject } from '@angular/core';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 <# 
     if(localize) {
@@ -63,7 +63,7 @@ import { LocalizationService } from '@abp/ng.core';
 import { Router, ActivatedRouteSnapshot, RouterStateSnapshot, Route } from '@angular/router';
 import { <#= appConfigServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appConfigServiceFolder, appSettingServiceFolder) #>';
 import { HttpParameterCodec } from '@angular/common/http';
-import { LocalizationService, PermissionService } from '@abp/ng.core';
+import { PermissionService } from '@abp/ng.core';
 
 
 @Injectable({

@@ -122,10 +122,10 @@
 #>
 
 
-        '<#= TitlePropName #>': this.L.instant({
+        
         "<#= apiName #>::<#= Model.ViewName #>:ViewTitle": "View <#= Model.Title #>",
-        "<#= apiName #>::<#= Model.ViewName #>:NabBckMstr": "Navigate back to master",
-        "<#= apiName #>::<#= Model.ViewName #>:HideDtls": "Hide details",
+        "CmSt::NabBckMstr": "Navigate back to master",
+        "CmSt::HideDtls": "Hide details",
 <#
     {
         foreach(string detailVwnm in detailViewNames) {
