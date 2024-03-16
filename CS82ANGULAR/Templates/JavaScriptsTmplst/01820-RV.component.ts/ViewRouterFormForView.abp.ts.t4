@@ -336,11 +336,19 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
 */
             }
         }
-        if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
-            this.<#= HiddenFilterPropName #> = this.<#= formRootService #>.get<#= HiddenFilterAsFltRsltSuffix #>(JSON.parse(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]));
-        }
-        if (!(typeof this.route.snapshot.params[this.<#= IdPrefix #>] === 'undefined')) {
-            this.<#= FormControlModelPropName #> =  JSON.parse(this.route.snapshot.params[this.<#= IdPrefix #>]);
+        if (this.<#= IsDetailPropName #> && this.<#= DepthParamName #> < 2) {
+            this.route.paramMap.subscribe(prms => {
+                this.<#= HiddenFilterPropName #> = this.<#= formRootService #>.get<#= HiddenFilterAsFltRsltSuffix #>(JSON.parse(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]));
+                this.<#= FormControlModelPropName #> =  JSON.parse(this.route.snapshot.params[this.<#= IdPrefix #>]);
+              
+            });
+        } else {
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                this.<#= HiddenFilterPropName #> = this.<#= formRootService #>.get<#= HiddenFilterAsFltRsltSuffix #>(JSON.parse(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]));
+            }
+            if (!(typeof this.route.snapshot.params[this.<#= IdPrefix #>] === 'undefined')) {
+                this.<#= FormControlModelPropName #> =  JSON.parse(this.route.snapshot.params[this.<#= IdPrefix #>]);
+            }
         }
         this.<#= ShowDetailsPropName #> = !this.<#= IsDetailPropName #>;
         this.<#= SelectedDetailPropName #> = this.<#= DetailViewsPropName #>[0];

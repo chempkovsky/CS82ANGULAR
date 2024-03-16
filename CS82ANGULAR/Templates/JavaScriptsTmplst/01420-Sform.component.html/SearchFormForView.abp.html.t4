@@ -244,8 +244,9 @@
             (<#= onContainerMenuItemClickSelector #>)="<#= onContainerMenuItemClickMethodName #>($event)"
             ></app-<#= filterComponentSelectorCommonPart #>>
     </div>
+    <!--
     <ngb-progressbar type="info" [value]="100" [striped]="true" [animated]="true" [style.visibility]="inQuery ? 'visible': 'hidden'"></ngb-progressbar>
-
+    -->
 
     <div class="ngb-tbl-outer-container">  
         <div  [style.maxHeight.px]="<#= MaxHeightExPropName #>" [style.overflow-y]="<#= OverflowPropName #>"  class="ngb-tbl-container"> 
@@ -281,23 +282,37 @@
     if(localize) {
 #>
                                 <button  ngbDropdownItem (click)="onFilter()" > 
-                                    <i class="fa fa-refresh" type="button"></i>
+                                    <span style="display:inline-block;width:30px;">
+                                        <i class="fa fa-retweet" type="button"></i>
+                                    </span>
                                     <span>{{ { key: 'CmSt::RfrshTbl', defaultValue: 'Refresh table' } | abpLocalization }} </span>
                                 </button>
                                 <button  ngbDropdownItem (click)="onSettings()"> 
-                                    <i class="fa fa-gear" type="button"></i>
+                                    <span style="display:inline-block;width:30px;">
+                                        <i class="fa fa-cog" type="button"></i>
+                                    </span>
                                     <span>{{ { key: 'CmSt::TblClmns', defaultValue: 'Table columns' } | abpLocalization }} </span>
                                 </button>
 <# 
     } else {
 #>
-                                <button  ngbDropdownItem (click)="onFilter()"> <i class="fa fa-refresh" type="button"></i>Refresh table</button>
-                                <button  ngbDropdownItem (click)="onSettings()"> <i class="fa fa-gear" type="button"></i>Table columns</button>
+                                <button  ngbDropdownItem (click)="onFilter()"> 
+                                    <span style="display:inline-block;width:30px;">
+                                        <i class="fa fa-retweet" type="button"></i>
+                                    </span>
+                                    Refresh table</button>
+                                <button  ngbDropdownItem (click)="onSettings()"> 
+                                    <span style="display:inline-block;width:30px;">
+                                        <i class="fa fa-cog" type="button"></i>
+                                    </span>
+                                    Table columns</button>
 <# 
     }
 #>
                                 <button ngbDropdownItem *ngFor="let m of tableMenuItemsData;"  [disabled]="!m.enabled" (click)="tableCommand(m.id)">
-                                    <i  class="{{'fa ' + m.iconName + ' text-'+ m.iconColor}}" type="button"></i>
+                                    <span style="display:inline-block;width:30px;">
+                                        <i  class="{{'fa ' + m.iconName + ' text-'+ m.iconColor}}" type="button"></i>
+                                    </span>
                                     <span>{{m.caption}}</span>
                                 </button>
                               </div>
@@ -333,7 +348,9 @@
                               <i class="fa fa-ellipsis-v" ngbDropdownToggle type="button" ></i> 
                                <div ngbDropdownMenu class="dropdown-menu" >
                                     <button ngbDropdownItem  *ngFor="let m of <#= RowCommandsPropName #>;"  [disabled]="!m.enabled" (click)="rowCommand(e, m.id)">
-                                        <i  class="{{'fa ' + m.iconName + ' text-'+ m.iconColor}}" type="button"></i>
+                                        <span style="display:inline-block;width:30px;">
+                                            <i  class="{{'fa ' + m.iconName + ' text-'+ m.iconColor}}" type="button"></i>
+                                        </span>
                                         <span>{{m.caption}}</span>
                                     </button>
                                </div>

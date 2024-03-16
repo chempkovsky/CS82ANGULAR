@@ -29,6 +29,7 @@
     string rdlComponentClassName                    = GetComponentClassNameWithAnglr(AngularJsonFile, Model, rdlComponentFolder, rdlComponentLazyRoutingModuleFolder);
 
     string rdlLazyModuleFolder                      = "02050-Rdl-lazy.routing.module.ts";
+    string rvLazyModuleFolder                       = "01970-Rv-lazy.routing.module.ts";
 
 
     string OutletNmPropName             = "outletNm";
@@ -63,6 +64,7 @@
     string routeDataViewNamePropName        = "vn";
     string routeDataViewActionPropName      = "va";
     string routeDataShowMultiSelectPropName = "ms";
+    string routePermission                  = "pm";
     string rdllzFrases                      = "rdllz" + Model.ViewName;
 
     Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>> tmpSearchSchema = null;
@@ -118,7 +120,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { <#= appSettingServiceClassName + "Activator" #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, rdlComponentLazyRoutingModuleFolder)#>';
+import { <#= appSettingServiceClassName + "CanActivateFn" #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, rdlComponentLazyRoutingModuleFolder)#>';
 import { <#= rdlComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, rdlComponentFolder, rdlComponentLazyRoutingModuleFolder) #>';
 
 
@@ -155,7 +157,7 @@ const routes: Routes = [
  {
     path: '',
     component: <#= rdlComponentClassName #>,
-    canActivate: [<#= appSettingServiceClassName + "Activator" #>],
+    canActivate: [<#= appSettingServiceClassName + "CanActivateFn" #>],
     children: [
 <#
 {
@@ -182,8 +184,8 @@ const routes: Routes = [
 //        outlet: '<#=  OutletNameValue #>',
         path: '<#= node.Item2 #>', 
         <#= rdlLazyModuleImport #>,
-        data: { <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, /* <#= routeOutletNmPropName #>: '<#=  OutletNameValue #>', */ <#= NavPrefix #>: '', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, <# if(!localize) { #> <#= TitlePropName #>: <#= rdllzFrases #>['<#= "List" + aModel.ViewName #>'], <# } #> <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
-        canActivate: [<#= appSettingServiceClassName + "Activator" #>],
+        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>', <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, /* <#= routeOutletNmPropName #>: '<#=  OutletNameValue #>', */ <#= NavPrefix #>: '', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, <# if(!localize) { #> <#= TitlePropName #>: <#= rdllzFrases #>['<#= "List" + aModel.ViewName #>'], <# } #> <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
+        canActivate: [<#= appSettingServiceClassName + "CanActivateFn" #>],
     },
 
 <#
@@ -203,6 +205,25 @@ const routes: Routes = [
         } // if(aModel.IsWebApiSelectManyWithPagination) { } else { ... }
     } // for(int k = nodes.Count-1; k > -1; k--) {
 }
+#>
+
+<#
+    if(Model.IsWebApiSelectOneByPrimarykey) {
+        string viewCurrentPath = OutletNameValue + "20/:" + HiddenFilterPrefix + "102/:"+IdPrefix+"102";
+        string viewCurrentRvLazyModuleImport = null;
+        if(Model.CommonStaffs.Any(c => c.FileType == rvLazyModuleFolder)) {
+            viewCurrentRvLazyModuleImport = GenerateLoadChildrenImportWithAnglr(AngularJsonFile, Model, rvLazyModuleFolder, Model, rdlComponentLazyRoutingModuleFolder);
+        }
+#>
+    { 
+//        outlet: '<#=  OutletNameValue #>',
+        path: '<#= viewCurrentPath #>', 
+        <#= viewCurrentRvLazyModuleImport #>,
+        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>', <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= Model.ViewName #>', <#= routeDataViewActionPropName #>: 'v', <#= NavPrefix #>: '',  <# if(!localize) { #>  <#= TitlePropName #>: <#= rdllzFrases #>['<#= "View" + Model.ViewName #>'], <# } #> <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + "102" #>',  <#= IdPrefix #>: '<#= IdPrefix + "102" #>', <#= routeDepthParamName #>: 1},
+        canActivate: [<#= appSettingServiceClassName + "CanActivateFn" #>],
+    },
+<#
+    }
 #>
 
     ]

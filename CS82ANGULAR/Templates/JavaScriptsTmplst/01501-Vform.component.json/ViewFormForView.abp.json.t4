@@ -290,7 +290,10 @@
 <#
     }
 #>
-        "<#= apiName #>::<#= Model.ViewName #>:ReviewTitle": "Review <#= Model.Title #>",
+
+
+
+        "<#= apiName #>::<#= Model.ViewName #>:ViewTitle": "View <#= Model.Title #>",
 
 
         "CmSt::NAllPrpsAreSet": "Not all properties are set",

@@ -8,7 +8,8 @@
 <#@ import namespace="System.Text" #>
 <#@ parameter type="System.Collections.Generic.List<System.String>"  name="UniqueKeyProperties" #>
 <#@ parameter type="System.String"  name="UniqueKeyName" #>
-.HasAlternateKey( p => <#= GetUniqueKeyPropertiesList(UniqueKeyProperties, "p.") #> ).HasName("<#= UniqueKeyName #>");
+// .HasAlternateKey( p => <#= GetUniqueKeyPropertiesList(UniqueKeyProperties, "p.") #> ).HasName("<#= UniqueKeyName #>");
+.HasIndex(p => <#= GetUniqueKeyPropertiesList(UniqueKeyProperties, "p.") #>).IsUnique().HasDatabaseName("<#= UniqueKeyName #>");
 <#+
         string GetUniqueKeyPropertiesList(System.Collections.Generic.List<System.String> uniqueKeyProperties, string prefixName)
         {

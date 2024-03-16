@@ -643,6 +643,17 @@ namespace CS82ANGULAR.Helpers
                             if (!string.IsNullOrEmpty(key.KeyName)) key.KeyName = key.KeyName.Replace("\"", "");
                         }
                     }
+                } else
+                {
+                    mthd = fApind.Methods.FirstOrDefault(m => "HasDatabaseName".Equals(m.MethodName));
+                    if (mthd.MethodArguments != null)
+                    {
+                        if (mthd.MethodArguments.Count > 0)
+                        {
+                            key.KeyName = mthd.MethodArguments[0];
+                            if (!string.IsNullOrEmpty(key.KeyName)) key.KeyName = key.KeyName.Replace("\"", "");
+                        }
+                    }
                 }
                 key.SourceCount = key.KeyProperties.Count;
                 key.KeySource = InfoSourceEnum.ByOnModelCreating;

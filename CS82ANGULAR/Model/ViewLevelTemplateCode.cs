@@ -4010,6 +4010,18 @@ namespace CS82ANGULAR.Model
             }
             return result;
         }
+        String GetAbpWebApiServicePrefix(ModelViewSerializable model)
+        {
+            string result = model.WebApiRoutePrefix;
+            if (!string.IsNullOrEmpty(result))
+            {
+                result = result.Trim(new char[] { '/', ' ' }) + "/" + model.ViewName;
+            } else
+            {
+                result = model.ViewName;
+            }
+            return result;
+        }
         string GetTypeScriptPropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model)
         {
             if ((model == null) || (prop == null))
@@ -5921,6 +5933,8 @@ namespace CS82ANGULAR.Model
                     result = "false";
                     break;
                 case "system.guid":
+                    result = "'00000000-0000-0000-0000-000000000000'";
+                    break;
                 case "system.string":
                     result = "'0'";
                     break;
@@ -5969,6 +5983,13 @@ namespace CS82ANGULAR.Model
                 "System.Boolean".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase) ||
                 "Boolean".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase) ||
                 "bool".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase);
+        }
+        bool IsGuidTypeName(ModelViewPropertyOfVwSerializable prop)
+        {
+            if (prop == null) return false;
+            return
+                "System.Guid".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase) ||
+                "Guid".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase);
         }
         ModelViewUniqueKeyOfVwSerializable GetModelPrimKeyFromList(List<ModelViewUniqueKeyOfVwSerializable> inuniqueKeys)
         {
@@ -6641,6 +6662,11 @@ namespace CS82ANGULAR.Model
         String GetFirstPrimKeyProperty(ModelViewSerializable model)
         {
             return model.PrimaryKeyProperties.FirstOrDefault().OriginalPropertyName;
+        }
+        bool IsInPrimKeyProperty(ModelViewPropertySerializable prop, ModelViewSerializable model)
+        {
+            if (model.PrimaryKeyProperties == null) return false;
+            return model.PrimaryKeyProperties.Any(k => k.OriginalPropertyName == prop.OriginalPropertyName);
         }
         String GetLowerCasePropertyName(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model)
         {

@@ -141,6 +141,12 @@ namespace <#= GetModelNameSpace(Model) #> {
                     if ("InverseProperty".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
                         continue;
                     }
+                    if ("DisableAuditing".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+                    if ("ConcurrencyCheck".Equals( a.AttrName, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
                 
                 
 #>

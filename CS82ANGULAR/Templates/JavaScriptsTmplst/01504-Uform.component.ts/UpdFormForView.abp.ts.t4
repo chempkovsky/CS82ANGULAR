@@ -962,7 +962,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 //            }
 //        },()=>{});
 
-        <#= DlgSrvPrefix + fk.Item2.ViewName #>.open(flt)
+        this.<#= DlgSrvPrefix + fk.Item2.ViewName #>.open(flt)
          .then((rslt) => {
             if (!(typeof rslt === 'undefined')) {
                 if (!(rslt === null)) {

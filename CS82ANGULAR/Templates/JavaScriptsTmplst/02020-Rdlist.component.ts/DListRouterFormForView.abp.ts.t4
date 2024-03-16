@@ -767,7 +767,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#
         }
     }
-    if(detailViewNames.Count > 0) {
+    if(detailViewNames.Count > 0 || Model.IsWebApiSelectOneByPrimarykey) {
 #>
         this.<#= SelectedDetailPropName #> = this.<#= DetailViewsPropName #>[0];
         this.<#= ShowDetailsPropName #> = !this.<#= IsDetailPropName #>;
@@ -786,6 +786,11 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     public <#= DetailViewsPropName #>: Array<{caption: string, vw: string|null, nv: string|null, addon: string|null}> = [
         {caption:this.<#= frasesPropName #>['Hide-details'], vw:null, nv:null, addon: null},
 <#
+    if(Model.IsWebApiSelectOneByPrimarykey) {
+#>
+        {caption:this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], vw:'0', nv:'0', addon: '<#= Model.ViewName #>'},
+<#
+    }
     {
         foreach(string detailVwnm in detailViewNames) {
             if(detailViewNamesToExclude.Any(s => s == detailVwnm)) continue;
@@ -852,6 +857,35 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         // for the named router-outlet uncomment the lines above and comment the lines below. Do not forget about html-file.
         if(isNtDef) {
             this.router.navigate(['./'], {relativeTo: this.route});
+        } else if(this.<#= SelectedDetailPropName #>!.vw === '0' && this.<#= SelectedDetailPropName #>!.nv === '0') {
+            let qp: string[] = [];
+            qp.push( '<#= OutletNameValue +"2" #>' + this.<#= SelectedDetailPropName #>!.vw );
+<#
+        if(primKeys != null) {
+#>      
+            let flt: any = {
+<#
+            foreach(ModelViewPropertyOfVwSerializable primKey in primKeys) { 
+#>      
+              <#= GetTypeScriptPropertyName(primKey, Model) #>: this.childForm.<#= currentRowPropName #>.<#= GetTypeScriptPropertyName(primKey, Model) #>,
+<#
+            }
+#>
+            };
+<#
+        } else {
+#>
+            let flt: any = this.childForm.<#= currentRowPropName #>;
+<#
+        }
+#>
+            if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
+                qp.push(this.route.snapshot.params[this.<#= HiddenFilterPrefix #>]);
+            } else {
+                qp.push(JSON.stringify({}));
+            }
+            qp.push(JSON.stringify(flt));
+            this.router.navigate(qp, {relativeTo: this.route});
         } else {
             let qp: string[] = [];
             qp.push( '<#= OutletNameValue +"2" #>' + this.<#= SelectedDetailPropName #>!.vw ); 

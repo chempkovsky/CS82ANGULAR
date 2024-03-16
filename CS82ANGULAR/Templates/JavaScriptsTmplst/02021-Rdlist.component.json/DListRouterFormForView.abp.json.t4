@@ -249,17 +249,112 @@
 #>
 
 
+    "RmCurrFltItm": "Remove current filter item",
+    "ShowDtDlg": "Show date dialog",
+    "FltVal": "Filter value",
+    "Oprtr": "Operator",
+    "ClNm": "Column name",
+    "ApplFlt": "Apply filter",
+    "RmvAllFltItms": "Remove all filter items",
+    "AddFltItm": "Add filter item",
+    "NavBckToMstr": "Navigate back to master",
+    "VlMstLssTn": "The value must be less than",
+    "VlMstGtTn": "The value must be greater than",
+    "IncrctFt": "Icorrect format",
+    "IncrctDtFt": "Icorrect date format",
+    "ClNmb": "Number of columns",
+    "Cancel": "Cancel",
+    "Ok": "Ok",
+    "NoClSel": "No columns selected",
+
+    "ErrorTxt": "Error :",
+    "ErrorTp": "Error of type",
+    "SttsTxt": "status:",
+    "SttsText": "Status Text:",
+    "ErrorCd": "error code:",
+    "ErrorDscr": "error descr:",
+    "ValidError": "Validation Error.",
+    "ReqMxLn": "Required max length",
+    "ReqMinLn": "Required min length",
+    "ReqFld": "Required field",
+
+    "RfrshTbl": "Refresh table",
+    "TblClmns": "Table columns",
+
+    "EItm": "Modify Item",
+    "DItm": "Delete Item",
+    "VItm": "View Item",
+    "AItm": "Add Item",
+    "SItm": "Select Item",
+    "DSel": "Delete Selected",
+    "Prmssn": "Permission",
+    "AccDen": "Access denied",
+
+    "FullScan": "Full Scan",
+    "FltNtAppl": "Could not apply filter as not all attributes are set",
+    "NAllPrpsAreSet": "Not all properties are set",
+    "NtAllMstSet": "Not all masters have been set",
+    "NabBckMstr": "Navigate back to master",
+    "HideDtls": "Hide details",
+    "Nvm2mntallwd": "Navigating to detail form is not allowed in One-to-Many mode"
+
+
+
+    "RmCurrFltItm": "Удалить текущий элемент фильтра",
+    "ShowDtDlg": "Показать диалог даты",
+    "FltVal": "Значение фильтра",
+    "Oprtr": "Оператор",
+    "ClNm": "Имя столбца",
+    "ApplFlt": "Применить фильтр",
+    "RmvAllFltItms": "Удалить все элементы фильтра",
+    "AddFltItm": "Добавить элемент фильтра",
+    "NavBckToMstr": "Вернуться к мастеру",
+    "VlMstLssTn": "Значение должно быть меньше чем",
+    "VlMstGtTn": "Значение должно быть больше чем",
+    "IncrctFt": "Неверный формат",
+    "IncrctDtFt": "Неверный формат даты",
+    "ClNmb": "Число столбцов",
+    "Cancel": "Отмена",
+    "Ok": "Ok",
+    "NoClSel": "Столбцы не выбраны",
+
+    "ErrorTxt": "Ошибка:",
+    "ErrorTp": "Ошибка типа",
+    "SttsTxt": "статус:",
+    "SttsText": "Текст состояния:",
+    "ErrorCd": "Код ошибки:",
+    "ErrorDscr": "описание ошибки:",
+    "ValidError": "Ошибка проверки.",
+    "ReqMxLn": "Требуемая максимальная длина",
+    "ReqMinLn": "Требуемая минимальная длина",
+    "ReqFld": "Обязательное поле",
+
+    "RfrshTbl": "Обновить таблицу",
+    "TblClmns": "Столбцы таблицы",
+
+    "EItm": "Изменить",
+    "DItm": "Удалить",
+    "VItm": "Просмотреть",
+    "AItm": "Добавить",
+    "SItm": "Выберите элемент",
+    "DSel": "Удалить выбранные",
+    "Prmssn": "Разрешение",
+    "AccDen": "Доступ запрещен",
+
+    "FullScan": "Любой фильтр",
+    "FltNtAppl": "Не удалось применить фильтр, так как установлены не все атрибуты.",
+    "NAllPrpsAreSet": "Не все свойства установлены",
+    "NtAllMstSet": "Не все мастера установлены",
+    "NabBckMstr": "Вернуться к мастеру",
+    "HideDtls": "Скрыть детали",
+    "Nvm2mntallwd": "Переход к подробной форме не разрешен в режиме Один ко многим."
+
+
+
+
 
         "<#= apiName #>::<#= Model.ViewName #>:PluralTitle": "<#= Model.PluralTitle #>",
-        "CmSt::HideDtls": "Hide details",
-        "CmSt::Nvm2mntallwd": "Navigating to detail form is not allowed in One-to-Many mode",
-        "CmSt::EItm": "Modify Item",
-        "CmSt::DItm": "Delete Item",
-        "CmSt::VItm": "View Item"
-        "CmSt::AItm": "Add Item",
-        "CmSt::DSel": "Delete Selected",
-        "CmSt::Prmssn: "Permission",
-        "CmSt::AccDen": "Access denied",
+
 <#
         foreach(string detailViewName in detailViewNames) {
             if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;

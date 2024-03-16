@@ -122,10 +122,7 @@
 #>
 
 
-        
         "<#= apiName #>::<#= Model.ViewName #>:ViewTitle": "View <#= Model.Title #>",
-        "CmSt::NabBckMstr": "Navigate back to master",
-        "CmSt::HideDtls": "Hide details",
 <#
     {
         foreach(string detailVwnm in detailViewNames) {
@@ -164,3 +161,8 @@
         }
     }
 #>
+
+
+
+        "CmSt::NabBckMstr": "Navigate back to master",
+        "CmSt::HideDtls": "Hide details",

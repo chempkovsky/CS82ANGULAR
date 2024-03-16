@@ -360,8 +360,8 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             defaultValue: "Not all properties are set"
         }),
         '<#= captionPropName #>': this.L.instant({
-            key: '<#= apiName #>::<#= Model.ViewName #>:ReviewTitle',
-            defaultValue: "Review <#= Model.Title #>"
+            key: '<#= apiName #>::<#= Model.ViewName #>:ViewTitle',
+            defaultValue: "View <#= Model.Title #>"
         }),
         '<#= TitlePropName #>': this.L.instant({
             key: 'CmSt::SItm',
@@ -897,7 +897,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 //            }
 //        },()=>{});
 
-        <#= DlgSrvPrefix + fk.Item2.ViewName #>.open(flt)
+        this.<#= DlgSrvPrefix + fk.Item2.ViewName #>.open(flt)
          .then((rslt) => {
             if (!(typeof rslt === 'undefined')) {
                 if (!(rslt === null)) {

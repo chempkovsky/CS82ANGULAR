@@ -286,7 +286,10 @@
 <#
     }
 #>
-        "<#= apiName #>::<#= Model.ViewName #>:AddTitle: "Add <#= Model.Title #>",
+
+
+
+        "<#= apiName #>::<#= Model.ViewName #>:AddTitle": "Add <#= Model.Title #>",
 
         "CmSt::NAllPrpsAreSet": "Not all properties are set",
         "CmSt::SItm": "Select Item",

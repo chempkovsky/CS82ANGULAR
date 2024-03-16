@@ -206,6 +206,7 @@
 
 #>
 
+
     "RmCurrFltItm": "Remove current filter item",
     "ShowDtDlg": "Show date dialog",
     "FltVal": "Filter value",
@@ -223,6 +224,7 @@
     "Cancel": "Cancel",
     "Ok": "Ok",
     "NoClSel": "No columns selected",
+
     "ErrorTxt": "Error :",
     "ErrorTp": "Error of type",
     "SttsTxt": "status:",
@@ -233,15 +235,19 @@
     "ReqMxLn": "Required max length",
     "ReqMinLn": "Required min length",
     "ReqFld": "Required field",
+
     "RfrshTbl": "Refresh table",
     "TblClmns": "Table columns",
+
     "EItm": "Modify Item",
     "DItm": "Delete Item",
     "VItm": "View Item",
     "AItm": "Add Item",
+    "SItm": "Select Item",
     "DSel": "Delete Selected",
     "Prmssn": "Permission",
     "AccDen": "Access denied",
+
     "FullScan": "Full Scan",
     "FltNtAppl": "Could not apply filter as not all attributes are set",
     "NAllPrpsAreSet": "Not all properties are set",
@@ -249,6 +255,7 @@
     "NabBckMstr": "Navigate back to master",
     "HideDtls": "Hide details",
     "Nvm2mntallwd": "Navigating to detail form is not allowed in One-to-Many mode"
+
 
 
     "RmCurrFltItm": "Удалить текущий элемент фильтра",
@@ -268,6 +275,7 @@
     "Cancel": "Отмена",
     "Ok": "Ok",
     "NoClSel": "Столбцы не выбраны",
+
     "ErrorTxt": "Ошибка:",
     "ErrorTp": "Ошибка типа",
     "SttsTxt": "статус:",
@@ -278,15 +286,19 @@
     "ReqMxLn": "Требуемая максимальная длина",
     "ReqMinLn": "Требуемая минимальная длина",
     "ReqFld": "Обязательное поле",
+
     "RfrshTbl": "Обновить таблицу",
     "TblClmns": "Столбцы таблицы",
+
     "EItm": "Изменить",
     "DItm": "Удалить",
     "VItm": "Просмотреть",
     "AItm": "Добавить",
+    "SItm": "Выберите элемент",
     "DSel": "Удалить выбранные",
     "Prmssn": "Разрешение",
     "AccDen": "Доступ запрещен",
+
     "FullScan": "Любой фильтр",
     "FltNtAppl": "Не удалось применить фильтр, так как установлены не все атрибуты.",
     "NAllPrpsAreSet": "Не все свойства установлены",
@@ -296,16 +308,10 @@
     "Nvm2mntallwd": "Переход к подробной форме не разрешен в режиме Один ко многим."
 
 
+
+
         "<#= apiName #>::<#= Model.ViewName #>:PluralTitle": "<#= Model.PluralTitle #>",
-        "CmSt::HideDtls": "Hide details",
-        "CmSt::Nvm2mntallwd": "Navigating to detail form is not allowed in One-to-Many mode",
-        "CmSt::EItm": "Modify Item",
-        "CmSt::DItm": "Delete Item",
-        "CmSt::VItm": "View Item",
-        "CmSt::AItm": "Add Item",
-        "CmSt::DSel": "Delete Selected",
-        "CmSt::Prmssn": "Permission",
-        "CmSt::AccDen": "Access denied",
+
 <#
         foreach(string detailViewName in detailViewNames) {
             if(detailViewNamesToExclude.Any(s => s == detailViewName)) continue;

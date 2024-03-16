@@ -311,7 +311,7 @@ import { <#=  GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile,Context, viewN
     foreach(string viewNm in SearchDialogViewsList) {
 #>
 // import { <#=  GetComponentClassNameExWithAnglrEx(AngularJsonFile, Context, viewNm, sdlgComponentFolder, Model, delformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, delformComponentFolder, Context, viewNm, sdlgComponentFolder) #>';
-import { <#=  GetModuleServiceClassNameExWithAnglrEx(AngularJsonFile, Context, viewNm, searchModuleServiceFolder, Model, delformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, delformComponentFolder, Context, viewNm, delformComponentFolder) #>';
+import { <#=  GetModuleServiceClassNameExWithAnglrEx(AngularJsonFile, Context, viewNm, searchModuleServiceFolder, Model, delformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, delformComponentFolder, Context, viewNm, searchModuleServiceFolder) #>';
 import { <#=  GetInterfaceDlgNameExWithAnglrEx(AngularJsonFile, Context, viewNm, viewInterfaceDlgFolder, Model, delformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, delformComponentFolder, Context, viewNm, viewInterfaceDlgFolder) #>';
 <#
     }
@@ -893,7 +893,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 //            }
 //        },()=>{});
 
-        <#= DlgSrvPrefix + fk.Item2.ViewName #>.open(flt)
+        this.<#= DlgSrvPrefix + fk.Item2.ViewName #>.open(flt)
          .then((rslt) => {
             if (!(typeof rslt === 'undefined')) {
                 if (!(rslt === null)) {

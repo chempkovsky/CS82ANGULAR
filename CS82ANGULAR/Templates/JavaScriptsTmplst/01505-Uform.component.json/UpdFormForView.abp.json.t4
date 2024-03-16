@@ -291,7 +291,10 @@
 <#
     }
 #>
-        "<<#= apiName #>::<#= Model.ViewName #>:UpdateTitle": "Update <#= Model.Title #>"
+
+
+
+        "<#= apiName #>::<#= Model.ViewName #>:UpdateTitle": "Update <#= Model.Title #>"
 
         "CmSt::NAllPrpsAreSet": "Not all properties are set",
         "CmSt::SItm": "Select Item",

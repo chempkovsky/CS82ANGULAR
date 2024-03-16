@@ -188,6 +188,8 @@ namespace CS82ANGULAR.ViewModel
                     if (ce.Kind == EnvDTE.vsCMElement.vsCMElementNamespace)
                     {
                         CodeNamespace cn = (CodeNamespace)ce;
+                        string fn = cn.FullName;
+                        if (fn == "") fn = null;
                         InternalCollectProjectClasses(cn, localList);
                     }
                 }
@@ -222,10 +224,11 @@ namespace CS82ANGULAR.ViewModel
                     if (ce.Kind == EnvDTE.vsCMElement.vsCMElementNamespace)
                     {
                         CodeNamespace cn = (CodeNamespace)ce;
-                        if (!InternalCollectProjectClasses(cn, list))
-                        {
-                            return false;
-                        }
+                        InternalCollectProjectClasses(cn, list);
+                        //if (!InternalCollectProjectClasses(cn, list))
+                        //{
+                        //    return false;
+                        //}
                     }
                 }
             }

@@ -64,7 +64,7 @@ import { Router, ActivatedRouteSnapshot, RouterStateSnapshot, Route } from '@ang
 import { <#= appConfigServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appConfigServiceFolder, appSettingServiceFolder) #>';
 import { HttpParameterCodec } from '@angular/common/http';
 import { PermissionService } from '@abp/ng.core';
-
+import { ToasterService } from '@abp/ng.theme.shared';
 
 @Injectable({
   providedIn: 'root'
@@ -94,15 +94,15 @@ export class <#= appSettingServiceClassName #> implements // CanActivate, CanAct
     public tableHeightAddition: number = 0;
     public tableHeightFactor: number = 31;
 
-    public toasts: any[] = [];
+    // public toasts: any[] = [];
     // Push new Toasts to array with content and options
-    public showToast(textOrTpl: string | TemplateRef<any>, options: any = {}) {
-        this.toasts.push({ textOrTpl, ...options });
-    }
+    // public showToast(textOrTpl: string | TemplateRef<any>, options: any = {}) {
+    //    this.toasts.push({ textOrTpl, ...options });
+    // }
     // Callback method to remove Toast DOM element from view
-    public removeToast(toast: any) {
-        this.toasts = this.toasts.filter(t => t !== toast);
-    }
+    // public removeToast(toast: any) {
+    //    this.toasts = this.toasts.filter(t => t !== toast);
+    // }
 
 
 <# 
@@ -182,6 +182,7 @@ export class <#= appSettingServiceClassName #> implements // CanActivate, CanAct
 <# 
     }
 #>
+        private toasterService: ToasterService,
         private _<#= settingsPropName #>: <#= appConfigServiceClassName #>) {
 <# 
     if(localize) {
@@ -253,12 +254,13 @@ export class <#= appSettingServiceClassName #> implements // CanActivate, CanAct
 
     }
     public <#= ShowMessageMethodName #>(msg: string) {
-      this.showToast(msg, {
-        classname: 'bg-info text-light',
-        delay: 4000 ,
-        autohide: true,
-        headertext: 'Info'
-      });      
+      this.toasterService.success(msg);  
+//      this.showToast(msg, {
+//        classname: 'bg-info text-light',
+//        delay: 4000 ,
+//        autohide: true,
+//        headertext: 'Info'
+//      });      
     }
     public <#= ShowErrorMethodName #>(errTp: string, errorStruct: any) {
 <# 
@@ -349,12 +351,15 @@ export class <#= appSettingServiceClassName #> implements // CanActivate, CanAct
                 }
             }
         }
-        this.showToast(text, {
-          classname: 'bg-danger text-light',
-          delay: 4000 ,
-          autohide: true,
-          headertext: 'Error'
-        });
+//
+//        this.showToast(text, {
+//          classname: 'bg-danger text-light',
+//          delay: 4000 ,
+//          autohide: true,
+//         headertext: 'Error'
+//        });
+//
+        this.toasterService.error(text);
     }
     public getWebApiPrefix(vwNm: string): string {
         let reslt: string = '';

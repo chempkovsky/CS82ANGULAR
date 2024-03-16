@@ -98,11 +98,11 @@ import { <#= filterResultModelClassName #> } from '<#=  GetCommonFolderNameWithA
   providedIn: 'root'
 })
 export class <#= serviceClassName #> {
-    apiName: string = '<#= apiName #>';
+    // apiName: string = '<#= apiName #>';
     serviceUrl: string;  
     constructor( //  private restService: RestService, 
-       private http: HttpClient, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {
-       this.serviceUrl = this.<#= AppSettingServicePropName #>.getWebApiPrefix('<#= Model.ViewName #>') + '<#= GetWebApiServicePrefix(Model) #>';  
+       private http: HttpClient, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) { 
+       this.serviceUrl = this.<#= AppSettingServicePropName #>.getWebApiPrefix('<#= Model.ViewName #>') + '<#= GetAbpWebApiServicePrefix(Model) #>';  
     }
     protected _<#= ValuesSuffix #>: {[key: string]: {org: string, fk: string, fkchain: string, isinprimkey: boolean, isinunqkey: boolean, required: boolean, dbgenerated: boolean, dttp: string}} = {
 <#
