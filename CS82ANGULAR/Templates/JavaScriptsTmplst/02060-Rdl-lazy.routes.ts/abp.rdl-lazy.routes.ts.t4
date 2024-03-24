@@ -54,6 +54,7 @@
     string NavPrefix                    = "np";
     string routeDepthParamName          = "dp"; 
     string routeMaxHeightPropName       = "mh";
+    string routeMinHeightPropName       = "nh";
 
     string routeDataViewNamePropName        = "vn";
     string routeDataViewActionPropName      = "va";
@@ -197,7 +198,7 @@
 #>
     { path: '<#= node.Item2 #>', canActivate:[<#= appSettingServiceClassName + "CanActivateFn" #>],
         <#= rdlLazyModuleImport #>,
-        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, <#= NavPrefix #>: '<#= RDLPrefix #>', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, /* <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + node.Item3.ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, <#= NavPrefix #>: '<#= RDLPrefix #>', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 16, <#= routeMinHeightPropName #>: 8, <#= routeShowFilterPropName #>: true, /* <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + node.Item3.ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
 
@@ -205,7 +206,7 @@
 #>
     { path: '<#= node.Item2 #>', canActivate:[<#= appSettingServiceClassName + "CanActivateFn" #>],
         <#= rdlLazyModuleImport #>,
-        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, <#= NavPrefix #>: '<#= RDLPrefix #>', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 10, <#= routeShowFilterPropName #>: true, /* <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, <#= NavPrefix #>: '<#= RDLPrefix #>', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 16, <#= routeMinHeightPropName #>: 8, <#= routeShowFilterPropName #>: true, /* <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
                 } // if(node.Item3 > 1) { ... } else { ... }

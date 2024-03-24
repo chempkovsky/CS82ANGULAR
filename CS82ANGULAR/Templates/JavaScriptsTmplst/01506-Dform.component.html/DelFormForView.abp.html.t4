@@ -175,13 +175,7 @@
 #>
                     <div class="input-group" >
                         <input class="form-control" ngbDatepicker container="body" #apicker<#= dateTmPickNo #>="ngbDatepicker" 
-                            (click)="apicker<#= dateTmPickNo #>.toggle()"
                             formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true">
-                        <div class="input-group-append" >
-                            <button class="btn btn-outline-secondary " type="button"   (click)="apicker<#= dateTmPickNo #>.toggle()" data-toggle="tooltip" title="Show date dialog" >
-                                <i class="fa fa-calendar md-18 text-primary"></i>
-                            </button>
-                        </div>
 <#
                                 } else {
 #>

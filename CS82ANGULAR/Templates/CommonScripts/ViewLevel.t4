@@ -3476,7 +3476,7 @@
                 if (hasForeignKeyProps)
                 {
                     result.Add(ForeignKey);
-                    break;
+//                    break;
                 }
             }
             return result;

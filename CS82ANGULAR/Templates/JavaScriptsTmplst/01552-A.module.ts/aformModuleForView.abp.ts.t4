@@ -70,6 +70,7 @@ import { <#=  aformDlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(A
 <#
             continue;
         }
+        continue; // we use services instead
 #>
 import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, aformModuleFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, aformModuleFolder, Context, masterView.ViewName, searchModuleFolder) #>';
 <#
@@ -93,6 +94,7 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
         if (masterView == null) {
             continue;
         }
+        continue; // we use services instead
 #>
         <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, aformModuleFolder) #>,
 <#

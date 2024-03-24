@@ -72,6 +72,7 @@ import { <#=  vformDlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(A
 <#
             continue;
         }
+        continue; // we use services instead
 #>
 import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, vformModuleFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, vformModuleFolder, Context, masterView.ViewName, searchModuleFolder) #>';
 
@@ -96,6 +97,7 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
         if (masterView == null) {
             continue;
         }
+        continue; // we use services instead
 #>
         <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, vformModuleFolder) #>,
 <#

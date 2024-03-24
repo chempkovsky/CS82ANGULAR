@@ -157,6 +157,7 @@
     List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
         GetSearchResources(Model, Context);
 
+    boolean requireTree = false;
 #>
 <div class="card">
     <div style="box-sizing: border-box;left: 1px;right: 1px;">

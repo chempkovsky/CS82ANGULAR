@@ -80,7 +80,7 @@ import { <#=  materialModuleClassName #> } from '<#=  GetCommonFolderNameWithAng
 <#
     if(!string.IsNullOrEmpty(rlComponentClassName)) {
 #>
-import { <#=  searchModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, searchModuleFolder, rdFormModuleFolder) #>';
+// import { <#=  searchModuleClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, searchModuleFolder, rdFormModuleFolder) #>';
 import { <#=  rlComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, rlistComponentFolder, rdFormModuleFolder) #>';
 <#
     }
@@ -142,9 +142,12 @@ import { <#=  delformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(Angu
 <#
             continue;
         }
+        continue; // we do not need to import search module since we use services for lazy load search-dialog modules
+        if (masterView.ViewName != Model.ViewName) {
 #>
 import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, rdFormModuleFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, rdFormModuleFolder, Context, masterView.ViewName, searchModuleFolder) #>';
 <#
+        }
     }
 #>
 
@@ -189,7 +192,7 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
 <#
     if(!string.IsNullOrEmpty(rlComponentClassName)) {
 #>
-        <#=  searchModuleClassName #>,
+//        <#=  searchModuleClassName #>,
 <#
     }
 #>
@@ -200,6 +203,7 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
         if (masterView == null) {
             continue;
         }
+        continue; // we do not need to import search module since we use services for lazy load search-dialog modules
 #>
         <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, rdFormModuleFolder) #>,
 <#

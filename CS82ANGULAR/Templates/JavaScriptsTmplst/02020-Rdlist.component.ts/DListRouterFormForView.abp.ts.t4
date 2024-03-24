@@ -38,6 +38,7 @@
     string routeShowFilterPropName      = "sf";
     string routeDepthParamName          = "dp"; 
     string routeMaxHeightPropName       = "mh";
+    string routeMinHeightPropName       = "nh";
     string routeOutletNmPropName        = "oltn";
 
 
@@ -111,6 +112,9 @@
 
     string MaxHeightPropSelector        = "max-height";
     string MaxHeightPropName            = "maxHeight";
+    string MinHeightPropSelector        = "min-height";
+    string MinHeightPropName            = "minHeight";
+    string CurHeightPropName            = "curHeight";
     string FilterMaxHeightPropSelector  = "filter-max-height";
     string FilterMaxHeightPropName      = "filterMaxHeight";
 
@@ -496,6 +500,9 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
     <#= showBackBtnPropName #>: boolean = false;
     @Input('<#= FilterMaxHeightPropSelector #>')  <#= FilterMaxHeightPropName #>: number | null = null;
     @Input('<#= MaxHeightPropSelector #>') <#= MaxHeightPropName #>: number | null = null;
+    @Input('<#= MinHeightPropSelector #>') <#= MinHeightPropName #>: number | null = null;
+    <#= CurHeightPropName #>: number | null = null;
+    
     @Output('<#= onContainerMenuItemClickSelector #>') <#= onContainerMenuItemClickEmitter #> = new EventEmitter<<#= eventEmitterDataModelClassName #>>();
     @Input('<#= containerMenuItemsSelector #>') <#= containerMenuItemsPropName #>: Array<<#= menuItemDataModelClassName #>> = [];
     <#= onContainerMenuItemClickMethodName #>(e: <#= eventEmitterDataModelClassName #>)  {
@@ -604,6 +611,9 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 }
                 if (!(typeof this.route.snapshot.data['<#= routeMaxHeightPropName #>'] === 'undefined')) {
                     this.<#= MaxHeightPropName #> = this.route.snapshot.data['<#= routeMaxHeightPropName #>'];
+                }
+                if (!(typeof this.route.snapshot.data['<#= routeMinHeightPropName #>'] === 'undefined')) {
+                    this.<#= MinHeightPropName #> = this.route.snapshot.data['<#= routeMinHeightPropName #>'];
                 }
                 if (!(typeof this.route.snapshot.data['<#= routeFilterMaxHeightPropName #>'] === 'undefined')) {
                     this.<#= FilterMaxHeightPropName #> = this.route.snapshot.data['<#= routeFilterMaxHeightPropName #>'];
@@ -774,6 +784,11 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#
     }
 #>
+        if(this.<#= IsDetailPropName #>) {
+            this.<#= CurHeightPropName #> = this.<#= MinHeightPropName #>;
+        } else {
+            this.<#= CurHeightPropName #> = this.<#= MaxHeightPropName #>;
+        }
         this.isOnInitCalled = true;
     }
     @Output('<#= selectedRowSelector #>') <#= selectedRowPropName #>: EventEmitter<<#= viewInterfaceName #>> = new EventEmitter<<#= viewInterfaceName #>>();
@@ -838,6 +853,13 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         if(!this.<#= ShowDetailsPropName #>) return;
         let isNtDef: boolean = (this.<#= SelectedDetailPropName #> === null) || (typeof this.childForm.<#= currentRowPropName #> === 'undefined');
         isNtDef = isNtDef ? isNtDef : ((this.<#= SelectedDetailPropName #>!.vw === null) || (this.<#= SelectedDetailPropName #>!.nv === null) || (this.childForm.<#= currentRowPropName #> === null))
+        if(!(this.<#= IsDetailPropName #>)) {
+            if(isNtDef) {
+                this.<#= CurHeightPropName #> = this.<#= MaxHeightPropName #>;
+            } else {
+                this.<#= CurHeightPropName #> = this.<#= MinHeightPropName #>;
+            }
+        }
 /*
         if(isNtDef) {
             this.router.navigate([{outlets: { '<#=  OutletNameValue #>': null}}], {relativeTo: this.route}).then(()=>{

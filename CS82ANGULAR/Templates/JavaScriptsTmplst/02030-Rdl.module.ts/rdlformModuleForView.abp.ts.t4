@@ -29,17 +29,19 @@
     string searchModuleFolder           = "01450-S.module.ts";
     string searchModuleClassName        = GetModuleClassNameWithAnglr(AngularJsonFile, Model, searchModuleFolder, rdlFormModuleFolder);
 
+    // we do not need to import search module since we use services for lazy load dialog modules
     string viewformModuleFolder         = "01550-V.module.ts";
-    string viewformModuleClassName      = GetModuleClassNameWithAnglr(AngularJsonFile, Model, viewformModuleFolder, rdlFormModuleFolder);
+    string viewformModuleClassName      = null;//GetModuleClassNameWithAnglr(AngularJsonFile, Model, viewformModuleFolder, rdlFormModuleFolder);
 
     string addformModuleFolder          = "01552-A.module.ts";
-    string addformModuleClassName       = GetModuleClassNameWithAnglr(AngularJsonFile, Model, addformModuleFolder, rdlFormModuleFolder);
+    string addformModuleClassName       = null;//GetModuleClassNameWithAnglr(AngularJsonFile, Model, addformModuleFolder, rdlFormModuleFolder);
 
     string updformModuleFolder          = "01554-U.module.ts";
-    string updformModuleClassName       = GetModuleClassNameWithAnglr(AngularJsonFile, Model, updformModuleFolder, rdlFormModuleFolder);
+    string updformModuleClassName       = null;//GetModuleClassNameWithAnglr(AngularJsonFile, Model, updformModuleFolder, rdlFormModuleFolder);
 
     string delformModuleFolder          = "01556-D.module.ts";
-    string delformModuleClassName       = GetModuleClassNameWithAnglr(AngularJsonFile, Model, delformModuleFolder, rdlFormModuleFolder);
+    string delformModuleClassName       = null;//GetModuleClassNameWithAnglr(AngularJsonFile, Model, delformModuleFolder, rdlFormModuleFolder);
+    // we do not need to import search module since we use services for lazy load dialog modules
 
     string rdlistComponentFolder        = "02020-Rdlist.component.ts";
     string rdlComponentClassName        = GetComponentClassNameWithAnglr(AngularJsonFile, Model, rdlistComponentFolder, rdlFormModuleFolder);
@@ -100,9 +102,12 @@ import { <#=  delformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(Angu
 <#
             continue;
         }
+        continue; // we do not need to import search module since we use services for lazy load search-dialog modules
+        if (masterView.ViewName != Model.ViewName) {
 #>
 import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, rdlFormModuleFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, rdlFormModuleFolder, Context, masterView.ViewName, searchModuleFolder) #>';
 <#
+        }
     }
 #>
 
@@ -167,6 +172,7 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
         if (masterView == null) {
             continue;
         }
+        continue; // we do not need to import search module since we use services for lazy load search-dialog modules
 #>
         <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, rdlFormModuleFolder) #>,
 <#

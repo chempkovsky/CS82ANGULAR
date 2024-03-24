@@ -3495,7 +3495,7 @@ namespace CS82ANGULAR.Model
                 if (hasForeignKeyProps)
                 {
                     result.Add(ForeignKey);
-                    break;
+//                    break;
                 }
             }
             return result;
