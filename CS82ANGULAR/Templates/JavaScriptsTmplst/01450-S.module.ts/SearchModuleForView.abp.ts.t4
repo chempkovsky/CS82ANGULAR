@@ -41,6 +41,10 @@
     string sdlgComponentFolder          = "01440-Sdlg.component.ts";
     string searchDlgComponentClassName  = GetComponentClassNameWithAnglr(AngularJsonFile, Model, sdlgComponentFolder, searchModuleFolder);
     string GetMethodPrefix              = "get";
+
+    string navName = RequireTreeNavName(Model);
+    bool requireTree = !string.IsNullOrEmpty(navName);
+
 #>
 
 import { NgModule } from '@angular/core';
@@ -53,6 +57,13 @@ import { <#=  formatterModuleClassName #> } from '<#=  GetCommonFolderNameWithAn
 import { <#=  searchComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, sformComponentFolder, searchModuleFolder) #>';
 import { <#=  searchDlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, sdlgComponentFolder, searchModuleFolder) #>';
 import { <#=  appTblModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appTblModuleFolder, searchModuleFolder) #>';
+<#
+    if(requireTree) {
+#>
+import { NzTreeModule } from 'ng-zorro-antd/tree';
+<#
+    }
+#>
 
 
 @NgModule({
@@ -68,6 +79,14 @@ import { <#=  appTblModuleClassName #> } from '<#=  GetCommonFolderNameWithAnglr
         <#= formatterModuleClassName #>,
         <#= filterModuleClassName #>,
         <#= appTblModuleClassName #>,
+<#
+    if(requireTree) {
+#>
+        NzTreeModule,
+<#
+    }
+#>
+
     ],
     exports: [
         <#=  searchComponentClassName #>,

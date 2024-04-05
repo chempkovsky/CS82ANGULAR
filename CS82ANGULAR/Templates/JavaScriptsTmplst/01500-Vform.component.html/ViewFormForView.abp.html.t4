@@ -211,7 +211,7 @@
                     <label></label>
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"  [disabled]="true">
+                            <input type="checkbox" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>"  onclick="return false">
                             {{<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-label']}}
                         </label>
                     </div>

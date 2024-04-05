@@ -215,7 +215,7 @@ namespace <#= appServiceNameSpace #> {
         {
 
             string[] EqualOperators = { "eq", "lk" };
-            string[] ExpectedOperators = { "eq", "lk", "gt", "lt", "ne" };
+            string[] ExpectedOperators = { "eq", "lk", "gt", "lt", "ne", "cn", "sw" };
 
             int currentPageSize = this.defaultPageSize;
             int currentPage = 1;
@@ -249,9 +249,19 @@ namespace <#= appServiceNameSpace #> {
 #>
                         switch(op_<#= GetFilterPropertyOperatorName(prop, Model, OperatorSufix) #>) {
                             case "eq": 
-                                query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(_tmp<#= GetFilterPropertyName(prop, Model) #>));
+                                if (string.IsNullOrEmpty(_tmp<#= GetFilterPropertyName(prop, Model) #>)) {
+                                    query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> == null);
+                                } else {
+                                    query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> == _tmp<#= GetFilterPropertyName(prop, Model) #>);
+                                }
+                                break;
+                            case "sw":
+                                if (!string.IsNullOrEmpty(_tmp<#= GetFilterPropertyName(prop, Model) #>)) {
+                                    query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#>.StartsWith(_tmp<#= GetFilterPropertyName(prop, Model) #>));
+                                }
                                 break;
                             case "lk":
+                            case "cn":
                                 query = query.Where(p => p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#>.Contains(_tmp<#= GetFilterPropertyName(prop, Model) #>));
                                 break;
                             case "gt":
@@ -272,6 +282,8 @@ namespace <#= appServiceNameSpace #> {
                                 query = query.Where(p => (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> == _tmp<#= GetFilterPropertyName(prop, Model) #>));
                                 break;
                             case "lk":
+                            case "cn":
+                            case "sw":
                                 query = query.Where(p => (p.<#=  GetForeignKeyNameChainAndProp(prop, Model)#> == _tmp<#= GetFilterPropertyName(prop, Model) #>));
                                 break;
                             case "gt":

@@ -130,6 +130,7 @@
     string MaxHeightPropSelector        = "max-height";
     string MaxHeightPropName            = "maxHeight";
     string MaxHeightExPropName          = "maxHeightEx";
+    string TrMaxHeightExPropName        = "trMaxHeightEx";
 
     string HiddenFilterSelector     = "hidden-filter";
     string HiddenFilterPropName     = "hiddenFilter";
@@ -178,6 +179,12 @@
     string afterObjSelSelector          = "after-obj-sel";
     string columnCaptionsPropName       = "clmnCptns";
     string menuCaptionsPropName         = "menuCptns";
+    string requireTreePropName          = "rqTr";
+    string trDefSelKeyPropName          = "trDefSelKey";
+    string trDataSourcePropName         = "trDataSource";
+    string readTrSubitemsMethodName     = "readTrSubitems";
+    string trItmClickMethodName         = "trItmClick";
+    string cp2TrDtSrcMethodName         = "cp2TrDtSrc";
 
     List<string> FKViewsDict =  GetFKViewsList(Model, Context, new List<string>());
     if (! FKViewsDict.Contains(Model.ViewName) ) {
@@ -256,6 +263,9 @@
     string showBackBtnSelector          = "show-back-btn";
     string PermissionServicePropName    = "pmssnSrvs";
     
+    string treeNavName = RequireTreeNavName(Model);
+    bool requireTree = !string.IsNullOrEmpty(treeNavName);
+
     List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = GetModelUniqueKeys(Model, new List<ModelViewUniqueKeyOfVwSerializable>());
     ModelViewUniqueKeyOfVwSerializable pk = GetModelPrimaryKey(Model);
     if(pk!= null) uniqueKeys.Add(pk);
@@ -353,6 +363,15 @@ import { <#= GetInterfaceFilterNameWithAnglrEx(AngularJsonFile, m2mModel, viewIn
 /* eslint-disable @angular-eslint/no-input-rename */
 
 
+<# 
+    if(requireTree) {
+#>
+import { NzFormatEmitEvent } from 'ng-zorro-antd/tree';
+<# 
+    }
+#>
+
+
 @Component({
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, sformHtmlFolder, sformComponentFolder)#>.html',
@@ -397,6 +416,139 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
     }
 #>
     };
+
+<# 
+    if(requireTree) {
+        string pkstr = "";
+        ModelViewUniqueKeyOfVwSerializable ukos = GetModelPrimaryKey(Model);
+        if (ukos != null) {
+            if (ukos.UniqueKeyProperties != null) {
+                foreach(var ukp in ukos.UniqueKeyProperties) {
+                    if(string.IsNullOrEmpty(pkstr)) {
+                        pkstr = "e." + ukp.JsonPropertyName;
+                    } else {
+                        pkstr += "+ '.' + e." + ukp.JsonPropertyName;
+                    }
+                }
+            }
+        }
+#>
+    <#= requireTreePropName #>: boolean = false;
+//    public <#= trDefSelKeyPropName #>: Array<string> = [];
+    public <#= trDataSourcePropName #>: Array<any> = [];
+    <#= cp2TrDtSrcMethodName #>(): void {
+        if(this.<#= requireTreePropName #>) {
+            if (!(typeof this.dataSource  === 'undefined')) { 
+                if(!(this.dataSource  === null)) {
+                    let tmp: Array<any> = [];
+                    this.dataSource.forEach((e) => {
+                        let k: string = '' + <#= pkstr #>;
+                        tmp.push({
+                            key: k,
+                            data: e,
+                            children: []
+                        });
+                    });
+                    this.<#= trDataSourcePropName #> = tmp;
+                    if (tmp.length > 0) {
+//                        this.<#= trDefSelKeyPropName #> = [tmp[0].key];
+                        this.<#= OnSelectRowMethodName #>(tmp[0].data);
+                    } else {
+//                        this.<#= trDefSelKeyPropName #> = [];
+                        this.<#= OnSelectRowMethodName #>(null);
+                    }
+                    return;
+                }
+            }
+//            this.<#= trDefSelKeyPropName #> = [];
+            this.<#= trDataSourcePropName #> = [];
+            this.<#= OnSelectRowMethodName #>(null);
+        } else {
+//            this.<#= trDefSelKeyPropName #> = [];
+            this.<#= trDataSourcePropName #> = [];
+        }
+    }
+    <#= trItmClickMethodName #>(e: any): void {
+        if(this.<#= requireTreePropName #>) {
+//            this.<#= trDefSelKeyPropName #> = [e.node.key];
+            this.<#= OnSelectRowMethodName #>(e.node.origin.data);
+        }
+    }
+    trFindByKey(arr:Array<any>,k: string): any {
+        let rslt: any = null;
+        arr.forEach(e=> {   
+            if(rslt === null) {
+                if (e.key === k) { rslt = e; } 
+                else { rslt = this.trFindByKey(e.children, k) } 
+            }
+        });
+        return rslt;
+    }
+
+    <#= readTrSubitemsMethodName #>(evnt: any) {
+        if(this.<#= requireTreePropName #>) {
+            let node = this.trFindByKey(this.<#= trDataSourcePropName #>, evnt.key);
+            if(node) {
+                let fltRslt: Array<<#= filterResultModelClassName #>> = 
+                    this.<#= formRootService #>.get<#= HiddenFilterAsFltRsltSuffix #>(this.<#= formRootService #>.get<#= HiddenFilterByRowSuffix #>(node.data, '<#= treeNavName #>'));
+                let flt: <#= viewInterfaceFilterName #>|any = { page: 0, pagesize: this.currentPageSize };
+                fltRslt.forEach(e => {
+                    let opNm =  e.fltrName + '<#= OperatorSufix #>';
+                    if(typeof flt[e.fltrName] === 'undefined') {
+                        flt[e.fltrName] = [];
+                        flt[opNm] = [];
+                    }
+                    flt[e.fltrName].push(e.fltrValue);
+                    flt[opNm].push(e.fltrOperator);
+                });
+
+                this.<#= formRootService #>.<#= GetWithFilterMethodName #>(flt)
+                .subscribe({
+                    next: (v: <#= viewInterfacePageName #>) =>{
+                        let rslt: Array<<#= viewInterfaceName #>> = [];
+                        if (!(typeof v.items === 'undefined')) {
+                            if(!(v.items === null)) {
+                                rslt = v.items;
+                            }
+                        }
+                        let tmp: Array<any> = [];
+                        rslt.forEach((e) => {
+                            let k: string = '' + <#= pkstr #>;
+                            tmp.push({
+                                key: k,
+                                data: e,
+                                children: []
+                            });
+                            let ind: number = this.<#= trDataSourcePropName #>.findIndex(i=>{ return (i.key === k) })
+                            if(ind > -1) {
+                                this.<#= trDataSourcePropName #>.splice(ind,1)
+                            }
+                        });
+                        node.children = tmp;
+                        this.<#= trDataSourcePropName #> = [...this.<#= trDataSourcePropName #>];
+                        // this.<#= trDefSelKeyPropName #> = [this.<#= trDataSourcePropName #>[0].key];
+                        this.cd.detectChanges();
+                    },
+                    error: (error: any) => {
+                        this.inQuery = false;
+                        this.<#= AppSettingServicePropName #>.<#= ShowErrorMethodName #>('http', error);
+                    }
+                });
+            }
+        }
+    }
+    showTree(b: boolean) {
+        if (b) {
+            this.<#= requireTreePropName #> = true;
+        } else {
+            this.<#= requireTreePropName #> = false;
+        }
+        this.onFilter();
+    }
+<# 
+    }
+#>
+
 
 <#
     if(searchSchemas != null) {
@@ -650,6 +802,13 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
     public <#= OverflowPropName #>: string | null = null;   
 
     <#= MaxHeightExPropName #>: number|null = null;
+<#
+    if(requireTree) {
+#>
+    <#= TrMaxHeightExPropName #>: string|null = null;
+<#
+    }
+#>
     protected _<#= MaxHeightPropName #>: number|null = null;
     @Input('<#= MaxHeightPropSelector #>')
         get <#= MaxHeightPropName #>(): number|null {
@@ -660,6 +819,13 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
         if (!(typeof inp === 'undefined')) {
           if(!(inp === null)) {
             this.<#= MaxHeightExPropName #> = inp * this.<#= AppSettingServicePropName #>.tableHeightFactor + this.<#= AppSettingServicePropName #>.tableHeightAddition;
+<#
+    if(requireTree) {
+#>
+            this.<#= TrMaxHeightExPropName #> = this.<#= MaxHeightExPropName #> + 'px';
+<#
+    }
+#>
             this.<#= OverflowPropName #> = 'auto';
             if(this.isOnInitCalled) {
               this.cd.detectChanges();
@@ -1425,8 +1591,24 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= ev
                             currow = this.dataSource[0];
                         }
                     }
+<#
+    if (requireTree) {
+#>
+                    if (this.<#= requireTreePropName #>) {
+                        this.<#= cp2TrDtSrcMethodName #>();
+                        this.cd.detectChanges();
+                    } else {
+                        this.<#= OnSelectRowMethodName #>(currow);
+                        this.cd.detectChanges();
+                    }
+<#
+    } else {
+#>
                     this.<#= OnSelectRowMethodName #>(currow);
                     this.cd.detectChanges();
+<#
+    }
+#>
                 },
                 error: (error: any) => {
                     this.inQuery = false;

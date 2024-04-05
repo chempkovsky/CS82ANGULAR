@@ -7992,5 +7992,21 @@ namespace CS82ANGULAR.Model
             return rslt;
         }
 
+        bool CheckRequireTree(ModelViewSerializable model)
+        {
+            bool rslt = false;
+            if (model == null) return rslt;
+            if (model.ForeignKeys == null) return rslt;
+            return model.ForeignKeys.Any(p => p.ViewName == model.ViewName); 
+        }
+        string RequireTreeNavName(ModelViewSerializable model)
+        {
+            string rslt = "";
+            if (model == null) return rslt;
+            if (model.ForeignKeys == null) return rslt;
+            ModelViewForeignKeySerializable fk =  model.ForeignKeys.Where(p => p.ViewName == model.ViewName).FirstOrDefault();
+            if (fk == null) return rslt;
+            return fk.NavigationName;
+        }
     }
 }

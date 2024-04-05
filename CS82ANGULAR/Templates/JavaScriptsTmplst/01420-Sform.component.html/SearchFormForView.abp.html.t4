@@ -72,6 +72,8 @@
     string MaxHeightPropSelector        = "max-height";
     string MaxHeightPropName            = "maxHeight";
     string MaxHeightExPropName          = "maxHeightEx";
+    string TrMaxHeightExPropName        = "trMaxHeightEx";
+
     string OverflowSelector             = "ovrflw";
     string OverflowPropName             = "ovrflw";
     string FilterMaxHeightPropSelector  = "filter-max-height";
@@ -123,6 +125,12 @@
     string showBackBtnSelector          = "show-back-btn";
     string captionPropName              = "caption";
     string captionSelector              = "caption";
+    string requireTreePropName          = "rqTr";
+    string trDefSelKeyPropName          = "trDefSelKey";
+    string trDataSourcePropName         = "trDataSource";
+    string readTrSubitemsMethodName     = "readTrSubitems";
+    string trItmClickMethodName         = "trItmClick";
+
 
     string searchShowFilterPropName     = "searchShowFilter";
     string searchShowAddFltItemPropName = "searchShowAddFltItem";
@@ -157,7 +165,9 @@
     List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
         GetSearchResources(Model, Context);
 
-    boolean requireTree = false;
+    string navName = RequireTreeNavName(Model);
+    bool requireTree = !string.IsNullOrEmpty(navName);
+
 #>
 <div class="card">
     <div style="box-sizing: border-box;left: 1px;right: 1px;">
@@ -248,8 +258,17 @@
     <!--
     <ngb-progressbar type="info" [value]="100" [striped]="true" [animated]="true" [style.visibility]="inQuery ? 'visible': 'hidden'"></ngb-progressbar>
     -->
-
+<#
+    if (requireTree) {
+#>
+    <div class="ngb-tbl-outer-container" *ngIf="!<#= requireTreePropName #>">  
+<#
+    } else {
+#>
     <div class="ngb-tbl-outer-container">  
+<#
+    } 
+#>
         <div  [style.maxHeight.px]="<#= MaxHeightExPropName #>" [style.overflow-y]="<#= OverflowPropName #>"  class="ngb-tbl-container"> 
             <div ngbRadioGroup>
                 <table class="table table-sm table-striped tblwidthclss">
@@ -294,7 +313,18 @@
                                     </span>
                                     <span>{{ { key: 'CmSt::TblClmns', defaultValue: 'Table columns' } | abpLocalization }} </span>
                                 </button>
+<#
+        if (requireTree) {
+#>
+
+                                <button  ngbDropdownItem (click)="showTree(true)"> 
+                                    <span style="display:inline-block;width:30px;">
+                                        <i class="fa fa-sitemap" type="button"></i>
+                                    </span>
+                                    <span>{{ { key: 'CmSt::ShwTree', defaultValue: 'Show Tree' } | abpLocalization }} </span>
+                                </button>
 <# 
+        }
     } else {
 #>
                                 <button  ngbDropdownItem (click)="onFilter()"> 
@@ -305,9 +335,16 @@
                                 <button  ngbDropdownItem (click)="onSettings()"> 
                                     <span style="display:inline-block;width:30px;">
                                         <i class="fa fa-cog" type="button"></i>
-                                    </span>
-                                    Table columns</button>
+                                    </span>Table columns</button>
+<#
+        if (requireTree) {
+#>
+                                <button  ngbDropdownItem (click)="showTree(false)"> 
+                                    <span style="display:inline-block;width:30px;">
+                                        <i class="fa fa-sitemap" type="button"></i>
+                                    </span>Show Table</button>
 <# 
+        }
     }
 #>
                                 <button ngbDropdownItem *ngFor="let m of tableMenuItemsData;"  [disabled]="!m.enabled" (click)="tableCommand(m.id)">
@@ -365,6 +402,78 @@
         </div> 
     </div> 
 
+<#
+    if (requireTree) {
+#>
+    <div *ngIf="<#= requireTreePropName #>">  
+        <div align="right" style="margin-right: 10px;">
+            <span ngbDropdown display="dynamic" placement="bottom-right" container="body" >
+                <i class="fa fa-ellipsis-v" ngbDropdownToggle type="button" ></i> 
+                <div ngbDropdownMenu class="dropdown-menu">
+<# 
+    if(localize) {
+#>
+                <button  ngbDropdownItem (click)="onFilter()" > 
+                    <span style="display:inline-block;width:30px;">
+                        <i class="fa fa-retweet" type="button"></i>
+                    </span>
+                    <span>{{ { key: 'CmSt::RfrshTbl', defaultValue: 'Refresh table' } | abpLocalization }} </span>
+                </button>
+                <button  ngbDropdownItem (click)="onSettings()"> 
+                    <span style="display:inline-block;width:30px;">
+                        <i class="fa fa-cog" type="button"></i>
+                    </span>
+                    <span>{{ { key: 'CmSt::TblClmns', defaultValue: 'Table columns' } | abpLocalization }} </span>
+                </button>
+                <button  ngbDropdownItem (click)="showTree(false)"> 
+                    <span style="display:inline-block;width:30px;">
+                        <i class="fa fa-table" type="button"></i>
+                    </span>
+                    <span>{{ { key: 'CmSt::ShwTbl', defaultValue: 'Show Table' } | abpLocalization }} </span>
+                </button>
+<# 
+    } else {
+#>
+                <button  ngbDropdownItem (click)="onFilter()"> 
+                    <span style="display:inline-block;width:30px;">
+                        <i class="fa fa-retweet" type="button"></i>
+                    </span>Refresh table</button>
+                <button  ngbDropdownItem (click)="onSettings()"> 
+                    <span style="display:inline-block;width:30px;">
+                        <i class="fa fa-cog" type="button"></i>
+                    </span>Table columns</button>
+                <button  ngbDropdownItem (click)="showTree(false)"> 
+                    <span style="display:inline-block;width:30px;">
+                        <i class="fa fa-table" type="button"></i>
+                    </span>Show Table</button>
+<# 
+    }
+#>
+<!--
+                <button ngbDropdownItem *ngFor="let m of tableMenuItemsData;"  [disabled]="!m.enabled" (click)="tableCommand(m.id)">
+                    <span style="display:inline-block;width:30px;">
+                        <i  class="{{'fa ' + m.iconName + ' text-'+ m.iconColor}}" type="button"></i>
+                    </span>
+                    <span>{{m.caption}}</span>
+                </button>
+-->
+                </div>
+            </span> 
+        </div> 
+        <div ngbRadioGroup>
+            <nz-tree
+                [nzData]="<#= trDataSourcePropName #>"
+                nzCheckable="false"
+                nzCheckStrictly="true"
+                (nzClick)="<#= trItmClickMethodName #>($event)"
+                [nzVirtualHeight]="<#= TrMaxHeightExPropName #>"
+                [nzTreeTemplate]="ngtmpl<#= Model.ViewName #>">
+            </nz-tree>
+        </div> 
+    </div> 
+<#
+    }
+#>
     <div class="pagination-container">
         <ngb-pagination [boundaryLinks]="true" [directionLinks]="true" [size]="'sm'" [maxSize]="5"
           [collectionSize]="matPaginatorLen" [(page)]="currentPageIndex" [pageSize]="currentPageSize" (pageChange)="onPage()">
@@ -375,8 +484,81 @@
             </select>
         </div>
     </div> 
-
 </div> 
 
 
-
+<#
+    if (requireTree) {
+#>
+    <ng-template #ngtmpl<#= Model.ViewName #> let-node let-origin="origin">
+        <input type="radio" [value]="origin.data" [checked]="origin.data === currentRow" disabled/>
+        <span>
+            <span ngbDropdown container="body">
+<#
+    foreach(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable in Model.UIListProperties) {
+        if (!modelViewUIListPropertySerializable.IsShownInView) {
+            continue;
+        }
+#>
+                <i aria-hidden="true"  ngbDropdownToggle>
+                    {{origin.data.<#= GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model) #> <#= GetDataPipeEx2(modelViewUIListPropertySerializable, Model) #> }}
+                </i>
+<#
+        break;
+    }
+#>
+                <div ngbDropdownMenu class="dropdown-menu" >
+<# 
+    if(localize) {
+#>
+                    <button  ngbDropdownItem (click)="<#= readTrSubitemsMethodName #>(node)"> 
+                        <span style="display:inline-block;width:30px;">
+                            <i class="fa fa-retweet" type="button"></i>
+                        </span>
+                        <span>{{ { key: 'CmSt::RdSbtms', defaultValue: 'Read Subitems' } | abpLocalization }} </span>
+                    </button>
+<# 
+    } else {
+#>
+                    <button  ngbDropdownItem (click)="<#= readTrSubitemsMethodName #>(node)"> 
+                        <span style="display:inline-block;width:30px;">
+                            <i class="fa fa-retweet" type="button"></i>
+                        </span>Read Subitems</button>
+                    </button>
+<# 
+    }
+#>
+<!--
+                    <button ngbDropdownItem  *ngFor="let m of <#= RowCommandsPropName #>;"  [disabled]="!m.enabled" (click)="rowCommand(origin.data, m.id)">
+                        <span style="display:inline-block;width:30px;">
+                            <i  class="{{'fa ' + m.iconName + ' text-'+ m.iconColor}}" type="button"></i>
+                        </span>
+                        <span>{{m.caption}}</span>
+                    </button>
+-->
+                </div>
+            </span>
+        </span>
+<#
+    {
+        bool isFrst = true;
+        foreach(ModelViewUIListPropertySerializable modelViewUIListPropertySerializable in Model.UIListProperties) {
+            if (!modelViewUIListPropertySerializable.IsShownInView) {
+                continue;
+            }
+            if (isFrst) {
+                isFrst = false;
+                continue;
+            }
+#>
+            <span *ngIf="displayedColumns.includes('<#= GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model) #>')">
+                {{origin.data.<#= GetTypeScriptPropertyNameEx2(modelViewUIListPropertySerializable, Model) #> <#= GetDataPipeEx2(modelViewUIListPropertySerializable, Model) #> }}
+            </span>
+<#
+        }
+    }
+#>
+  </ng-template>
+<#
+    } 
+#>

@@ -247,6 +247,13 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
     public <#= CalcIsDefinedMethodName #>(): boolean {
         for(let i in this._Values) {
             if((!this.<#= formRootService #>.dbgenerated<#= ValueSuffix #>(i)) && 
+<#
+    if (Model.UseOnlyRootPropsForSelect) {
+#>
+                (this.<#= formRootService #>.getFk<#= ValueSuffix #>(i) === '')  && 
+<#
+    }
+#>
                 this.<#= formRootService #>.required<#= ValueSuffix #>(i)) {
                 if(!this.isSet<#= ValueSuffix #>(i)) return false;        
             }
@@ -375,6 +382,9 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
 <#
         if (Model.ScalarProperties != null) {
             foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+                if (Model.UseOnlyRootPropsForSelect) {
+                    if (GetRootEntityProperty(prop, Model) == null) continue;
+                }
                 string nvName = "";
                 if(string.IsNullOrEmpty(prop.ForeignKeyName)) {
                     if (Model.ForeignKeys != null) {
@@ -653,6 +663,9 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
 <#
     {
         foreach (ModelViewPropertyOfVwSerializable sclrProp in Model.ScalarProperties) { 
+                if (Model.UseOnlyRootPropsForSelect) {
+                    if (GetRootEntityProperty(sclrProp, Model) == null) continue;
+                }
                 if(string.IsNullOrEmpty(sclrProp.ForeignKeyName)) {
                     bool codenotadded =true;
                     if (Model.ForeignKeys != null) {
@@ -715,7 +728,8 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
         if ((typeof masterDirNav === 'undefined') || (typeof masterClnt == 'undefined')) return;
         if ((masterDirNav === null) || (masterClnt === null)) return;
         if (masterClnt !== this.get<#= CurrentViewNameFieldName #>()) return;
-        let clntNtChngd = true;
+        let kNC = true;
+        let vNC = false;
         let ignrFlds: Array<string> = [];
         let masterVw: string | any = v.getCurrentViewName();
         let <#= MasterToClientKeyFieldsMapFieldName #>: {[key: string]: {[key: string]: {[key: string]: {isMstrReq: boolean ,propNm:string}}}} = this.<#= formRootService #>.get<#= MasterToClientKeyFieldsMapFieldName #>();
@@ -728,7 +742,7 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
                     let dst: any = this.get<#= ValueSuffix #>(dstnm);
                     ignrFlds.push(dstnm);
                     if (this.isEqual(src, dst)) continue;
-                    clntNtChngd = false;
+                    kNC = false;
                     this.set<#= ValueSuffix #>(dstnm, src);
                     // if(this._<#= ClearIgnorFldsPropName #>.indexOf(dstnm) > -1) ignrFlds.push(dstnm);
                 }
@@ -741,13 +755,16 @@ export class <#= viewDatasourceClassName #> implements <#= viewModelDatasourceIn
                     let dstnm: string = <#= MasterToClientFieldsMapFieldName #>[masterVw][masterDirNav][i];
                     ignrFlds.push(dstnm);
                     if (this.isEqual(src, this.get<#= ValueSuffix #>(dstnm))) continue;
-                    clntNtChngd = false;
+                    vNC = true;// it is correct: master keys are still unchangeable
                     this.set<#= ValueSuffix #>(dstnm, src);
                     // if(this._<#= ClearIgnorFldsPropName #>.indexOf(dstnm) > -1) ignrFlds.push(dstnm);
                 }
             }
         }
-        if (clntNtChngd) return;
+        if (kNC) { // check foreign key
+            if (vNC) this.<#= DoEmitEventMethodName #>(true); // check other fields
+            return;
+        }
         // clear primary and unique key props of the current ViewModel. Eliminate those associated with the current direct master props.
         if(!this.get<#= IsTopDetailFieldName #>()) {
             this.<#= ClearPartiallyMethodName #>(false, ignrFlds);

@@ -4213,6 +4213,54 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01500-Vform.component.css\ViewFormForView.abp.small.css.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01500-Vform.component.html\ViewFormForView.abp.small.html.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01502-Aform.component.css\AddFormForView.abp.small.css.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01502-Aform.component.html\AddFormForView.abp.small.html.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01504-Uform.component.css\UpdFormForView.abp.small.css.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01504-Uform.component.html\UpdFormForView.abp.small.html.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01506-Dform.component.css\DelFormForView.abp.small.css.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01506-Dform.component.html\DelFormForView.abp.small.html.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\BatchJavaScriptsTmplst\01000-ViewModelLevelTmplts\01500-Vform.abp.small.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\BatchJavaScriptsTmplst\01000-ViewModelLevelTmplts\01502-Aform.abp.small.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\BatchJavaScriptsTmplst\01000-ViewModelLevelTmplts\01506-Dform.abp.small.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\BatchJavaScriptsTmplst\01000-ViewModelLevelTmplts\01504-Uform.abp.small.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -4337,7 +4385,7 @@
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties templates_4batchjavascriptstmplst_401000-viewmodelleveltmplts_401600-lform_1json__JsonSchema="https://download.stackhawk.com/hawk/jsonschema/hawkconfig.json" templates_4batchjavascriptstmplst_400000-contextleveltmplts_400200-app-glbl-auth_1json__JsonSchema="https://beaujs.com/schema.json" />
+      <UserProperties templates_4batchjavascriptstmplst_400000-contextleveltmplts_400200-app-glbl-auth_1json__JsonSchema="https://beaujs.com/schema.json" templates_4batchjavascriptstmplst_401000-viewmodelleveltmplts_401600-lform_1json__JsonSchema="https://download.stackhawk.com/hawk/jsonschema/hawkconfig.json" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
