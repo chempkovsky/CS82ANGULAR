@@ -44,6 +44,12 @@
     string addformComponentFolder       = "01502-Aform.component.ts";
     string componentClassName = GetComponentClassName(Model, addformComponentFolder);
 
+    bool    hasFileUpload               = HasFileUpload(Model);
+    string  OnSelectFilesPrefix         = "selFls";
+    string  DisplayFilesPrefix          = "dispFls";
+    string  IdFilesPrefix               = "idFls";
+    int     fileUploadNo                = 0;
+
 
     int typeAheadNo = 0;
     int dateTmPickNo = 0;
@@ -72,8 +78,8 @@
 
     bool isNewLine = false;
     for(int i = 0; i < Model.UIFormProperties.Count; i++) {
-        ModelViewUIFormPropertySerializable 
-                modelViewUIFormPropertySerializable = Model.UIFormProperties[i];
+        ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable = Model.UIFormProperties[i];
+        ModelViewPropertyOfVwSerializable sclrProp = Model.ScalarProperties.Where(p => p.ViewPropertyName == modelViewUIFormPropertySerializable.ViewPropertyName).FirstOrDefault();
         if (isNewLine || i == 0) {
             isNewLine = false;
 
@@ -166,7 +172,25 @@
 
                         typeAheadNo++;
                     } /// if(modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Typeahead) {}
-                    else  
+                    else if (hasFileUpload && IsFileUpload(sclrProp, Model) && string.IsNullOrEmpty(sclrProp.ForeignKeyName)) {
+                        fileUploadNo++;
+#>
+                <div class="form-group"  fxFlex.gt-md="<#= GetXXX1Wdth(XXX1Wdth, percentEq100).ToString() #>" fxFlex.gt-sm="<#=  GetGreaterThanPercent(XXXCnt, XXX2Cnt, XXX2Wdth,percentEq100) #>" fxFlex.gt-xs="<#=  GetGreaterThanPercent(XXXCnt, XXX3Cnt, XXX3Wdth,percentEq100) #>" fxFlex="<#=  percentEq100.ToString() #>">
+                    <input type="file" multiple (change)="<#= OnSelectFilesPrefix + sclrProp.ViewPropertyName #>($event)" #fileUpload<#= fileUploadNo #> style="display: none;">
+                    <div>
+                        <div *ngFor="let i of <#= IdFilesPrefix + sclrProp.ViewPropertyName #>">
+                          {{<#= DisplayFilesPrefix + sclrProp.ViewPropertyName #>[i].name}}
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-outline-secondary btn-sm" type="button"   (click)="fileUpload<#= fileUploadNo #>.click()">
+                            {{<#= frasesPropName #>['Select-Files']}}
+                        </button>
+                    </div>
+                </div>
+<#
+                    }
+                    else 
                     {
                             bool hasButton = HasButton(modelViewUIFormPropertySerializable.InputTypeWhenAdd);
 #>

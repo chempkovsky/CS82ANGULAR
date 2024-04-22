@@ -33,6 +33,7 @@ using Microsoft.AspNetCore.Authorization;
     string UpdateOneMethodName          = "updateone";
     string AddOneMethodName             = "addone";
     string DeleteOneMethodName          = "deleteone";
+    string DownloadOneMethodName        = "downloadone";
     string GetManyByRepPrimMethodNamePrefix = "getmanybyrepprim";
     string GetManyByRepUnqMethodNamePrefix  = "getmanybyrepunq";
 
@@ -131,7 +132,7 @@ using <#= repoInterfaceNameSpace #>;
         ...
     }
 
-    
+
 
 
 */
@@ -895,9 +896,24 @@ namespace <#= appServiceNameSpace #> {
 
         } else {
             primKeys = locPrimKey.UniqueKeyProperties;
+            if (HasFileUpload(Model)) {
+#>
+        [Authorize(<#= moduleName #>Permissions.<#= Model.ViewName #>.Create)]
+        public Task<<#= Model.ViewName #>> <#= AddOneMethodName #>() {
+                throw new Exception("Not implemented. Do not implement and never call this method.");
+        }
+
+
+        [Authorize(<#= moduleName #>Permissions.<#= Model.ViewName #>.Create)]
+        public async Task<<#= Model.ViewName #>> <#= AddOneMethodName #>(<#= Model.ViewName#> viewToAdd)
+<#
+            } else {
 #>
         [Authorize(<#= moduleName #>Permissions.<#= Model.ViewName #>.Create)]
         public async Task<<#= Model.ViewName #>> <#= AddOneMethodName #>(<#= Model.ViewName#> viewToAdd)
+<#
+            }
+#>
         {
             // using(repo.EnableTracking()) 
             {
@@ -1078,7 +1094,62 @@ namespace <#= appServiceNameSpace #> {
     } // the end of if: (Model.IsWebApiDelete)
 #>
 
+
+<#
+    if (HasFileUpload(Model)) {
+        string fileNameProp = GetFileUploadViewPropertyName(Model);
+        List<ModelViewPropertyOfVwSerializable> primKeys = null;
+        ModelViewUniqueKeyOfVwSerializable locPrimKey = GetModelPrimKeyFromList(uniqueKeys);
+        string indErrrorText = "";
+        bool indIsCorrect = locPrimKey != null;
+        if (!indIsCorrect) {
+            indErrrorText = "Could not find primary key";
+        }
+        if (indIsCorrect) {
+            indIsCorrect = CheckModelIfIndexIsCorrect(Model, locPrimKey, out indErrrorText);
+        }
+        if(!indIsCorrect) {
+#>
+//
+// Could not generate <#= DeleteOneMethodName #>
+// Primary Index Is not correct:
+// <#= indErrrorText #>
+//
+<#
+
+        } else {
+            primKeys = locPrimKey.UniqueKeyProperties;
+#>
+        // 
+        // IActionResult is of type: Microsoft.AspNetCore.Mvc.IActionResult
+        // to get ready the code "using Microsoft.AspNetCore.Mvc;"
+        // include something like <PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="8.0.4" /> in the .csproj file
+        // pay special attention to the "Version="X.Y.Z"
+        //
+//        [Authorize(<#= moduleName #>Permissions.<#= Model.ViewName #>.Default)]
+//        public Task<IActionResult> <#= DownloadOneMethodName #>(<#
+        int counter = 0;
+        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+            if(counter > 0) { 
+#>                
+//            ,<#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
+<#
+            } else { 
+#>                
+//             <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
+<#
+                counter++;
+            } 
+        } 
+#>
+//           ) {
+//                throw new Exception("Not implemented. Do not implement and never call this method.");
+ //          }
+<#
+        } // the end of if (HasFileUpload(Model)) {} else {}
+    } // the end of if (HasFileUpload(Model)) {}
+#>
+
     }
-  
 }
 

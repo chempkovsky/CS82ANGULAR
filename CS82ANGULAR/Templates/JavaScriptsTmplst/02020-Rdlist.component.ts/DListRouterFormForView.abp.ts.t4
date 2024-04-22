@@ -51,6 +51,7 @@
 
     string GetOneMethodName             = "getone";
     string DeleteOneMethodName          = "deleteone";
+    string DownloadOneMethodName        = "downloadone";
 
 
     string ActionParamName              = "mode";  
@@ -58,6 +59,7 @@
     string ActionParamUpdateMode        = "update";
     string ActionParamDeleteMode        = "delete";
     string ActionParamViewMode          = "view";
+    string ActionParamDownloadMode      = "download";
     string ActionParamDeleteSelMode     = "deletesel";
     string ActionParamNavM2mNotAllwd    = "nvm2mntallwd";
     string ViewNameParamName            = "view";
@@ -364,6 +366,16 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 key: 'CmSt::AItm',
                 defaultValue: "Add Item"
             }), 
+<#
+if (HasFileUpload(Model)) {
+#>
+        '<#= ActionParamDownloadMode #>':       this.L.instant({
+                key: 'CmSt::DwnLd',
+                defaultValue: "Download Item"
+            }), 
+<#
+}
+#>
         '<#= ActionParamDeleteSelMode #>':  this.L.instant({
                 key: 'CmSt::DSel',
                 defaultValue: "Delete Selected"
@@ -434,6 +446,13 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         '<#= ActionParamViewMode #>': 'View Item',
         '<#= ActionParamAddMode #>': 'Add Item',
         '<#= ActionParamDeleteSelMode #>': 'Delete Selected',
+<#
+if (HasFileUpload(Model)) {
+#>
+        '<#= ActionParamDownloadMode #>': 'Download Item',
+<#
+}
+#>
         '<#= permissionPropName #>': 'Permission',
         '<#= accessDeniedPropName #>': 'Access denied',
 <#
@@ -530,6 +549,13 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
          {id: '<#= ActionParamUpdateMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'], iconName: 'fa-edit', iconColor: 'primary', enabled: true},
          {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'fa-trash', iconColor: 'warning', enabled: true},
          {id: '<#= ActionParamViewMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'fa-eye', iconColor: 'primary', enabled: true},
+<#
+if (HasFileUpload(Model)) {
+#>
+         {id: '<#= ActionParamDownloadMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDownloadMode #>'], iconName: 'fa-download', iconColor: 'primary', enabled: true},
+<#
+}
+#>
       ];
     tableMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
          {id: '<#= ActionParamAddMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'], iconName: 'fa-plus', iconColor: 'primary', enabled: true},
@@ -697,6 +723,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         this.rowMenuItemsData[0].enabled = this.rowMenuItemsData[0].enabled && (!this.extfltrOn) && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>.u') <# if (!Model.IsWebApiUpdate) { #> && false <# } #>; // modify
         this.rowMenuItemsData[1].enabled = this.rowMenuItemsData[1].enabled && (!this.extfltrOn) && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>.d') <# if (!Model.IsWebApiDelete) { #> && false <# } #>; // delete
         this.rowMenuItemsData[2].enabled = this.rowMenuItemsData[2].enabled && (!this.extfltrOn) <# if (!Model.IsWebApiSelectOneByPrimarykey) { #> && false <# } #>; // view
+
 <#
     {
         if (detailViewNames.Count > 0)  {
@@ -1240,8 +1267,19 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 <#
         }
 #>
+
+
         if(v.id === '<#= ActionParamUpdateMode #>') {
             this.onEdit(v.value);
+<#
+if (HasFileUpload(Model)) {
+#>
+        } else if(v.id === '<#= ActionParamDownloadMode #>') {
+            this.<#= ActionParamDownloadMode #>(flt);
+            return;
+<#
+}
+#>
         } else if(v.id === '<#= ActionParamDeleteMode #>') {
             this.onDelete(v.value, v.sender);
         } else if(v.id === '<#= ActionParamViewMode #>') {
@@ -1274,6 +1312,32 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             }
         }
     }
+<#
+if (HasFileUpload(Model)) {
+#>
+    <#= ActionParamDownloadMode #>(flt: any) {
+<#
+    if(primKeys != null) {
+#>    
+        this.<#= formRootService #>.<#= DownloadOneMethodName #>(
+<#
+        {
+            int counter = 0;
+            foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+#>                <#if(counter > 0) { #>, <#} #>flt.<#= GetTypeScriptPropertyName(prop, Model) #>  
+<#
+                counter++;
+            }
+        }
+#> 
+        );
+<#
+    } // the end of if(primKeys != null) {}
+#>
+    }
+<#
+} // the end of if (HasFileUpload(Model)) {}
+#>
     tableCommand(v: <#= eventEmitterDataModelClassName #>) {
         let id = this.tableMenuItemsData.findIndex(e => { return e.id === v.id; });
         if(id < 0) return;

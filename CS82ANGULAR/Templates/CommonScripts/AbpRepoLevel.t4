@@ -5,6 +5,32 @@
 //  https://docs.abp.io/en/abp/latest/Entities#auditing-base-classes
 //
 
+        string GetDashedName(string aName)
+        {
+            string result = "";
+            if (string.IsNullOrEmpty(aName))
+            {
+                return result;
+            }
+            StringBuilder sb = new StringBuilder();
+            //bool toUpper = true;
+            bool isNotFirst = false;
+            foreach (char c in aName)
+            {
+                if (Char.ToUpper(c) == c)
+                {
+                    if (isNotFirst) sb.Append('-');
+                    sb.Append(Char.ToLower(c));
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+                isNotFirst = true;
+            }
+            return sb.ToString();
+        }
+
         string GetPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
         {
             if (prop.IsNullable || (!prop.IsRequiredInView))
@@ -14,6 +40,14 @@
             return prop.UnderlyingTypeName;
         }
         bool IsStringPropertyTypeName(ModelViewPropertyOfVwSerializable prop)
+        {
+            if ("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase) || "String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+            return false;
+        }
+        bool IsStringPropertyTypeNameEx(ModelViewEntityPropertySerializable prop)
         {
             if ("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase) || "String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase))
             {
@@ -95,6 +129,63 @@
                 result = result + valProp.PropValue;
             }
             return result + ")]";
+        }
+        string GetAtributeUnNamedValue(ModelViewPropertyOfVwSerializable sclrProp, string attrName)
+        {
+            if (sclrProp != null)
+            {
+                if (sclrProp.Attributes != null)
+                {
+                    ModelViewAttributeSerializable modelViewAttributeSerializable =
+                        sclrProp.Attributes.Where(a => a.AttrName == attrName).FirstOrDefault();
+                    if (modelViewAttributeSerializable != null)
+                    {
+                        if (modelViewAttributeSerializable.VaueProperties != null)
+                        {
+
+                            ModelViewAttributePropertySerializable modelViewAttributePropertySerializable =
+                                modelViewAttributeSerializable.VaueProperties.Where(p => (string.IsNullOrEmpty(p.PropName) || (p.PropName == "..."))).FirstOrDefault();
+                            if (modelViewAttributePropertySerializable != null)
+                            {
+                                return modelViewAttributePropertySerializable.PropValue;
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+        bool IsFileUpload(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model)
+        {
+            string attrVal = GetAtributeUnNamedValue(prop, "DataType");
+            if (string.IsNullOrEmpty(attrVal))
+            {
+                return false;
+            }
+            attrVal = attrVal.ToLower();
+            return attrVal.Contains("upload");
+        }
+        bool HasFileUpload(ModelViewSerializable model)
+        {
+            if (model.ScalarProperties != null) {
+                foreach(ModelViewPropertyOfVwSerializable prop in model.ScalarProperties) {
+                    if(string.IsNullOrEmpty(prop.ForeignKeyName)) {
+                        if(IsFileUpload(prop, model)) return true;
+                    }
+                }
+            }
+            return false;
+        }
+        string GetFileUploadViewPropertyName(ModelViewSerializable model)
+        {
+            if (model.ScalarProperties != null) {
+                foreach(ModelViewPropertyOfVwSerializable prop in model.ScalarProperties) {
+                    if(string.IsNullOrEmpty(prop.ForeignKeyName)) {
+                        if(IsFileUpload(prop, model)) return prop.ViewPropertyName;
+                    }
+                }
+            }
+            return null;
         }
 
 

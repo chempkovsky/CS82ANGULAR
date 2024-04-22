@@ -49,6 +49,7 @@
 
     string GetOneMethodName             = "getone";
     string DeleteOneMethodName          = "deleteone";
+    string DownloadOneMethodName        = "downloadone";
 
 
     string ActionParamName              = "mode";  
@@ -58,6 +59,8 @@
     string ActionParamDeleteSelMode     = "deletesel";
     string ActionParamNavM2mNotAllwd    = "nvm2mntallwd";
     string ActionParamViewMode          = "view";
+    string ActionParamDownloadMode      = "download";
+
     string ViewNameParamName            = "view";
     string NavigationParamName          = "nav";
     string NavigationAddOnName          = "addon";
@@ -95,6 +98,7 @@
     string OnRowCommandPropName         = "onRowCommand";
     string OnTableCommandSelector       = "on-table-command";
     string OnTableCommandPropName       = "onTableCommand";
+
 
     string externalFilterSelector               = "external-filter";
     string externalFilterPropName               = "externalFilter";
@@ -296,6 +300,16 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 key: 'CmSt::AItm',
                 defaultValue: "Add Item"
             }), 
+<#
+if (HasFileUpload(Model)) {
+#>
+        '<#= ActionParamDownloadMode #>':       this.L.instant({
+                key: 'CmSt::DwnLd',
+                defaultValue: "Download Item"
+            }), 
+<#
+}
+#>
         '<#= ActionParamDeleteSelMode #>':  this.L.instant({
                 key: 'CmSt::DSel',
                 defaultValue: "Delete Selected"
@@ -365,6 +379,13 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         '<#= ActionParamViewMode #>': 'View Item',
         '<#= ActionParamAddMode #>': 'Add Item',
         '<#= ActionParamDeleteSelMode #>': 'Delete Selected',
+<#
+if (HasFileUpload(Model)) {
+#>
+        '<#= ActionParamDownloadMode #>': 'Download Item',
+<#
+}
+#>
         '<#= permissionPropName #>': 'Permission',
         '<#= accessDeniedPropName #>': 'Access denied',
 <#
@@ -462,6 +483,13 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             {id: '<#= ActionParamUpdateMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'], iconName: 'fa-edit', iconColor: 'primary', enabled: true},
             {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'fa-trash', iconColor: 'warning', enabled: true},
             {id: '<#= ActionParamViewMode #>',   caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'fa-eye', iconColor: 'primary', enabled: true},
+<#
+if (HasFileUpload(Model)) {
+#>
+            {id: '<#= ActionParamDownloadMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDownloadMode #>'], iconName: 'fa-download', iconColor: 'primary', enabled: true},
+<#
+}
+#>
         ];
     tableMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
             {id: '<#= ActionParamAddMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'], iconName: 'fa-plus', iconColor: 'primary', enabled: true},
@@ -913,6 +941,15 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 qp.push(JSON.stringify({}));
             }
             qp.push(JSON.stringify(flt));
+<#
+if (HasFileUpload(Model)) {
+#>
+        } else if(v.id === '<#= ActionParamDownloadMode #>') {
+            this.<#= ActionParamDownloadMode #>(flt);
+            return;
+<#
+}
+#>
         } else if(v.id === '<#= ActionParamUpdateMode #>') {
             qp.push( '<#= UPrefix #>' + '<#= Model.ViewName #>' );
             if (!(typeof this.route.snapshot.params[this.<#= HiddenFilterPrefix #>] === 'undefined')) {
@@ -964,6 +1001,32 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         }
 */
     }
+<#
+if (HasFileUpload(Model)) {
+#>
+    <#= ActionParamDownloadMode #>(flt: any) {
+<#
+    if(primKeys != null) {
+#>    
+        this.<#= formRootService #>.<#= DownloadOneMethodName #>(
+<#
+        {
+            int counter = 0;
+            foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+#>                <#if(counter > 0) { #>, <#} #>flt.<#= GetTypeScriptPropertyName(prop, Model) #>  
+<#
+                counter++;
+            }
+        }
+#> 
+        );
+<#
+    } // the end of if(primKeys != null) {}
+#>
+    }
+<#
+} // the end of if (HasFileUpload(Model)) {}
+#>
     tableCommand(v: <#= eventEmitterDataModelClassName #>) {
         let id = this.tableMenuItemsData.findIndex(e => { return e.id === v.id; });
         if(id < 0) return;

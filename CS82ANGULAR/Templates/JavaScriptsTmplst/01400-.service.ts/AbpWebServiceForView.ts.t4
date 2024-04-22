@@ -28,6 +28,7 @@
     string UpdateOneMethodName                  = "updateone";
     string AddOneMethodName                     = "addone";
     string DeleteOneMethodName                  = "deleteone";
+    string DownloadOneMethodName                = "downloadone";
     string GetManyByRepPrimMethodNamePrefix     = "getmanybyrepprim";
     string GetManyByRepUnqMethodNamePrefix      = "getmanybyrepunq";
 
@@ -72,6 +73,7 @@
     string viewInterfaceFilterName              = GetInterfaceFilterNameWithAnglr(AngularJsonFile, Model, viewInterfaceFltFolder, viewServiceFolder);
 
     string apiName                              = AbpFirstItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
+    string a_filename                           = "'noname'";
 
     List<ModelViewUniqueKeyOfVwSerializable> uniqueKeys = new List<ModelViewUniqueKeyOfVwSerializable>();
     {
@@ -888,7 +890,9 @@ export class <#= serviceClassName #> {
     <#= AddOneMethodName #>(item: <#= viewInterfaceName #>) // , config?: Partial<Rest.Config>)
         : Observable<<#= viewInterfaceName #>> {
 <#
-        foreach (ModelViewPropertyOfVwSerializable identProp in identProps) {
+        {
+            bool hasFU = HasFileUpload(Model);
+            foreach (ModelViewPropertyOfVwSerializable identProp in identProps) {
 #>
         if(!(typeof item === 'undefined')) {
             if(!(item === null)) {
@@ -901,9 +905,52 @@ export class <#= serviceClassName #> {
             }
         }
 <#
+            }
+            if (hasFU) {
+#>
+        let frmDt: FormData = new FormData(); 
+        // at first the props which is not file upload 
+        // file upload props must be the last
+<#
+        foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(string.IsNullOrEmpty(prop.ForeignKeyName) &&  IsFileUpload(prop, Model)) continue;
+#>
+        if (!(typeof item['<#= GetTypeScriptPropertyName(prop, Model) #>'] === 'undefined')) {
+            if (!(item['<#= GetTypeScriptPropertyName(prop, Model) #>'] === null)) {
+                frmDt.append('<#= prop.ViewPropertyName #>', '' + item['<#= GetTypeScriptPropertyName(prop, Model) #>']);
+            }
+        }
+<#
         }
 #>
+        // at second the props which is file upload 
+        // file upload props must be the last
+<#
+        foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(string.IsNullOrEmpty(prop.ForeignKeyName) &&  IsFileUpload(prop, Model)) {
+#>
+        if(!(item['<#= GetTypeScriptPropertyName(prop, Model) #>'] === null)) {
+            for(let i = 0; i < (item['<#= GetTypeScriptPropertyName(prop, Model) #>'] as FileList).length; i++) {
+                let  lfl: File = item['<#= GetTypeScriptPropertyName(prop, Model) #>'][i] as File;
+                frmDt.append('<#= prop.ViewPropertyName #>', lfl);
+            }
+        }
+<#
+            }
+        }
+#>
+        return this.http.post<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= AddOneMethodName #>', frmDt); //, httpOptions);
+
+<#
+            } else {
+#>
         return this.http.post<<#= viewInterfaceName #>>(this.serviceUrl+'/<#= AddOneMethodName #>', item); //, httpOptions);
+
+<#
+            }
+        }
+#>
+
         // .pipe(
         //      catchError(this.handleError('<#= AddOneMethodName #>', item))
         // );
@@ -1000,8 +1047,92 @@ export class <#= serviceClassName #> {
         //);
     }
 <#
+        } // the end of if(!indIsCorrect) {} else {}
+    } // the end of if (Model.IsWebApiDelete) {}
+
+    
+
+    if (HasFileUpload(Model)) {
+        List<ModelViewPropertyOfVwSerializable> primKeys = null;
+        ModelViewUniqueKeyOfVwSerializable locPrimKey = GetModelPrimKeyFromList(uniqueKeys);
+        string indErrrorText = "";
+        bool indIsCorrect = locPrimKey != null;
+        if (!indIsCorrect) {
+            indErrrorText = "Could not find primary key";
         }
-    } 
+        if (indIsCorrect) {
+            indIsCorrect = CheckModelIfIndexIsCorrect(Model, locPrimKey, out indErrrorText);
+        }
+        if(!indIsCorrect) {
+#>
+//
+// Could not generate <#= DeleteOneMethodName #>
+// Primary Index Is not correct:
+// <#= indErrrorText #>
+//
+<#
+
+        } else {
+            primKeys = locPrimKey.UniqueKeyProperties;
+
+#>
+    // 
+    // HowTo: item is of type <#= viewInterfaceName #> 
+    //
+    // this.serviceRefInYourCode.<#= DeleteOneMethodName #>(item).subscibe(value =>{
+    //    // handling value of type <#= viewInterfaceName #>
+    // },
+    // error => {
+    //    // handling error 
+    // });
+    // 
+    <#= DownloadOneMethodName #>(<# 
+        {
+            int counter = 0;
+            foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+                if(string.IsNullOrEmpty(prop.ForeignKeyName)) {
+                    if(IsFileUpload(prop, Model)) a_filename = GetTypeScriptPropertyName(prop, Model);
+                }
+                if(counter > 0) { #>, <#} #><#= GetTypeScriptPropertyName(prop, Model) #>: <#= GetPropertyTypeScriptTypeName(prop) #>|any <#
+                counter++;
+            }
+        }#> //, config?: Partial<Rest.Config>
+        ): void {
+        let params: HttpParams  = new HttpParams({encoder: this.<#= AppSettingServicePropName #>});
+<#
+        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            if(! (primKeys.Contains(prop))) {
+                continue;
+            }
+#>
+        if (!(typeof <#= GetTypeScriptPropertyName(prop, Model) #> === 'undefined')) {
+            if (!(<#= GetTypeScriptPropertyName(prop, Model) #> === null)) {
+                params = params.append('<#= GetTypeScriptPropertyName(prop, Model) #>', <#= GetTypeScriptPropertyName(prop, Model) #><#= GetJavaScriptToStringMethod(prop) #>);
+            }
+        }
+<#
+    }
+#>
+        this.http.get(this.serviceUrl+'/<#= DownloadOneMethodName #>', {params: params, observe:'response', responseType:'blob'})
+            .subscribe((response) => {
+                let _blbflNm = <#= a_filename #>;
+                let _blbData: Blob = response.body as Blob;
+                let _blbUrl = window.URL.createObjectURL(_blbData);
+                let a = document.createElement('a');
+                a.setAttribute('style', 'display:none;');
+                a.target = '_blank';
+                a.download = _blbflNm;
+                a.href = _blbUrl;
+                a.click();
+                window.URL.revokeObjectURL(_blbUrl);
+                a.remove();
+            });
+        
+    }
+<#
+        } // the end of if(!indIsCorrect) {} else {}
+    } // the end of if (HasFileUpload(Model)) {}
+
 #>
 
     <#= src2destMethodName #>(src: <#= viewInterfaceName #>, dest: <#= viewInterfaceName #>) {

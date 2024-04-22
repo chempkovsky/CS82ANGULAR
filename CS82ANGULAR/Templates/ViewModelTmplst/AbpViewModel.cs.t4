@@ -79,10 +79,12 @@ namespace <#= GetModelNameSpace(Model) #> {
     public class <#= Model.ViewName #> : <#= InheritedFrom  #> {
 <#
         foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+            
             if(Model.UseOnlyRootPropsForSelect) {
                 if(!string.IsNullOrEmpty(prop.ForeignKeyName)) continue;
                 if(!string.IsNullOrEmpty(prop.ForeignKeyNameChain)) continue;
             }
+            bool isFileUpload = IsFileUpload(prop, Model);
             if (string.IsNullOrEmpty(prop.ForeignKeyName) && string.IsNullOrEmpty(prop.ForeignKeyNameChain)) {
                 if(("DeletionTime".Equals(prop.ViewPropertyName) ||
                 "DeleterId".Equals(prop.ViewPropertyName) ||
@@ -154,6 +156,12 @@ namespace <#= GetModelNameSpace(Model) #> {
 <#
                 }
             }
+            if (isFileUpload) {
+                if(string.IsNullOrEmpty(prop.ForeignKeyName) && !IsStringPropertyTypeName(prop)) {
+                    throw new Exception(prop.ViewPropertyName +  "-property has [DataType(DataType.Upload)] attribute: String property type required.");
+                }
+            }
+
             if((!prop.IsNullable) && IsStringPropertyTypeName(prop)) {
 #>
         public <#= GetPropertyTypeName(prop) #>  <#= GetTypeScriptPropertyName(prop, Model) #> { get; set; } = null!;

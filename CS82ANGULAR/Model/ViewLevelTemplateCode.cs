@@ -1,5 +1,6 @@
 ﻿using CS82ANGULAR.Model.Serializable;
 using CS82ANGULAR.Model.Serializable.Angular;
+using CS82ANGULAR.TemplateProcessingHelpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6483,6 +6484,14 @@ namespace CS82ANGULAR.Model
             }
             return false;
         }
+        bool IsStringPropertyTypeNameEx(ModelViewPropertySerializable prop)
+        {
+            if ("System.String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase) || "String".Equals(prop.UnderlyingTypeName, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+            return false;
+        }
         String GetDestinationNameSpace(ModelViewSerializable model)
         {
             string result = "";
@@ -6832,6 +6841,44 @@ namespace CS82ANGULAR.Model
             string rsltStr = GetAtributeUnNamedValue(sclrProp, "DataType");
             if (string.IsNullOrEmpty(rsltStr)) return false;
             return (rsltStr.IndexOf("Currency", StringComparison.CurrentCultureIgnoreCase) >= 0);
+        }
+        bool IsFileUpload(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model)
+        {
+            string attrVal = GetAtributeUnNamedValue(prop, "DataType");
+            if (string.IsNullOrEmpty(attrVal))
+            {
+                return false;
+            }
+            attrVal = attrVal.ToLower();
+            return attrVal.Contains("upload");
+        }
+        bool HasFileUpload(ModelViewSerializable model)
+        {
+            if (model.ScalarProperties != null)
+            {
+                foreach (ModelViewPropertyOfVwSerializable prop in model.ScalarProperties)
+                {
+                    if (string.IsNullOrEmpty(prop.ForeignKeyName))
+                    {
+                        if (IsFileUpload(prop, model)) return true;
+                    }
+                }
+            }
+            return false;
+        }
+        string GetFileUploadViewPropertyName(ModelViewSerializable model)
+        {
+            if (model.ScalarProperties != null)
+            {
+                foreach (ModelViewPropertyOfVwSerializable prop in model.ScalarProperties)
+                {
+                    if (string.IsNullOrEmpty(prop.ForeignKeyName))
+                    {
+                        if (IsFileUpload(prop, model)) return prop.ViewPropertyName;
+                    }
+                }
+            }
+            return null;
         }
         string GetDataPipe(ModelViewPropertyOfVwSerializable prop, ModelViewSerializable model)
         {

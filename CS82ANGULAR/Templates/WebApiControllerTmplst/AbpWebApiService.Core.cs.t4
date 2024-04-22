@@ -30,6 +30,7 @@ using Volo.Abp;
     string UpdateOneMethodName          = "updateone";
     string AddOneMethodName             = "addone";
     string DeleteOneMethodName          = "deleteone";
+    string DownloadOneMethodName        = "downloadone";
     string GetManyByRepPrimMethodNamePrefix = "getmanybyrepprim";
     string GetManyByRepUnqMethodNamePrefix  = "getmanybyrepunq";
 
@@ -123,6 +124,46 @@ using <#= appServiceInterfaceNameSpace #>;
     }
 
     
+<#
+    if (HasFileUpload(Model)) {
+#>
+  // == 3 ==
+  // read this: https://docs.abp.io/en/abp/latest/Blob-Storing
+  // 3.1. add "Volo.Abp.BlobStoring" package to the ".csproj"-file
+  // 3.2. add [DependsOn(typeof(AbpBlobStoringModule))] to the ABP module class inside your project.
+  // create a class  "<#= Model.ViewName #>BlobContainer" like seen
+  //
+    [BlobContainerName("<#= GetDashedName(Model.ViewName) #>")]
+    public class <#= Model.ViewName #>BlobContainer {}
+<#
+    }
+#>    
+
+
+  // 3.3.create this class in the same folder as for the "<#= AbpServiceName(Model) #>"-class
+  // 3.3.in the project XXX.HttpApi.Host.csproj
+  //        in the module class 
+  //           in the "ConfigureServices"-method write something like seen below:
+
+    public override void ConfigureServices(ServiceConfigurationContext context)
+    {
+...
+        Configure<AbpBlobStoringOptions>(options =>
+        {
+            options.Containers.Configure("<#= GetDashedName(Model.ViewName) #>", container =>
+            {
+                container.IsMultiTenant = false; // or true
+                container.UseFileSystem(fileSystem =>
+                {
+                    fileSystem.BasePath = "C:\\temp\\<#= GetDashedName(Model.ViewName) #>"; // or any folder you like or use something like this configuration["AbpBlobStoringOptions:<#= Model.ViewName #>"]
+                });
+            });
+        });
+
+...
+    }  
+
+
 
 
 */
@@ -141,8 +182,24 @@ namespace <#= webApiNameSpace #> {
     {
 
         private readonly <#= AbpServiceInterfaceName(Model)  #> appService;
+<#
+    if (HasFileUpload(Model)) {
+#>
+        IBlobContainer<<#= Model.ViewName #>BlobContainer> blobContainer;
+
+
+        public <#= AbpWebApiControllerName(Model) #>(<#= AbpServiceInterfaceName(Model)  #> _appService, IBlobContainer<<#= Model.ViewName #>BlobContainer> _blobContainer)
+        {
+            blobContainer = _blobContainer;
+
+<#
+    } else {
+#>
         public <#= AbpWebApiControllerName(Model) #>(<#= AbpServiceInterfaceName(Model)  #> _appService)
         {
+<#
+    }
+#>
             appService = _appService;
         }
 
@@ -389,6 +446,128 @@ namespace <#= webApiNameSpace #> {
 
         } else {
             primKeys = locPrimKey.UniqueKeyProperties;
+            bool hasFU = HasFileUpload(Model);
+            if (hasFU) {
+                string fileNameProp = GetFileUploadViewPropertyName(Model);
+#>
+
+        [HttpPost]
+        [Route("[controller]/<#= AddOneMethodName #>NotImplemented")]
+        [Authorize(<#= moduleName #>Permissions.<#= Model.ViewName #>.Create)]
+        public Task<<#= Model.ViewName #>> <#= AddOneMethodName #>(<#= Model.ViewName#> viewToAdd) {
+            throw new System.Exception("Not implemented. Never call this method.");
+        }
+
+        [HttpPost]
+        [Route("[controller]/<#= AddOneMethodName #>")]
+        [Authorize(<#= moduleName #>Permissions.<#= Model.ViewName #>.Create)]
+        public async Task<<#= Model.ViewName #>> <#= AddOneMethodName #>()
+        {
+            <#= Model.ViewName #> viewToAdd = new <#= Model.ViewName #>();
+
+            var request = HttpContext.Request;
+            // validation of Content-Type
+            // 1. first, it must be a form-data request
+            // 2. a boundary should be found in the Content-Type
+            if (!request.HasFormContentType ||
+                !Microsoft.Net.Http.Headers.MediaTypeHeaderValue.TryParse(request.ContentType, out var mediaTypeHeader) ||
+                string.IsNullOrEmpty(mediaTypeHeader.Boundary.Value))
+            {
+                throw new System.Exception("Unsupported Media Type");
+            }
+            var boundary = Microsoft.Net.Http.Headers.HeaderUtilities.RemoveQuotes(mediaTypeHeader.Boundary.Value).Value;
+            var reader = new Microsoft.AspNetCore.WebUtilities.MultipartReader(boundary, request.Body);
+            var section = await reader.ReadNextSectionAsync();
+
+
+            while (section != null)
+            {
+                var hasContentDispositionHeader = 
+                    Microsoft.Net.Http.Headers.ContentDispositionHeaderValue.TryParse(section.ContentDisposition, out var contentDisposition);
+                if (hasContentDispositionHeader)
+                {
+                    if (hasContentDispositionHeader && 
+                        contentDisposition.DispositionType.Equals("form-data") &&
+                        !string.IsNullOrEmpty(contentDisposition.FileName.Value))
+                    {
+                        viewToAdd.<#= fileNameProp #> = contentDisposition.FileName.Value;
+                        viewToAdd = await appService.<#= AddOneMethodName #>(viewToAdd);
+
+                        string blbNm = "<#= Model.ViewName #>";
+<#
+            for(int pkId= 0; pkId < primKeys.Count; pkId++) {
+                ModelViewEntityPropertySerializable entityProp = GetRootEntityProperty(primKeys[pkId], Model);
+#>
+                        if(viewToAdd.<#= entityProp.OriginalPropertyName #> != null) {
+<#
+                if (IsStringPropertyTypeNameEx(entityProp)) {
+#>
+                            blbNm += "/" + viewToAdd.<#= entityProp.OriginalPropertyName #>.Replace('?', 'q').Replace('%', 'p').Replace('\\', 's').Replace('/', 'b').Replace('{', 'm').Replace('}', 'n');
+<#
+                } else {
+#>
+                            blbNm += "/" + viewToAdd.<#= entityProp.OriginalPropertyName #>.ToString().Replace('?', 'q').Replace('%', 'p').Replace('\\', 's').Replace('/', 'b').Replace('{', 'm').Replace('}', 'n');
+<#
+                }
+#>
+                        } else {
+                            blbNm += "/NULL";
+                        }
+<#
+            }
+#>
+                        await blobContainer.SaveAsync(blbNm, section.Body, true);
+                    } 
+                    else
+                    {
+<#
+                {
+                    bool isNotFrst = false;
+                    foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+                        if(Model.UseOnlyRootPropsForSelect) {
+                            if(!string.IsNullOrEmpty(prop.ForeignKeyName)) continue;
+                            if(!string.IsNullOrEmpty(prop.ForeignKeyNameChain)) continue;
+                        }
+                        if(IsFileUpload(prop, Model)) continue;
+                        if(isNotFrst) {
+#>
+                        else if (contentDisposition.Name == "<#= prop.ViewPropertyName #>") {
+<#                      
+                        } else { 
+#>
+                        if (contentDisposition.Name == "<#= prop.ViewPropertyName #>") {
+<#                      
+                            isNotFrst = true;
+                        } // the end of if(isNotFrst) {} else {}
+                        if (IsStringPropertyTypeName(prop)) {
+#>
+                            viewToAdd.<#= GetTypeScriptPropertyName(prop, Model) #> = await section.ReadAsStringAsync(); // using Microsoft.AspNetCore.WebUtilities;
+<#
+                        } else {
+#>
+                            string sv = await section.ReadAsStringAsync(); // using Microsoft.AspNetCore.WebUtilities;
+                            if(!string.IsNullOrEmpty(sv)) {
+                                <#= prop.UnderlyingTypeName #> v;
+                                if (<#= prop.UnderlyingTypeName #>.TryParse(sv, out v)) {
+                                    viewToAdd.<#= GetTypeScriptPropertyName(prop, Model) #> = v;
+                                }
+                            }
+<#
+                        } // if (IsStringPropertyTypeName(prop)) {} else {}
+#>
+                        }
+<#                      
+                    } // the end of foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {}
+                } // the end of { bool isNotFrst = false;
+#>
+                    }
+                }
+                section = await reader.ReadNextSectionAsync();
+            }
+            return viewToAdd;
+        }
+<#
+            } else { // the end of if (hasFU) {}
 #>
         [HttpPost]
         [Route("[controller]/<#= AddOneMethodName #>")]
@@ -398,6 +577,7 @@ namespace <#= webApiNameSpace #> {
             return await appService.<#= AddOneMethodName #>(viewToAdd);
         }
 <#
+            } // the end of: if (hasFU) {} else {}
         } // the end of: if(indIsCorrect) {}
     } // the end of if (Model.IsWebApiAdd)
 #>
@@ -447,7 +627,7 @@ namespace <#= webApiNameSpace #> {
         } #>                
            )
         {
-            return await appService.<#= DeleteOneMethodName #>(<#
+            <#= Model.ViewName #> entityToDelete = await appService.<#= DeleteOneMethodName #>(<#
         int counter09 = 0;
         foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
             if(counter09 > 0) { 
@@ -462,11 +642,138 @@ namespace <#= webApiNameSpace #> {
             } 
         } #>                
             );
+
+<#
+        if (HasFileUpload(Model)) {
+#>
+                string blbNm = "<#= Model.ViewName #>";
+<#
+            for(int pkId= 0; pkId < primKeys.Count; pkId++) {
+                ModelViewEntityPropertySerializable entityProp = GetRootEntityProperty(primKeys[pkId], Model);
+#>
+                if(entityToDelete.<#= entityProp.OriginalPropertyName #> != null) {
+<#
+                if (IsStringPropertyTypeNameEx(entityProp)) {
+#>
+                    blbNm += "/" + entityToDelete.<#= entityProp.OriginalPropertyName #>.Replace('?', 'q').Replace('%', 'p').Replace('\\', 's').Replace('/', 'b').Replace('{', 'm').Replace('}', 'n');
+<#
+                } else {
+#>
+                    blbNm += "/" + entityToDelete.<#= entityProp.OriginalPropertyName #>.ToString().Replace('?', 'q').Replace('%', 'p').Replace('\\', 's').Replace('/', 'b').Replace('{', 'm').Replace('}', 'n');
+<#
+                }
+#>
+                } else {
+                    blbNm += "/NULL";
+                }
+<#
+            }
+#>
+                await blobContainer.DeleteAsync(blbNm);
+<#
+        } 
+#>
+            return entityToDelete;
         }
 <#
         } // the end of: if(!indIsCorrect) {} else {}
     } // the end of if: (Model.IsWebApiDelete)
 #>
+
+<#
+    if (HasFileUpload(Model)) {
+        string fileNameProp = GetFileUploadViewPropertyName(Model);
+        List<ModelViewPropertyOfVwSerializable> primKeys = null;
+        ModelViewUniqueKeyOfVwSerializable locPrimKey = GetModelPrimKeyFromList(uniqueKeys);
+        string indErrrorText = "";
+        bool indIsCorrect = locPrimKey != null;
+        if (!indIsCorrect) {
+            indErrrorText = "Could not find primary key";
+        }
+        if (indIsCorrect) {
+            indIsCorrect = CheckModelIfIndexIsCorrect(Model, locPrimKey, out indErrrorText);
+        }
+        if(!indIsCorrect) {
+#>
+//
+// Could not generate <#= DeleteOneMethodName #>
+// Primary Index Is not correct:
+// <#= indErrrorText #>
+//
+<#
+
+        } else {
+            primKeys = locPrimKey.UniqueKeyProperties;
+#>
+
+
+
+        [HttpGet]
+        [Route("[controller]/<#= DownloadOneMethodName #>")]
+        [Authorize(<#= moduleName #>Permissions.<#= Model.ViewName #>.Default)]
+        public async Task<IActionResult> <#= DownloadOneMethodName #>(<#
+        int counter = 0;
+        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+            if(counter > 0) { 
+#>                
+            ,[FromQuery] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
+<#
+            } else { 
+#>                
+             [FromQuery] <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
+<#
+                counter++;
+            } 
+        } #>                
+           )
+        {
+
+            <#= Model.ViewName #> entityToDownload = await appService.<#= GetOneMethodName #>(<#
+        int counter09 = 0;
+        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+            if(counter09 > 0) { 
+#>                
+                ,<#= GetFilterPropertyName(prop, Model)#>
+<#
+            } else { 
+#>                
+                 <#= GetFilterPropertyName(prop, Model)#>
+<#
+                counter09++;
+            } 
+        } #>                
+            );
+                string blbNm = "<#= Model.ViewName #>";
+<#
+            for(int pkId= 0; pkId < primKeys.Count; pkId++) {
+                ModelViewEntityPropertySerializable entityProp = GetRootEntityProperty(primKeys[pkId], Model);
+#>
+                if(entityToDownload.<#= entityProp.OriginalPropertyName #> != null) {
+<#
+                if (IsStringPropertyTypeNameEx(entityProp)) {
+#>
+                    blbNm += "/" + entityToDownload.<#= entityProp.OriginalPropertyName #>.Replace('?', 'q').Replace('%', 'p').Replace('\\', 's').Replace('/', 'b').Replace('{', 'm').Replace('}', 'n');
+<#
+                } else {
+#>
+                    blbNm += "/" + entityToDownload.<#= entityProp.OriginalPropertyName #>.ToString().Replace('?', 'q').Replace('%', 'p').Replace('\\', 's').Replace('/', 'b').Replace('{', 'm').Replace('}', 'n');
+<#
+                }
+#>
+                } else {
+                    blbNm += "/NULL";
+                }
+<#
+            }
+#>
+                var data =  await blobContainer.GetAsync(blbNm);
+                return File(data,  "application/octet-stream", entityToDownload.<#= fileNameProp #> );
+        }
+<#
+        } //  the end of if(!indIsCorrect) {} else {}
+    } // the end of if (HasFileUpload(Model)) {}
+#>
+
 
     }
   

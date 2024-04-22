@@ -28,6 +28,7 @@ using System.Collections.Generic;
     string UpdateOneMethodName          = "updateone";
     string AddOneMethodName             = "addone";
     string DeleteOneMethodName          = "deleteone";
+    string DownloadOneMethodName        = "downloadone";
     string GetManyByRepPrimMethodNamePrefix = "getmanybyrepprim";
     string GetManyByRepUnqMethodNamePrefix  = "getmanybyrepunq";
 
@@ -233,9 +234,16 @@ namespace <#= appServiceNameSpace #> {
 
         } else {
             primKeys = locPrimKey.UniqueKeyProperties;
+            if (HasFileUpload(Model)) {
+#>
+        Task<<#= Model.ViewName #>> <#= AddOneMethodName #>(<#= Model.ViewName#> viewToAdd);
+        Task<<#= Model.ViewName #>> <#= AddOneMethodName #>();
+<#
+            } else {
 #>
         Task<<#= Model.ViewName #>> <#= AddOneMethodName #>(<#= Model.ViewName#> viewToAdd);
 <#
+            }
         } // the end of: if(indIsCorrect) {}
     } // the end of if (Model.IsWebApiAdd)
 #>
@@ -285,6 +293,61 @@ namespace <#= appServiceNameSpace #> {
         } // the end of: if(!indIsCorrect) {} else {}
     } // the end of if: (Model.IsWebApiDelete)
 #>
+
+
+<#
+    if (HasFileUpload(Model)) {
+        string fileNameProp = GetFileUploadViewPropertyName(Model);
+        List<ModelViewPropertyOfVwSerializable> primKeys = null;
+        ModelViewUniqueKeyOfVwSerializable locPrimKey = GetModelPrimKeyFromList(uniqueKeys);
+        string indErrrorText = "";
+        bool indIsCorrect = locPrimKey != null;
+        if (!indIsCorrect) {
+            indErrrorText = "Could not find primary key";
+        }
+        if (indIsCorrect) {
+            indIsCorrect = CheckModelIfIndexIsCorrect(Model, locPrimKey, out indErrrorText);
+        }
+        if(!indIsCorrect) {
+#>
+//
+// Could not generate <#= DeleteOneMethodName #>
+// Primary Index Is not correct:
+// <#= indErrrorText #>
+//
+<#
+
+        } else {
+            primKeys = locPrimKey.UniqueKeyProperties;
+#>
+
+        // 
+        // IActionResult is of type: Microsoft.AspNetCore.Mvc.IActionResult
+        // to get ready the code "using Microsoft.AspNetCore.Mvc;"
+        // include something like <PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="8.0.4" /> in the .csproj file
+        // pay special attention to the "Version="X.Y.Z"
+        //
+//        Task<IActionResult> <#= DownloadOneMethodName #>(<#
+        int counter = 0;
+        foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+            if(counter > 0) { 
+#>                
+//            ,<#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
+<#
+            } else { 
+#>                
+//             <#= prop.UnderlyingTypeName #> <#= GetFilterPropertyName(prop, Model)#>
+<#
+                counter++;
+            } 
+        } 
+#>                
+//           );
+<#
+        } // the end of if(!indIsCorrect) {} else {}
+    } // the end of if (HasFileUpload(Model)) {}
+#>
+
 
     }
   

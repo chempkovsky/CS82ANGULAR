@@ -277,6 +277,11 @@
     string searchModuleServiceFolder    = "01450-S.module.service.ts";
     string apiName                      = AbpFirstItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
     
+    bool    hasFileUpload               = HasFileUpload(Model);
+    string  OnSelectFilesPrefix         = "selFls";
+    string  DisplayFilesPrefix          = "dispFls";
+    string  IdFilesPrefix               = "idFls";
+
 #>
 
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
@@ -366,6 +371,16 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             key: 'CmSt::NtAllMstSet',
             defaultValue: "Not all masters have been set"
         }) 
+<#
+        if (hasFileUpload) {
+#>
+        ,'Select-Files': this.L.instant({
+            key: 'CmSt::SlctFls',
+            defaultValue: "Select-Files"
+        }) 
+<#
+        }
+#>
     };
 <# 
     } else {
@@ -628,6 +643,10 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         foreach(ModelViewUIFormPropertySerializable modelViewUIFormPropertySerializable in Model.UIFormProperties) {
             //if ((!modelViewUIFormPropertySerializable.IsShownInView) || (modelViewUIFormPropertySerializable.InputTypeWhenAdd == InputTypeEnum.Hidden)) continue;
             if ((!modelViewUIFormPropertySerializable.IsShownInView)) continue;
+            if (hasFileUpload) {
+                ModelViewPropertyOfVwSerializable sclrProp = Model.ScalarProperties.Where(p => p.ViewPropertyName == modelViewUIFormPropertySerializable.ViewPropertyName).FirstOrDefault();
+                if(IsFileUpload(sclrProp, Model) && string.IsNullOrEmpty(sclrProp.ForeignKeyName)) continue;
+            }
             bool isDbGenProp = IsDatabaseGeneratedPropertyEx(modelViewUIFormPropertySerializable, Model);
             string defval = "null";
             if (IsBooleanInput(modelViewUIFormPropertySerializable, Model)) {
@@ -1049,6 +1068,29 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         } // foreach(Tuple<string, ModelViewSerializable, ModelViewUIFormPropertySerializable, InputTypeEnum> fk in ForeignKeyNameChainList) {}
     }
 #>
+
+<#
+    if (hasFileUpload) {
+        foreach(ModelViewUIFormPropertySerializable mvUIFormProp in Model.UIFormProperties) {
+            if ((!mvUIFormProp.IsShownInView)) continue;
+            ModelViewPropertyOfVwSerializable sclrProp = Model.ScalarProperties.Where(p => p.ViewPropertyName == mvUIFormProp.ViewPropertyName).FirstOrDefault();
+            if(!string.IsNullOrEmpty(sclrProp.ForeignKeyName)) continue;
+            if(!string.IsNullOrEmpty(sclrProp.ForeignKeyNameChain)) continue;
+            if(!IsFileUpload(sclrProp, Model)) continue;
+#>
+    <#= DisplayFilesPrefix + sclrProp.ViewPropertyName #>: FileList|null = null;
+    <#= IdFilesPrefix + sclrProp.ViewPropertyName #>:number[] =[];
+    <#= OnSelectFilesPrefix + sclrProp.ViewPropertyName #>(event: any): void {
+        this.<#= RootDataSource #>.set<#= ValueSuffix #>("<#= GetTypeScriptPropertyName(sclrProp, Model) #>", event.target.files);
+        this.<#= DisplayFilesPrefix + sclrProp.ViewPropertyName #> = event.target.files;
+        this.<#= IdFilesPrefix + sclrProp.ViewPropertyName #> = Array(event.target.files.length).fill(0).map((x,i)=>i);
+    }
+<#
+
+        } // the end of foreach(ModelViewUIFormPropertySerializable mvUIFormProp in Model.UIFormProperties) {
+    } // the end of if (hasFileUpload) {}
+#>
+
 
 } // the end of the <#= componentClassName #> class body
 

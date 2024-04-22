@@ -20,9 +20,15 @@ export interface <#= GetInterfaceName(Model) #> {
 <#  
     if (Model.ScalarProperties != null) {
         foreach (ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) { 
+            if(IsFileUpload(prop, Model) && string.IsNullOrEmpty(prop.ForeignKeyName)) {
+#>
+      <#=  GetTypeScriptPropertyName(prop, Model) #>: <#= GetPropertyTypeScriptTypeNameEx(prop) #>|FileList|null;  // FileUpload:  <#= GetPropertyTypeName(prop) #>
+<#
+            } else {
 #>
       <#=  GetTypeScriptPropertyName(prop, Model) #>: <#= GetPropertyTypeScriptTypeNameEx(prop) #>|null;  // <#= GetPropertyTypeName(prop) #>
 <#
+            }
         }
     }
 #>

@@ -34,6 +34,7 @@
     string UpdateOneMethodName      = "updateone";
     string AddOneMethodName         = "addone";
     string DeleteOneMethodName      = "deleteone";
+    string DownloadOneMethodName    = "downloadone";
     string src2destMethodName       = "src2dest";
 
 
@@ -56,6 +57,7 @@
     string ShowFilterPropName       = "showFilter";
     string frasesPropName           = "frases";
     string ActionParamDeleteSelMode = "deletesel";
+    string ActionParamDownloadMode  = "download";
 
 
     Dictionary<string, string> RegExps = new Dictionary<string, string>() {
@@ -327,6 +329,16 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
                 key: 'CmSt::DSel',
                 defaultValue: "Delete Selected"
             }), 
+<#
+if (HasFileUpload(Model)) {
+#>
+        '<#= ActionParamDownloadMode #>':       this.L.instant({
+                key: 'CmSt::DwnLd',
+                defaultValue: "Download Item"
+            }), 
+<#
+}
+#>
         '<#= permissionPropName #>': this.L.instant({
                 key: 'CmSt::Prmssn',
                 defaultValue: "Permission"
@@ -346,6 +358,13 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         '<#= ActionParamViewMode #>': 'View Item',
         '<#= ActionParamAddMode #>': 'Add Item',
         '<#= ActionParamDeleteSelMode #>': 'Delete Selected',
+<#
+if (HasFileUpload(Model)) {
+#>
+        '<#= ActionParamDownloadMode #>': 'Download Item',
+<#
+}
+#>
         '<#= permissionPropName #>': 'Permission',
         '<#= accessDeniedPropName #>': 'Access denied',
     };
@@ -516,6 +535,13 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             {id: '<#= ActionParamUpdateMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'], iconName: 'fa-edit', iconColor: 'primary', enabled: true},
             {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'fa-trash', iconColor: 'warning', enabled: true},
             {id: '<#= ActionParamViewMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'fa-eye', iconColor: 'primary', enabled: true},
+<#
+if (HasFileUpload(Model)) {
+#>
+         {id: '<#= ActionParamDownloadMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDownloadMode #>'], iconName: 'fa-download', iconColor: 'primary', enabled: true},
+<#
+}
+#>
         ];
     tableMenuItemsData: Array<<#= menuItemDataModelClassName #>> = [
         {id: '<#= ActionParamAddMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamAddMode #>'], iconName: 'fa-plus', iconColor: 'primary', enabled: true},
@@ -568,6 +594,13 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
           {id: '<#= ActionParamUpdateMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamUpdateMode #>'], iconName: 'fa-edit', iconColor: 'primary', enabled: true },
           {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'fa-trash', iconColor: 'warning', enabled: true},
           {id: '<#= ActionParamViewMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamViewMode #>'], iconName: 'fa-eye', iconColor: 'primary', enabled: true },
+<#
+if (HasFileUpload(Model)) {
+#>
+          {id: '<#= ActionParamDownloadMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDownloadMode #>'], iconName: 'fa-download', iconColor: 'primary', enabled: true},
+<#
+}
+#>
         ];
         tmp = tmp.concat(this._<#= RowCommandsPropName #>);
         tmp[0].enabled = this._<#= CanUpdPropName #> && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>.u')  <# if (!Model.IsWebApiUpdate) { #> && false <# } #>;
@@ -865,6 +898,15 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
         }
         if(v.id === '<#= ActionParamUpdateMode #>') {
             this.onEdit(v.value);
+<#
+if (HasFileUpload(Model)) {
+#>
+        } else if(v.id === '<#= ActionParamViewMode #>') {
+            this.<#= ActionParamDownloadMode #>(flt);
+            return;
+<#
+}
+#>
         } else if(v.id === '<#= ActionParamDeleteMode #>') {
             this.onDelete(v.value, v.sender);
         } else if(v.id === '<#= ActionParamViewMode #>') {
@@ -873,6 +915,35 @@ export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eve
             this.onRowCommand.emit(v);
         }
     }
+<#
+if (HasFileUpload(Model)) {
+#>
+    <#= ActionParamDownloadMode #>(flt: any) {
+<#
+    {
+        List<ModelViewPropertyOfVwSerializable> primKeys = GetPrimaryKeyProps(Context, Model.ViewName);
+        if(primKeys != null) {
+#>    
+        this.<#= formRootService #>.<#= DownloadOneMethodName #>(
+<#
+        {
+            int counter = 0;
+            foreach(ModelViewPropertyOfVwSerializable prop in primKeys) {
+#>                <#if(counter > 0) { #>, <#} #>flt.<#= GetTypeScriptPropertyName(prop, Model) #>  
+<#
+                counter++;
+            }
+        }
+#> 
+        );
+<#
+        } // the end of if(primKeys != null) {}
+    }
+#>
+    }
+<#
+} // the end of if (HasFileUpload(Model)) {}
+#>
     tableCommand(v: <#= eventEmitterDataModelClassName #>) {
         let id = this.tableMenuItemsData.findIndex(e => { return e.id === v.id; });
         if(id < 0) return;
