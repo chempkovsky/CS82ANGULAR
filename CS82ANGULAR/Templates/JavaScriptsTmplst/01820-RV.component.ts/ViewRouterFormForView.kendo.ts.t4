@@ -138,6 +138,12 @@ import { <#= serviceClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJson
 import { <#= vformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, vformComponentFolder, rvComponentFolder) #>';
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, rvHtmlFolder, rvComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderName(Model, rvCssFolder, rvComponentFolder) #>.css']

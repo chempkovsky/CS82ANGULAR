@@ -45,6 +45,12 @@ import { <#= addformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(An
 import { <#= viewInterfaceName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, adddlgComponentFolder) #>';
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, adddlgHtmlFolder, adddlgComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderName(Model, adddlgCssFolder, adddlgComponentFolder) #>.css']

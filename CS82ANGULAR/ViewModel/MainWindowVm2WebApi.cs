@@ -303,6 +303,8 @@ namespace CS82ANGULAR.ViewModel
                 existedModelViewSerializable.IsWebApiAdd = modelViewSerializable.IsWebApiAdd;
                 existedModelViewSerializable.IsWebApiUpdate = modelViewSerializable.IsWebApiUpdate;
                 existedModelViewSerializable.IsWebApiDelete = modelViewSerializable.IsWebApiDelete;
+                existedModelViewSerializable.IsStandalone = modelViewSerializable.IsStandalone;
+
                 existedModelViewSerializable.WebApiServiceProject = modelViewSerializable.WebApiServiceProject;
                 existedModelViewSerializable.WebApiServiceDefaultProjectNameSpace = modelViewSerializable.WebApiServiceDefaultProjectNameSpace;
                 existedModelViewSerializable.WebApiServiceFolder = modelViewSerializable.WebApiServiceFolder;

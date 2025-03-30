@@ -30,6 +30,12 @@
 import { Component } from '@angular/core';
 
 @Component({
+<# if (Model.IsStandalone) { #>
+   standalone: true,
+<# } else { #>
+   standalone: false,
+<# } #>
+
   selector: 'app-<#= homeComponentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, homeComponentHtmlFolder, homeComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, homeComponentCssFolder, homeComponentFolder) #>.css']

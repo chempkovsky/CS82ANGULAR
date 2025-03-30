@@ -45,6 +45,12 @@ import { <#= delformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(An
 import { <#= viewInterfaceName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, deldlgComponentFolder) #>';
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, deldlgHtmlFolder, deldlgComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderName(Model, deldlgCssFolder, deldlgComponentFolder) #>.css']

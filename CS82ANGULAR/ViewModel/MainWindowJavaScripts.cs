@@ -370,6 +370,8 @@ namespace CS82ANGULAR.ViewModel
                             (CreateWebApiUC.DataContext as CreateWebApiViewModel).SerializableDbContext;
                     (SelectFolderUC.DataContext as SelectFolderViewModel).SelectedModel =
                             (CreateWebApiUC.DataContext as CreateWebApiViewModel).SelectedModel;
+                    (SelectFolderUC.DataContext as SelectFolderViewModel).SelectedModel.IsStandalone =
+                            (CreateWebApiUC.DataContext as CreateWebApiViewModel).IsStandalone;
 
                     (SelectFolderUC.DataContext as SelectFolderViewModel).UIFormProperties = (CreateWebApiUC.DataContext as CreateWebApiViewModel).UIFormProperties;
                     (SelectFolderUC.DataContext as SelectFolderViewModel).UIListProperties = (CreateWebApiUC.DataContext as CreateWebApiViewModel).UIListProperties;

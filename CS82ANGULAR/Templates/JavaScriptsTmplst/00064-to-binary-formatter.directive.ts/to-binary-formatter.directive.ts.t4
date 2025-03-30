@@ -32,6 +32,12 @@ import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { <#= toBinaryPipeClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, toBinaryPipeFolder, toBinaryFormatterDirectiveFolder) #>';
 
  @Directive({ 
+<# if (Model.IsStandalone) { #>
+   standalone: true,
+<# } else { #>
+   standalone: false,
+<# } #>
+
    selector: '[<#= toBinaryFormatterDirectiveSelectorName #>]',
    providers: [
      {

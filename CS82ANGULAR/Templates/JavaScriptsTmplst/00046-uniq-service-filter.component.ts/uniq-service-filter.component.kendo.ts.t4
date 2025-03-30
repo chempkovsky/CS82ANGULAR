@@ -141,6 +141,12 @@ import { <#= eventEmitterPubModelClassName #> } from '<#= GetFolderNameWithAnglr
 
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-<#= filterComponentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterComponentHtmlFolder, uniqFilterComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterComponentCssFolder, uniqFilterComponentFolder) #>.css']

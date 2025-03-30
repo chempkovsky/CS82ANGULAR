@@ -64,6 +64,11 @@ export class <#= toastComponentName #> {
 
 
 @Component({
+  <# if (Model.IsStandalone) { #>
+  standalone: true,
+  <# } else { #>
+  standalone: false,
+  <# } #>
   selector: 'app-root',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appHtmlComponentFolder, appComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appCssComponentFolder, appComponentFolder) #>.css']
@@ -72,11 +77,12 @@ export class AppComponent implements OnInit {
     apptitle = 'LitApp';
     isSideBarCollapsed: boolean = false;
 
-    isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
-    .pipe(map(result => result.matches), shareReplay());
+    isHandset$: Observable<boolean>; 
 
     constructor(private breakpointObserver: BreakpointObserver, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {
     //<#= AppSettingServicePropName #>.appearance = 'fill';
+        this.isHandset$ = this.breakpointObserver.observe(Breakpoints.Handset)
+            .pipe(map(result => result.matches), shareReplay());
     }
 
     ngOnInit() {

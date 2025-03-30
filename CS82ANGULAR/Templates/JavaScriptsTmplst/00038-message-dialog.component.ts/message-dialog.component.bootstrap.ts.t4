@@ -37,6 +37,12 @@ import { <#= messageDialogDataModelClassName #> } from '<#= GetFolderNameWithAng
 
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, messageDialogComponentHtmlFolder, messageDialogComponentFolder)#>.html',
   styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, messageDialogComponentCssFolder, messageDialogComponentFolder)#>.css']

@@ -40,6 +40,12 @@ import { <#= viewInterfaceDlgClassName #> } from '<#= GetFolderNameWithAnglr(Ang
 /* eslint-disable @angular-eslint/no-input-rename */
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, ldlgHtmlFolder, ldlgComponentFolder)#>.html',
   styleUrls: ['<#= GetFolderName(Model, ldlgCssFolder, ldlgComponentFolder)#>.css']

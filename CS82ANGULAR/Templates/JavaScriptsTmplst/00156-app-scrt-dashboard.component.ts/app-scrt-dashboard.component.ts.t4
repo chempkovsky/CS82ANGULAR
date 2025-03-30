@@ -30,6 +30,12 @@
 import { Component } from '@angular/core';
 
 @Component({
+<# if (Model.IsStandalone) { #>
+   standalone: true,
+<# } else { #>
+   standalone: false,
+<# } #>
+
   selector: 'app-<#= securityDashboardComponentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, securityDashboardComponentHtmlFolder, securityDashboardComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, securityDashboardComponentCssFolder, securityDashboardComponentFolder) #>.css']

@@ -52,6 +52,7 @@ namespace CS82ANGULAR.ViewModel
         protected string _WebApiRoutePrefix;
         protected string _WebApiServiceName;
         protected string _WebApiSufix = "WebApiController";
+        protected bool _IsStandalone;
         protected bool _IsWebApiDelete;
         protected bool _IsWebApiUpdate;
         protected bool _IsWebApiAdd;
@@ -665,6 +666,13 @@ namespace CS82ANGULAR.ViewModel
                 CheckIsReady();
             }
         }
+        public Visibility IsStandaloneVisible
+        {
+            get
+            {
+                return _IsWebServiceEditable ? Visibility.Hidden : Visibility.Visible;
+            }
+        }
         public string WebApiSufix
         {
             get
@@ -788,6 +796,20 @@ namespace CS82ANGULAR.ViewModel
             {
                 if (_IsWebApiDelete == value) return;
                 _IsWebApiDelete = value;
+                OnPropertyChanged();
+                CheckIsReady();
+            }
+        }
+        public bool IsStandalone
+        {
+            get
+            {
+                return _IsStandalone;
+            }
+            set
+            {
+                if (_IsStandalone == value) return;
+                _IsStandalone = value;
                 OnPropertyChanged();
                 CheckIsReady();
             }
@@ -927,6 +949,7 @@ namespace CS82ANGULAR.ViewModel
             result.IsWebApiAdd = this.IsWebApiAdd;
             result.IsWebApiUpdate = this.IsWebApiUpdate;
             result.IsWebApiDelete = this.IsWebApiDelete;
+            result.IsStandalone = this.IsStandalone;
             result.WebApiServiceProject = this.DestinationProject;
             result.WebApiServiceDefaultProjectNameSpace = this.DefaultProjectNameSpace;
             result.WebApiServiceFolder = this.DestinationFolder;
@@ -1088,6 +1111,7 @@ namespace CS82ANGULAR.ViewModel
             IsWebApiAdd = false;
             IsWebApiUpdate = false;
             IsWebApiDelete = false;
+            IsStandalone = false;
             IsViewHasProperties = false;
             IsViewHasRimaryKey = false;
             IsViewHasAllRequiredProperties = false;
@@ -1127,6 +1151,7 @@ namespace CS82ANGULAR.ViewModel
             this.IsWebApiAdd = SelectedModel.IsWebApiAdd;
             this.IsWebApiUpdate = SelectedModel.IsWebApiUpdate;
             this.IsWebApiDelete = SelectedModel.IsWebApiDelete;
+            this.IsStandalone = SelectedModel.IsStandalone;
             if (SelectedModel.ScalarProperties != null)
             {
                 IsViewHasProperties = SelectedModel.ScalarProperties.Count > 0;

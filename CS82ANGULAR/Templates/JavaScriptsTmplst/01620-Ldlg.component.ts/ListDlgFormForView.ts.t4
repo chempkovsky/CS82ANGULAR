@@ -36,6 +36,12 @@ import { <#= viewInterfaceName #> } from '<#=  GetFolderNameWithAnglr(AngularJso
 import { <#= viewInterfaceDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceDlgFolder, ldlgComponentFolder) #>';
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, ldlgHtmlFolder, ldlgComponentFolder)#>.html',
   styleUrls: ['<#= GetFolderName(Model, ldlgCssFolder, ldlgComponentFolder)#>.css']

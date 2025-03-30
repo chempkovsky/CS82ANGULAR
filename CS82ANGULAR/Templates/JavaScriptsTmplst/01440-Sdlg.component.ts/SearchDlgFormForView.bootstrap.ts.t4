@@ -45,6 +45,12 @@ import { <#= viewInterfaceName #> } from '<#=  GetFolderNameWithAnglr(AngularJso
 /* eslint-disable @angular-eslint/no-input-rename */
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, sdlgHtmlFolder, sdlgComponentFolder)#>.html',
   styleUrls: ['<#= GetFolderName(Model, sdlgCssFolder, sdlgComponentFolder)#>.css']

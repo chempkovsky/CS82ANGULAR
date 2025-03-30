@@ -35,6 +35,11 @@ export interface <#= sortheadDirectiveEventName #> {
 const rotate: {[key: string]: string} = { 'asc': 'desc', 'desc': '', '': 'asc' };
 
 @Directive({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
   selector: 'th[<#= sortheadDirectiveSelectorName #>]',
   host: {
     '[class.sortheadasc]': 'direction === "asc"',

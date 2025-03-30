@@ -115,6 +115,12 @@ import { MatSelectChange } from '@angular/material/select';
 
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-<#= filterComponentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterComponentHtmlFolder, filterComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterComponentCssFolder, filterComponentFolder) #>.css']

@@ -26,6 +26,12 @@
 import { Pipe, PipeTransform } from "@angular/core";
 
 @Pipe({ 
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   name: '<#= toBinaryPipeSelectorName #>' 
 })
 export class <#= toBinaryPipeClassName #> implements PipeTransform {

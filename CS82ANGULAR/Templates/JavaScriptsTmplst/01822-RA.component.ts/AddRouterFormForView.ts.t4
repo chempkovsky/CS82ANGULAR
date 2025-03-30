@@ -110,6 +110,12 @@ import { <#= aformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(Angu
 
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, raHtmlFolder, raComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderName(Model, raCssFolder, raComponentFolder) #>.css']

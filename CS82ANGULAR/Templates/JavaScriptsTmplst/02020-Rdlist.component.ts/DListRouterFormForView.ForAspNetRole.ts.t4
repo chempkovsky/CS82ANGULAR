@@ -305,6 +305,12 @@ import { <#=  ddlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(Angul
 
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, rdlistHtmlFolder, rdlistComponentFolder)#>.html',
   styleUrls: ['<#=  GetFolderName(Model, rdlistCssFolder, rdlistComponentFolder)#>.css']

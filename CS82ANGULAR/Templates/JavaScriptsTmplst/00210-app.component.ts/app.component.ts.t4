@@ -37,6 +37,12 @@ import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(An
 
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-root',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appHtmlComponentFolder, appComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appCssComponentFolder, appComponentFolder) #>.css']
@@ -44,11 +50,12 @@ import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(An
 export class AppComponent {
     apptitle = 'LitApp';
 
-    isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
-    .pipe(map(result => result.matches), shareReplay());
+    isHandset$: Observable<boolean>;
 
     constructor(private breakpointObserver: BreakpointObserver, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {
     //<#= AppSettingServicePropName #>.appearance = 'fill';
+        this.isHandset$ = this.breakpointObserver.observe(Breakpoints.Handset)
+            .pipe(map(result => result.matches), shareReplay());
     }
 
     get userName(): string|null {

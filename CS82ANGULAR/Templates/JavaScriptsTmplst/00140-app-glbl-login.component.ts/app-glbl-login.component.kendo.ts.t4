@@ -57,6 +57,12 @@ import { <#= appLoginServiceClassName #> } from '<#= GetFolderNameWithAnglr(Angu
 
 
 @Component({
+<# if (Model.IsStandalone) { #>
+   standalone: true,
+<# } else { #>
+   standalone: false,
+<# } #>
+
   selector: 'app-<#= appLoginComponentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginHtmlComponentFolder, appLoginComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginCssComponentFolder, appLoginComponentFolder) #>.css']

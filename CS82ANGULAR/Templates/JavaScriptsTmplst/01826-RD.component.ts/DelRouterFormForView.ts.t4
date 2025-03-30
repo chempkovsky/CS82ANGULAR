@@ -107,6 +107,12 @@ import { <#= serviceClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJson
 import { <#= dformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, dformComponentFolder, rdComponentFolder) #>';
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, rdHtmlFolder, rdComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderName(Model, rdCssFolder, rdComponentFolder) #>.css']

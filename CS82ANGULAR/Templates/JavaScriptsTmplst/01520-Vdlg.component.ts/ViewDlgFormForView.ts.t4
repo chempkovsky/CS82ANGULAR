@@ -45,6 +45,12 @@ import { <#= viewformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(A
 import { <#= viewInterfaceName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, viewdlgComponentFolder) #>';
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, viewdlgHtmlFolder, viewdlgComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderName(Model, viewdlgCssFolder, viewdlgComponentFolder) #>.css']

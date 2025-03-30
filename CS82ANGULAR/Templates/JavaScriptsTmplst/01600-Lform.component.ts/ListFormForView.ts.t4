@@ -277,6 +277,12 @@ import { <#=  ddlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(Angul
 #>
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, lformHtmlFolder, lformComponentFolder)#>.html',
   styleUrls: ['<#=  GetFolderName(Model, lformCssFolder, lformComponentFolder)#>.css']

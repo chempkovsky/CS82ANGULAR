@@ -914,6 +914,7 @@ namespace CS82ANGULAR.Helpers
                 IsWebApiAdd = srcModelViewSerializable.IsWebApiAdd,
                 IsWebApiUpdate = srcModelViewSerializable.IsWebApiUpdate,
                 IsWebApiDelete = srcModelViewSerializable.IsWebApiDelete,
+                IsStandalone = srcModelViewSerializable.IsStandalone,
                 WebApiServiceProject = srcModelViewSerializable.WebApiServiceProject,
                 WebApiServiceDefaultProjectNameSpace = srcModelViewSerializable.WebApiServiceDefaultProjectNameSpace,
                 WebApiServiceFolder = srcModelViewSerializable.WebApiServiceFolder
@@ -1675,6 +1676,7 @@ namespace CS82ANGULAR.Helpers
                 IsWebApiAdd = srcModelViewSerializable.IsWebApiAdd,
                 IsWebApiUpdate = srcModelViewSerializable.IsWebApiUpdate,
                 IsWebApiDelete = srcModelViewSerializable.IsWebApiDelete,
+                IsStandalone = srcModelViewSerializable.IsStandalone,
             };
             result.ScalarProperties = ListModelViewPropertyOfVwSerializableGetCopy(srcModelViewSerializable.ScalarProperties);
             result.PrimaryKeyProperties = ListModelViewKeyPropertySerializableGetCopy(srcModelViewSerializable.PrimaryKeyProperties);
@@ -1721,6 +1723,7 @@ namespace CS82ANGULAR.Helpers
                 IsWebApiAdd = srcModelViewSerializable.IsWebApiAdd,
                 IsWebApiUpdate = srcModelViewSerializable.IsWebApiUpdate,
                 IsWebApiDelete = srcModelViewSerializable.IsWebApiDelete,
+                IsStandalone = srcModelViewSerializable.IsStandalone,
             };
             result.ScalarProperties = ListModelViewPropertyOfVwSerializableGetCopy(srcModelViewSerializable.ScalarProperties);
             result.PrimaryKeyProperties = ListModelViewKeyPropertySerializableGetCopy(srcModelViewSerializable.PrimaryKeyProperties);

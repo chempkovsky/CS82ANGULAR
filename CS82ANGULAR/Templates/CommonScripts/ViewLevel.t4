@@ -2082,7 +2082,7 @@
         {
             if (hasMatSort(model))
             {
-                return "matSort";
+                return "matSort (matSortChange)=\"onSort($event)\"";
             }
             return "";
         }

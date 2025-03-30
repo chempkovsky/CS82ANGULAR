@@ -315,6 +315,12 @@ import { <#=  GetInterfaceDlgNameExWithAnglrEx(AngularJsonFile, Context, viewNm,
 #>
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, viewformHtmlFolder, viewformComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderName(Model, viewformCssFolder, viewformComponentFolder) #>.css']

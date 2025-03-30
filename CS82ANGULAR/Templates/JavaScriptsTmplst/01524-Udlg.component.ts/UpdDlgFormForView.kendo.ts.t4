@@ -44,6 +44,12 @@ import { <#= updformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(An
 import { <#= viewInterfaceName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceFolder, upddlgComponentFolder) #>';
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, upddlgHtmlFolder, upddlgComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderName(Model, upddlgCssFolder, upddlgComponentFolder) #>.css']

@@ -55,6 +55,12 @@ import { <#= appChangePasswordModelClassName #> } from '<#= GetFolderNameWithAng
 
 
 @Component({
+<# if (Model.IsStandalone) { #>
+   standalone: true,
+<# } else { #>
+   standalone: false,
+<# } #>
+
   selector: 'app-<#= appChangePasswordComponentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appChangePasswordHtmlComponentFolder, appChangePasswordComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appChangePasswordCssComponentFolder, appChangePasswordComponentFolder) #>.css']

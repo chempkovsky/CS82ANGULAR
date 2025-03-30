@@ -45,6 +45,12 @@ import { <#= viewInterfaceName #> } from '<#= GetFolderNameWithAnglr(AngularJson
 
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
+
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, deldlgHtmlFolder, deldlgComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderName(Model, deldlgCssFolder, deldlgComponentFolder) #>.css']

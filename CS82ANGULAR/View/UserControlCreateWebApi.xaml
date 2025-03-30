@@ -330,6 +330,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -394,6 +395,8 @@
                     <TextBlock Grid.Row="18" Grid.Column="0" Text="Delete Item" FontWeight="Bold" />
                     <CheckBox  Grid.Row="18" Grid.Column="1" IsChecked="{Binding IsWebApiDelete}" IsHitTestVisible="{Binding IsViewHasRimaryKey}"   />
 
+                    <TextBlock Grid.Row="19" Grid.Column="0" Text="Generate Standalone Angular components" FontWeight="Bold" Visibility="{Binding IsStandaloneVisible}"/>
+                    <CheckBox  Grid.Row="19" Grid.Column="1" IsChecked="{Binding IsStandalone}"  Visibility="{Binding IsStandaloneVisible}"/>
 
                 </Grid>
                 <Grid Grid.Row="0" Visibility="{Binding KeyPropertyVisibility}" >

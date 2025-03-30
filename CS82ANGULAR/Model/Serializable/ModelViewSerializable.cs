@@ -40,6 +40,7 @@ namespace CS82ANGULAR.Model.Serializable
         public bool IsWebApiAdd { get; set; }
         public bool IsWebApiUpdate { get; set; }
         public bool IsWebApiDelete { get; set; }
+        public bool IsStandalone { get; set; }
         public List<CommonStaffSerializable> CommonStaffs { get; set; }
         public List<ModelViewUIFormPropertySerializable> UIFormProperties { get; set; }
         public List<ModelViewUIListPropertySerializable> UIListProperties { get; set; }
