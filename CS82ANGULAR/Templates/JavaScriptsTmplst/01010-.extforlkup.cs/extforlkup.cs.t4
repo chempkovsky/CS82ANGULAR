@@ -6,11 +6,14 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="CS82ANGULAR" #>
 <#@ import namespace="CS82ANGULAR.Model" #>
 <#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
 <#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
 <#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
 #nullable disable
 using System.Text.Json.Serialization;
@@ -131,12 +134,12 @@ namespace <#= destinationNameSpace #> {
             } // if(slrPrp.Attributes != null) {...}
             if((!slrPrp.IsNullable) && IsStringPropertyTypeName(slrPrp)) {
 #>
-        public <#= GetPropertyTypeName(slrPrp) #>  <#= GetTypeScriptPropertyName(slrPrp, Model) #> { get; set; } = null!;
+        public <#= GetPropertyTypeName(slrPrp) #>  <#= slrPrp.ViewPropertyName #> { get; set; } = null!;
 
 <# 
             } else {
 #>
-        public <#= GetPropertyTypeName(slrPrp) #>  <#= GetTypeScriptPropertyName(slrPrp, Model) #> { get; set; }
+        public <#= GetPropertyTypeName(slrPrp) #>  <#= slrPrp.ViewPropertyName #> { get; set; }
 
 <# 
             } // if((!slrPrp.IsNullable) && IsStringPropertyTypeName(slrPrp)) { ... } else { ... }
@@ -196,12 +199,12 @@ namespace <#= destinationNameSpace #> {
                             } // if(slrPrp.Attributes != null) {...}
                             if((!slrPrp.IsNullable) && IsStringPropertyTypeName(slrPrp)) {
 #>
-        public <#= GetPropertyTypeName(slrPrp) #>  <#= GetTypeScriptPropertyName(slrPrp, m2mModel) #> { get; set; } = null!;
+        public <#= GetPropertyTypeName(slrPrp) #>  <#= slrPrp.ViewPropertyName #> { get; set; } = null!;
 
 <# 
                             } else {
 #>
-        public <#= GetPropertyTypeName(slrPrp) #>  <#= GetTypeScriptPropertyName(slrPrp, m2mModel) #> { get; set; }
+        public <#= GetPropertyTypeName(slrPrp) #>  <#= slrPrp.ViewPropertyName #> { get; set; }
 
 <# 
                             } // if((!slrPrp.IsNullable) && IsStringPropertyTypeName(slrPrp)) { ... } else { ... }
