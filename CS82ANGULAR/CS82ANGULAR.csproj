@@ -4261,6 +4261,30 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01450-S.module.service.ts\SearchDlgServiceForView.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01550-V.module.service.ts\VDlgServiceForView.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01552-A.module.service.ts\ADlgServiceForView.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01554-U.module.service.ts\UDlgServiceForView.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01556-D.module.service.ts\DDlgServiceForView.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\JavaScriptsTmplst\01650-L.module.service.ts\LDlgServiceForView.ts.t4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -4385,7 +4409,7 @@
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties templates_4batchjavascriptstmplst_401000-viewmodelleveltmplts_401600-lform_1json__JsonSchema="https://download.stackhawk.com/hawk/jsonschema/hawkconfig.json" templates_4batchjavascriptstmplst_400000-contextleveltmplts_400200-app-glbl-auth_1json__JsonSchema="https://beaujs.com/schema.json" />
+      <UserProperties templates_4batchjavascriptstmplst_400000-contextleveltmplts_400200-app-glbl-auth_1json__JsonSchema="https://beaujs.com/schema.json" templates_4batchjavascriptstmplst_401000-viewmodelleveltmplts_401600-lform_1json__JsonSchema="https://download.stackhawk.com/hawk/jsonschema/hawkconfig.json" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

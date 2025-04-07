@@ -1,0 +1,62 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="ts" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+<#
+
+    string viewModuleServiceFolder              = "01550-V.module.service.ts";
+    string viewModuleServiceClassName           = GetModuleServiceClassName(Model, viewModuleServiceFolder);
+
+    string viewModuleFolder                     = "01550-V.module.ts";
+    string viewModuleClassName                  = GetModuleClassNameWithAnglr(AngularJsonFile, Model, viewModuleFolder, viewModuleServiceFolder);
+
+    string appSettingServiceFolder              = "00015-app-glbl-settings.service.ts";
+    string appSettingServiceClassName           = GetCommonServiceClassNameWithAnglr(AngularJsonFile, Model, Context, appSettingServiceFolder, viewModuleServiceFolder);
+
+
+    string vdlgComponentFolder                  = "01520-Vdlg.component.ts";
+    string viewDlgComponentClassName            = GetComponentClassNameWithAnglr(AngularJsonFile, Model, vdlgComponentFolder, viewModuleServiceFolder);
+    string GetMethodPrefix                      = "get";
+    string AppSettingServicePropName            = "appGlblSettings";
+
+    string viewInterfaceVDlgFolder              = "01510-Vdlg.interface.ts";
+    string viewInterfaceVDlgClassName           = GetInterfaceVDlgNameWithAnglr(AngularJsonFile, Model,  viewInterfaceVDlgFolder, viewModuleServiceFolder);
+
+
+#>
+
+import { Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { <#= appSettingServiceClassName #> } from '<#=  GetCommonFolderNameWithAnglr(AngularJsonFile, Model, Context,  appSettingServiceFolder, viewModuleServiceFolder)#>';
+import { <#= viewInterfaceVDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceVDlgFolder, viewModuleServiceFolder)#>';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class <#= viewModuleServiceClassName #> {
+  constructor(private dialog: MatDialog, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #>) {}
+  async open(indata: <#= viewInterfaceVDlgClassName #>): Promise<any> {
+    let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
+    let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
+    const  <#= viewModuleClassName #> = (await import('<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewModuleFolder, viewModuleServiceFolder) #>')).<#= viewModuleClassName #>;
+    return this.dialog.open(<#= viewModuleClassName #>.<#= GetMethodPrefix #><#=  viewDlgComponentClassName #>(), {
+        data: indata,
+        maxWidth: mw,
+        width: w,
+        }); 
+  }  
+}
+
