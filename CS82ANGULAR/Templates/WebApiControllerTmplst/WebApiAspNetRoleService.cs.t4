@@ -655,7 +655,7 @@ namespace <#= webApiServiceNameSpace #> {
 
 #>
         [HttpPost]
-        [Route("<#= AddOneMethodName #>")]
+        [Route("[controller]/<#= AddOneMethodName #>")]
         public async Task<ActionResult<<#= Model.ViewName#>>> <#= AddOneMethodName #>([FromBody] <#= Model.ViewName#> viewToAdd)
         {
             if (!ModelState.IsValid)
