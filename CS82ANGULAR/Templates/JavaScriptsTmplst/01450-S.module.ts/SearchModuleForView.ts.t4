@@ -36,6 +36,8 @@
 
     string sdlgComponentFolder          = "01440-Sdlg.component.ts";
     string searchDlgComponentClassName  = GetComponentClassNameWithAnglr(AngularJsonFile, Model, sdlgComponentFolder, searchModuleFolder);
+    string GetMethodPrefix              = "get";
+
 #>
 
 import { NgModule } from '@angular/core';
@@ -68,6 +70,10 @@ import { <#=  searchDlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(
 //        <#=  searchDlgComponentClassName #>
 //    ]
 })
-export class <#= searchModuleClassName #> { }
+export class <#= searchModuleClassName #> { 
+    static <#= GetMethodPrefix #><#=  searchDlgComponentClassName #>(): typeof <#=  searchDlgComponentClassName #> {
+        return <#=  searchDlgComponentClassName #>;
+    }
+}
 
 

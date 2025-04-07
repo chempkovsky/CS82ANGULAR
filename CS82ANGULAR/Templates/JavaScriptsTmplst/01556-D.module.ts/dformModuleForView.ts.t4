@@ -41,6 +41,7 @@
 
     string ddlgComponentFolder          = "01526-Ddlg.component.ts";
     string dformDlgComponentClassName   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, ddlgComponentFolder, dformModuleFolder);
+    string GetMethodPrefix              = "get";
 
     
 
@@ -108,6 +109,10 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
 //        <#=  dformDlgComponentClassName #>
 //    ]
 })
-export class <#= dformModuleClassName #> { }
+export class <#= dformModuleClassName #> { 
+    static <#= GetMethodPrefix #><#=  dformDlgComponentClassName #>(): typeof <#=  dformDlgComponentClassName #> {
+        return <#=  dformDlgComponentClassName #>;
+    }
+}
 
 

@@ -53,6 +53,7 @@
 
     string ldlgComponentFolder          = "01620-Ldlg.component.ts";
     string lformDlgComponentClassName   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, ldlgComponentFolder, lformModuleFolder);
+    string GetMethodPrefix              = "get";
     
 #>
 
@@ -99,6 +100,10 @@ import { <#=  lformDlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(A
 //        <#=  lformDlgComponentClassName #>
 //    ]
 })
-export class <#= lformModuleClassName #> { }
+export class <#= lformModuleClassName #> { 
+    static <#= GetMethodPrefix #><#=  lformDlgComponentClassName #>(): typeof <#=  lformDlgComponentClassName #> {
+        return <#=  lformDlgComponentClassName #>;
+    }
+}
 
 

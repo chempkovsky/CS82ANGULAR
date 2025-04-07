@@ -40,6 +40,7 @@
 
     string vdlgComponentFolder          = "01520-Vdlg.component.ts";
     string vformDlgComponentClassName   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, vdlgComponentFolder, vformModuleFolder);
+    string GetMethodPrefix              = "get";
     
 
     List<string> masterViewNames = new List<string>();
@@ -109,6 +110,9 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
 //    ]
 })
 export class <#= vformModuleClassName #> { 
+    static <#= GetMethodPrefix #><#=  vformDlgComponentClassName #>(): typeof <#=  vformDlgComponentClassName #> {
+        return <#=  vformDlgComponentClassName #>;
+    }
 }
 
 

@@ -41,6 +41,7 @@
 
     string udlgComponentFolder          = "01524-Udlg.component.ts";
     string uformDlgComponentClassName   = GetComponentClassNameWithAnglr(AngularJsonFile, Model, udlgComponentFolder, uformModuleFolder);
+    string GetMethodPrefix              = "get";
 
     List<string> masterViewNames = new List<string>();
     masterViewNames = GetSearchDialogViewsList(Model, Context, masterViewNames);
@@ -107,6 +108,10 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
 //        <#=  uformDlgComponentClassName #>
 //    ]
 })
-export class <#= uformModuleClassName #> { }
+export class <#= uformModuleClassName #> { 
+    static <#= GetMethodPrefix #><#=  uformDlgComponentClassName #>(): typeof <#=  uformDlgComponentClassName #> {
+        return <#=  uformDlgComponentClassName #>;
+    }
+}
 
 
