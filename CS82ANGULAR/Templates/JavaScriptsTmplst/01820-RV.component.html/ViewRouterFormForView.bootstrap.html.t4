@@ -62,7 +62,7 @@
                 arrow_back
             </i>
             <div class="form-group" fxFlex="79%" *ngIf="<#= ShowDetailsPropName #>">
-                <select class="form-control" (change)="<#= OnDetailChangedMethodName #>()" [(ngModel)]="<#= SelectedDetailPropName #>">
+                <select class="form-control" (change)="<#= OnDetailChangedMethodName #>($event)" [(ngModel)]="<#= SelectedDetailPropName #>">
                     <option *ngFor="let v of  <#= DetailViewsPropName #>;" [ngValue]="v">{{ v.caption }}</option>
                 </select>
             </div>

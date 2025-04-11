@@ -73,7 +73,7 @@ import { <#=  dformDlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(A
             continue;
         }
 #>
-import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, dformModuleFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, dformModuleFolder, Context, masterView.ViewName, searchModuleFolder) #>';
+// import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, dformModuleFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, dformModuleFolder, Context, masterView.ViewName, searchModuleFolder) #>';
 <#
     }
 #>
@@ -95,7 +95,7 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
             continue;
         }
 #>
-        <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, dformModuleFolder) #>,
+//        <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, dformModuleFolder) #>,
 <#
     }
 #>

@@ -67,22 +67,22 @@ import { <#=  rdlComponentClassName #> } from '<#= GetFolderNameWithAnglr(Angula
     }
     if(!string.IsNullOrEmpty(viewformModuleClassName)) {
 #>
-import { <#=  viewformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewformModuleFolder, rdlFormModuleFolder) #>';
+// import { <#=  viewformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, viewformModuleFolder, rdlFormModuleFolder) #>';
 <#
     }
     if(!string.IsNullOrEmpty(addformModuleClassName)) {
 #>
-import { <#=  addformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, addformModuleFolder, rdlFormModuleFolder) #>';
+// import { <#=  addformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, addformModuleFolder, rdlFormModuleFolder) #>';
 <#
     }
     if(!string.IsNullOrEmpty(updformModuleClassName)) {
 #>
-import { <#=  updformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, updformModuleFolder, rdlFormModuleFolder) #>';
+// import { <#=  updformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, updformModuleFolder, rdlFormModuleFolder) #>';
 <#
     }
     if(!string.IsNullOrEmpty(delformModuleClassName)) {
 #>
-import { <#=  delformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, delformModuleFolder, rdlFormModuleFolder) #>';
+// import { <#=  delformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(AngularJsonFile, Model, delformModuleFolder, rdlFormModuleFolder) #>';
 <#
     }
 #>
@@ -100,7 +100,7 @@ import { <#=  delformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(Angu
             continue;
         }
 #>
-import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, rdlFormModuleFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, rdlFormModuleFolder, Context, masterView.ViewName, searchModuleFolder) #>';
+// import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, rdlFormModuleFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, rdlFormModuleFolder, Context, masterView.ViewName, searchModuleFolder) #>';
 <#
     }
 #>
@@ -138,22 +138,22 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
 <#
     if(!string.IsNullOrEmpty(viewformModuleClassName)) {
 #>
-        <#=  viewformModuleClassName #>,
+//        <#=  viewformModuleClassName #>,
 <#
     }
     if(!string.IsNullOrEmpty(addformModuleClassName)) {
 #>
-        <#=  addformModuleClassName #>,
+//        <#=  addformModuleClassName #>,
 <#
     }
     if(!string.IsNullOrEmpty(updformModuleClassName)) {
 #>
-        <#=  updformModuleClassName #>,
+//        <#=  updformModuleClassName #>,
 <#
     }
     if(!string.IsNullOrEmpty(delformModuleClassName)) {
 #>
-        <#=  delformModuleClassName #>,
+//        <#=  delformModuleClassName #>,
 <#
     }
 #>
@@ -166,7 +166,7 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
             continue;
         }
 #>
-        <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, rdlFormModuleFolder) #>,
+//        <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, rdlFormModuleFolder) #>,
 <#
     }
 #>

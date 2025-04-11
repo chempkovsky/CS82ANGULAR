@@ -142,7 +142,7 @@ import { <#=  delformModuleClassName #> } from '<#=  GetFolderNameWithAnglr(Angu
             continue;
         }
 #>
-import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, rdFormModuleFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, rdFormModuleFolder, Context, masterView.ViewName, searchModuleFolder) #>';
+// import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, rdFormModuleFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, rdFormModuleFolder, Context, masterView.ViewName, searchModuleFolder) #>';
 <#
     }
 #>
@@ -199,7 +199,7 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
             continue;
         }
 #>
-        <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, rdFormModuleFolder) #>,
+//        <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, rdFormModuleFolder) #>,
 <#
     }
 #>

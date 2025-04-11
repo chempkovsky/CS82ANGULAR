@@ -70,7 +70,7 @@ import { <#=  aformDlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(A
             continue;
         }
 #>
-import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, aformModuleFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, aformModuleFolder, Context, masterView.ViewName, searchModuleFolder) #>';
+// import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, aformModuleFolder) #> } from '<#=  GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, aformModuleFolder, Context, masterView.ViewName, searchModuleFolder) #>';
 <#
     }
 #>
@@ -92,7 +92,7 @@ import { <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchMo
             continue;
         }
 #>
-        <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, aformModuleFolder) #>,
+//        <#= GetModuleClassNameWithAnglrEx(AngularJsonFile, masterView, searchModuleFolder, Model, aformModuleFolder) #>,
 <#
     }
 #>

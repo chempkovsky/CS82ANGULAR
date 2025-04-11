@@ -169,24 +169,32 @@
 
     string viewInterfaceVDlgFolder              = "01510-Vdlg.interface.ts";
     string viewInterfaceVDlgClassName           = GetInterfaceVDlgNameWithAnglr(AngularJsonFile, Model,  viewInterfaceVDlgFolder, rdlistComponentFolder);
+    string vModSrvFolder                        = "01550-V.module.service.ts";
+    string vModSrvClassName                     = GetModuleServiceClassNameWithAnglr(AngularJsonFile, Model, vModSrvFolder, rdlistComponentFolder);
 
     string vdlgComponentFolder                  = "01520-Vdlg.component.ts";
     string vdlgComponentClassName               = GetComponentClassNameWithAnglr(AngularJsonFile, Model, vdlgComponentFolder, rdlistComponentFolder);
 
     string viewInterfaceADlgFolder              = "01512-Adlg.interface.ts";
     string viewInterfaceADlgClassName           = GetInterfaceADlgNameWithAnglr(AngularJsonFile, Model,  viewInterfaceADlgFolder, rdlistComponentFolder);
+    string aModSrvFolder                        = "01552-A.module.service.ts";
+    string aModSrvClassName                     = GetModuleServiceClassNameWithAnglr(AngularJsonFile, Model, aModSrvFolder, rdlistComponentFolder);
 
     string adlgComponentFolder                  = "01522-Adlg.component.ts";
     string adlgComponentClassName               = GetComponentClassNameWithAnglr(AngularJsonFile, Model, adlgComponentFolder, rdlistComponentFolder); 
 
     string viewInterfaceUDlgFolder              = "01514-Udlg.interface.ts";
     string viewInterfaceUDlgClassName           = GetInterfaceUDlgNameWithAnglr(AngularJsonFile, Model,  viewInterfaceUDlgFolder, rdlistComponentFolder);
+    string uModSrvFolder                        = "01554-U.module.service.ts";
+    string uModSrvClassName                     = GetModuleServiceClassNameWithAnglr(AngularJsonFile, Model, uModSrvFolder, rdlistComponentFolder);
 
     string udlgComponentFolder                  = "01524-Udlg.component.ts";
     string udlgComponentClassName               = GetComponentClassNameWithAnglr(AngularJsonFile, Model, udlgComponentFolder, rdlistComponentFolder); 
 
     string viewInterfaceDDlgFolder              = "01516-Ddlg.interface.ts";
     string viewInterfaceDDlgClassName           = GetInterfaceDDlgNameWithAnglr(AngularJsonFile, Model,  viewInterfaceDDlgFolder, rdlistComponentFolder);
+    string dModSrvFolder                        = "01556-D.module.service.ts";
+    string dModSrvClassName                     = GetModuleServiceClassNameWithAnglr(AngularJsonFile, Model, dModSrvFolder, rdlistComponentFolder);
 
     string ddlgComponentFolder                  = "01526-Ddlg.component.ts";
     string ddlgComponentClassName               = GetComponentClassNameWithAnglr(AngularJsonFile, Model, ddlgComponentFolder, rdlistComponentFolder); 
@@ -236,6 +244,7 @@
     string selectedRowPropName          = "selectedRow";
 
     string OutletNameValue = DlOutletNamePrefix + Model.ViewName;
+    string DlgSrvPrefix                 = "dlgSrv";
 
 
 #>
@@ -277,28 +286,29 @@ import { <#=  GetServiceClassNameExWithAnglrEx(AngularJsonFile, Context, m2mMode
     if(Model.IsWebApiSelectOneByPrimarykey) {
 #>
 import { <#=  viewInterfaceVDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceVDlgFolder, rdlistComponentFolder)#>';
-import { <#=  vdlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, vdlgComponentFolder, rdlistComponentFolder) #>';
-
+// import { <#=  vdlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, vdlgComponentFolder, rdlistComponentFolder) #>';
+import { <#=  vModSrvClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, vModSrvFolder, rdlistComponentFolder) #>';
 <#
     }
     if(Model.IsWebApiAdd) {
 #>
 import { <#=  viewInterfaceADlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceADlgFolder, rdlistComponentFolder)#>';
-import { <#=  adlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, adlgComponentFolder, rdlistComponentFolder) #>';
-
+// import { <#=  adlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, adlgComponentFolder, rdlistComponentFolder) #>';
+import { <#=  aModSrvClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, aModSrvFolder, rdlistComponentFolder) #>';
 <#
     }
     if(Model.IsWebApiUpdate) {
 #>
 import { <#=  viewInterfaceUDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceUDlgFolder, rdlistComponentFolder)#>';
-import { <#=  udlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, udlgComponentFolder, rdlistComponentFolder) #>';
-
+// import { <#=  udlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, udlgComponentFolder, rdlistComponentFolder) #>';
+import { <#=  uModSrvClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uModSrvFolder, rdlistComponentFolder) #>';
 <#
     }
     if(Model.IsWebApiDelete) {
 #>
 import { <#=  viewInterfaceDDlgClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, viewInterfaceDDlgFolder, rdlistComponentFolder)#>';
-import { <#=  ddlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, ddlgComponentFolder, rdlistComponentFolder) #>';
+// import { <#=  ddlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, ddlgComponentFolder, rdlistComponentFolder) #>';
+import { <#=  dModSrvClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, dModSrvFolder, rdlistComponentFolder) #>';
 <#
     }
 #>
@@ -491,6 +501,29 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             }
         } // if(searchSchemas!= null) {...}
 #>    
+
+<#
+    if(Model.IsWebApiSelectOneByPrimarykey) {
+#>
+        protected v<#= DlgSrvPrefix #>: <#=  vModSrvClassName #>,
+<#
+    }
+    if(Model.IsWebApiAdd) {
+#>
+        protected a<#= DlgSrvPrefix #>: <#=  aModSrvClassName #>,
+<#
+    }
+    if(Model.IsWebApiUpdate) {
+#>
+        protected u<#= DlgSrvPrefix #>: <#=  uModSrvClassName #>,
+<#
+    }
+    if(Model.IsWebApiDelete) {
+#>
+        protected d<#= DlgSrvPrefix #>: <#=  dModSrvClassName #>,
+<#
+    }
+#>
 
         public dialog: MatDialog, 
         protected cd: ChangeDetectorRef) {
@@ -832,6 +865,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             <#= FormControlModelPropName #>: e,
             <#= FormControlNewModelPropName #>: null
         };
+/*
         let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
         let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
         let dialogRef = this.dialog.open(<#=  vdlgComponentClassName #>, {
@@ -840,6 +874,10 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
               width: w,
             });
         dialogRef.afterClosed().subscribe(rslt => {
+        });
+*/
+        this.v<#= DlgSrvPrefix #>.open(locdata).then( (dialogRef: any) => {
+            dialogRef.afterClosed().subscribe((rslt: any) => {});
         });
 <#
     }
@@ -856,6 +894,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             <#= FormControlModelPropName #>: null,
             <#= FormControlNewModelPropName #>: null
         };
+/*
         let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
         let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
         let dialogRef = this.dialog.open(<#=  adlgComponentClassName #>, {
@@ -887,6 +926,33 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 }
             }
         });
+*/
+        this.a<#= DlgSrvPrefix #>.open(locdata).then( (dialogRef: any) => {
+            dialogRef.afterClosed().subscribe(rslt => {
+                if (!(typeof rslt === 'undefined')) {
+                    if (!(rslt === null)) {
+                        if (!( typeof rslt.<#= FormControlNewModelPropName #> === 'undefined') ) {
+                            if (!( rslt.<#= FormControlNewModelPropName #> === null) ) {
+                                if (!Array.isArray(sender.dataSource)) {
+                                    sender.dataSource = [];
+                                }
+                                sender.dataSource.splice(0, 0, rslt.eformNewControlModel);
+                                sender.dataSource = sender.dataSource.slice(0);
+                                let isNDef = true;
+                                if (!(typeof sender.currentRow === 'undefined')) {
+                                    if (!(sender.currentRow === null)) {
+                                        isNDef = false;
+                                    }
+                                }
+                                if(isNDef) {
+                                    sender.onSelectRow(rslt.eformNewControlModel);
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+        });
 <#
     }
 #>
@@ -902,6 +968,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             <#= FormControlModelPropName #>: e,
             <#= FormControlNewModelPropName #>: null
         };
+/*
         let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
         let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
         let dialogRef = this.dialog.open(<#=  udlgComponentClassName #>, {
@@ -920,6 +987,20 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                 }
             }
         });
+*/
+        this.u<#= DlgSrvPrefix #>.open(locdata).then( (dialogRef: any) => {
+            dialogRef.afterClosed().subscribe(rslt => {
+                if (!(typeof rslt === 'undefined')) {
+                    if (!(rslt === null)) {
+                        if (!((typeof rslt.<#= FormControlModelPropName #> === 'undefined') || (typeof rslt.<#= FormControlNewModelPropName #> === 'undefined'))) {
+                            if (!((rslt.<#= FormControlModelPropName #> === null) || (rslt.<#= FormControlNewModelPropName #> === null))) {
+                                this.<#= formRootService #>.<#= src2destMethodName #>(rslt.<#= FormControlNewModelPropName #>, rslt.<#= FormControlModelPropName #>);
+                            }
+                        }
+                    }
+                }
+            })
+        });
 <#
     }
 #>
@@ -935,6 +1016,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             <#= FormControlModelPropName #>: e,
             <#= FormControlNewModelPropName #>: null
         };
+/*
         let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
         let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
         let dialogRef = this.dialog.open(<#=  ddlgComponentClassName #>, {
@@ -970,6 +1052,38 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                     }
                 }
             }
+        });
+*/
+        this.d<#= DlgSrvPrefix #>.open(locdata).then((dialogRef: any) => {
+            dialogRef.afterClosed().subscribe(rslt => {
+                if (!(typeof rslt === 'undefined')) {
+                    if (!(rslt === null)) {
+                        if (!((typeof rslt.<#= FormControlModelPropName #> === 'undefined') || (typeof rslt.<#= FormControlNewModelPropName #> === 'undefined'))) {
+                            if (!((rslt.<#= FormControlModelPropName #> === null) || (rslt.<#= FormControlNewModelPropName #> === null))) {
+                                if (!Array.isArray(sender.dataSource)) {
+                                    sender.dataSource = [];
+                                }
+                                let i: number = sender.dataSource.indexOf(rslt.<#= FormControlModelPropName #>);
+                                if (i > -1) {
+                                    if (!(sender.currentRow === null)) {
+                                        if (sender.currentRow === rslt.eformControlModel) {
+                                            if (i > 0) {
+                                                sender.onSelectRow(sender.dataSource[i-1]);
+                                            } else if (i < sender.dataSource.length-1) {
+                                                sender.onSelectRow(sender.dataSource[i+1]);
+                                            } else {
+                                                sender.onSelectRow(null);
+                                            }
+                                        }
+                                    }
+                                    sender.dataSource.splice(i, 1);
+                                    sender.dataSource = sender.dataSource.slice(0);
+                                } 
+                            }
+                        }
+                    }
+                }
+            })
         });
 <#
     }

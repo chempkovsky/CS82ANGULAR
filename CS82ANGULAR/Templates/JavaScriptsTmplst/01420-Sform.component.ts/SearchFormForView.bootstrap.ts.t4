@@ -1542,7 +1542,9 @@ if (Model.IsWebApiSelectOneByPrimarykey) {
 #>
     <#= searchDoSelectRowMethodName + m2mModel.ViewName #>() {
         if(!this.isOnInitCalled) return;
-        let dtlflt: <#= GetInterfaceFilterNameWithAnglrEx(AngularJsonFile, m2mModel, viewInterfaceFltFolder, Model, sformComponentFolder) #> | any = { page: this.currentPageIndex, pagesize: this.currentPageSize };
+        let pgind: number  = this.currentPageIndex;
+        if(pgind > 0) pgind = pgind-1;
+        let dtlflt: <#= GetInterfaceFilterNameWithAnglrEx(AngularJsonFile, m2mModel, viewInterfaceFltFolder, Model, sformComponentFolder) #> | any = { page: pgind, pagesize: this.currentPageSize };
         let isFltSet: boolean = true;
 <#
             foreach(KeyValuePair<ModelViewForeignKeySerializable,int> kvp in sch.Item3) {

@@ -286,7 +286,7 @@
 
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { FormControl, Validators, ValidatorFn, FormGroup, AbstractControl, ValidationErrors } from '@angular/forms';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+// import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, Subscription, OperatorFunction, switchMap, distinctUntilChanged, debounceTime, of } from 'rxjs';
 <# 
     if(localize) {
@@ -540,7 +540,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             constructorParams += "private " +  formServicePrefix + viewNm + ": " + GetServiceClassNameExWithAnglrEx(AngularJsonFile, Context, viewNm, viewServiceFolder, Model, updformComponentFolder);
         } 
 #>
-    constructor(<#= constructorParams #>, public dialog: NgbModal, 
+    constructor(<#= constructorParams #>, // public dialog: NgbModal, 
 
 <# 
     if(localize) {
@@ -963,7 +963,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 //        },()=>{});
 
         this.<#= DlgSrvPrefix + fk.Item2.ViewName #>.open(flt)
-         .then((rslt) => {
+         .then((rslt: any) => {
             if (!(typeof rslt === 'undefined')) {
                 if (!(rslt === null)) {
                     if (!(rslt.<#= SelectedItemsPropName #> === 'undefined')) {

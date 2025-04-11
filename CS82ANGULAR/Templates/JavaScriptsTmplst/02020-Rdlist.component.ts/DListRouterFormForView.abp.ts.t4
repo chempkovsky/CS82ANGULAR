@@ -996,7 +996,7 @@ if (HasFileUpload(Model)) {
 //        dialogRef.result.then((rslt) => {
 //        });
         this.v<#= DlgSrvPrefix #>.open(locdata)
-        .then((rslt) => {})
+        .then((rslt: any) => {})
         .catch(c => {});
 
 <#
@@ -1043,7 +1043,7 @@ if (HasFileUpload(Model)) {
 //            }
 //        });
         this.a<#= DlgSrvPrefix #>.open(locdata)
-        .then((rslt) => {
+        .then((rslt: any) => {
             if (!(typeof rslt === 'undefined')) {
                 if (!(rslt === null)) {
                     if (!( typeof rslt.<#= FormControlNewModelPropName #> === 'undefined') ) {
@@ -1098,7 +1098,7 @@ if (HasFileUpload(Model)) {
 //                }
 //            }
 //        });
-        this.u<#= DlgSrvPrefix #>.open(locdata).then((rslt) => {
+        this.u<#= DlgSrvPrefix #>.open(locdata).then((rslt: any) => {
             if (!(typeof rslt === 'undefined')) {
                 if (!(rslt === null)) {
                     if (!((typeof rslt.<#= FormControlModelPropName #> === 'undefined') || (typeof rslt.<#= FormControlNewModelPropName #> === 'undefined'))) {
@@ -1157,7 +1157,7 @@ if (HasFileUpload(Model)) {
 //                }
 //            }
 //        });
-        this.d<#= DlgSrvPrefix #>.open(locdata).then((rslt) => {
+        this.d<#= DlgSrvPrefix #>.open(locdata).then((rslt: any) => {
             if (!(typeof rslt === 'undefined')) {
                 if (!(rslt === null)) {
                     if (!((typeof rslt.<#= FormControlModelPropName #> === 'undefined') || (typeof rslt.<#= FormControlNewModelPropName #> === 'undefined'))) {

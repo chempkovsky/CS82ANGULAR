@@ -898,7 +898,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 //        },()=>{});
 
         this.<#= DlgSrvPrefix + fk.Item2.ViewName #>.open(flt)
-         .then((rslt) => {
+         .then((rslt: any) => {
             if (!(typeof rslt === 'undefined')) {
                 if (!(rslt === null)) {
                     if (!(rslt.<#= SelectedItemsPropName #> === 'undefined')) {

@@ -163,8 +163,10 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
         this._<#= MaxHeightPropName #> = inp;
         if (!(typeof inp === 'undefined')) {
           if(!(inp === null)) {
-            this.<#= MaxHeightExPropName #> = inp * this.<#= AppSettingServicePropName #>.filterHeightFactor + this.<#= AppSettingServicePropName #>.filterHeightAddition;
-            this.<#= OverflowPropName #> = 'auto';
+            // this is correct: [ngbTypeahead] should display a dropdown list
+            // if to define this.<#= MaxHeightExPropName #> and this.<#= OverflowPropName #> than a dropdown list of the [ngbTypeahead] will be hidden
+            // this.<#= MaxHeightExPropName #> = inp * this.<#= AppSettingServicePropName #>.filterHeightFactor + this.<#= AppSettingServicePropName #>.filterHeightAddition;
+            // this.<#= OverflowPropName #> = 'auto';
             if(this.isOnInitCalled) {
               this.cd.detectChanges();
             }

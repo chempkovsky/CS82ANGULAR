@@ -1,0 +1,63 @@
+{
+  "Description": [
+    "",
+    "                                BEFORE YOU START !!!",
+    "1.",
+    "  Please make sure that you selected src\\app folder",
+    "",
+    "2.",
+    " Please make that AspNet ModelViews has the following names",
+    " (Names are case sensitive)",
+    "     aspnetmodelView",
+    "     aspnetuserView",
+    "     aspnetroleView",
+    "     aspnetuserrolesView",
+    "     aspnetrolemaskView",
+    "     aspnetusermaskView",
+    "     aspnetuserpermsView",
+    "",
+    "",
+    ""
+  ],
+  "BatchItems": [
+    {
+      "DestinationFolder": "services\\aspnetmodel-view",
+      "GeneratorType": "01550-V.module.service.ts",
+      "GeneratorSript": "VDlgServiceForView.ts.t4",
+      "ViewModel": "aspnetmodelView"
+    },
+
+
+    {
+      "DestinationFolder": "services\\aspnetuser-view",
+      "GeneratorType": "01550-V.module.service.ts",
+      "GeneratorSript": "VDlgServiceForView.ts.t4",
+      "ViewModel": "aspnetuserView"
+    },
+
+
+    {
+      "DestinationFolder": "services\\aspnetrole-view",
+      "GeneratorType": "01550-V.module.service.ts",
+      "GeneratorSript": "VDlgServiceForView.ts.t4",
+      "ViewModel": "aspnetroleView"
+    },
+
+    {
+      "DestinationFolder": "services\\aspnetuserroles-view",
+      "GeneratorType": "01550-V.module.service.ts",
+      "GeneratorSript": "VDlgServiceForView.ts.t4",
+      "ViewModel": "aspnetuserrolesView"
+    },
+
+
+    {
+      "DestinationFolder": "services\\aspnetrolemask-view",
+      "GeneratorType": "01550-V.module.service.ts",
+      "GeneratorSript": "VDlgServiceForView.ts.t4",
+      "ViewModel": "aspnetrolemaskView"
+    }
+
+
+  ]
+}

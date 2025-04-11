@@ -134,6 +134,7 @@
     
     string captionPropName                      = "caption";
     string captionSelector                      = "caption";
+    string DlgSrvPrefix                         = "dlgSrv";
 
 
     int CurrentInputTypeId = 1;
@@ -272,13 +273,14 @@
     string sformComponentFolder         = "01420-Sform.component.ts";
     string viewInterfaceDlgFolder       = "01430-Dlg.interface.ts";
     string sdlgComponentFolder          = "01440-Sdlg.component.ts";
+    string searchModuleServiceFolder    = "01450-S.module.service.ts";
     
 #>
 
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { FormControl, Validators, ValidatorFn, FormGroup, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatSelectChange } from '@angular/material/select';
-import { MatDialog } from '@angular/material/dialog';
+// import { MatDialog } from '@angular/material/dialog';
 import { Observable } from 'rxjs/internal/Observable';
 import { switchMap,  catchError, debounceTime } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
@@ -305,7 +307,8 @@ import { <#=  GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile,Context, viewN
     }
     foreach(string viewNm in SearchDialogViewsList) {
 #>
-import { <#=  GetComponentClassNameExWithAnglrEx(AngularJsonFile, Context, viewNm, sdlgComponentFolder, Model, addformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, addformComponentFolder, Context, viewNm, sdlgComponentFolder) #>';
+// import { <#=  GetComponentClassNameExWithAnglrEx(AngularJsonFile, Context, viewNm, sdlgComponentFolder, Model, addformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, addformComponentFolder, Context, viewNm, sdlgComponentFolder) #>';
+import { <#=  GetModuleServiceClassNameExWithAnglrEx(AngularJsonFile, Context, viewNm, searchModuleServiceFolder, Model, addformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, addformComponentFolder, Context, viewNm, searchModuleServiceFolder) #>';
 import { <#=  GetInterfaceDlgNameExWithAnglrEx(AngularJsonFile, Context, viewNm, viewInterfaceDlgFolder, Model, addformComponentFolder) #> } from '<#= GetCrossComponentFolderNameWithAnglr(AngularJsonFile, Model, addformComponentFolder, Context, viewNm, viewInterfaceDlgFolder) #>';
 <#
     }
@@ -516,7 +519,17 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             constructorParams += "private " +  formServicePrefix + viewNm + ": " + GetServiceClassNameExWithAnglrEx(AngularJsonFile, Context, viewNm, viewServiceFolder, Model, addformComponentFolder);
         } 
 #>
-    constructor(<#= constructorParams #>, public dialog: MatDialog, protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #> ) {
+    constructor(<#= constructorParams #>, // public dialog: MatDialog, 
+
+<#
+    foreach(string viewNm in SearchDialogViewsList) {
+#>
+        protected <#= DlgSrvPrefix + viewNm #>: <#=  GetModuleServiceClassNameExWithAnglrEx(AngularJsonFile, Context, viewNm, searchModuleServiceFolder, Model, addformComponentFolder) #>,
+<#
+    }
+#>
+
+        protected <#= AppSettingServicePropName #>: <#= appSettingServiceClassName #> ) {
         this.<#= AppearancePropName #> = this.<#= AppSettingServicePropName #>.<#= AppearancePropName #>;
         this.<#= RootDataSource #> = new <#= GetJavaScriptClassNameExWithAnglrEx(AngularJsonFile, Context, Model.ViewName, viewDatasourceClassFolder, Model, addformComponentFolder) #> (this.<#= formServicePrefix + Model.ViewName #>,
             this.<#= AppSettingServicePropName #>, null, null, [<#= GetCurrentDirectNavs(ForeignKeyNameChainList, "") #>],'',[]);
@@ -906,6 +919,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
             <#= FilterMaxHeightPropName #>: 2
         };
         flt.<#= HiddenFilterPropName #> = this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= GetWSFltrRsltByCurrDirMstrsMethodName #>();
+/*
         let w: string = this.<#= AppSettingServicePropName #>.getDialogWidth('<#= Model.ViewName #>');
         let mw: string = this.<#= AppSettingServicePropName #>.getDialogMaxWidth('<#= Model.ViewName #>');
         let dialogRef = this.dialog.open(<#= GetComponentClassNameWithAnglrEx(AngularJsonFile, fk.Item2, sdlgComponentFolder, Model, addformComponentFolder) #>, {
@@ -915,7 +929,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
         });
         dialogRef.afterClosed()
             .subscribe({
-                next: (rslt) => {
+                next: (rslt: any) => {
                     if (!(typeof rslt === 'undefined')) {
                         if (!(rslt === null)) {
                             if (!(rslt.<#= SelectedItemsPropName #> === 'undefined')) {
@@ -929,6 +943,25 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
                     }
                 }
             });
+*/
+        this.<#= DlgSrvPrefix + fk.Item2.ViewName #>.open(flt).then( (dialogRef: any) => {
+            dialogRef.afterClosed()
+                .subscribe({
+                    next: (rslt: any) => {
+                        if (!(typeof rslt === 'undefined')) {
+                            if (!(rslt === null)) {
+                                if (!(rslt.<#= SelectedItemsPropName #> === 'undefined')) {
+                                    if(Array.isArray(rslt.<#= SelectedItemsPropName #>)) {
+                                        if(rslt.<#= SelectedItemsPropName #>.length > 0) {
+                                            this.<#= GetTypeScriptPropertyNameWithSufix(fk.Item3, Model, DataSourceSufix) #>.<#= Interface2ValuesMethodName #>(rslt.<#= SelectedItemsPropName #>[0], true);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                })
+        }).catch(c => {});
     }
 <#
             } // if(fk.Item4 == InputTypeEnum.Typeahead) {} else if(fk.Item4 == InputTypeEnum.Combo) {}else if(fk.Item4 == InputTypeEnum.SearchDialog) {}
