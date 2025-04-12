@@ -36,6 +36,11 @@ import { map, shareReplay } from 'rxjs/operators';
 import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, appComponentFolder)#>';
 
 @Component({
+  <# if (Model.IsStandalone) { #>
+    standalone: true,
+  <# } else { #>
+    standalone: false,
+  <# } #>
 	selector: 'app-toasts',
 	template: `
 		<ngb-toast
