@@ -6,7 +6,7 @@
     - **Backend** based on net.core 6 (last test on TargetFramework = net9.0).
     - For the **Frontend** the developer can choose
       - [Material Design components for Angular](https://material.angular.io)
-      - [Kendo UI for Angular](https://www.telerik.com/kendo-angular-ui)
+      - [Kendo UI for Angular](https://www.telerik.com/kendo-angular-ui) **no longer supported**
       - [Angular powered Bootstrap components](https://ng-bootstrap.github.io/#/home)
     - For the **Frontend** the developer can choose
       - Monolithic app. 
