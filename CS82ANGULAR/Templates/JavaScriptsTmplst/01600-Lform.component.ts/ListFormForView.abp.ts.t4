@@ -296,6 +296,11 @@ import { <#=  dModSrvClassName #> } from '<#= GetFolderNameWithAnglr(AngularJson
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, lformHtmlFolder, lformComponentFolder)#>.html',
   styleUrls: ['<#=  GetFolderName(Model, lformCssFolder, lformComponentFolder)#>.css']
