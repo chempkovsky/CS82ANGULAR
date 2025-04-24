@@ -147,6 +147,11 @@ import { <#= vformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(Angu
 /* eslint-disable @angular-eslint/no-output-on-prefix */
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, rvHtmlFolder, rvComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderName(Model, rvCssFolder, rvComponentFolder) #>.css']

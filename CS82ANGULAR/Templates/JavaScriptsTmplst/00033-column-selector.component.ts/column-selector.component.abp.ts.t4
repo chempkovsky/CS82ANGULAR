@@ -48,6 +48,11 @@ import { <#= columnSelectorItemModelClassName #> } from '<#= GetFolderNameWithAn
 import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appSettingServiceFolder, columnSelectorComponentFolder)#>';
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
   selector: 'app-<#= columnSelectorComponentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentHtmlFolder, columnSelectorComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentCssFolder, columnSelectorComponentFolder) #>.css']

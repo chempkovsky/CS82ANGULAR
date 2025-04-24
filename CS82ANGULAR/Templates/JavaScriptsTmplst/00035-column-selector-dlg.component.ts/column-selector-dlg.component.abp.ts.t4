@@ -45,6 +45,11 @@ import { <#= GetComponentClassNameWithAnglr(AngularJsonFile, Model, columnSelect
 /* eslint-disable @angular-eslint/no-input-rename */
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorDlgHtmlComponentFolder, columnSelectorDlgComponentFolder)#>.html',
   styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorDlgCssComponentFolder, columnSelectorDlgComponentFolder)#>.css']

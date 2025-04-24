@@ -121,6 +121,11 @@ import { <#= uformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(Angu
 /* eslint-disable @angular-eslint/no-output-on-prefix */
 
 @Component({
+<# if (Model.IsStandalone) { #>
+  standalone: true,
+<# } else { #>
+  standalone: false,
+<# } #>
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, ruHtmlFolder, ruComponentFolder) #>.html',
   styleUrls: ['<#= GetFolderName(Model, ruCssFolder, ruComponentFolder) #>.css']
