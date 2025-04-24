@@ -336,7 +336,7 @@ namespace CS82ANGULAR.ViewModel
             (SelectedEntity.CodeElementRef as CodeClass).
                 DefineModelView(SelectedDbContext.CodeElementRef as CodeClass, SelectedModel, ViewNameSufix, PageViewNameSufix, DomainViewNameSufix, DomainPageViewNameSufix);
 
-        SelectedModel.ViewProject = DestinationProject;
+            SelectedModel.ViewProject = DestinationProject;
             SelectedModel.ViewDefaultProjectNameSpace = DefaultProjectNameSpace;
             SelectedModel.ViewFolder = DestinationFolder;
             if (srcModel != null)
