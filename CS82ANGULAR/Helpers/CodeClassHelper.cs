@@ -2878,10 +2878,11 @@ namespace CS82ANGULAR.Helpers
                 if (codeElement.Kind != vsCMElement.vsCMElementFunction) continue;
                 CodeFunction codeFunction = codeElement as CodeFunction;
                 if (codeFunction.Access != vsCMAccess.vsCMAccessPublic) continue;
-                if ((codeFunction.FunctionKind & vsCMFunction.vsCMFunctionTopLevel) != vsCMFunction.vsCMFunctionTopLevel) continue;
-                bool isContructor = (codeFunction.FunctionKind & vsCMFunction.vsCMFunctionConstructor) == vsCMFunction.vsCMFunctionConstructor;
-                bool isSub = (codeFunction.FunctionKind & vsCMFunction.vsCMFunctionSub) == vsCMFunction.vsCMFunctionSub;
-                bool isFun = (codeFunction.FunctionKind & vsCMFunction.vsCMFunctionFunction) == vsCMFunction.vsCMFunctionFunction;
+                // if ((codeFunction.FunctionKind & vsCMFunction.vsCMFunctionTopLevel) != vsCMFunction.vsCMFunctionTopLevel) continue;
+                vsCMFunction functionKind = codeFunction.FunctionKind;
+                bool isContructor = (functionKind & vsCMFunction.vsCMFunctionConstructor) == vsCMFunction.vsCMFunctionConstructor;
+                bool isSub = (functionKind & vsCMFunction.vsCMFunctionSub) == vsCMFunction.vsCMFunctionSub;
+                bool isFun = (functionKind & vsCMFunction.vsCMFunctionFunction) == vsCMFunction.vsCMFunctionFunction;
                 if ((!isContructor) && (!isSub) && (!isFun)) continue;
                 ModelViewFun mvf = new ModelViewFun();
                 mvf.FunName = codeFunction.Name;    
@@ -2892,7 +2893,7 @@ namespace CS82ANGULAR.Helpers
                     mvf.RetTypeFullName = "";
                     mvf.RetUnderlyingTypeName = "";
                 } 
-                if (mvf.IsSub)
+                else if (mvf.IsSub)
                 {
                     mvf.RetTypeFullName = "void";
                     mvf.RetUnderlyingTypeName = "void";
@@ -2918,8 +2919,11 @@ namespace CS82ANGULAR.Helpers
                     }
                 }
                 int order = 0;
-                foreach(CodeElements ce in codeFunction.Parameters)
+                CodeElements prms = codeFunction.Parameters;
+                int cnt = prms.Count;
+                for (int i = 1; i <= cnt; i++)
                 {
+                    CodeElement ce = prms.Item(i);
                     CodeParameter codeParameter = ce as CodeParameter;
                     ModelViewFunParam modelViewFunParam = new ModelViewFunParam();
                     modelViewFunParam.ParamOrder = order;
@@ -3063,6 +3067,14 @@ namespace CS82ANGULAR.Helpers
             else
             {
                 SelectedModel.ForeignKeys.Clear();
+            }
+            if (SelectedModel.RootEntityFunctions == null)
+            {
+                SelectedModel.RootEntityFunctions = new ObservableCollection<ModelViewFun>();
+            }
+            else
+            {
+                SelectedModel.RootEntityFunctions.Clear();
             }
             List<FluentAPIForeignKey> foreignKeys =
                 srcClass.CollectForeignKeys(dbContext, null);
@@ -3280,6 +3292,14 @@ namespace CS82ANGULAR.Helpers
                         }
                     }
                 }
+            }
+            if (SelectedModel.RootEntityFunctions == null)
+            {
+                SelectedModel.RootEntityFunctions = new ObservableCollection<ModelViewFun>();
+            }
+            else
+            {
+                SelectedModel.RootEntityFunctions.Clear();
             }
             srcClass.DefineEntityMethods(SelectedModel);
 

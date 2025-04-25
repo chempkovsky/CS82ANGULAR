@@ -1113,7 +1113,7 @@ namespace CS82ANGULAR.Helpers
                 {
                     destModelView.RootEntityFunctions = new ObservableCollection<ModelViewFun>();
                 }
-                else destModelView.GeneratedServices.Clear();
+                else destModelView.RootEntityFunctions.Clear();
                 foreach (ModelViewFunSerializable srcProp in srcModelView.RootEntityFunctions)
                 {
                     destModelView.RootEntityFunctions.Add(srcProp.ModelViewFunSerializableAssingTo(new ModelViewFun()));
