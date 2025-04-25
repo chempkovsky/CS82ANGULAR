@@ -894,5 +894,69 @@
             }
             return rslt;
         }
+        ModelViewFunSerializable GetConstructorWithMaxInputParams(ModelViewSerializable model)
+        {
+            if (model == null)  return null;
+            if (model.RootEntityFunctions == null) return null;
+            ModelViewFunSerializable rslt = null;
+            foreach(ModelViewFunSerializable func in model.RootEntityFunctions)
+            {
+                if (!func.IsConstructor) continue;
+                if (func.FunParams == null) continue;
+                if (func.FunParams.Count < 1) continue;
+                if (rslt == null)
+                {
+                    rslt = func;
+                    continue;
+                }
+                if (rslt.FunParams.Count < func.FunParams.Count)
+                {
+                    rslt = func;
+                }
+            }
+            return rslt;
+        }
+        ModelViewFunSerializable GetFuncWithMaxInputParams(ModelViewSerializable model, string funcName)
+        {
+            if (model == null) return null;
+            if (model.RootEntityFunctions == null) return null;
+            ModelViewFunSerializable rslt = null;
+            foreach(ModelViewFunSerializable  func in model.RootEntityFunctions)
+            {
+                if (func.IsConstructor) continue;
+                if (func.FunParams == null) continue;
+                if (func.FunParams.Count < 1) continue;
+                if (!string.IsNullOrEmpty(funcName))
+                {
+                    if (!funcName.Equals(func.FunName,StringComparison.OrdinalIgnoreCase)) continue;
+                }
+                if (rslt == null)
+                {
+                    rslt = func;
+                    continue;
+                }
+                if (rslt.FunParams.Count < func.FunParams.Count)
+                {
+                    rslt = func;
+                }
+            }
+            return rslt;
+        }
+        ModelViewPropertyOfVwSerializable GetMappedScalarPro(ModelViewSerializable model, string ChangeValPrmPrefix, string prmName)
+        {
+            if ((model == null) || (string.IsNullOrEmpty(prmName))) return null;
+            if (model.ScalarProperties == null) return null;
+            foreach(ModelViewPropertyOfVwSerializable prop in model.ScalarProperties)
+            {
+                ModelViewEntityPropertySerializable entityProp = GetRootEntityProperty(prop, model);
+                if (entityProp == null) continue;
+                if (prmName.Equals(entityProp.OriginalPropertyName, StringComparison.OrdinalIgnoreCase) ||
+                    prmName.Equals(ChangeValPrmPrefix + entityProp.OriginalPropertyName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return prop;
+                }
+            }
+            return null;
+        }
 
 #>

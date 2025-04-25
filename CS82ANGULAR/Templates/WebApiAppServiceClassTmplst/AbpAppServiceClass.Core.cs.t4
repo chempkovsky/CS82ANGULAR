@@ -26,6 +26,9 @@ using Microsoft.AspNetCore.Authorization;
 
 <#
 
+    string ChangeValMethodName          = "ChangeVals";
+    string ChangeValPrmPrefix           = "_";
+
     string GetAllMethodName             = "getall";
     string GetWithFilterMethodName      = "getwithfilter";
     string GetOneMethodName             = "getone";
@@ -816,24 +819,59 @@ namespace <#= appServiceNameSpace #> {
                 }
 
 <#
-        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
-            if(primKeys.Contains(prop)) {
-                continue;
-            }
-            ModelViewEntityPropertySerializable entityProp =  GetRootEntityProperty(prop, Model);
-            if( entityProp == null ) continue;
-            if("EntityVersion" == entityProp.OriginalPropertyName) continue;
-            if("TenantId" == entityProp.OriginalPropertyName) continue;
-            if (EntHasId) {
-                if ("Id" == entityProp.OriginalPropertyName) {
-                    if(entityProp.UnderlyingTypeName == "System.Guid") continue;
+
+        bool useChngValFnc = false;
+        ModelViewFunSerializable chngValFnc =  GetFuncWithMaxInputParams(Model, ChangeValMethodName);
+        if (chngValFnc != null) {
+            if (chngValFnc.FunParams != null) {
+                if (chngValFnc.FunParams.Count > 0) {
+                    useChngValFnc = true;
+                    foreach(ModelViewFunParamSerializable chngValFncPrm in chngValFnc.FunParams) {
+                        if (GetMappedScalarPro(Model, ChangeValPrmPrefix, chngValFncPrm.OriginalParamName) == null) {
+                            useChngValFnc = false;
+                            break;
+                        }
+                    }
                 }
             }
+        } 
+
+        if (useChngValFnc) {
+#>
+                resultEntity.<#= chngValFnc.FunName #>( 
+<#
+                    bool isFrst = true;
+                    foreach(ModelViewFunParamSerializable chngValFncPrm in chngValFnc.FunParams) {
+                        ModelViewPropertyOfVwSerializable prop = GetMappedScalarPro(Model, ChangeValPrmPrefix, chngValFncPrm.OriginalParamName);
+#>
+                        <# if(isFrst) { isFrst = false; } else {#> ,  <#} #>viewToUpdate.<#= GetTypeScriptPropertyName(prop, Model) #>
+<#
+                    }
+#>    
+                     
+                );
+<#
+
+        } else {
+            foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+                if(primKeys.Contains(prop)) {
+                    continue;
+                }
+                ModelViewEntityPropertySerializable entityProp =  GetRootEntityProperty(prop, Model);
+                if( entityProp == null ) continue;
+                if("EntityVersion" == entityProp.OriginalPropertyName) continue;
+                if("TenantId" == entityProp.OriginalPropertyName) continue;
+                if (EntHasId) {
+                    if ("Id" == entityProp.OriginalPropertyName) {
+                        if(entityProp.UnderlyingTypeName == "System.Guid") continue;
+                    }
+                }
 
 #>
                 resultEntity.<#= entityProp.OriginalPropertyName #> =  viewToUpdate.<#= GetTypeScriptPropertyName(prop, Model)#>;
 <#
-        }
+            } // foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {}
+        } // if (chngValFnc != null) {} else {}
 #>
                 await repo.UpdateAsync(resultEntity);
                 await UnitOfWorkManager.Current.SaveChangesAsync();
@@ -913,48 +951,65 @@ namespace <#= appServiceNameSpace #> {
         public async Task<<#= Model.ViewName #>> <#= AddOneMethodName #>(<#= Model.ViewName#> viewToAdd)
 <#
             }
+        bool useConstructor = false;
+        ModelViewFunSerializable constructorFnc =  GetConstructorWithMaxInputParams(Model);
+        if (constructorFnc != null) {
+            if (constructorFnc.FunParams != null) {
+                if (constructorFnc.FunParams.Count > 0) {
+                    useConstructor = true;
+                    foreach(ModelViewFunParamSerializable chngValFncPrm in constructorFnc.FunParams) {
+                        if (GetMappedScalarPro(Model, ChangeValPrmPrefix, constructorFnc.OriginalParamName) == null) {
+                            useConstructor = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        } 
+
+
+
 #>
         {
             // using(repo.EnableTracking()) 
             {
+<#
+
+        if (useConstructor) {
+#>
                 <#= Model.RootEntityClassName#> entityToAdd = new <#= Model.RootEntityClassName #>(
 <#
-            {
-                bool commaInserted = false;
-                if (EntHasId) {
-                    if(IdDataType == "System.Guid") {
-                        commaInserted = true;
+                    bool isCnstrctrFrst = true;
+                    foreach(ModelViewFunParamSerializable constructorFnc in constructorFnc.FunParams) {
+                        ModelViewPropertyOfVwSerializable prop = GetMappedScalarPro(Model, ChangeValPrmPrefix, constructorFnc.OriginalParamName);
 #>
-                        GuidGenerator.Create()
+                        <# if(isCnstrctrFrst) { isCnstrctrFrst = false; } else {#> ,  <#} #>viewToUpdate.<#= GetTypeScriptPropertyName(prop, Model) #>
 <#
                     }
-                }
-                if(EntHasTenantId) {
 #>
-                    <# if(commaInserted) {#>, <#}#>CurrentTenant.Id
-<#
-                    commaInserted = true;
-                }
-            }
-#>            
                 );
 <#
-        foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
-            ModelViewEntityPropertySerializable entityProp =  GetRootEntityProperty(prop, Model);
-            if(entityProp != null) {
-                if("EntityVersion" == entityProp.OriginalPropertyName) continue;
-                if("TenantId" == entityProp.OriginalPropertyName) continue;
-                if (EntHasId) {
-                    if ("Id" == entityProp.OriginalPropertyName) {
-                        if(entityProp.UnderlyingTypeName == "System.Guid") continue;
+        } else {
+#>
+                <#= Model.RootEntityClassName#> entityToAdd = new <#= Model.RootEntityClassName #>();
+<#
+            foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {
+                ModelViewEntityPropertySerializable entityProp =  GetRootEntityProperty(prop, Model);
+                if(entityProp != null) {
+                    if("EntityVersion" == entityProp.OriginalPropertyName) continue;
+                    if("TenantId" == entityProp.OriginalPropertyName) continue;
+                    if (EntHasId) {
+                        if ("Id" == entityProp.OriginalPropertyName) {
+                            if(entityProp.UnderlyingTypeName == "System.Guid") continue;
+                        }
                     }
-                }
                 
 #>
                 entityToAdd.<#=  entityProp.OriginalPropertyName #> =  viewToAdd.<#=  GetTypeScriptPropertyName(prop, Model) #>;
 <#
-            }
-        }
+                }
+            } // foreach(ModelViewPropertyOfVwSerializable prop in Model.ScalarProperties) {...}
+        } // if (useConstructor) {} else {...}
 #>
                 await repo.InsertAsync(entityToAdd);
                 await UnitOfWorkManager.Current.SaveChangesAsync();
@@ -1149,6 +1204,9 @@ namespace <#= appServiceNameSpace #> {
         } // the end of if (HasFileUpload(Model)) {} else {}
     } // the end of if (HasFileUpload(Model)) {}
 #>
+
+
+
 
     }
 }
