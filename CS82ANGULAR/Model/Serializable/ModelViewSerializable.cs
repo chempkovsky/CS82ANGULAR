@@ -45,6 +45,7 @@ namespace CS82ANGULAR.Model.Serializable
         public List<ModelViewUIFormPropertySerializable> UIFormProperties { get; set; }
         public List<ModelViewUIListPropertySerializable> UIListProperties { get; set; }
         public List<ModelViewUniqueKeySerializable> UniqueKeys { get; set; }
+        public List<ModelViewFunSerializable> RootEntityFunctions { get; set; }
     }
 
 }

@@ -1,4 +1,6 @@
 ﻿using CS82ANGULAR.Helpers.UI;
+using CS82ANGULAR.Model.Serializable;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace CS82ANGULAR.Model
@@ -276,6 +278,7 @@ namespace CS82ANGULAR.Model
         public ObservableCollection<ModelViewUniqueKey> UniqueKeys { get; set; }
         public ObservableCollection<GeneratedDto> GeneratedDtos { get; set; }
         public ObservableCollection<GeneratedService> GeneratedServices { get; set; }
+        public ObservableCollection<ModelViewFun> RootEntityFunctions { get; set; }
     }
 
 }

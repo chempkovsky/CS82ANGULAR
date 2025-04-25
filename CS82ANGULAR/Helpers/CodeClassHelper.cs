@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.Windows.Documents;
 using VSLangProj;
 
 
@@ -2865,6 +2867,89 @@ namespace CS82ANGULAR.Helpers
             }
             return SelectedModel;
         }
+
+        public static ModelView DefineEntityMethods(this CodeClass srcClass, ModelView SelectedModel)
+        {
+            if ((srcClass == null) || (SelectedModel == null)) return SelectedModel;
+            if (SelectedModel.RootEntityFunctions == null) return SelectedModel;
+
+            foreach (CodeElement codeElement in srcClass.Members)
+            {
+                if (codeElement.Kind != vsCMElement.vsCMElementFunction) continue;
+                CodeFunction codeFunction = codeElement as CodeFunction;
+                if (codeFunction.Access != vsCMAccess.vsCMAccessPublic) continue;
+                if ((codeFunction.FunctionKind & vsCMFunction.vsCMFunctionTopLevel) != vsCMFunction.vsCMFunctionTopLevel) continue;
+                bool isContructor = (codeFunction.FunctionKind & vsCMFunction.vsCMFunctionConstructor) == vsCMFunction.vsCMFunctionConstructor;
+                bool isSub = (codeFunction.FunctionKind & vsCMFunction.vsCMFunctionSub) == vsCMFunction.vsCMFunctionSub;
+                bool isFun = (codeFunction.FunctionKind & vsCMFunction.vsCMFunctionFunction) == vsCMFunction.vsCMFunctionFunction;
+                if ((!isContructor) && (!isSub) && (!isFun)) continue;
+                ModelViewFun mvf = new ModelViewFun();
+                mvf.FunName = codeFunction.Name;    
+                mvf.IsConstructor = isContructor;
+                mvf.IsSub = isSub;
+                if (mvf.IsConstructor)
+                {
+                    mvf.RetTypeFullName = "";
+                    mvf.RetUnderlyingTypeName = "";
+                } 
+                if (mvf.IsSub)
+                {
+                    mvf.RetTypeFullName = "void";
+                    mvf.RetUnderlyingTypeName = "void";
+                } 
+                else
+                {
+                    CodeTypeRef codeTypeRef = codeFunction.Type;
+                    vsCMTypeRef codeTypeRefTypeKind = codeTypeRef.TypeKind;
+                    mvf.RetTypeFullName = codeTypeRef.AsFullName;
+                    if (codeTypeRefTypeKind == vsCMTypeRef.vsCMTypeRefCodeType)
+                    {
+                        if (mvf.RetTypeFullName.Contains("System.Nullable"))
+                        {
+                            mvf.RetUnderlyingTypeName = mvf.RetTypeFullName.Replace("System.Nullable", "").Replace("<", "").Replace(">", "").Replace(">", "").Replace("\n", "").Replace("\t", "").Replace("\r", "");
+                        }
+                    }
+                    else
+                    {
+                        if (codeTypeRefTypeKind == vsCMTypeRef.vsCMTypeRefString)
+                        {
+                            mvf.RetUnderlyingTypeName = "string";
+                        }
+                    }
+                }
+                int order = 0;
+                foreach(CodeElements ce in codeFunction.Parameters)
+                {
+                    CodeParameter codeParameter = ce as CodeParameter;
+                    ModelViewFunParam modelViewFunParam = new ModelViewFunParam();
+                    modelViewFunParam.ParamOrder = order;
+                    order++;
+                    modelViewFunParam.OriginalParamName = codeParameter.Name;
+                    CodeTypeRef codeTypeRef = codeParameter.Type;
+                    vsCMTypeRef codeTypeRefTypeKind = codeTypeRef.TypeKind;
+                    modelViewFunParam.TypeFullName = codeTypeRef.AsFullName;
+                    if (codeTypeRefTypeKind == vsCMTypeRef.vsCMTypeRefCodeType)
+                    {
+                        if (modelViewFunParam.TypeFullName.Contains("System.Nullable"))
+                        {
+                            modelViewFunParam.UnderlyingTypeName = modelViewFunParam.TypeFullName.Replace("System.Nullable", "").Replace("<", "").Replace(">", "").Replace(">", "").Replace("\n", "").Replace("\t", "").Replace("\r", "");
+                        }
+                    }
+                    else
+                    {
+                        if (codeTypeRefTypeKind == vsCMTypeRef.vsCMTypeRefString)
+                        {
+                            modelViewFunParam.UnderlyingTypeName = "string";
+                        }
+                    }
+                    modelViewFunParam.IsInParam = true; 
+                    if (mvf.FunParams == null) mvf.FunParams = new List<ModelViewFunParam>();
+                    mvf.FunParams.Add(modelViewFunParam);
+                }
+                SelectedModel.RootEntityFunctions.Add(mvf);
+            }
+            return SelectedModel;
+        }
         public static ModelView DefineModelView(this CodeClass srcClass, CodeClass dbContext, ModelView SelectedModel, string viewSufix = null, string pageViewNameSufix = null, string domainViewSufix = null, string domainPageViewSufix = null)
         {
             if ((srcClass == null) || (dbContext == null) || (SelectedModel == null)) return null;
@@ -3196,6 +3281,8 @@ namespace CS82ANGULAR.Helpers
                     }
                 }
             }
+            srcClass.DefineEntityMethods(SelectedModel);
+
             //Volo.Abp.Domain.Entities.AggregateRoot<System.Guid>
             /*
                 CreationAuditedEntityDto

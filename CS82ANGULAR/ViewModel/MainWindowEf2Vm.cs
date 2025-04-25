@@ -543,6 +543,7 @@ namespace CS82ANGULAR.ViewModel
                 existedModelViewSerializable.UIListProperties = modelViewSerializable.UIListProperties;
                 existedModelViewSerializable.UniqueKeys = modelViewSerializable.UniqueKeys;
                 existedModelViewSerializable.GeneratedDtos = modelViewSerializable.GeneratedDtos;
+                existedModelViewSerializable.RootEntityFunctions = modelViewSerializable.RootEntityFunctions;
             }
             else
             {

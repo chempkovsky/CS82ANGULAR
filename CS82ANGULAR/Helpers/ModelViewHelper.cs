@@ -74,6 +74,11 @@ namespace CS82ANGULAR.Helpers
                 selectedModel.GeneratedServices = new ObservableCollection<GeneratedService>();
             }
             selectedModel.GeneratedServices.Clear();
+            if (selectedModel.RootEntityFunctions == null)
+            {
+                selectedModel.RootEntityFunctions = new ObservableCollection<ModelViewFun>();
+            }
+            selectedModel.RootEntityFunctions.Clear();
             return selectedModel;
         }
         public static ModelViewSerializable ClearModelViewSerializable(this ModelViewSerializable selectedModel)
@@ -134,6 +139,12 @@ namespace CS82ANGULAR.Helpers
                 selectedModel.GeneratedServices = new List<GeneratedServiceSerializable>();
             }
             selectedModel.GeneratedServices.Clear();
+
+            if (selectedModel.RootEntityFunctions == null)
+            {
+                selectedModel.RootEntityFunctions = new List<ModelViewFunSerializable>();
+            }
+            selectedModel.RootEntityFunctions.Clear();
 
             return selectedModel;
         }
@@ -351,6 +362,80 @@ namespace CS82ANGULAR.Helpers
             return destProp;
         }
 
+
+        public static ModelViewFunParamSerializable ModelViewFunParamAssingTo(this ModelViewFunParam srcParam, ModelViewFunParamSerializable destParam)
+        {
+            if ((srcParam == null) || (destParam == null)) return null;
+            destParam.ParamOrder = srcParam.ParamOrder;
+            destParam.OriginalParamName = srcParam.OriginalParamName;
+            destParam.TypeFullName = srcParam.TypeFullName;
+            destParam.UnderlyingTypeName = srcParam.UnderlyingTypeName;
+            destParam.IsNullable = srcParam.IsNullable;
+            destParam.IsInParam = srcParam.IsInParam;
+            destParam.IsOutParam = srcParam.IsOutParam;
+            return destParam;
+        }
+        public static ModelViewFunParam ModelViewFunParamSerializableAssingTo(this ModelViewFunParamSerializable srcParam, ModelViewFunParam destParam)
+        {
+            if ((srcParam == null) || (destParam == null)) return null;
+            destParam.ParamOrder = srcParam.ParamOrder;
+            destParam.OriginalParamName = srcParam.OriginalParamName;
+            destParam.TypeFullName = srcParam.TypeFullName;
+            destParam.UnderlyingTypeName = srcParam.UnderlyingTypeName;
+            destParam.IsNullable = srcParam.IsNullable;
+            destParam.IsInParam = srcParam.IsInParam;
+            destParam.IsOutParam = srcParam.IsOutParam;
+            return destParam;
+        }
+        public static ModelViewFunSerializable ModelViewFunAssingTo(this ModelViewFun srcFun, ModelViewFunSerializable destFun)
+        {
+            if ((srcFun == null) || (destFun == null)) return null;
+            destFun.FunName = srcFun.FunName;
+            destFun.IsSub = srcFun.IsSub;
+            destFun.IsConstructor = srcFun.IsConstructor;
+            destFun.RetTypeFullName = srcFun.RetTypeFullName;
+            destFun.RetUnderlyingTypeName = srcFun.RetUnderlyingTypeName;
+            if (srcFun.FunParams != null)
+            {
+                if (srcFun.FunParams.Count > 0)
+                {
+                    if (destFun.FunParams == null)
+                    {
+                        destFun.FunParams = new List<ModelViewFunParamSerializable>();
+                        foreach (ModelViewFunParam srcFunParam in srcFun.FunParams)
+                        {
+                            destFun.FunParams.Add(srcFunParam.ModelViewFunParamAssingTo(new ModelViewFunParamSerializable()));
+                        }
+                    }
+                }
+            }
+            return destFun;
+        }
+        public static ModelViewFun ModelViewFunSerializableAssingTo(this ModelViewFunSerializable srcFun, ModelViewFun destFun)
+        {
+            if ((srcFun == null) || (destFun == null)) return null;
+            destFun.FunName = srcFun.FunName;
+            destFun.IsSub = srcFun.IsSub;
+            destFun.IsConstructor = srcFun.IsConstructor;
+            destFun.RetTypeFullName = srcFun.RetTypeFullName;
+            destFun.RetUnderlyingTypeName = srcFun.RetUnderlyingTypeName;
+            if (srcFun.FunParams != null)
+            {
+                if (srcFun.FunParams.Count > 0)
+                {
+                    if (destFun.FunParams == null)
+                    {
+                        destFun.FunParams = new List<ModelViewFunParam>();
+                        foreach (ModelViewFunParamSerializable srcFunParam in srcFun.FunParams)
+                        {
+                            destFun.FunParams.Add(srcFunParam.ModelViewFunParamSerializableAssingTo(new ModelViewFunParam()));
+                        }
+                    }
+                }
+            }
+            return destFun;
+        }
+
         public static ModelViewForeignKeySerializable ModelViewForeignKeyAssingTo(this ModelViewForeignKey srcForeignKey, ModelViewForeignKeySerializable destForeignKey)
         {
             if ((srcForeignKey == null) || (destForeignKey == null)) return null;
@@ -564,6 +649,13 @@ namespace CS82ANGULAR.Helpers
                 foreach (GeneratedService prop in srcModel.GeneratedServices)
                 {
                     destModel.GeneratedServices.Add(prop.ModelViewGeneratedServiceAssignTo(new GeneratedServiceSerializable()));
+                }
+            }
+            if (srcModel.RootEntityFunctions != null)
+            {
+                foreach (ModelViewFun prop in srcModel.RootEntityFunctions)
+                {
+                    destModel.RootEntityFunctions.Add(prop.ModelViewFunAssingTo(new ModelViewFunSerializable()));
                 }
             }
 
@@ -917,7 +1009,8 @@ namespace CS82ANGULAR.Helpers
                 IsStandalone = srcModelViewSerializable.IsStandalone,
                 WebApiServiceProject = srcModelViewSerializable.WebApiServiceProject,
                 WebApiServiceDefaultProjectNameSpace = srcModelViewSerializable.WebApiServiceDefaultProjectNameSpace,
-                WebApiServiceFolder = srcModelViewSerializable.WebApiServiceFolder
+                WebApiServiceFolder = srcModelViewSerializable.WebApiServiceFolder,
+                RootEntityFunctions = srcModelViewSerializable.RootEntityFunctions
             };
         }
         public static ModelViewKeyProperty ModelViewKeyPropertySerializableAssingTo(this ModelViewKeyPropertySerializable srcProp, ModelViewKeyProperty destProp)
@@ -1012,6 +1105,18 @@ namespace CS82ANGULAR.Helpers
                 foreach (GeneratedServiceSerializable srcProp in srcModelView.GeneratedServices)
                 {
                     destModelView.GeneratedServices.Add(srcProp.GeneratedServiceSerializableAssingTo(new GeneratedService()));
+                }
+            }
+            if (srcModelView.RootEntityFunctions != null)
+            {
+                if (destModelView.RootEntityFunctions == null)
+                {
+                    destModelView.RootEntityFunctions = new ObservableCollection<ModelViewFun>();
+                }
+                else destModelView.GeneratedServices.Clear();
+                foreach (ModelViewFunSerializable srcProp in srcModelView.RootEntityFunctions)
+                {
+                    destModelView.RootEntityFunctions.Add(srcProp.ModelViewFunSerializableAssingTo(new ModelViewFun()));
                 }
             }
 
@@ -1348,7 +1453,6 @@ namespace CS82ANGULAR.Helpers
             dest.SrvDefaultProjectNameSpace = src.SrvDefaultProjectNameSpace;
             return dest;
         }
-
         public static List<ModelViewSerializable> GetViewsByForeignNameChain(this DbContextSerializable context, string ViewName, string foreignKeyNameChain)
         {
             if ((context == null) || (string.IsNullOrEmpty(ViewName)))
@@ -1584,7 +1688,6 @@ namespace CS82ANGULAR.Helpers
             }
             return result;
         }
-
         public static List<ModelViewUIFormPropertySerializable> ListModelViewForeignKeySerializableGetCopy(this List<ModelViewUIFormPropertySerializable> UIFormProperties)
         {
             List<ModelViewUIFormPropertySerializable> result = new List<ModelViewUIFormPropertySerializable>();
@@ -1637,6 +1740,48 @@ namespace CS82ANGULAR.Helpers
             }
             return result;
         }
+        public static List<ModelViewFunParamSerializable> ListModelViewFunParamSerializableGetCopy(this List<ModelViewFunParamSerializable> funcParams)
+        {
+            List<ModelViewFunParamSerializable> result = new List<ModelViewFunParamSerializable>();
+            if (funcParams == null) return result;
+            foreach (ModelViewFunParamSerializable funcParam in funcParams)
+            {
+                ModelViewFunParamSerializable dest = new ModelViewFunParamSerializable()
+                {
+                    ParamOrder = funcParam.ParamOrder,
+                    OriginalParamName = funcParam.OriginalParamName,
+                    TypeFullName = funcParam.TypeFullName,
+                    UnderlyingTypeName = funcParam.UnderlyingTypeName,
+                    IsNullable = funcParam.IsNullable,
+                    IsInParam = funcParam.IsInParam,
+                    IsOutParam = funcParam.IsOutParam
+                };
+                result.Add(dest);
+            }
+            return result;
+
+        }
+        public static List<ModelViewFunSerializable> ListModelViewFunSerializableGetCopy(this List<ModelViewFunSerializable> funcProperties)
+        {
+            List<ModelViewFunSerializable> result = new List<ModelViewFunSerializable>();
+            if (funcProperties == null) return result;
+            foreach (ModelViewFunSerializable funcPropertie in funcProperties)
+            {
+                ModelViewFunSerializable dest = new ModelViewFunSerializable()
+                {
+                    FunName = funcPropertie.FunName,
+                    IsSub = funcPropertie.IsSub,
+                    IsConstructor = funcPropertie.IsConstructor,
+                    RetTypeFullName = funcPropertie.RetTypeFullName,
+                    RetUnderlyingTypeName = funcPropertie.RetUnderlyingTypeName,
+                    
+                };
+                dest.FunParams = ListModelViewFunParamSerializableGetCopy(funcPropertie.FunParams);
+                result.Add(dest);
+            }
+            return result;
+
+        }
         public static ModelViewSerializable ModelViewSerializableGetCopy(this ModelViewSerializable srcModelViewSerializable, string destinationProject, string defaultProjectNameSpace, string destinationFolder, string dbSetProppertyName, SolutionCodeElement SelectedEntity)
         {
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
@@ -1685,6 +1830,7 @@ namespace CS82ANGULAR.Helpers
             result.UniqueKeys = ListModelViewUniqueKeySerializableGetCopy(srcModelViewSerializable.UniqueKeys);
             result.UIFormProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIFormProperties);
             result.UIListProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIListProperties);
+            result.RootEntityFunctions = ListModelViewFunSerializableGetCopy(srcModelViewSerializable.RootEntityFunctions);
             return result;
         }
         public static ModelViewSerializable ModelViewSerializableSimpleGetCopy(this ModelViewSerializable srcModelViewSerializable, string destinationProject, string defaultProjectNameSpace, string destinationFolder)
@@ -1732,6 +1878,7 @@ namespace CS82ANGULAR.Helpers
             result.UniqueKeys = ListModelViewUniqueKeySerializableGetCopy(srcModelViewSerializable.UniqueKeys);
             result.UIFormProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIFormProperties);
             result.UIListProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIListProperties);
+            result.RootEntityFunctions = ListModelViewFunSerializableGetCopy(srcModelViewSerializable.RootEntityFunctions);
             return result;
         }
         public static ModelViewAttribute CloneModelViewAttribute(this ModelViewAttribute src)

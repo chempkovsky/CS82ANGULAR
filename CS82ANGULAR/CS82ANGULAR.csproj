@@ -85,6 +85,8 @@
     <Compile Include="Model\GeneratedDto.cs" />
     <Compile Include="Model\GeneratedService.cs" />
     <Compile Include="Model\GenTypeItem.cs" />
+    <Compile Include="Model\ModelViewFun.cs" />
+    <Compile Include="Model\ModelViewFunParam.cs" />
     <Compile Include="Model\Serializable\Angular\AngularJson.cs" />
     <Compile Include="Model\Serializable\Angular\AngularProject.cs" />
     <Compile Include="Model\Serializable\Angular\AngularPublicApiExportItem.cs" />
@@ -131,6 +133,8 @@
     <Compile Include="Model\Serializable\ModelViewFAPIAttributePropertySerializable.cs" />
     <Compile Include="Model\Serializable\ModelViewFAPIAttributeSerializable.cs" />
     <Compile Include="Model\Serializable\ModelViewForeignKeySerializable.cs" />
+    <Compile Include="Model\Serializable\ModelViewFunParamSerializable.cs" />
+    <Compile Include="Model\Serializable\ModelViewFunSerializable.cs" />
     <Compile Include="Model\Serializable\ModelViewKeyPropertySerializable.cs" />
     <Compile Include="Model\Serializable\ModelViewPropertyOfFkSerializable.cs" />
     <Compile Include="Model\Serializable\ModelViewPropertyOfVwSerializable.cs" />
@@ -4473,7 +4477,7 @@
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties templates_4batchjavascriptstmplst_400000-contextleveltmplts_400200-app-glbl-auth_1json__JsonSchema="https://beaujs.com/schema.json" templates_4batchjavascriptstmplst_401000-viewmodelleveltmplts_401600-lform_1json__JsonSchema="https://download.stackhawk.com/hawk/jsonschema/hawkconfig.json" />
+      <UserProperties templates_4batchjavascriptstmplst_401000-viewmodelleveltmplts_401600-lform_1json__JsonSchema="https://download.stackhawk.com/hawk/jsonschema/hawkconfig.json" templates_4batchjavascriptstmplst_400000-contextleveltmplts_400200-app-glbl-auth_1json__JsonSchema="https://beaujs.com/schema.json" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
