@@ -894,6 +894,21 @@
             }
             return rslt;
         }
+        string AbpSecondItemOfNameSpace(string inpt)
+        {
+            string rslt = "";
+            if (!string.IsNullOrEmpty(inpt))
+            {
+                string[] itms = inpt.Split('.');
+                if(itms.Length > 1)
+                {
+                    rslt = itms[1];
+                } else if(itms.Length > 0) {
+                    rslt = itms[0];
+                }
+            }
+            return rslt;
+        }
         ModelViewFunSerializable GetConstructorWithMaxInputParams(ModelViewSerializable model)
         {
             if (model == null)  return null;

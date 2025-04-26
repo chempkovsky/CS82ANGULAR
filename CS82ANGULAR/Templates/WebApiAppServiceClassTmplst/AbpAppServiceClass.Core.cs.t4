@@ -69,7 +69,7 @@ using Microsoft.AspNetCore.Authorization;
         GetModelUniqueKeys(Model, uniqueKeys);
     }
 
-    string moduleName = AbpFirstItemOfNameSpace(appServiceNameSpace);
+    string moduleName = AbpSecondItemOfNameSpace(appServiceNameSpace);
 
 
 #>
@@ -958,7 +958,7 @@ namespace <#= appServiceNameSpace #> {
                 if (constructorFnc.FunParams.Count > 0) {
                     useConstructor = true;
                     foreach(ModelViewFunParamSerializable chngValFncPrm in constructorFnc.FunParams) {
-                        if (GetMappedScalarPro(Model, ChangeValPrmPrefix, constructorFnc.OriginalParamName) == null) {
+                        if (GetMappedScalarPro(Model, ChangeValPrmPrefix, chngValFncPrm.OriginalParamName) == null) {
                             useConstructor = false;
                             break;
                         }
@@ -979,9 +979,9 @@ namespace <#= appServiceNameSpace #> {
 #>
                 <#= Model.RootEntityClassName#> entityToAdd = new <#= Model.RootEntityClassName #>(
 <#
-                    bool isCnstrctrFrst = true;
-                    foreach(ModelViewFunParamSerializable constructorFnc in constructorFnc.FunParams) {
-                        ModelViewPropertyOfVwSerializable prop = GetMappedScalarPro(Model, ChangeValPrmPrefix, constructorFnc.OriginalParamName);
+                    bool isCnstrctrFrst = true; 
+                    foreach(ModelViewFunParamSerializable constructorFncPrm in constructorFnc.FunParams) {
+                        ModelViewPropertyOfVwSerializable prop = GetMappedScalarPro(Model, ChangeValPrmPrefix, constructorFncPrm.OriginalParamName);
 #>
                         <# if(isCnstrctrFrst) { isCnstrctrFrst = false; } else {#> ,  <#} #>viewToUpdate.<#= GetTypeScriptPropertyName(prop, Model) #>
 <#
