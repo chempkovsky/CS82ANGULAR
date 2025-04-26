@@ -69,7 +69,7 @@ using Microsoft.AspNetCore.Authorization;
         GetModelUniqueKeys(Model, uniqueKeys);
     }
 
-    string moduleName = AbpSecondItemOfNameSpace(appServiceNameSpace);
+    string moduleName = AbpLastItemOfNameSpace(appServiceNameSpace);
 
 
 #>
@@ -827,7 +827,7 @@ namespace <#= appServiceNameSpace #> {
                 if (chngValFnc.FunParams.Count > 0) {
                     useChngValFnc = true;
                     foreach(ModelViewFunParamSerializable chngValFncPrm in chngValFnc.FunParams) {
-                        if (GetMappedScalarPro(Model, ChangeValPrmPrefix, chngValFncPrm.OriginalParamName) == null) {
+                        if (GetMappedScalarProp(Model, ChangeValPrmPrefix, chngValFncPrm.OriginalParamName) == null) {
                             useChngValFnc = false;
                             break;
                         }
@@ -842,7 +842,7 @@ namespace <#= appServiceNameSpace #> {
 <#
                     bool isFrst = true;
                     foreach(ModelViewFunParamSerializable chngValFncPrm in chngValFnc.FunParams) {
-                        ModelViewPropertyOfVwSerializable prop = GetMappedScalarPro(Model, ChangeValPrmPrefix, chngValFncPrm.OriginalParamName);
+                        ModelViewPropertyOfVwSerializable prop = GetMappedScalarProp(Model, ChangeValPrmPrefix, chngValFncPrm.OriginalParamName);
 #>
                         <# if(isFrst) { isFrst = false; } else {#> ,  <#} #>viewToUpdate.<#= GetTypeScriptPropertyName(prop, Model) #>
 <#
@@ -958,7 +958,7 @@ namespace <#= appServiceNameSpace #> {
                 if (constructorFnc.FunParams.Count > 0) {
                     useConstructor = true;
                     foreach(ModelViewFunParamSerializable chngValFncPrm in constructorFnc.FunParams) {
-                        if (GetMappedScalarPro(Model, ChangeValPrmPrefix, chngValFncPrm.OriginalParamName) == null) {
+                        if (GetMappedScalarProp(Model, ChangeValPrmPrefix, chngValFncPrm.OriginalParamName) == null) {
                             useConstructor = false;
                             break;
                         }
@@ -981,7 +981,7 @@ namespace <#= appServiceNameSpace #> {
 <#
                     bool isCnstrctrFrst = true; 
                     foreach(ModelViewFunParamSerializable constructorFncPrm in constructorFnc.FunParams) {
-                        ModelViewPropertyOfVwSerializable prop = GetMappedScalarPro(Model, ChangeValPrmPrefix, constructorFncPrm.OriginalParamName);
+                        ModelViewPropertyOfVwSerializable prop = GetMappedScalarProp(Model, ChangeValPrmPrefix, constructorFncPrm.OriginalParamName);
 #>
                         <# if(isCnstrctrFrst) { isCnstrctrFrst = false; } else {#> ,  <#} #>viewToUpdate.<#= GetTypeScriptPropertyName(prop, Model) #>
 <#

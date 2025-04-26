@@ -8106,7 +8106,7 @@ namespace CS82ANGULAR.Model
         }
 
 
-        ModelViewPropertyOfVwSerializable GetMappedScalarPro(ModelViewSerializable model, string ChangeValPrmPrefix, string prmName)
+        ModelViewPropertyOfVwSerializable GetMappedScalarProp(ModelViewSerializable model, string ChangeValPrmPrefix, string prmName)
         {
             if ((model == null) || (string.IsNullOrEmpty(prmName))) return null;
             if (model.ScalarProperties == null) return null;

@@ -909,6 +909,19 @@
             }
             return rslt;
         }
+        string AbpLastItemOfNameSpace(string inpt)
+        {
+            string rslt = "";
+            if (!string.IsNullOrEmpty(inpt))
+            {
+                string[] itms = inpt.Split('.');
+                if(itms.Length > 0)
+                {
+                    rslt = itms[itms.Length - 1];
+                }
+            }
+            return rslt;
+        }
         ModelViewFunSerializable GetConstructorWithMaxInputParams(ModelViewSerializable model)
         {
             if (model == null)  return null;
@@ -957,7 +970,7 @@
             }
             return rslt;
         }
-        ModelViewPropertyOfVwSerializable GetMappedScalarPro(ModelViewSerializable model, string ChangeValPrmPrefix, string prmName)
+        ModelViewPropertyOfVwSerializable GetMappedScalarProp(ModelViewSerializable model, string ChangeValPrmPrefix, string prmName)
         {
             if ((model == null) || (string.IsNullOrEmpty(prmName))) return null;
             if (model.ScalarProperties == null) return null;
