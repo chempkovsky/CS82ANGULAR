@@ -219,7 +219,7 @@
 #>
     { path: '<#= node.Item2 + "/" + VPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', canActivate:[<#= appSettingServiceClassName + "CanActivateFn" #>],
         <#= rvLazyModuleImport #>,
-        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'v', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'View <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>', <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
+        data: {<#= routePermission #>:'<#= AbpLastItemOfDefaultProjectNameSpace(aModel) #>.<#= aModel.ViewName #>', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'v', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'View <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>', <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
                     } else {
@@ -245,7 +245,7 @@
 #>
     { path: '<#= node.Item2 + "/" + APrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() #>', canActivate:[<#= appSettingServiceClassName + "CanActivateFn" #>],
         <#= raLazyModuleImport #>,
-        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>.a', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'a', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'Add <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
+        data: {<#= routePermission #>:'<#= AbpLastItemOfDefaultProjectNameSpace(aModel) #>.<#= aModel.ViewName #>.a', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'a', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'Add <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
                     } else {
@@ -271,7 +271,7 @@
 #>
     { path: '<#= node.Item2 + "/" + UPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', canActivate:[<#= appSettingServiceClassName + "CanActivateFn" #>],
         <#= ruLazyModuleImport #>,
-        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>.u', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'u', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'Update <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
+        data: {<#= routePermission #>:'<#= AbpLastItemOfDefaultProjectNameSpace(aModel) #>.<#= aModel.ViewName #>.u', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'u', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'Update <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
                     } else {
@@ -297,7 +297,7 @@
 #>
     { path: '<#= node.Item2 + "/" + DPrefix + aModel.ViewName + "/:" + HiddenFilterPrefix + CurrDepth.ToString() + "/:" + IdPrefix + CurrDepth.ToString() #>', canActivate:[<#= appSettingServiceClassName + "CanActivateFn" #>],
         <#= rdLazyModuleImport #>,
-        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>.d', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'd', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'Delete <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
+        data: {<#= routePermission #>:'<#= AbpLastItemOfDefaultProjectNameSpace(aModel) #>.<#= aModel.ViewName #>.d', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'd', /* <#= routeShowFilterPropName #>: true,  <#= TitlePropName #>: 'Delete <#= aModel.Title #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + CurrDepth.ToString() #>',  <#= IdPrefix #>: '<#= IdPrefix + CurrDepth.ToString() #>',  <#= routeDepthParamName #>: <#= CurrDepth.ToString() #>}},
 
 <#
                     } else {
@@ -320,7 +320,7 @@
 #>
     { path: '<#= node.Item2 #>', canActivate:[<#= appSettingServiceClassName + "CanActivateFn" #>], 
         <#= rlLazyModuleImport #>,
-        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true,  <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 16, <#= routeMinHeightPropName #>: 8, <#= routeShowFilterPropName #>: true, /*  <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + node.Item3.ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+        data: {<#= routePermission #>:'<#= AbpLastItemOfDefaultProjectNameSpace(aModel) #>.<#= aModel.ViewName #>', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true,  <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 16, <#= routeMinHeightPropName #>: 8, <#= routeShowFilterPropName #>: true, /*  <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */ <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + node.Item3.ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
 
@@ -328,7 +328,7 @@
 #>
     { path: '<#= node.Item2 #>', canActivate:[<#= appSettingServiceClassName + "CanActivateFn" #>], 
         <#= rlLazyModuleImport #>,
-        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true,  <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 16, <#= routeMinHeightPropName #>: 8, <#= routeShowFilterPropName #>: true, /* <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
+        data: {<#= routePermission #>:'<#= AbpLastItemOfDefaultProjectNameSpace(aModel) #>.<#= aModel.ViewName #>', <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true,  <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 16, <#= routeMinHeightPropName #>: 8, <#= routeShowFilterPropName #>: true, /* <#= TitlePropName #>: '<#= aModel.PluralTitle #>', */  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' }  },
 
 <#
                 } // if(node.Item3 > 1) { ... } else { ... }

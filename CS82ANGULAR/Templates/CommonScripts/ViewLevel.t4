@@ -8008,9 +8008,41 @@
             }
             return rslt;
         }
+        string AbpSecondItemOfNameSpace(string inpt)
+        {
+            string rslt = "";
+            if (!string.IsNullOrEmpty(inpt))
+            {
+                string[] itms = inpt.Split('.');
+                if(itms.Length > 1)
+                {
+                    rslt = itms[1];
+                } else if(itms.Length > 0) {
+                    rslt = itms[0];
+                }
+            }
+            return rslt;
+        }
+        string AbpLastItemOfNameSpace(string inpt)
+        {
+            string rslt = "";
+            if (!string.IsNullOrEmpty(inpt))
+            {
+                string[] itms = inpt.Split('.');
+                if(itms.Length > 0)
+                {
+                    rslt = itms[itms.Length - 1];
+                }
+            }
+            return rslt;
+        }
         string AbpFirstItemOfDestinationNameSpace(ModelViewSerializable model) {
             if (model == null) return "";
             return AbpFirstItemOfNameSpace(GetDestinationNameSpace(model));
+        }
+        string AbpLastItemOfDefaultProjectNameSpace(ModelViewSerializable model) {
+            if (model == null) return "";
+            return AbpLastItemOfNameSpace(model.WebApiServiceDefaultProjectNameSpace);
         }
         bool CheckRequireTree(ModelViewSerializable model)
         {

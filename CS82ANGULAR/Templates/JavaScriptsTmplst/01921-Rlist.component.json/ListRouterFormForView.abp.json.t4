@@ -202,7 +202,7 @@
     string OutletNameValue = LOutletNamePrefix + Model.ViewName;
 
     string DlgSrvPrefix                 = "dlgSrv";
-    string apiName                      = AbpFirstItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
+    string apiName                      = AbpLastItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
 
 #>
 

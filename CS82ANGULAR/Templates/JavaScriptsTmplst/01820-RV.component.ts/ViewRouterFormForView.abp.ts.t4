@@ -117,7 +117,7 @@
     List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
         GetSearchResources(Model, Context);
     string DlgSrvPrefix                         = "dlgSrv";
-    string apiName                              = AbpFirstItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
+    string apiName                              = AbpLastItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
 
 #>
 

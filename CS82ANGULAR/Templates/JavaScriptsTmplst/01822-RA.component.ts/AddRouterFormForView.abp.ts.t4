@@ -92,7 +92,7 @@
     string aformComponentClassName              = GetComponentClassNameWithAnglr(AngularJsonFile, Model, aformComponentFolder, raComponentFolder);
 
     string DlgSrvPrefix                         = "dlgSrv";
-    string apiName                              = AbpFirstItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
+    string apiName                              = AbpLastItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
 
     List<ModelViewPropertyOfVwSerializable> primKeys= GetModelPrimaryKeyProps(Model);
 #>

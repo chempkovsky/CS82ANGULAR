@@ -238,7 +238,7 @@
     string viewServiceFolder                        = "01400-.service.ts";
     string serviceClassName                         = GetServiceClassNameWithAnglr(AngularJsonFile, Model, viewServiceFolder, sformComponentFolder);
 
-    string apiName                                  = AbpFirstItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
+    string apiName                                  = AbpLastItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
 
     string ActionColumnDefProperty      = "menuAction";
     string SelectColumnDefProperty      = "selectAction";

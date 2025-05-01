@@ -185,7 +185,7 @@ const routes: Routes = [
 //        outlet: '<#=  OutletNameValue #>',
         path: '<#= node.Item2 #>', 
         <#= rdlLazyModuleImport #>,
-        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(aModel) #>.<#= aModel.ViewName #>', <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, /* <#= routeOutletNmPropName #>: '<#=  OutletNameValue #>', */ <#= NavPrefix #>: '', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 16, <#= routeMinHeightPropName #>: 8, <#= routeShowFilterPropName #>: true, <# if(!localize) { #> <#= TitlePropName #>: <#= rdllzFrases #>['<#= "List" + aModel.ViewName #>'], <# } #> <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
+        data: {<#= routePermission #>:'<#= AbpLastItemOfDefaultProjectNameSpace(aModel) #>.<#= aModel.ViewName #>', <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= aModel.ViewName #>', <#= routeDataViewActionPropName #>: 'l', <#= routeDataShowMultiSelectPropName #>: true, /* <#= routeOutletNmPropName #>: '<#=  OutletNameValue #>', */ <#= NavPrefix #>: '', <#= routeFilterMaxHeightPropName #>: 2, <#= routeMaxHeightPropName #>: 16, <#= routeMinHeightPropName #>: 8, <#= routeShowFilterPropName #>: true, <# if(!localize) { #> <#= TitlePropName #>: <#= rdllzFrases #>['<#= "List" + aModel.ViewName #>'], <# } #> <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + (node.Item3+100).ToString() #>',  <#= routeDepthParamName #>: <#= node.Item3.ToString() #>, <#= uidParamName #>: '<#= Guid.NewGuid().ToString("N") #>' },
         canActivate: [<#= appSettingServiceClassName + "CanActivateFn" #>],
     },
 
@@ -220,7 +220,7 @@ const routes: Routes = [
 //        outlet: '<#=  OutletNameValue #>',
         path: '<#= viewCurrentPath #>', 
         <#= viewCurrentRvLazyModuleImport #>,
-        data: {<#= routePermission #>:'<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>', <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= Model.ViewName #>', <#= routeDataViewActionPropName #>: 'v', <#= NavPrefix #>: '',  <# if(!localize) { #>  <#= TitlePropName #>: <#= rdllzFrases #>['<#= "View" + Model.ViewName #>'], <# } #> <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + "102" #>',  <#= IdPrefix #>: '<#= IdPrefix + "102" #>', <#= routeDepthParamName #>: 1},
+        data: {<#= routePermission #>:'<#= AbpLastItemOfDefaultProjectNameSpace(Model) #>.<#= Model.ViewName #>', <#= IsDetailPropName #>: true, <#=routeDataViewNamePropName #>: '<#= Model.ViewName #>', <#= routeDataViewActionPropName #>: 'v', <#= NavPrefix #>: '',  <# if(!localize) { #>  <#= TitlePropName #>: <#= rdllzFrases #>['<#= "View" + Model.ViewName #>'], <# } #> <#= HiddenFilterPrefix #>: '<#= HiddenFilterPrefix + "102" #>',  <#= IdPrefix #>: '<#= IdPrefix + "102" #>', <#= routeDepthParamName #>: 1},
         canActivate: [<#= appSettingServiceClassName + "CanActivateFn" #>],
     },
 <#

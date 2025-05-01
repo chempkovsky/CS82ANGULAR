@@ -224,7 +224,7 @@
 
     string AppSettingServicePropName    = "appGlblSettings";
     string DlgSrvPrefix                 = "dlgSrv";
-    string apiName                      = AbpFirstItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
+    string apiName                      = AbpLastItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
 
 #>
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
@@ -608,8 +608,8 @@ if (HasFileUpload(Model)) {
 #>
         ];
         tmp = tmp.concat(this._<#= RowCommandsPropName #>);
-        tmp[0].enabled = this._<#= CanUpdPropName #> && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>.u')  <# if (!Model.IsWebApiUpdate) { #> && false <# } #>;
-        tmp[1].enabled = this._<#= CanDelPropName #> && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>.d') <# if (!Model.IsWebApiDelete) { #> && false <# } #>;
+        tmp[0].enabled = this._<#= CanUpdPropName #> && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpLastItemOfDefaultProjectNameSpace(Model) #>.<#= Model.ViewName #>.u')  <# if (!Model.IsWebApiUpdate) { #> && false <# } #>;
+        tmp[1].enabled = this._<#= CanDelPropName #> && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpLastItemOfDefaultProjectNameSpace(Model) #>.<#= Model.ViewName #>.d') <# if (!Model.IsWebApiDelete) { #> && false <# } #>;
         tmp[2].enabled = this._<#= CanViewPropName #> <# if (!Model.IsWebApiSelectOneByPrimarykey) { #> && false <# } #>;
         this.rowMenuItemsData = tmp;
     }
@@ -619,8 +619,8 @@ if (HasFileUpload(Model)) {
             {id: '<#= ActionParamDeleteMode #>', caption: this.<#= frasesPropName #>['<#= ActionParamDeleteMode #>'], iconName: 'fa-trash', iconColor: 'warning', enabled: true},
         ];
         tmp = tmp.concat(this._<#= TableCommandsPropName #>);
-        tmp[0].enabled = this._<#= CanAddPropName #> && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>.a') <# if (!Model.IsWebApiAdd) { #> && false <# } #>;
-        tmp[1].enabled = this._<#= CanDelPropName #> && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>.d') <# if (!Model.IsWebApiDelete) { #> && false <# } #>;
+        tmp[0].enabled = this._<#= CanAddPropName #> && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpLastItemOfDefaultProjectNameSpace(Model) #>.<#= Model.ViewName #>.a') <# if (!Model.IsWebApiAdd) { #> && false <# } #>;
+        tmp[1].enabled = this._<#= CanDelPropName #> && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpLastItemOfDefaultProjectNameSpace(Model) #>.<#= Model.ViewName #>.d') <# if (!Model.IsWebApiDelete) { #> && false <# } #>;
         this.tableMenuItemsData = tmp;
     }
     

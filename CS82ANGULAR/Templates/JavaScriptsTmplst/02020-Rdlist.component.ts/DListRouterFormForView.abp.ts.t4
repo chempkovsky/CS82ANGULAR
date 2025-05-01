@@ -249,7 +249,7 @@
 
     string OutletNameValue = DlOutletNamePrefix + Model.ViewName;
     string DlgSrvPrefix                 = "dlgSrv";
-    string apiName                      = AbpFirstItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
+    string apiName                      = AbpLastItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
     string PermissionServicePropName    = "pmssnSrvs";
 
 #>
@@ -722,11 +722,11 @@ if (HasFileUpload(Model)) {
             }
         }
         
-        this.tableMenuItemsData[0].enabled = this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>.a') && (!this.extfltrOn) <# if (!Model.IsWebApiAdd) { #> && false <# } #>;
-        this.tableMenuItemsData[1].enabled = this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>.d') && (!this.extfltrOn) <# if (!Model.IsWebApiDelete) { #> && false <# } #>;
+        this.tableMenuItemsData[0].enabled = this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpLastItemOfDefaultProjectNameSpace(Model) #>.<#= Model.ViewName #>.a') && (!this.extfltrOn) <# if (!Model.IsWebApiAdd) { #> && false <# } #>;
+        this.tableMenuItemsData[1].enabled = this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpLastItemOfDefaultProjectNameSpace(Model) #>.<#= Model.ViewName #>.d') && (!this.extfltrOn) <# if (!Model.IsWebApiDelete) { #> && false <# } #>;
 
-        this.rowMenuItemsData[0].enabled = this.rowMenuItemsData[0].enabled && (!this.extfltrOn) && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>.u') <# if (!Model.IsWebApiUpdate) { #> && false <# } #>; // modify
-        this.rowMenuItemsData[1].enabled = this.rowMenuItemsData[1].enabled && (!this.extfltrOn) && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(Model) #>.<#= Model.ViewName #>.d') <# if (!Model.IsWebApiDelete) { #> && false <# } #>; // delete
+        this.rowMenuItemsData[0].enabled = this.rowMenuItemsData[0].enabled && (!this.extfltrOn) && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpLastItemOfDefaultProjectNameSpace(Model) #>.<#= Model.ViewName #>.u') <# if (!Model.IsWebApiUpdate) { #> && false <# } #>; // modify
+        this.rowMenuItemsData[1].enabled = this.rowMenuItemsData[1].enabled && (!this.extfltrOn) && this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpLastItemOfDefaultProjectNameSpace(Model) #>.<#= Model.ViewName #>.d') <# if (!Model.IsWebApiDelete) { #> && false <# } #>; // delete
         this.rowMenuItemsData[2].enabled = this.rowMenuItemsData[2].enabled && (!this.extfltrOn) <# if (!Model.IsWebApiSelectOneByPrimarykey) { #> && false <# } #>; // view
 
 <#
@@ -768,7 +768,7 @@ if (HasFileUpload(Model)) {
                             ModelViewSerializable viewToNavigate = GetViewByName(Context, tmpSearchSchema.Item2.ViewName);
 #>
             msk = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= viewToNavigate.ViewName #>');
-            if(this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(viewToNavigate) #>.<#= viewToNavigate.ViewName #>')) {
+            if(this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpLastItemOfDefaultProjectNameSpace(viewToNavigate) #>.<#= viewToNavigate.ViewName #>')) {
                 this.rowMenuItemsData.push(
                  { id: '<#= id #>', caption: this.<#= frasesPropName #>['<#= viewToNavigate.ViewName +"__"+ detailView.ViewName #>'], iconName: 'fa-arrow-circle-right', iconColor: 'primary', enabled: true, 
                     data: {
@@ -787,7 +787,7 @@ if (HasFileUpload(Model)) {
                     }
 #>
             msk = this.<#= AppSettingServicePropName #>.getViewModelMask('<#= detailViewName #>');
-            if(this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpFirstItemOfDestinationNameSpace(detailView) #>.<#= detailView.ViewName #>')) {
+            if(this.<#= PermissionServicePropName #>.getGrantedPolicy('<#= AbpLastItemOfDefaultProjectNameSpace(detailView) #>.<#= detailView.ViewName #>')) {
                 this.rowMenuItemsData.push(
                  { id: '<#= id #>', caption: this.<#= frasesPropName #>['<#= detailView.ViewName + foreignKey.NavigationName #>'], iconName: 'fa-arrow-circle-right', iconColor: 'primary', enabled: true, 
                     data: {

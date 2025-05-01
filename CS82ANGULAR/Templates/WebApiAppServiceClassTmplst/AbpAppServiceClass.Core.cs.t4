@@ -69,7 +69,7 @@ using Microsoft.AspNetCore.Authorization;
         GetModelUniqueKeys(Model, uniqueKeys);
     }
 
-    string moduleName = AbpLastItemOfNameSpace(appServiceNameSpace);
+    string moduleName = AbpLastItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
 
 
 #>
@@ -983,7 +983,7 @@ namespace <#= appServiceNameSpace #> {
                     foreach(ModelViewFunParamSerializable constructorFncPrm in constructorFnc.FunParams) {
                         ModelViewPropertyOfVwSerializable prop = GetMappedScalarProp(Model, ChangeValPrmPrefix, constructorFncPrm.OriginalParamName);
 #>
-                        <# if(isCnstrctrFrst) { isCnstrctrFrst = false; } else {#> ,  <#} #>viewToUpdate.<#= GetTypeScriptPropertyName(prop, Model) #>
+                        <# if(isCnstrctrFrst) { isCnstrctrFrst = false; } else {#> ,  <#} #>viewToAdd.<#= GetTypeScriptPropertyName(prop, Model) #>
 <#
                     }
 #>

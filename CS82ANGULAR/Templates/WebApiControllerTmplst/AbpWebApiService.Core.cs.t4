@@ -63,7 +63,7 @@ using Volo.Abp;
         GetModelUniqueKeys(Model, uniqueKeys);
     }
 
-    string moduleName = AbpFirstItemOfNameSpace(webApiNameSpace);
+    string moduleName = AbpLastItemOfNameSpace(Model.WebApiServiceDefaultProjectNameSpace);
 
 
 #>
