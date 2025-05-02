@@ -54,8 +54,10 @@ using Microsoft.AspNetCore.Authorization;
     bool EntHasTenantId = AbpHasMultiTenant(Model);
     string IdDataType = "";
     string EntityKey = "";
+    bool needGuidGenerator = false;
     if(EntHasId) {
         IdDataType = GetAbpIdDataType(Model);
+        needGuidGenerator =  IdDataType == "System.Guid";
         EntityKey = ", " + IdDataType;
     }
 
@@ -154,11 +156,27 @@ namespace <#= appServiceNameSpace #> {
         // private IRepository<<#= Model.RootEntityClassName #><#= EntityKey #>> repo;
         // public <#= AbpServiceName(Model) #>(IRepository<<#= Model.RootEntityClassName #><#= EntityKey #>> _repo) { repo = _repo; }
 
+<#
+    if (needGuidGenerator) {
+#>
+        private readonly IGuidGenerator _guidGenerator;
+<#
+    }
+#>
+
         private <#= AbpRepositoryInterfaceName(Model) #> repo;
 
-        public <#= AbpServiceName(Model) #>(<#= AbpRepositoryInterfaceName(Model) #> _repo)
+        public <#= AbpServiceName(Model) #>(<#= AbpRepositoryInterfaceName(Model) #> _repo <# if (needGuidGenerator) { #>, IGuidGenerator guidGenerator  <# } #> )
         {
             repo = _repo;
+<#
+    if (needGuidGenerator) {
+#>
+            this._guidGenerator = guidGenerator;
+<#
+    }
+#>
+
         }
 
 <# 
@@ -982,6 +1000,20 @@ namespace <#= appServiceNameSpace #> {
                     bool isCnstrctrFrst = true; 
                     foreach(ModelViewFunParamSerializable constructorFncPrm in constructorFnc.FunParams) {
                         ModelViewPropertyOfVwSerializable prop = GetMappedScalarProp(Model, ChangeValPrmPrefix, constructorFncPrm.OriginalParamName);
+                        ModelViewEntityPropertySerializable entityProp =  GetRootEntityProperty(prop, Model);
+                        if(entityProp != null) {
+                            if (needGuidGenerator) {
+                                if (EntHasId) {
+                                    if ("Id" == entityProp.OriginalPropertyName) {
+                                        if(entityProp.UnderlyingTypeName == "System.Guid") {
+#>
+                        <# if(isCnstrctrFrst) { isCnstrctrFrst = false; } else {#> ,  <#} #>_guidGenerator.Create()
+<#
+                                            continue;
+                                        }
+                                    }
+                                }
+                            }
 #>
                         <# if(isCnstrctrFrst) { isCnstrctrFrst = false; } else {#> ,  <#} #>viewToAdd.<#= GetTypeScriptPropertyName(prop, Model) #>
 <#
@@ -1000,7 +1032,12 @@ namespace <#= appServiceNameSpace #> {
                     if("TenantId" == entityProp.OriginalPropertyName) continue;
                     if (EntHasId) {
                         if ("Id" == entityProp.OriginalPropertyName) {
-                            if(entityProp.UnderlyingTypeName == "System.Guid") continue;
+                            if(entityProp.UnderlyingTypeName == "System.Guid") {
+#>
+                entityToAdd.<#=  entityProp.OriginalPropertyName #> = _guidGenerator.Create();
+<#
+                                continue;
+                            }
                         }
                     }
                 
