@@ -1007,7 +1007,7 @@ namespace <#= appServiceNameSpace #> {
                                     if ("Id" == entityProp.OriginalPropertyName) {
                                         if(entityProp.UnderlyingTypeName == "System.Guid") {
 #>
-                        <# if(isCnstrctrFrst) { isCnstrctrFrst = false; } else {#> ,  <#} #>_guidGenerator.Create()
+                        <# if(isCnstrctrFrst) { isCnstrctrFrst = false; } else { #> ,  <# } #>_guidGenerator.Create()
 <#
                                             continue;
                                         }
@@ -1015,8 +1015,9 @@ namespace <#= appServiceNameSpace #> {
                                 }
                             }
 #>
-                        <# if(isCnstrctrFrst) { isCnstrctrFrst = false; } else {#> ,  <#} #>viewToAdd.<#= GetTypeScriptPropertyName(prop, Model) #>
+                        <# if(isCnstrctrFrst) { isCnstrctrFrst = false; } else { #> ,  <# } #>viewToAdd.<#= GetTypeScriptPropertyName(prop, Model) #>
 <#
+                        }
                     }
 #>
                 );
