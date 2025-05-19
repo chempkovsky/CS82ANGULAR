@@ -58,7 +58,7 @@ import { <#= viewInterfaceName #> } from '<#= GetFolderNameWithAnglr(AngularJson
 
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, adddlgHtmlFolder, adddlgComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderName(Model, adddlgCssFolder, adddlgComponentFolder) #>.css']
+  styleUrls: ['<#= GetFolderName(Model, adddlgCssFolder, adddlgComponentFolder) #>.scss']
 })
 export class <#= componentClassName #>  {
     @ViewChild(<#= addformComponentClassName #>) childForm: <#= addformComponentClassName #>|any;

@@ -123,7 +123,7 @@ import { MatSelectChange } from '@angular/material/select';
 
   selector: 'app-<#= filterComponentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterComponentHtmlFolder, filterComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterComponentCssFolder, filterComponentFolder) #>.css']
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, filterComponentCssFolder, filterComponentFolder) #>.scss']
 })
 export class <#= filterComponentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #> {
     protected isOnInitCalled: boolean = false;

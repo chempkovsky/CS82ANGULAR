@@ -43,7 +43,7 @@ import { <#= messageDialogDataModelClassName #> } from '<#= GetFolderNameWithAng
 
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, messageDialogComponentHtmlFolder, messageDialogComponentFolder)#>.html',
-  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, messageDialogComponentCssFolder, messageDialogComponentFolder)#>.css']
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, messageDialogComponentCssFolder, messageDialogComponentFolder)#>.scss']
 })
 export class <#= messageDialogComponentClassName #> extends DialogContentBase  {
     @Input('data')

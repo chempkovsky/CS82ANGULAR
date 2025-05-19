@@ -53,7 +53,7 @@ import { <#= viewInterfaceName #> } from '<#= GetFolderNameWithAnglr(AngularJson
 
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, deldlgHtmlFolder, deldlgComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderName(Model, deldlgCssFolder, deldlgComponentFolder) #>.css']
+  styleUrls: ['<#= GetFolderName(Model, deldlgCssFolder, deldlgComponentFolder) #>.scss']
 })
 export class <#= componentClassName #> extends DialogContentBase  {
     @ViewChild(<#= delformComponentClassName #>) childForm: <#= delformComponentClassName #>|any;

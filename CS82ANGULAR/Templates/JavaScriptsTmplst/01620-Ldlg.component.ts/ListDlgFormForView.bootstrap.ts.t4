@@ -48,7 +48,7 @@ import { <#= viewInterfaceDlgClassName #> } from '<#= GetFolderNameWithAnglr(Ang
 
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, ldlgHtmlFolder, ldlgComponentFolder)#>.html',
-  styleUrls: ['<#= GetFolderName(Model, ldlgCssFolder, ldlgComponentFolder)#>.css']
+  styleUrls: ['<#= GetFolderName(Model, ldlgCssFolder, ldlgComponentFolder)#>.scss']
 })
 export class <#= componentClassName #> { 
     @Input('data')

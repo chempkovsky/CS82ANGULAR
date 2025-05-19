@@ -63,7 +63,7 @@ import { <#= appChangePasswordModelClassName #> } from '<#= GetFolderNameWithAng
 
   selector: 'app-<#= appChangePasswordComponentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appChangePasswordHtmlComponentFolder, appChangePasswordComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appChangePasswordCssComponentFolder, appChangePasswordComponentFolder) #>.css']
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appChangePasswordCssComponentFolder, appChangePasswordComponentFolder) #>.scss']
 })
 export class <#= appChangePasswordComponentClassName #> {
 <# 

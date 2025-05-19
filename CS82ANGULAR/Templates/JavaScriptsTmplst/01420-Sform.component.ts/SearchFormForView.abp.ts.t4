@@ -380,7 +380,7 @@ import { NzFormatEmitEvent } from 'ng-zorro-antd/tree';
 <# } #>
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, sformHtmlFolder, sformComponentFolder)#>.html',
-  styleUrls: ['<#=  GetFolderName(Model, sformCssFolder, sformComponentFolder)#>.css'],
+  styleUrls: ['<#=  GetFolderName(Model, sformCssFolder, sformComponentFolder)#>.scss'],
 })
 export class <#= componentClassName #> implements OnInit, AfterViewInit,  <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
 

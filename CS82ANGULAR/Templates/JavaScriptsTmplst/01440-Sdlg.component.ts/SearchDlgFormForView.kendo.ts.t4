@@ -49,7 +49,7 @@ import { <#= viewInterfaceName #> } from '<#=  GetFolderNameWithAnglr(AngularJso
 
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, sdlgHtmlFolder, sdlgComponentFolder)#>.html',
-  styleUrls: ['<#= GetFolderName(Model, sdlgCssFolder, sdlgComponentFolder)#>.css']
+  styleUrls: ['<#= GetFolderName(Model, sdlgCssFolder, sdlgComponentFolder)#>.scss']
 })
 
 export class <#= componentClassName #> extends DialogContentBase { 

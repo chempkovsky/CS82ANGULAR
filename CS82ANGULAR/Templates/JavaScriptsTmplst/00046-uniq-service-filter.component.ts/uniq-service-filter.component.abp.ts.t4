@@ -146,7 +146,7 @@ import { <#= eventEmitterPubModelClassName #> } from '<#= GetFolderNameWithAnglr
 <# } #>
   selector: 'app-<#= filterComponentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterComponentHtmlFolder, uniqFilterComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterComponentCssFolder, uniqFilterComponentFolder) #>.css']
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, uniqFilterComponentCssFolder, uniqFilterComponentFolder) #>.scss']
 })
 export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #> {
     protected isOnInitCalled: boolean = false;

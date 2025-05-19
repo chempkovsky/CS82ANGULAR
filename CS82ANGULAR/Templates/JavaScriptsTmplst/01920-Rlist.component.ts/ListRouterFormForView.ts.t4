@@ -246,7 +246,7 @@ import { <#=  GetServiceClassNameExWithAnglrEx(AngularJsonFile, Context, m2mMode
 
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, rlistHtmlFolder, rlistComponentFolder)#>.html',
-  styleUrls: ['<#=  GetFolderName(Model, rlistCssFolder, rlistComponentFolder)#>.css']
+  styleUrls: ['<#=  GetFolderName(Model, rlistCssFolder, rlistComponentFolder)#>.scss']
 })
 export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
 <# 

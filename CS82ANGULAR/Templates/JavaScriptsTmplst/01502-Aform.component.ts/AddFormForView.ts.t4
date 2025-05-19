@@ -323,7 +323,7 @@ import { <#=  GetInterfaceDlgNameExWithAnglrEx(AngularJsonFile, Context, viewNm,
 
   selector: 'app-<#= componentSelectorCommonPart#>',
   templateUrl: '<#= GetFolderName(Model, addformHtmlFolder, addformComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderName(Model, addformCssFolder, addformComponentFolder) #>.css']
+  styleUrls: ['<#= GetFolderName(Model, addformCssFolder, addformComponentFolder) #>.scss']
 })
 export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEmitterPubModelClassName #> {
 

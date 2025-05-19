@@ -38,7 +38,7 @@ import { Component } from '@angular/core';
 
   selector: 'app-<#= pagenotfoundComponentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, pagenotfoundComponentHtmlFolder, pagenotfoundComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, pagenotfoundComponentCssFolder, pagenotfoundComponentFolder) #>.css']
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, pagenotfoundComponentCssFolder, pagenotfoundComponentFolder) #>.scss']
 })
 export class <#= pagenotfoundComponentClassName #>  {
 }

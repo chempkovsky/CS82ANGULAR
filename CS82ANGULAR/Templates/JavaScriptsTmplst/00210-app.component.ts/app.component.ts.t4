@@ -45,7 +45,7 @@ import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(An
 
   selector: 'app-root',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appHtmlComponentFolder, appComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appCssComponentFolder, appComponentFolder) #>.css']
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appCssComponentFolder, appComponentFolder) #>.scss']
 })
 export class AppComponent {
     apptitle = 'LitApp';

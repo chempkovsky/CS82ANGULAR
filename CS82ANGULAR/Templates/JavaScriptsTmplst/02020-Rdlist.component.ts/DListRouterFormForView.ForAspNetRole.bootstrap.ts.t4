@@ -321,7 +321,7 @@ import { <#=  dModSrvClassName #> } from '<#= GetFolderNameWithAnglr(AngularJson
 
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, rdlistHtmlFolder, rdlistComponentFolder)#>.html',
-  styleUrls: ['<#=  GetFolderName(Model, rdlistCssFolder, rdlistComponentFolder)#>.css']
+  styleUrls: ['<#=  GetFolderName(Model, rdlistCssFolder, rdlistComponentFolder)#>.scss']
 })
 export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
 <# 

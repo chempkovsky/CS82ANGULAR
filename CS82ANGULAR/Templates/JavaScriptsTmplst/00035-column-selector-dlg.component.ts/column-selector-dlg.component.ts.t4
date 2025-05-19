@@ -44,7 +44,7 @@ import { <#= GetComponentClassNameWithAnglr(AngularJsonFile, Model, columnSelect
 
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorDlgHtmlComponentFolder, columnSelectorDlgComponentFolder)#>.html',
-  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorDlgCssComponentFolder, columnSelectorDlgComponentFolder)#>.css']
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorDlgCssComponentFolder, columnSelectorDlgComponentFolder)#>.scss']
 })
 
 export class <#= columnSelectorDlgComponentClassName #> { 

@@ -118,7 +118,7 @@ import { <#= aformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(Angu
 
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, raHtmlFolder, raComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderName(Model, raCssFolder, raComponentFolder) #>.css']
+  styleUrls: ['<#= GetFolderName(Model, raCssFolder, raComponentFolder) #>.scss']
 })
 
 export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #> {

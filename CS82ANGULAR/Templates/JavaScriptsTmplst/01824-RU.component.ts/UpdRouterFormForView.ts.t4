@@ -114,7 +114,7 @@ import { <#= uformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(Angu
 
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, ruHtmlFolder, ruComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderName(Model, ruCssFolder, ruComponentFolder) #>.css']
+  styleUrls: ['<#= GetFolderName(Model, ruCssFolder, ruComponentFolder) #>.scss]
 })
 
 export class <#= componentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #> {

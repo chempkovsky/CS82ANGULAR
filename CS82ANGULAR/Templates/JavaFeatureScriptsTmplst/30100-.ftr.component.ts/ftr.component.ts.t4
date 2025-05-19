@@ -82,7 +82,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-<#= featureSelectorCommonPart #>',
   templateUrl: '<#= GetFeatureFolderName(Feature, ftrFeatureHtmlFolder, ftrFeatureComponentFolder) #>.html',
-  styleUrls: ['<#= GetFeatureFolderName(Feature, ftrFeatureCssFolder, ftrFeatureComponentFolder) #>.css']
+  styleUrls: ['<#= GetFeatureFolderName(Feature, ftrFeatureCssFolder, ftrFeatureComponentFolder) #>.scss']
 })
 export class <#= featureClassName #>  {
     curBreakpoint: number = 1;

@@ -285,7 +285,7 @@ import { <#=  ddlgComponentClassName #> } from '<#= GetFolderNameWithAnglr(Angul
 
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, lformHtmlFolder, lformComponentFolder)#>.html',
-  styleUrls: ['<#=  GetFolderName(Model, lformCssFolder, lformComponentFolder)#>.css']
+  styleUrls: ['<#=  GetFolderName(Model, lformCssFolder, lformComponentFolder)#>.scss']
 })
 export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eventEmitterPubModelClassName #>, <#= itemHeightDataModelClassName #> {
 <# 

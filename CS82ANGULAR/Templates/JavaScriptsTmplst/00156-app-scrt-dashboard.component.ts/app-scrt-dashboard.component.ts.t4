@@ -38,7 +38,7 @@ import { Component } from '@angular/core';
 
   selector: 'app-<#= securityDashboardComponentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, securityDashboardComponentHtmlFolder, securityDashboardComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, securityDashboardComponentCssFolder, securityDashboardComponentFolder) #>.css']
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, securityDashboardComponentCssFolder, securityDashboardComponentFolder) #>.scss']
 })
 export class <#= securityDashboardComponentClassName #>  {
 }

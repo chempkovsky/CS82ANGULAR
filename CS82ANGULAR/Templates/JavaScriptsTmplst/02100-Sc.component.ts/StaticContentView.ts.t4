@@ -89,7 +89,7 @@ import { <#= menuItemDataModelClassName #> } from '<#=  GetCommonFolderNameWithA
 
   selector: 'app-<#= staticContentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, staticContentHtmlFolder, staticContentComponentFolder)#>.html',
-  styleUrls: ['<#=  GetFolderName(Model, staticContentCssFolder, staticContentComponentFolder)#>.css']
+  styleUrls: ['<#=  GetFolderName(Model, staticContentCssFolder, staticContentComponentFolder)#>.scss']
 })
 export class <#= staticContentClassName #> implements OnInit, <#= eventEmitterPubModelClassName #> {
 <# 

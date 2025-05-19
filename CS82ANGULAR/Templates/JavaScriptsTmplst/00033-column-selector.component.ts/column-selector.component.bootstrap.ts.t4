@@ -50,7 +50,7 @@ import { <#= appSettingServiceClassName #> } from '<#= GetFolderNameWithAnglr(An
 
   selector: 'app-<#= columnSelectorComponentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentHtmlFolder, columnSelectorComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentCssFolder, columnSelectorComponentFolder) #>.css']
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, columnSelectorComponentCssFolder, columnSelectorComponentFolder) #>.scss']
 })
 export class <#= columnSelectorComponentClassName #> implements OnInit {
   

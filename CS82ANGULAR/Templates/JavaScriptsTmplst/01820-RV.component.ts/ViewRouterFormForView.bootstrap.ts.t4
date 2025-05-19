@@ -141,7 +141,7 @@ import { <#= vformComponentClassName #> } from '<#=  GetFolderNameWithAnglr(Angu
 
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, rvHtmlFolder, rvComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderName(Model, rvCssFolder, rvComponentFolder) #>.css']
+  styleUrls: ['<#= GetFolderName(Model, rvCssFolder, rvComponentFolder) #>.scss']
 })
 
 export class <#= componentClassName #> implements OnInit, AfterViewInit, <#= eventEmitterPubModelClassName #> {

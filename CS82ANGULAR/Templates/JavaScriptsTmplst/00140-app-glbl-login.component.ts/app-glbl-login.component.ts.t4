@@ -63,7 +63,7 @@ import { <#= appLoginServiceClassName #> } from '<#= GetFolderNameWithAnglr(Angu
 
   selector: 'app-<#= appLoginComponentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginHtmlComponentFolder, appLoginComponentFolder) #>.html',
-  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginCssComponentFolder, appLoginComponentFolder) #>.css']
+  styleUrls: ['<#= GetFolderNameWithAnglr(AngularJsonFile, Model, appLoginCssComponentFolder, appLoginComponentFolder) #>.scss']
 })
 export class <#= appLoginComponentClassName #> {
 <# 

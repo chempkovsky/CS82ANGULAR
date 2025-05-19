@@ -368,7 +368,7 @@ class <#= Model.ViewName + "MtPgntrIntl" #> implements MatPaginatorIntl {
 
   selector: 'app-<#= componentSelectorCommonPart #>',
   templateUrl: '<#= GetFolderName(Model, sformHtmlFolder, sformComponentFolder)#>.html',
-  styleUrls: ['<#=  GetFolderName(Model, sformCssFolder, sformComponentFolder)#>.css'],
+  styleUrls: ['<#=  GetFolderName(Model, sformCssFolder, sformComponentFolder)#>.scss'],
 <# 
     if(localize) {
 #>
