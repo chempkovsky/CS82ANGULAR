@@ -344,7 +344,7 @@ export class <#= componentClassName #> implements OnInit, OnDestroy, <#= eventEm
 #>
     <#= frasesPropName #>: {[key:string]: string}  = {
         'Hide-details':             this.L.instant({
-            key: '<#= apiName #>::<#= Model.ViewName #>:HideDtls',
+            key: 'CmSt::HideDtls',
             defaultValue: "Hide details"
         }), 
         '<#= ActionParamNavM2mNotAllwd #>': this.L.instant({

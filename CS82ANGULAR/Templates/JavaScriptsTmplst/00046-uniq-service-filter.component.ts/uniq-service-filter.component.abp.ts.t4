@@ -402,14 +402,14 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
             case 'uint32':
             case 'uint64':
                 flt.fltrValue.reset({ value: null, disabled: false });
-                validators.push(Validators.pattern(<#= RegExps["RegExpInteger"] #>));
+                // validators.push(Validators.pattern(<#= RegExps["RegExpInteger"] #>));
                 flt.fltrValue.setValidators(validators);
                 break;
             case 'double':
             case 'decimal':
             case 'single':
                 flt.fltrValue.reset({ value: null, disabled: false });
-                validators.push(Validators.pattern(<#= RegExps["RegExpFloat"] #>));
+                // validators.push(Validators.pattern(<#= RegExps["RegExpFloat"] #>));
                 flt.fltrValue.setValidators(validators);
                 break;
             case 'guid':
@@ -618,7 +618,7 @@ export class <#= uniqFilterComponentClassName #> implements OnInit, <#= eventEmi
 			debounceTime(200),
 			distinctUntilChanged(),
 			switchMap((value: any) => {
-                if((typeof this.<#= tpAheadFncPropName  #> === 'undefined')||(value.length < 2)) {
+                if((typeof this.<#= tpAheadFncPropName  #> === 'undefined')||(value.length < 1)) {
                   return of([]);
                 } 
                 if(this.<#= tpAheadFncPropName  #> === null) {
