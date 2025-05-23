@@ -214,10 +214,13 @@ namespace CS82ANGULAR.ViewModel
                     if (ce.Kind == EnvDTE.vsCMElement.vsCMElementNamespace)
                     {
                         EnvDTE.CodeNamespace cn = (EnvDTE.CodeNamespace)ce;
+                        /*
                         if (!InternalCollectProjectClasses(cn))
                         {
                             return false;
                         }
+                        */
+                        InternalCollectProjectClasses(cn);
                     }
                 }
             }
