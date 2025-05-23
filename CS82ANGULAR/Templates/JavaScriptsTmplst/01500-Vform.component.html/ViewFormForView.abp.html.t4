@@ -235,7 +235,7 @@
                     <div class="input-group">
                         <input class="form-control" <#= GetFormatters(modelViewUIFormPropertySerializable, Model) #> [placeholder]="<#= frasesPropName #>['<#= modelViewUIFormPropertySerializable.ViewPropertyName #>-placeholder']" formControlName="<#= GetTypeScriptPropertyNameEx(modelViewUIFormPropertySerializable, Model) #>" [readonly]="true">
 <#
-                                            if (hasButton) {                           
+                                            if (hasButton && false) {                           
 #>
                         <div class="input-group-append" >
                             <button class="btn btn-outline-secondary" type="button"  
