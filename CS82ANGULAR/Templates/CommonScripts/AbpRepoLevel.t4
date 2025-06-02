@@ -265,6 +265,9 @@
                     if (!string.IsNullOrEmpty(gss.SrvFolder))
                     {
                         result = gss.SrvFolder.Replace("\\", ".");
+                        if(!string.IsNullOrEmpty(result)) {
+                            result = "." + result;
+                        }
                     }
 
                     return gss.SrvDefaultProjectNameSpace + result;
@@ -283,6 +286,9 @@
                     if (!string.IsNullOrEmpty(gss.SrvFolder))
                     {
                         result = gss.SrvFolder.Replace("\\", ".");
+                        if(!string.IsNullOrEmpty(result)) {
+                            result = "." + result;
+                        }
                     }
 
                     return gss.SrvDefaultProjectNameSpace + result;
@@ -745,6 +751,29 @@
 
 
         ///////////////////////////////////////////////////////////////////////////////////// 
+        bool HasDescriptionAttribute(ModelViewPropertyOfVwSerializable sp, string prp) {
+            if(sp == null) return false;
+            if(sp.Attributes == null) return false;
+            List<ModelViewAttributeSerializable> attrs = sp.Attributes.Where(a => a.AttrName == "Description").ToList();
+            if(attrs == null) return false;
+            string flt1 = null;
+            string flt2 = null;
+            if ( string.IsNullOrEmpty(prp) ) {
+                foreach(ModelViewAttributeSerializable a in attrs) {
+                    if ( a.VaueProperties != null ) {
+                        if (a.VaueProperties.Any(v => v.PropValue is null || v.PropValue == "")) return true;
+                    }
+                }
+            } else {
+                string flt = "\"" + prp + "\"";
+                foreach(ModelViewAttributeSerializable a in attrs) {
+                    if ( a.VaueProperties != null ) {
+                        if (a.VaueProperties.Any(v => v.PropValue == flt || v.PropValue == prp)) return true;
+                    }
+                }
+            }
+            return false;
+        }
 
 
         bool AbpIsEntityWithId(ModelViewSerializable model)
@@ -782,20 +811,33 @@
             bool rslt = false;
             if (model == null) return rslt;
             if (model.ScalarProperties == null) return rslt;
-            return
+            ModelViewPropertyOfVwSerializable sp =
                 model.ScalarProperties.Any(p => p.OriginalPropertyName == "CreatorId" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")))
-                &&
-                model.ScalarProperties.Any(p => p.OriginalPropertyName == "CreationTime" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
+            if (sp == null) return rslt; 
+            if (HasDescriptionAttribute(sp, "IsNot_CreatorId")) return rslt;
+                
+            sp = model.ScalarProperties.Any(p => p.OriginalPropertyName == "CreationTime" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
+            if (sp == null) return rslt; 
+            if (HasDescriptionAttribute(sp, "IsNot_CreationTime")) return rslt;
+
+            return true;
         }
         bool AbpIsModificationAuditedObject(ModelViewSerializable model)
         {
             bool rslt = false;
             if (model == null) return rslt;
             if (model.ScalarProperties == null) return rslt;
-            return
-                model.ScalarProperties.Any(p => p.OriginalPropertyName == "LastModifierId" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")))
-                &&
-                model.ScalarProperties.Any(p => p.OriginalPropertyName == "LastModificationTime" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
+            
+            ModelViewPropertyOfVwSerializable sp =
+                model.ScalarProperties.FirstOrDefault(p => p.OriginalPropertyName == "LastModifierId" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")))
+            if (sp == null) return rslt; 
+            if (HasDescriptionAttribute(sp, "IsNot_LastModifierId")) return rslt;    
+
+            sp = model.ScalarProperties.FirstOrDefault(p => p.OriginalPropertyName == "LastModificationTime" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
+            if (sp == null) return rslt;
+            if (HasDescriptionAttribute(sp, "IsNot_LastModificationTime")) return rslt;    
+
+            return true;
         }
         bool AbpIsAuditedObject(ModelViewSerializable model)
         {
@@ -807,12 +849,19 @@
             bool rslt = false;
             if (model == null) return rslt;
             if (model.ScalarProperties == null) return rslt;
-            return
-                model.ScalarProperties.Any(p => p.OriginalPropertyName == "IsDeleted" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")))
-                &&
-                model.ScalarProperties.Any(p => p.OriginalPropertyName == "DeleterId" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")))
-                &&
-                model.ScalarProperties.Any(p => p.OriginalPropertyName == "DeletionTime" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
+            ModelViewPropertyOfVwSerializable sp =
+                model.ScalarProperties.FirstOrDefault(p => p.OriginalPropertyName == "IsDeleted" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
+            if (sp == null) return rslt;
+            if (HasDescriptionAttribute(sp, "IsNot_IsDeleted")) return rslt;    
+
+            sp = model.ScalarProperties.FirstOrDefault(p => p.OriginalPropertyName == "DeleterId" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")))
+            if (sp == null) return rslt;
+            if (HasDescriptionAttribute(sp, "IsNot_DeleterId")) return rslt;    
+
+            sp = model.ScalarProperties.FirstOrDefault(p => p.OriginalPropertyName == "DeletionTime" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
+            if (sp == null) return rslt;
+            if (HasDescriptionAttribute(sp, "IsNot_DeletionTime")) return rslt;    
+            return true;
         }
         bool AbpIsFullAuditedObject(ModelViewSerializable model)
         {
@@ -823,24 +872,33 @@
             bool rslt = false;
             if (model == null) return rslt;
             if (model.ScalarProperties == null) return rslt;
-            return
-                model.ScalarProperties.Any(p => p.OriginalPropertyName == "EntityVersion" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
+            ModelViewPropertyOfVwSerializable sp =
+                model.ScalarProperties.FirstOrDefault(p => p.OriginalPropertyName == "EntityVersion" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
+            if (sp == null) return rslt;
+            if (HasDescriptionAttribute(sp, "IsNot_EntityVersion")) return rslt;
+            return true;
         }
         bool AbpHasMultiTenant(ModelViewSerializable model)
         {
             bool rslt = false;
             if (model == null) return rslt;
             if (model.ScalarProperties == null) return rslt;
-            return
-                model.ScalarProperties.Any(p => p.OriginalPropertyName == "TenantId" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
+            ModelViewPropertyOfVwSerializable sp =
+                model.ScalarProperties.FirstOrDefault(p => p.OriginalPropertyName == "TenantId" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
+            if (sp == null) return rslt;
+            if (HasDescriptionAttribute(sp, "IsNot_TenantId")) return rslt;
+            return true;
         }
         bool AbpHasConcurrencyStamp(ModelViewSerializable model)
         {
             bool rslt = false;
             if (model == null) return rslt;
             if (model.ScalarProperties == null) return rslt;
-            return
-                model.ScalarProperties.Any(p => p.OriginalPropertyName == "ConcurrencyStamp" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
+            ModelViewPropertyOfVwSerializable sp =
+                model.ScalarProperties.FirstOrDefault(p => p.OriginalPropertyName == "ConcurrencyStamp" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
+            if (sp == null) return rslt;
+            if (HasDescriptionAttribute(sp, "IsNot_ConcurrencyStamp")) return rslt;
+            return true;
         }
         bool AbpHasExtraProperties(ModelViewSerializable model)
         {

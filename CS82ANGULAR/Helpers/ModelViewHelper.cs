@@ -1010,7 +1010,8 @@ namespace CS82ANGULAR.Helpers
                 WebApiServiceProject = srcModelViewSerializable.WebApiServiceProject,
                 WebApiServiceDefaultProjectNameSpace = srcModelViewSerializable.WebApiServiceDefaultProjectNameSpace,
                 WebApiServiceFolder = srcModelViewSerializable.WebApiServiceFolder,
-                RootEntityFunctions = srcModelViewSerializable.RootEntityFunctions
+                RootEntityFunctions = srcModelViewSerializable.RootEntityFunctions,
+                GeneratedServices = srcModelViewSerializable.GeneratedServices,
             };
         }
         public static ModelViewKeyProperty ModelViewKeyPropertySerializableAssingTo(this ModelViewKeyPropertySerializable srcProp, ModelViewKeyProperty destProp)
@@ -1782,6 +1783,24 @@ namespace CS82ANGULAR.Helpers
             return result;
 
         }
+        public static List<GeneratedServiceSerializable> ListModelViewGeneratedServicesSerializableGetCopy(this List<GeneratedServiceSerializable> genServiceProperties)
+        {
+            List<GeneratedServiceSerializable> result = new List<GeneratedServiceSerializable>();
+            if (genServiceProperties == null) return result;
+            foreach (GeneratedServiceSerializable genServiceProp in genServiceProperties)
+            {
+                GeneratedServiceSerializable dest = new GeneratedServiceSerializable()
+                {
+                    SrvClassName = genServiceProp.SrvClassName,
+                    SrvType = genServiceProp.SrvType,
+                    SrvFolder = genServiceProp.SrvFolder,
+                    SrvDefaultProjectNameSpace = genServiceProp.SrvDefaultProjectNameSpace
+                };
+                result.Add(dest);
+            }
+            return result;
+        }
+
         public static ModelViewSerializable ModelViewSerializableGetCopy(this ModelViewSerializable srcModelViewSerializable, string destinationProject, string defaultProjectNameSpace, string destinationFolder, string dbSetProppertyName, SolutionCodeElement SelectedEntity)
         {
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
@@ -1831,6 +1850,7 @@ namespace CS82ANGULAR.Helpers
             result.UIFormProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIFormProperties);
             result.UIListProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIListProperties);
             result.RootEntityFunctions = ListModelViewFunSerializableGetCopy(srcModelViewSerializable.RootEntityFunctions);
+            result.GeneratedServices = ListModelViewGeneratedServicesSerializableGetCopy(srcModelViewSerializable.GeneratedServices);
             return result;
         }
         public static ModelViewSerializable ModelViewSerializableSimpleGetCopy(this ModelViewSerializable srcModelViewSerializable, string destinationProject, string defaultProjectNameSpace, string destinationFolder)
@@ -1879,6 +1899,7 @@ namespace CS82ANGULAR.Helpers
             result.UIFormProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIFormProperties);
             result.UIListProperties = ListModelViewForeignKeySerializableGetCopy(srcModelViewSerializable.UIListProperties);
             result.RootEntityFunctions = ListModelViewFunSerializableGetCopy(srcModelViewSerializable.RootEntityFunctions);
+            result.GeneratedServices = ListModelViewGeneratedServicesSerializableGetCopy(srcModelViewSerializable.GeneratedServices);
             return result;
         }
         public static ModelViewAttribute CloneModelViewAttribute(this ModelViewAttribute src)
