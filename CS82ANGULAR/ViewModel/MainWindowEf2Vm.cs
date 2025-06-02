@@ -544,6 +544,7 @@ namespace CS82ANGULAR.ViewModel
                 existedModelViewSerializable.UniqueKeys = modelViewSerializable.UniqueKeys;
                 existedModelViewSerializable.GeneratedDtos = modelViewSerializable.GeneratedDtos;
                 existedModelViewSerializable.RootEntityFunctions = modelViewSerializable.RootEntityFunctions;
+                existedModelViewSerializable.GeneratedServices = modelViewSerializable.GeneratedServices;
             }
             else
             {
