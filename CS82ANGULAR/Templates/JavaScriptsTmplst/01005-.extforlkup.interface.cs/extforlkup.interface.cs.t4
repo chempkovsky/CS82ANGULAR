@@ -61,7 +61,10 @@ using System.ComponentModel.DataAnnotations;
             }
             foreach(var searchFkPair in searchFkPairs) {
                 ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
-                ModelViewPropertyOfVwSerializable slrPrp = Model.ScalarProperties.Where(p => p.ViewPropertyName == GetScalarPropByOriginaPropName(searchVM.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName, searchVM).ViewPropertyName).FirstOrDefault();
+                List<ModelViewEntityPropertySerializable> cukps = GetDictCommonUniqueKeyProps(searchVM.UniqueKeys[0], searchVM);
+                if (cukps == null) continue;
+                if (cukps.Count < 1) continue;
+                ModelViewPropertyOfVwSerializable slrPrp = Model.ScalarProperties.Where(p => p.ViewPropertyName == GetScalarPropByOriginaPropName(cukps[0].OriginalPropertyName, searchVM).ViewPropertyName).FirstOrDefault();
                 if(mappedFlds.Any(p => p.ViewPropertyName == slrPrp.ViewPropertyName)) continue;
                 mappedFlds.Add(slrPrp);
             }

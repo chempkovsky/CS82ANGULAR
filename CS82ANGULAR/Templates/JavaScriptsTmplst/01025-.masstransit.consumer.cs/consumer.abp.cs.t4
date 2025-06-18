@@ -1,0 +1,234 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="CS82ANGULAR" #>
+<#@ import namespace="CS82ANGULAR.Model" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable" #>
+<#@ import namespace="CS82ANGULAR.Model.Serializable.Angular" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.ModelViewSerializable" name="Model" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.DbContextSerializable" name="Context" #>
+<#@ parameter type="CS82ANGULAR.Model.Serializable.Angular.AngularJson" name="AngularJsonFile" #>
+<#@ include file="..\..\CommonScripts\ViewLevel.t4" #>
+#nullable disable
+using System.Threading.Tasks;
+using Volo.Abp.DependencyInjection;
+using Volo.Abp.EventBus.Distributed;
+using Volo.Abp.Linq;
+using Volo.Abp.MultiTenancy;
+using Volo.Abp.Uow;
+
+
+<#
+
+    string extforlkupFolder                 = "01010-.extforlkup.cs";
+    string lookupheperFolder                = "01020-.lookupheper.cs";
+    string extforlkupConsumerFolder         = "01025-.masstransit.consumer.cs";
+    string ExtForLkUpMsgTenantIdPropName    = "TenantId";
+    string ExtForLkUpMsgActionPropName      = "Action";
+    string ExtForLkUpMsgOldPropName         = "OldVals";
+    string ExtForLkUpMsgNewPropName         = "NewVals";
+    string actionInputParamName             = "action";
+    string oldObjInputParamName             = "oldObj";
+    string newObjInputParamName             = "newObj";
+
+
+//    string etoClassName                 =  GetAbpEtoClassName(Model);
+    string etoExClassName               =  GetAbpEtoExClassName(Model);
+
+
+    string extendedMdlMsgConsumer               =  GetExtForLkUpMsgConsumerClassName(Model);
+    string extendedMdlMsgConsumerDefinition     =  GetExtForLkUpMsgConsumerDefinitionClassName(Model);
+
+    
+
+
+    string extforlkupFolderNameSpace    = GetTypeNameSpace(Model, Context, extforlkupFolder);
+    string lookupHeperNameSpace         = GetTypeNameSpace(Model, Context, lookupheperFolder);
+    string destinationNameSpace         = GetTypeNameSpace(Model, Context, extforlkupConsumerFolder);
+
+    string staticM2mUpdateAllMethodName = GetM2mStaticUpdateMethodName(Model);
+    string staticM2mClassName           = GetM2mStaticClassName(Model);
+
+
+    List<Tuple<ModelViewSerializable, ModelViewForeignKeySerializable, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>, List<KeyValuePair<ModelViewForeignKeySerializable,int>>>> searchSchemas =
+        GetSearchResources(Model, Context);
+
+
+
+    
+
+#>
+
+
+
+/*
+    according to https://abp.io/docs/latest/framework/infrastructure/event-bus/distributed
+    and according to https://abp.io/docs/latest/framework/infrastructure/event-bus/distributed/rabbitmq
+    ==1==
+    in `appsettings.json` of the `XXXXX.YYYYY.HttpApi.Host.csproj`-project add the setting like below
+
+{
+
+  ...
+
+  "RabbitMQ": {
+    "Connections": {
+      "Default": {
+        "HostName": "123.123.123.123"
+        "Port": "5672"
+      },
+      "SecondConnection": {
+        "HostName": "321.321.321.321"
+        "Port": "5672"
+      }
+    },
+    "EventBus": {
+      "ClientName": "MyClientName",
+      "ExchangeName": "MyExchangeName",
+      "ConnectionName": "SecondConnection",
+      "VirtualHost": "RabbitMq_virtual_host_name"
+    }
+  }
+
+  ...
+
+}
+
+    ==2==
+    in the class `YYYYYHttpApiHostModule` of the `XXXXX.YYYYY.HttpApi.Host.csproj`-project modify
+public class YYYYYHttpApiHostModule : AbpModule {
+    ...
+    ...
+    public override void ConfigureServices(ServiceConfigurationContext context)
+    {
+        var configuration = context.Services.GetConfiguration();
+        var hostingEnvironment = context.Services.GetHostingEnvironment();
+
+        ...
+        ...
+
+        string  rmqCnn =  configuration["RabbitMQ:EventBus:ConnectionName"];
+
+        Configure<AbpRabbitMqOptions>(options =>
+        {
+            options.Connections.Default.UserName    = "Enter_User_name_here"
+            options.Connections.Default.Password    = "Enter_Password_here";
+            options.Connections.Default.HostName    = configuration["RabbitMQ:Connections:" + rmqCnn + ":HostName"];
+            options.Connections.Default.Port        = configuration["RabbitMQ:Connections:" + rmqCnn + ":Port"];
+            options.Connections.Default.VirtualHost = configuration["RabbitMQ:EventBus:VirtualHost"];
+        });
+
+        Configure<AbpRabbitMqEventBusOptions>(options =>
+        {
+            options.ClientName = configuration["RabbitMQ:EventBus:ClientName"];
+            options.ExchangeName = configuration["RabbitMQ:EventBus:ExchangeName"];
+            options.PrefetchCount = 1;
+            options.ExchangeArguments["x-delayed-type"] = "direct";
+            options.QueueArguments["x-message-ttl"] = 60000;
+        });
+
+        ...
+        ...
+    }
+    ...
+    ...
+}
+
+
+*/
+
+
+
+
+namespace <#= destinationNameSpace #> {
+
+    // public class MyHandler : ILocalEventHandler<<#= etoExClassName #>>, ITransientDependency
+
+    public class <#= extendedMdlMsgConsumer #> : IDistributedEventHandler<<#= etoExClassName #>>, ITransientDependency {
+
+        protected IAbpLazyServiceProvider LazyServiceProvider { get; set; } = default!;
+
+        protected IUnitOfWorkManager UnitOfWorkManager => LazyServiceProvider.LazyGetRequiredService<IUnitOfWorkManager>();
+        protected IAsyncQueryableExecuter AsyncExecuter => LazyServiceProvider.LazyGetRequiredService<IAsyncQueryableExecuter>();
+        protected ICurrentTenant CurrentTenant => LazyServiceProvider.LazyGetRequiredService<ICurrentTenant>();
+
+<#
+        if(searchSchemas != null) {
+            List<string> viewNames = new List<string>();
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+                if (!viewNames.Contains(m2mModel.ViewName)) {
+#>
+        protected <#= AbpRepositoryInterfaceName(m2mModel) #> rp<#= AbpRepositoryInterfaceName(m2mModel) #> => LazyServiceProvider.LazyGetRequiredService<<#= AbpRepositoryInterfaceName(m2mModel) #>>();  
+<#
+                    viewNames.Add(m2mModel.ViewName);
+                }
+                List<KeyValuePair<ModelViewForeignKeySerializable,int>> searchFkPairs = sch.Item3;
+                foreach(var searchFkPair in searchFkPairs) {
+                    ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
+                    if(searchVM == null) continue;
+                    if (!viewNames.Contains(searchVM.ViewName)) {
+#>
+        protected <#= AbpRepositoryInterfaceName(searchVM) #> rp<#= AbpRepositoryInterfaceName(searchVM) #> => LazyServiceProvider.LazyGetRequiredService<<#= AbpRepositoryInterfaceName(searchVM) #>>();  
+<#
+                        viewNames.Add(searchVM.ViewName);
+                    }
+                }
+            }
+        }
+#>
+
+
+
+        public <#= extendedMdlMsgConsumer #>(IAbpLazyServiceProvider lsp) {
+            LazyServiceProvider = lsp;
+        }
+
+        public async Task HandleEventAsync(<#= etoExClassName #> eventData)
+        {
+
+            using (this.CurrentTenant.Change(eventData.<#= ExtForLkUpMsgTenantIdPropName #>))
+            {
+                await <#= staticM2mClassName #>.<#= staticM2mUpdateAllMethodName #>(
+                    ae : this.AsyncExecuter, 
+                    _uowmng : this.UnitOfWorkManager,
+<#
+        if(searchSchemas != null) {
+            List<string> viewNames = new List<string>();
+            foreach(var sch in searchSchemas) {
+                ModelViewSerializable m2mModel = sch.Item1;
+                if (!viewNames.Contains(m2mModel.ViewName)) {
+#>
+                    _rp<#= AbpRepositoryInterfaceName(m2mModel) #> : this.rp<#= AbpRepositoryInterfaceName(m2mModel) #>, 
+<#
+                    viewNames.Add(m2mModel.ViewName);
+                }
+                List<KeyValuePair<ModelViewForeignKeySerializable,int>> searchFkPairs = sch.Item3;
+                foreach(var searchFkPair in searchFkPairs) {
+                    ModelViewSerializable searchVM = GetViewByName(Context, searchFkPair.Key.ViewName);
+                    if(searchVM == null) continue;
+                    if (!viewNames.Contains(searchVM.ViewName)) {
+#>
+                    _rp<#= AbpRepositoryInterfaceName(searchVM) #> : this.rp<#= AbpRepositoryInterfaceName(searchVM) #>, 
+<#
+                        viewNames.Add(searchVM.ViewName);
+                    }
+                }
+            }
+        }
+#>
+                    <#= actionInputParamName #> : eventData.<#= ExtForLkUpMsgActionPropName #>, 
+                    <#= oldObjInputParamName #> : eventData.<#= ExtForLkUpMsgOldPropName #>, 
+                    <#= newObjInputParamName #> : eventData.<#= ExtForLkUpMsgNewPropName #>);
+            }
+        }
+    }
+
+}
+

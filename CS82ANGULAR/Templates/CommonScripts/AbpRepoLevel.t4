@@ -756,8 +756,8 @@
             if(sp.Attributes == null) return false;
             List<ModelViewAttributeSerializable> attrs = sp.Attributes.Where(a => a.AttrName == "Description").ToList();
             if(attrs == null) return false;
-            string flt1 = null;
-            string flt2 = null;
+            // string flt1 = null;
+            // string flt2 = null;
             if ( string.IsNullOrEmpty(prp) ) {
                 foreach(ModelViewAttributeSerializable a in attrs) {
                     if ( a.VaueProperties != null ) {
@@ -812,11 +812,11 @@
             if (model == null) return rslt;
             if (model.ScalarProperties == null) return rslt;
             ModelViewPropertyOfVwSerializable sp =
-                model.ScalarProperties.Any(p => p.OriginalPropertyName == "CreatorId" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")))
+                model.ScalarProperties.FirstOrDefault(p => p.OriginalPropertyName == "CreatorId" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
             if (sp == null) return rslt; 
             if (HasDescriptionAttribute(sp, "IsNot_CreatorId")) return rslt;
                 
-            sp = model.ScalarProperties.Any(p => p.OriginalPropertyName == "CreationTime" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
+            sp = model.ScalarProperties.FirstOrDefault(p => p.OriginalPropertyName == "CreationTime" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
             if (sp == null) return rslt; 
             if (HasDescriptionAttribute(sp, "IsNot_CreationTime")) return rslt;
 
@@ -829,7 +829,7 @@
             if (model.ScalarProperties == null) return rslt;
             
             ModelViewPropertyOfVwSerializable sp =
-                model.ScalarProperties.FirstOrDefault(p => p.OriginalPropertyName == "LastModifierId" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")))
+                model.ScalarProperties.FirstOrDefault(p => p.OriginalPropertyName == "LastModifierId" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
             if (sp == null) return rslt; 
             if (HasDescriptionAttribute(sp, "IsNot_LastModifierId")) return rslt;    
 
@@ -854,7 +854,7 @@
             if (sp == null) return rslt;
             if (HasDescriptionAttribute(sp, "IsNot_IsDeleted")) return rslt;    
 
-            sp = model.ScalarProperties.FirstOrDefault(p => p.OriginalPropertyName == "DeleterId" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")))
+            sp = model.ScalarProperties.FirstOrDefault(p => p.OriginalPropertyName == "DeleterId" && ((p.ForeignKeyName == null) || (p.ForeignKeyName == "")));
             if (sp == null) return rslt;
             if (HasDescriptionAttribute(sp, "IsNot_DeleterId")) return rslt;    
 
@@ -1043,6 +1043,37 @@
                 }
             }
             return null;
+        }
+
+        string GetTypeNameSpace(ModelViewSerializable model, DbContextSerializable context, string refFolder)
+        {
+            string result = "";
+            if ((model == null) || (context == null) || string.IsNullOrEmpty(refFolder))
+            {
+                return result;
+            }
+            if ((model.CommonStaffs == null) || (context.ModelViews == null))
+            {
+                return result;
+            }
+            CommonStaffSerializable refItem = model.CommonStaffs.Where(c => c.FileType == refFolder).FirstOrDefault();
+            if (refItem == null) return result;
+            if (string.IsNullOrEmpty(refItem.FileFolder)) return refItem.FileDefaultProjectNameSpace;
+            return refItem.FileDefaultProjectNameSpace + "." + refItem.FileFolder.Replace(@"\", ".").Replace(@"/", ".");
+        }
+        string GetAbpEtoClassName(ModelViewSerializable model)
+        {
+            string result = "";
+            if (model != null) result = result + model.RootEntityClassName;
+            result = result + "Eto";
+            return result;
+        }
+        string GetAbpEtoExClassName(ModelViewSerializable model)
+        {
+            string result = "";
+            if (model != null) result = result + model.RootEntityClassName;
+            result = result + "EtoEx";
+            return result;
         }
 
 #>

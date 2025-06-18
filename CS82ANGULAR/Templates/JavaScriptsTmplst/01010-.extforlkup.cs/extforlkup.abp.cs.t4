@@ -18,16 +18,24 @@
 #nullable disable
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
+using Volo.Abp.EventBus;
+using System;
 
 <#
 
     string extforlkupInterfaceFolder    = "01005-.extforlkup.interface.cs";
     string extforlkupFolder             = "01010-.extforlkup.cs";
 
-    string extendedMdlInterface         =  GetExtForLkUpInterfaceName(Model);
-    string extendedMdlClass             =  GetExtForLkUpClassName(Model);
+    string ExtForLkUpMsgTenantIdPropName    = "TenantId";
+    string ExtForLkUpMsgActionPropName      = "Action";
+    string ExtForLkUpMsgOldPropName         = "OldVals";
+    string ExtForLkUpMsgNewPropName         = "NewVals";
 
-    string extforlkupInterfaceNameSpace =  GetTypeNameSpace(Model, Context, extforlkupInterfaceFolder);
+    string extendedMdlInterface         =  GetExtForLkUpInterfaceName(Model);
+    string etoClassName                 =  GetAbpEtoClassName(Model);
+    string etoFullClassName             =  GetAbpEtoFullClassName(Model);
+    string etoExClassName               =  GetAbpEtoExClassName(Model);
+
     string destinationNameSpace         =  GetTypeNameSpace(Model, Context, extforlkupFolder);
     string clonerMdlClass               =  Model.ViewName + "CloneForLkUp";
     string DoCloneMethodName            =  "DoClone";
@@ -83,16 +91,13 @@ using System.ComponentModel.DataAnnotations;
 using <#= viewModelNameSpace #>;
 <# }} #>
 
-<# if (!string.IsNullOrEmpty(extforlkupInterfaceNameSpace)) {
- if (!string.Equals(extforlkupInterfaceNameSpace, destinationNameSpace)) {#>
-using <#= extforlkupInterfaceNameSpace #>;
-<# }} #>
 
 
 
 namespace <#= destinationNameSpace #> {
 
-    public class <#= extendedMdlClass #>: <#= extendedMdlInterface #>  {
+    // [EventName("<#= etoFullClassName #>")]
+    public class <#= etoClassName #>  {
 <#
         foreach(ModelViewPropertyOfVwSerializable slrPrp in mappedFlds) {
             if(Model.GenerateJSonAttribute) { 
@@ -220,9 +225,21 @@ namespace <#= destinationNameSpace #> {
 #>
     }
 
+
+
+    [EventName("<#= etoFullClassName #>")]
+    public class <#= etoExClassName #>  {
+        public Guid? <#= ExtForLkUpMsgTenantIdPropName #> { get; set; } = null!;
+        // 1 - insert; 2 - update; 3 - delete;
+        public int <#= ExtForLkUpMsgActionPropName #> { get; set; } 
+        public <#= etoClassName #> <#= ExtForLkUpMsgOldPropName #> { get; set; } = null!; 
+        public <#= etoClassName #> <#= ExtForLkUpMsgNewPropName #> { get; set; } = null!;
+    }
+
+
     public static class <#= clonerMdlClass #> {
-        public static <#= extendedMdlInterface #>  <#= DoCloneMethodName #>(<#= Model.ViewName #> src) {
-            <#= extendedMdlClass #> dest = new <#= extendedMdlClass #>();
+        public static <#= etoClassName #>  <#= DoCloneMethodName #>(<#= Model.ViewName #> src) {
+            <#= etoClassName #> dest = new <#= etoClassName #>();
             if(src != null) {
 <#
     if(Model.ScalarProperties != null) {

@@ -2974,6 +2974,7 @@ namespace CS82ANGULAR.Model
             }
             return false;
         }
+
         bool IsOnePropForeigKey(ModelViewForeignKeySerializable searchFk)
         {
             if (searchFk == null) return false;
@@ -2981,31 +2982,34 @@ namespace CS82ANGULAR.Model
             if ((searchFk.PrincipalKeyProps.Count == searchFk.ForeignKeyProps.Count) && (searchFk.ForeignKeyProps.Count == 1)) return true;
             return false;
         }
-        bool IsLookUpTable(ModelViewSerializable searchMdl)
-        {
-            if (searchMdl == null) return false;
-            if ((searchMdl.ScalarProperties == null) || (searchMdl.PrimaryKeyProperties == null) || (searchMdl.UniqueKeys == null)) return false;
-            if ((searchMdl.ScalarProperties.Count != 2) || (searchMdl.PrimaryKeyProperties.Count != 1) || (searchMdl.UniqueKeys.Count != 1)) return false;
-            if (searchMdl.UniqueKeys[0].UniqueKeyProperties == null) return false;
-            if (searchMdl.UniqueKeys[0].UniqueKeyProperties.Count != 1) return false;
-            if (searchMdl.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName == searchMdl.PrimaryKeyProperties[0].OriginalPropertyName) return false;
-            if ((GetScalarPropByOriginaPropName(searchMdl.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName, searchMdl) == null) ||
-                (GetScalarPropByOriginaPropName(searchMdl.PrimaryKeyProperties[0].OriginalPropertyName, searchMdl) == null)) return false;
-            return true;
-        }
-        bool IsUniqKeyMapedToScalarsEx(ModelViewUniqueKeySerializable searchUk, ModelViewSerializable searchModel, ModelViewSerializable model)
-        {
-            if ((searchModel == null) || (searchUk == null) || (model == null)) return false;
-            if ((searchModel.ScalarProperties == null) || (searchUk.UniqueKeyProperties == null) || (model.ScalarProperties == null)) return false;
-            if ((searchUk.UniqueKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1)) return false;
-            foreach (ModelViewKeyPropertySerializable ukp in searchUk.UniqueKeyProperties)
-            {
-                ModelViewPropertyOfVwSerializable sprp = GetScalarPropByOriginaPropName(ukp.OriginalPropertyName, searchModel);
-                if (sprp == null) return false;
-                if (!model.ScalarProperties.Any(p => p.ViewPropertyName == sprp.ViewPropertyName)) return false;
-            }
-            return true;
-        }
+        /*
+                bool IsLookUpTable(ModelViewSerializable searchMdl)
+                {
+                    if (searchMdl == null) return false;
+                    if ((searchMdl.ScalarProperties == null) || (searchMdl.PrimaryKeyProperties == null) || (searchMdl.UniqueKeys == null)) return false;
+                    if ((searchMdl.ScalarProperties.Count != 2) || (searchMdl.PrimaryKeyProperties.Count != 1) || (searchMdl.UniqueKeys.Count != 1)) return false;
+                    if (searchMdl.UniqueKeys[0].UniqueKeyProperties == null) return false;
+                    if (searchMdl.UniqueKeys[0].UniqueKeyProperties.Count != 1) return false;
+                    if (searchMdl.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName == searchMdl.PrimaryKeyProperties[0].OriginalPropertyName) return false;
+                    if ((GetScalarPropByOriginaPropName(searchMdl.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName, searchMdl) == null) ||
+                        (GetScalarPropByOriginaPropName(searchMdl.PrimaryKeyProperties[0].OriginalPropertyName, searchMdl) == null)) return false;
+                    return true;
+                }
+
+                bool IsUniqKeyMapedToScalarsEx(ModelViewUniqueKeySerializable searchUk, ModelViewSerializable searchModel, ModelViewSerializable model)
+                {
+                    if ((searchModel == null) || (searchUk == null) || (model == null)) return false;
+                    if ((searchModel.ScalarProperties == null) || (searchUk.UniqueKeyProperties == null) || (model.ScalarProperties == null)) return false;
+                    if ((searchUk.UniqueKeyProperties.Count < 1) || (model.ScalarProperties.Count < 1)) return false;
+                    foreach (ModelViewKeyPropertySerializable ukp in searchUk.UniqueKeyProperties)
+                    {
+                        ModelViewPropertyOfVwSerializable sprp = GetScalarPropByOriginaPropName(ukp.OriginalPropertyName, searchModel);
+                        if (sprp == null) return false;
+                        if (!model.ScalarProperties.Any(p => p.ViewPropertyName == sprp.ViewPropertyName)) return false;
+                    }
+                    return true;
+                }
+        */
         bool IsForeigKeyMapedToPrimKey(ModelViewForeignKeySerializable fk, ModelViewSerializable model)
         {
             if ((model == null) || (fk == null)) return false;
@@ -3233,6 +3237,7 @@ namespace CS82ANGULAR.Model
             }
             return null;
         }
+        /*
         ModelViewPropertyOfVwSerializable GetFirstPropOfFirstUniqueKey(ModelViewSerializable model)
         {
             if (model == null) return null;
@@ -3242,6 +3247,7 @@ namespace CS82ANGULAR.Model
             if (model.UniqueKeys[0].UniqueKeyProperties.Count < 1) return null;
             return GetScalarPropByOriginaPropName(model.UniqueKeys[0].UniqueKeyProperties[0].OriginalPropertyName, model);
         }
+        */
         bool IsUsebByForeignKey(ModelViewSerializable model, ModelViewPropertyOfVwSerializable sclProp)
         {
             if ((model == null) || (sclProp == null)) return false;
@@ -8119,6 +8125,154 @@ namespace CS82ANGULAR.Model
                 {
                     return prop;
                 }
+            }
+            return null;
+        }
+
+
+        bool HasDescriptionAttribute(ModelViewPropertyOfVwSerializable sp, string prp)
+        {
+            if (sp == null) return false;
+            if (sp.Attributes == null) return false;
+            List<ModelViewAttributeSerializable> attrs = sp.Attributes.Where(a => a.AttrName == "Description").ToList();
+            if (attrs == null) return false;
+            // string flt1 = null;
+            // string flt2 = null;
+            if (string.IsNullOrEmpty(prp))
+            {
+                foreach (ModelViewAttributeSerializable a in attrs)
+                {
+                    if (a.VaueProperties != null)
+                    {
+                        if (a.VaueProperties.Any(v => v.PropValue is null || v.PropValue == "")) return true;
+                    }
+                }
+            }
+            else
+            {
+                string flt = "\"" + prp + "\"";
+                foreach (ModelViewAttributeSerializable a in attrs)
+                {
+                    if (a.VaueProperties != null)
+                    {
+                        if (a.VaueProperties.Any(v => v.PropValue == flt || v.PropValue == prp)) return true;
+                    }
+                }
+            }
+            return false;
+        }
+        bool HasDescriptionAttribute(ModelViewEntityPropertySerializable sp, string prp)
+        {
+            if (sp == null) return false;
+            if (sp.Attributes == null) return false;
+            List<ModelViewAttributeSerializable> attrs = sp.Attributes.Where(a => a.AttrName == "Description").ToList();
+            if (attrs == null) return false;
+            // string flt1 = null;
+            // string flt2 = null;
+            if (string.IsNullOrEmpty(prp))
+            {
+                foreach (ModelViewAttributeSerializable a in attrs)
+                {
+                    if (a.VaueProperties != null)
+                    {
+                        if (a.VaueProperties.Any(v => v.PropValue is null || v.PropValue == "")) return true;
+                    }
+                }
+            }
+            else
+            {
+                string flt = "\"" + prp + "\"";
+                foreach (ModelViewAttributeSerializable a in attrs)
+                {
+                    if (a.VaueProperties != null)
+                    {
+                        if (a.VaueProperties.Any(v => v.PropValue == flt || v.PropValue == prp)) return true;
+                    }
+                }
+            }
+            return false;
+        }
+        List<ModelViewEntityPropertySerializable> GetDictCommonUniqueKeyProps(ModelViewUniqueKeySerializable UniqueKey, ModelViewSerializable searchMdl)
+        {
+            List<ModelViewEntityPropertySerializable> rslt = null;
+            if ((searchMdl == null) || (UniqueKey == null)) return rslt;
+            if ((searchMdl.ScalarProperties == null) || (searchMdl.UniqueKeys == null)) return rslt;
+            ModelViewUniqueKeySerializable uk = searchMdl.UniqueKeys.Where(p => p.UniqueKeyName == UniqueKey.UniqueKeyName).FirstOrDefault();
+            if (uk == null) return rslt;
+            if (uk.UniqueKeyProperties == null) return rslt;
+            if (uk.UniqueKeyProperties.Count < 1) return rslt;
+            foreach (ModelViewKeyPropertySerializable prop in uk.UniqueKeyProperties)
+            {
+                if (prop == null) continue;
+                ModelViewEntityPropertySerializable sp = searchMdl.AllProperties.FirstOrDefault(p => (p.OriginalPropertyName == prop.OriginalPropertyName));
+                if (sp == null) continue;
+                if (HasDescriptionAttribute(sp, "DictHelper")) continue;
+                if (rslt == null) rslt = new List<ModelViewEntityPropertySerializable>();
+                rslt.Add(sp);
+            }
+            return rslt;
+        }
+        List<ModelViewPropertyOfVwSerializable> GetDictCommonScalarProps(ModelViewSerializable searchMdl)
+        {
+            List<ModelViewPropertyOfVwSerializable> rslt = null;
+            if (searchMdl == null) return rslt;
+            if (searchMdl.ScalarProperties == null) return rslt;
+            foreach (ModelViewPropertyOfVwSerializable sp in searchMdl.ScalarProperties)
+            {
+                if (sp == null) continue;
+                if (!string.IsNullOrEmpty(sp.ForeignKeyNameChain)) continue;
+                if (HasDescriptionAttribute(sp, "DictHelper")) continue;
+                if (rslt == null) rslt = new List<ModelViewPropertyOfVwSerializable>();
+                rslt.Add(sp);
+            }
+            return rslt;
+        }
+        bool IsLookUpTable(ModelViewSerializable searchMdl)
+        {
+            if (searchMdl == null) return false;
+            if ((searchMdl.ScalarProperties == null) || (searchMdl.PrimaryKeyProperties == null) || (searchMdl.UniqueKeys == null)) return false;
+            if ((searchMdl.PrimaryKeyProperties.Count != 1) || (searchMdl.UniqueKeys.Count != 1)) return false;
+            List<ModelViewPropertyOfVwSerializable> csps = GetDictCommonScalarProps(searchMdl);
+            if (csps == null) return false;
+            if (csps.Count != 2) return false;
+            List<ModelViewEntityPropertySerializable> cukps = GetDictCommonUniqueKeyProps(searchMdl.UniqueKeys[0], searchMdl);
+            if (cukps == null) return false;
+            if (cukps.Count != 1) return false;
+            if (csps[0].OriginalPropertyName == cukps[0].OriginalPropertyName) return false;
+            if (GetScalarPropByOriginaPropName(searchMdl.PrimaryKeyProperties[0].OriginalPropertyName, searchMdl) == null) return false;
+            return true;
+        }
+        //
+        // searchUk is a unique key of the searchModel
+        //
+        bool IsUniqKeyMapedToScalarsEx(ModelViewUniqueKeySerializable searchUk, ModelViewSerializable searchModel, ModelViewSerializable model)
+        {
+            if ((searchModel == null) || (searchUk == null) || (model == null)) return false;
+            if ((searchModel.ScalarProperties == null) || (searchUk.UniqueKeyProperties == null) || (model.ScalarProperties == null)) return false;
+            List<ModelViewEntityPropertySerializable> cukps = GetDictCommonUniqueKeyProps(searchUk, searchModel);
+            if (cukps == null) return false;
+            if ((cukps.Count < 1) || (model.ScalarProperties.Count < 1)) return false;
+            foreach (ModelViewEntityPropertySerializable ukp in cukps)
+            {
+                ModelViewPropertyOfVwSerializable sprp = GetScalarPropByOriginaPropName(ukp.OriginalPropertyName, searchModel);
+                if (sprp == null) return false;
+                if (!model.ScalarProperties.Any(p => p.ViewPropertyName == sprp.ViewPropertyName)) return false;
+            }
+            return true;
+        }
+        ModelViewPropertyOfVwSerializable GetFirstPropOfFirstUniqueKey(ModelViewSerializable model)
+        {
+            if (model == null) return null;
+            if (model.UniqueKeys == null) return null;
+            if (model.UniqueKeys.Count < 1) return null;
+            if (model.UniqueKeys[0].UniqueKeyProperties == null) return null;
+            if (model.UniqueKeys[0].UniqueKeyProperties.Count < 1) return null;
+            List<ModelViewEntityPropertySerializable> cukps = GetDictCommonUniqueKeyProps(model.UniqueKeys[0], model);
+            if(cukps == null) return null;
+            // foreach (ModelViewKeyPropertySerializable ukProp in model.UniqueKeys[0].UniqueKeyProperties)
+            foreach (ModelViewEntityPropertySerializable ukProp in cukps)
+            {
+                return GetScalarPropByOriginaPropName(ukProp.OriginalPropertyName, model);
             }
             return null;
         }

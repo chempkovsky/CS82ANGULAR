@@ -14,6 +14,35 @@ namespace CS82ANGULAR.Model
 
     public class ContextLevelTemplateCode
     {
+        string GetExtForLkUpClassName(ModelViewSerializable model)
+        {
+            string result = "";
+            if (model != null) result = result + model.ViewName;
+            result = result + "ExtForLkUp";
+            return result;
+        }
+        string GetAbpEtoClassName(ModelViewSerializable model)
+        {
+            string result = "";
+            if (model != null) result = result + model.RootEntityClassName;
+            result = result + "Eto";
+            return result;
+        }
+        string GetAbpEtoFullClassName(ModelViewSerializable model)
+        {
+            string result = "";
+            if (model != null) result = result + model.RootEntityFullClassName;
+            result = result + "Eto";
+            return result;
+        }
+        string GetExtForLkUpConfName(ModelViewSerializable model)
+        {
+            string result = "";
+            if (model != null) result = result + model.ViewName;
+            result = result + "ExtForLkUpConf";
+            return result;
+        }
+
         AngularProject GetAngularProjectByRefItem(AngularJson anglJson, CommonStaffSerializable refItem)
         {
             if ((refItem is null) || (anglJson is null)) return null;
