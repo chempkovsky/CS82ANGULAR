@@ -163,7 +163,7 @@ namespace <#= destinationNameSpace #> {
                     // repo interface name
                     // string repoInterfaceName =  AbpRepositoryInterfaceName(searchVM);
 #>
-        public static async Task<<#= searchVM.RootEntityClassName #>> <#= staticM2mSelDictItemMethodName #>(IAsyncQueryableExecuter ae, <#= AbpRepositoryInterfaceName(searchVM) #> _rp, <#= etoClassName #> vm) {
+        public static async Task<<#= searchVM.RootEntityClassName #>> <#= staticM2mSelDictItemMethodName #>(<#= AbpRepositoryInterfaceName(searchVM) #> _rp, <#= etoClassName #> vm) {
             using (_rp.DisableTracking()) {
                 IQueryable<<#= searchVM.RootEntityClassName #>> query = await _rp.GetQueryableAsync(); // db.<#= searchVM.RootEntityDbContextPropertyName #>;
 <#
@@ -202,7 +202,7 @@ namespace <#= destinationNameSpace #> {
 #>
                 //<#= searchVM.RootEntityClassName #> rslt = await query.FirstOrDefaultAsync();
                 // if(rslt != null) db.Entry(rslt).State = EntityState.Detached;
-                <#= searchVM.RootEntityClassName #> rslt = await ae.FirstOrDefaultAsync(query);
+                <#= searchVM.RootEntityClassName #> rslt = await _rp.AsyncExecuter.FirstOrDefaultAsync(query);
                 return rslt;
             }
         }
@@ -256,7 +256,7 @@ namespace <#= destinationNameSpace #> {
                 List<KeyValuePair<ModelViewForeignKeySerializable,int>> searchFkPairs = sch.Item3;
 #>
         // <#= actionInputParamName #>: 1 - insert; 2 - update; 3 - delete
-        public static async Task <#= staticM2mUpdateMethodName #>(IAsyncQueryableExecuter ae, IUnitOfWorkManager _uowmng, // <#= Context.DbContextClassName #> db, 
+        public static async Task <#= staticM2mUpdateMethodName #>(IUnitOfWorkManager _uowmng, // <#= Context.DbContextClassName #> db, 
                 <#= AbpRepositoryInterfaceName(m2mModel) #> _rp<#= AbpRepositoryInterfaceName(m2mModel) #>,
 <#
 
@@ -297,7 +297,7 @@ namespace <#= destinationNameSpace #> {
 #>
                 if(readyToDel) {
                     <#= searchVM.RootEntityClassName #> <#= searchVM.ViewName + "updDelTmp" #> = await <#= staticM2mSelDictItemMethodName #>( // db, <#= oldObjInputParamName #>);
-                        ae, _rp<#= AbpRepositoryInterfaceName(searchVM) #>, <#= oldObjInputParamName #>);
+                        _rp<#= AbpRepositoryInterfaceName(searchVM) #>, <#= oldObjInputParamName #>);
                     readyToDel = <#= searchVM.ViewName + "updDelTmp" #> == null;
                     if(readyToDel) {
 <#
@@ -323,7 +323,7 @@ namespace <#= destinationNameSpace #> {
                 }
 #>                
                     // var delM2mRslt = await m2mDelQuery.FirstOrDefaultAsync();
-                    var delM2mRslt = await ae.FirstOrDefaultAsync(m2mDelQuery);
+                    var delM2mRslt = await _rp<#= AbpRepositoryInterfaceName(m2mModel) #>.AsyncExecuter.FirstOrDefaultAsync(m2mDelQuery);
                     if(delM2mRslt != null) {
                         // db.<#= m2mModel.RootEntityDbContextPropertyName #>.Remove(delM2mRslt);
                         // db.SaveChanges();
@@ -353,7 +353,7 @@ namespace <#= destinationNameSpace #> {
                     string staticM2mInsDictItemMethodName = GetM2mStaticInsDictItemMethodName(searchVM);
 #>
                 <#= searchVM.RootEntityClassName #> <#= searchVM.ViewName + "InsTmp" #> = await <#= staticM2mSelDictItemMethodName #>( // db, <#= newObjInputParamName #>);
-                        ae, _rp<#= AbpRepositoryInterfaceName(searchVM) #>, <#= newObjInputParamName #>);
+                        _rp<#= AbpRepositoryInterfaceName(searchVM) #>, <#= newObjInputParamName #>);
                 if(<#= searchVM.ViewName + "InsTmp" #> == null) {
                     <#= searchVM.ViewName + "InsTmp" #> = await <#= staticM2mInsDictItemMethodName #>( // db, <#= newObjInputParamName #>);
                         _uowmng, _rp<#= AbpRepositoryInterfaceName(searchVM) #>, <#= newObjInputParamName #>);
@@ -376,7 +376,7 @@ namespace <#= destinationNameSpace #> {
                 }
 #>                
                 // var insM2mRslt = await m2mInsQuery.FirstOrDefaultAsync();
-                var insM2mRslt = await ae.FirstOrDefaultAsync(m2mInsQuery);
+                var insM2mRslt = await _rp<#= AbpRepositoryInterfaceName(m2mModel) #>.AsyncExecuter.FirstOrDefaultAsync(m2mInsQuery);
                 if(insM2mRslt != null) return;
                 // db.<#= m2mModel.RootEntityDbContextPropertyName #>.Add(<#= m2mModel.ViewName + "InsTmp" #>);
                 // await db.SaveChangesAsync();
@@ -391,7 +391,7 @@ namespace <#= destinationNameSpace #> {
             string staticM2mUpdateAllMethodName = GetM2mStaticUpdateMethodName(Model);
 #>
         // <#= actionInputParamName #>: 1 - insert; 2 - update; 3 - delete
-        public static async Task <#= staticM2mUpdateAllMethodName #>(IAsyncQueryableExecuter ae, IUnitOfWorkManager _uowmng, // <#= Context.DbContextClassName #> db, 
+        public static async Task <#= staticM2mUpdateAllMethodName #>(IUnitOfWorkManager _uowmng, // <#= Context.DbContextClassName #> db, 
 <#
         if(searchSchemas != null) {
             List<string> viewNames = new List<string>();
@@ -455,7 +455,7 @@ namespace <#= destinationNameSpace #> {
                     string staticM2mSelDictItemMethodName = GetM2mStaticSelDictItemMethodName(searchVM);
 #>
                 <#= searchVM.RootEntityClassName #> <#= searchVM.ViewName + "delTmp" #> = await <#= staticM2mSelDictItemMethodName #>( //db, <#= oldObjInputParamName #>);
-                        ae, _rp<#= AbpRepositoryInterfaceName(searchVM) #>, <#= oldObjInputParamName #>);
+                        _rp<#= AbpRepositoryInterfaceName(searchVM) #>, <#= oldObjInputParamName #>);
 <#
                 } // foreach(var searchFkPair in searchFkPairs) { ... }
 #>
@@ -493,7 +493,7 @@ namespace <#= destinationNameSpace #> {
                 }
 #>                
                     // var <#= m2mModel.ViewName + "DelRslt" #> = await <#= m2mModel.ViewName + "DelQuery" #>.FirstOrDefaultAsync();
-                    var <#= m2mModel.ViewName + "DelRslt" #> = await ae.FirstOrDefaultAsync(<#= m2mModel.ViewName + "DelQuery" #>);
+                    var <#= m2mModel.ViewName + "DelRslt" #> = await _rp<#= AbpRepositoryInterfaceName(m2mModel) #>.AsyncExecuter.FirstOrDefaultAsync(<#= m2mModel.ViewName + "DelQuery" #>);
                     if(<#= m2mModel.ViewName + "DelRslt" #> != null) {
                         // db.<#= m2mModel.RootEntityDbContextPropertyName #>.Remove(<#= m2mModel.ViewName + "DelRslt" #>);
                         // db.SaveChanges();
@@ -546,7 +546,7 @@ namespace <#= destinationNameSpace #> {
                     string staticM2mInsDictItemMethodName = GetM2mStaticInsDictItemMethodName(searchVM);
 #>
                 <#= searchVM.RootEntityClassName #> <#= searchVM.ViewName + "InsTmp" #> = await <#= staticM2mSelDictItemMethodName #>( //db, <#= newObjInputParamName #>);
-                        ae, _rp<#= AbpRepositoryInterfaceName(searchVM) #>, <#= newObjInputParamName #>);
+                        _rp<#= AbpRepositoryInterfaceName(searchVM) #>, <#= newObjInputParamName #>);
                 if(<#= searchVM.ViewName + "InsTmp" #> == null) {
                     <#= searchVM.ViewName + "InsTmp" #> = await <#= staticM2mInsDictItemMethodName #>( // db, <#= newObjInputParamName #>);
                             _uowmng, _rp<#= AbpRepositoryInterfaceName(searchVM) #>, <#= newObjInputParamName #>);
@@ -570,7 +570,7 @@ namespace <#= destinationNameSpace #> {
                 }
 #>                
                 // var <#= m2mModel.ViewName + "insRslt" #> = await <#= m2mModel.ViewName + "InsQuery" #>.FirstOrDefaultAsync();
-                var <#= m2mModel.ViewName + "insRslt" #> = await ae.FirstOrDefaultAsync(<#= m2mModel.ViewName + "InsQuery" #>);
+                var <#= m2mModel.ViewName + "insRslt" #> = await _rp<#= AbpRepositoryInterfaceName(m2mModel) #>.AsyncExecuter.FirstOrDefaultAsync(<#= m2mModel.ViewName + "InsQuery" #>);
                 if(<#= m2mModel.ViewName + "insRslt" #> == null) {
                     // db.<#= m2mModel.RootEntityDbContextPropertyName #>.Add(<#= m2mModel.ViewName + "InsTmp" #>);
                     // await db.SaveChangesAsync();

@@ -84,15 +84,15 @@ using Volo.Abp.Uow;
         "Port": "5672"
       },
       "SecondConnection": {
-        "HostName": "321.321.321.321"
+        "HostName": "10.183.96.51"
         "Port": "5672"
       }
     },
     "EventBus": {
-      "ClientName": "MyClientName",
-      "ExchangeName": "MyExchangeName",
+      "ClientName": "firstapp",
+      "ExchangeName": "firstappExchange",
       "ConnectionName": "SecondConnection",
-      "VirtualHost": "RabbitMq_virtual_host_name"
+      "VirtualHost": "abpphbkhost"
     }
   }
 
@@ -101,7 +101,21 @@ using Volo.Abp.Uow;
 }
 
     ==2==
-    in the class `YYYYYHttpApiHostModule` of the `XXXXX.YYYYY.HttpApi.Host.csproj`-project modify
+    modify the `XXXXX.YYYYY.HttpApi.Host.csproj`-file. Set correct Version (in our case Version="9.1.3" )
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.EventBus.RabbitMQ" Version="9.1.3" />
+    </ItemGroup>
+
+    ==3==
+
+    in the class `YYYYYHttpApiHostModule` of the `XXXXX.YYYYY.HttpApi.Host.csproj`-project modify:
+
+[DependsOn(
+    ...
+    typeof(AbpEventBusRabbitMqModule)
+    )]
+
+
 public class YYYYYHttpApiHostModule : AbpModule {
     ...
     ...
@@ -113,21 +127,26 @@ public class YYYYYHttpApiHostModule : AbpModule {
         ...
         ...
 
-        string  rmqCnn =  configuration["RabbitMQ:EventBus:ConnectionName"];
+
+        string rmqCnn = configuration["RabbitMQ:EventBus:ConnectionName"]!;
 
         Configure<AbpRabbitMqOptions>(options =>
         {
-            options.Connections.Default.UserName    = "Enter_User_name_here"
-            options.Connections.Default.Password    = "Enter_Password_here";
-            options.Connections.Default.HostName    = configuration["RabbitMQ:Connections:" + rmqCnn + ":HostName"];
-            options.Connections.Default.Port        = configuration["RabbitMQ:Connections:" + rmqCnn + ":Port"];
+            if (!int.TryParse(configuration["RabbitMQ:Connections:" + rmqCnn + ":Port"], out int rmqPort) )
+            {
+                rmqPort = 5672;
+            }
+            options.Connections.Default.UserName = "abpadmin";
+            options.Connections.Default.Password = "abpadmin";
+            options.Connections.Default.HostName = configuration["RabbitMQ:Connections:" + rmqCnn + ":HostName"]!;
+            options.Connections.Default.Port = rmqPort;
             options.Connections.Default.VirtualHost = configuration["RabbitMQ:EventBus:VirtualHost"];
         });
 
         Configure<AbpRabbitMqEventBusOptions>(options =>
         {
-            options.ClientName = configuration["RabbitMQ:EventBus:ClientName"];
-            options.ExchangeName = configuration["RabbitMQ:EventBus:ExchangeName"];
+            options.ClientName = configuration["RabbitMQ:EventBus:ClientName"]!;
+            options.ExchangeName = configuration["RabbitMQ:EventBus:ExchangeName"]!;
             options.PrefetchCount = 1;
             options.ExchangeArguments["x-delayed-type"] = "direct";
             options.QueueArguments["x-message-ttl"] = 60000;
@@ -141,6 +160,28 @@ public class YYYYYHttpApiHostModule : AbpModule {
 }
 
 
+    ==3==
+    in a command-line terminal on a server with RabbitMQ installed
+    run the commands to created user (user name= "abpadmin" and password "abpadmin"):
+
+rabbitmqctl add_user "abpadmin" "abpadmin"
+rabbitmqctl set_user_tags abpadmin administrator
+rabbitmqctl set_permissions -p "/" "abpadmin" ".*" ".*" ".*"
+rabbitmqctl set_topic_permissions -p "/" "abpadmin" ".*" ".*" ".*"
+rabbitmqctl list_users
+
+    in a command line terminal on a server with RabbitMQ installed
+    run the commands to created virtual host ("abpphbkhost") 
+    run commands to assign rights to user ("abpadmin") on virtual host ("abpphbkhost") 
+
+rabbitmqctl add_vhost abpphbkhost
+rabbitmqctl set_vhost_limits -p abpphbkhost "{'max-queues': 30, 'max-connections': 25}"
+rabbitmqctl set_permissions -p "abpphbkhost" "abpadmin" ".*" ".*" ".*"
+rabbitmqctl set_topic_permissions -p "abpphbkhost" "abpadmin" ".*" ".*" ".*"
+rabbitmqctl list_exchanges -p "abpphbkhost"
+
+
+
 */
 
 
@@ -152,11 +193,10 @@ namespace <#= destinationNameSpace #> {
 
     public class <#= extendedMdlMsgConsumer #> : IDistributedEventHandler<<#= etoExClassName #>>, ITransientDependency {
 
-        protected IAbpLazyServiceProvider LazyServiceProvider { get; set; } = default!;
+        public IAbpLazyServiceProvider LazyServiceProvider { get; set; } = default!;
 
-        protected IUnitOfWorkManager UnitOfWorkManager => LazyServiceProvider.LazyGetRequiredService<IUnitOfWorkManager>();
-        protected IAsyncQueryableExecuter AsyncExecuter => LazyServiceProvider.LazyGetRequiredService<IAsyncQueryableExecuter>();
-        protected ICurrentTenant CurrentTenant => LazyServiceProvider.LazyGetRequiredService<ICurrentTenant>();
+        public IUnitOfWorkManager UnitOfWorkManager => LazyServiceProvider.LazyGetRequiredService<IUnitOfWorkManager>();
+        public ICurrentTenant CurrentTenant => LazyServiceProvider.LazyGetRequiredService<ICurrentTenant>();
 
 <#
         if(searchSchemas != null) {
@@ -165,7 +205,7 @@ namespace <#= destinationNameSpace #> {
                 ModelViewSerializable m2mModel = sch.Item1;
                 if (!viewNames.Contains(m2mModel.ViewName)) {
 #>
-        protected <#= AbpRepositoryInterfaceName(m2mModel) #> rp<#= AbpRepositoryInterfaceName(m2mModel) #> => LazyServiceProvider.LazyGetRequiredService<<#= AbpRepositoryInterfaceName(m2mModel) #>>();  
+        public <#= AbpRepositoryInterfaceName(m2mModel) #> rp<#= AbpRepositoryInterfaceName(m2mModel) #> => LazyServiceProvider.LazyGetRequiredService<<#= AbpRepositoryInterfaceName(m2mModel) #>>();  
 <#
                     viewNames.Add(m2mModel.ViewName);
                 }
@@ -175,7 +215,7 @@ namespace <#= destinationNameSpace #> {
                     if(searchVM == null) continue;
                     if (!viewNames.Contains(searchVM.ViewName)) {
 #>
-        protected <#= AbpRepositoryInterfaceName(searchVM) #> rp<#= AbpRepositoryInterfaceName(searchVM) #> => LazyServiceProvider.LazyGetRequiredService<<#= AbpRepositoryInterfaceName(searchVM) #>>();  
+        public <#= AbpRepositoryInterfaceName(searchVM) #> rp<#= AbpRepositoryInterfaceName(searchVM) #> => LazyServiceProvider.LazyGetRequiredService<<#= AbpRepositoryInterfaceName(searchVM) #>>();  
 <#
                         viewNames.Add(searchVM.ViewName);
                     }
@@ -186,17 +226,17 @@ namespace <#= destinationNameSpace #> {
 
 
 
-        public <#= extendedMdlMsgConsumer #>(IAbpLazyServiceProvider lsp) {
-            LazyServiceProvider = lsp;
-        }
+        public <#= extendedMdlMsgConsumer #>() { }
 
-        public async Task HandleEventAsync(<#= etoExClassName #> eventData)
+        // 1. the method must be declared as virtual 
+        // 2. without [UnitOfWork]-attribure it does not work
+        [UnitOfWork]
+        public virtual async Task HandleEventAsync(<#= etoExClassName #> eventData)
         {
 
             using (this.CurrentTenant.Change(eventData.<#= ExtForLkUpMsgTenantIdPropName #>))
             {
                 await <#= staticM2mClassName #>.<#= staticM2mUpdateAllMethodName #>(
-                    ae : this.AsyncExecuter, 
                     _uowmng : this.UnitOfWorkManager,
 <#
         if(searchSchemas != null) {
